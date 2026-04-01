@@ -27,8 +27,7 @@ export function Layout({ children }: { children: ReactNode }) {
             <span className="text-white/50 text-xs">◈</span>
           </div>
           <div>
-            {/* TODO: Replace with your app name */}
-            <p className="text-sm font-semibold text-white tracking-tight">AppName</p>
+            <p className="text-sm font-semibold text-white tracking-tight">PulseGrid</p>
             <p className="text-[10px] text-white/25 uppercase tracking-widest">{user?.role}</p>
           </div>
         </div>

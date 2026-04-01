@@ -93,8 +93,8 @@ npm run dev
 
 - [ ] Rename `project_db` → your database name (docker-compose.yml, setup-replication.sh, .env.example)
 - [ ] Replace `Entity` / `entities` with your domain model name throughout
-- [ ] Update `UserRole` enum if you need different roles
+- [x] Update `UserRole` enum if you need different roles
 - [ ] Update nav items in `Layout.tsx` to match your routes
 - [ ] Add your domain-specific routes in `App.tsx`
 - [ ] Update table schema in `setup-replication.sh`
-- [ ] Replace `AppName` in `Layout.tsx` with your app name
+- [x] Replace `AppName` in `Layout.tsx` with your app name
