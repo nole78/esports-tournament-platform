@@ -57,27 +57,80 @@ $M -e "DROP DATABASE IF EXISTS ${DB_NAME};"
 $M -e "CREATE DATABASE ${DB_NAME} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 
 # TODO: Replace the SQL below with your actual table definitions
+
 $M ${DB_NAME} << 'SQL'
 CREATE TABLE users (
   id           INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   username     VARCHAR(40)  NOT NULL UNIQUE,
   email        VARCHAR(120) NOT NULL UNIQUE,
   passwordHash VARCHAR(255) NOT NULL,
-  role         ENUM('user','admin') DEFAULT 'user',
+  role         ENUM('player','admin') DEFAULT 'player',
   isActive     TINYINT(1)   DEFAULT 1,
   createdAt    DATETIME DEFAULT CURRENT_TIMESTAMP,
   updatedAt    DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  INDEX idx_username (username),
+  INDEX idx_email (email)
 );
 
 -- TODO: Replace "entities" with your domain table and its columns
-CREATE TABLE entities (
-  id          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  userId      INT UNSIGNED NOT NULL,
-  status      ENUM('pending','active','completed','cancelled') DEFAULT 'pending',
-  createdAt   DATETIME DEFAULT CURRENT_TIMESTAMP,
-  updatedAt   DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (userId) REFERENCES users(id)
-);
+
+CREATE TABLE teams(
+  team_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  team_name VARCHAR(100) NOT NULL UNIQUE,
+  team_tag VARCHAR(10) NOT NULL UNIQUE,
+  team_logotip TEXT,
+  team_description TEXT,
+)
+
+CREATE TABLE games(
+  game_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  game_name VARCHAR(100) NOT NULL UNIQUE,
+  game_logotip TEXT,
+  game_genre VARCHAR(50) NOT NULL,
+  game_players INT NOT NULL,
+)
+
+CREATE TABLE tournaments(
+  tournament_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  tournament_name VARCHAR(100) NOT NULL UNIQUE,
+  tournament_game VARCHAR(50) NOT NULL,
+  tournament_format ENUM('single_elimination', 'double_elimination', 'round_robin') DEFAULT 'single_elimination',
+  tournament_max_teams INT NOT NULL,
+  tournament_application_deadline DATETIME,
+  tournament_prize_fund INT NOT NULL,
+  tournament_status ENUM('upcoming','active','completed') DEFAULT 'upcoming',
+  FOREIGN KEY (game_id) REFERENCES games(game_id)
+)
+
+CREATE TABLE matches(
+  match_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+)
+
+CREATE TABLE team_members(
+  
+)
+
+
+
+CREATE TABLE team_members(
+  role ENUM('captain','member') DEFAULT 'member',
+  joined_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+)
+
+CREATE TABLE tournament_registrations(
+  seed INT NULL,
+  status ENUM('pending','confirmed','disqualified') DEFAULT 'pending',
+  registered_at DATETIME DEFAULT CURRENT_TIMESTAMP, 
+)
+
+CREATE TABLE match_players(
+  team_id INT,
+  performance_notes TEXT, 
+)
+
+CREATE TABLE user_watchlist(
+  added_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+)
 SQL
 
 MASTER_TABLES=$($M -s --skip-column-names \
