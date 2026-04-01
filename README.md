@@ -96,5 +96,5 @@ npm run dev
 - [x] Update `UserRole` enum if you need different roles
 - [ ] Update nav items in `Layout.tsx` to match your routes -> Marton Viktor Melar
 - [ ] Add your domain-specific routes in `App.tsx` -> Denis Đuriš
-- [ ] Update table schema in `setup-replication.sh` -> Danković Marko
+- [x] Update table schema in `setup-replication.sh` -> Danković Marko
 - [x] Replace `AppName` in `Layout.tsx` with your app name
