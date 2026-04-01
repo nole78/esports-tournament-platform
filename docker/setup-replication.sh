@@ -59,6 +59,7 @@ $M -e "CREATE DATABASE ${DB_NAME} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_
 # TODO: Replace the SQL below with your actual table definitions
 
 $M ${DB_NAME} << 'SQL'
+//Denis
 CREATE TABLE users (
   id           INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   username     VARCHAR(40)  NOT NULL UNIQUE,
@@ -73,7 +74,7 @@ CREATE TABLE users (
 );
 
 -- TODO: Replace "entities" with your domain table and its columns
-
+//Danko
 CREATE TABLE teams(
   team_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   team_name VARCHAR(100) NOT NULL UNIQUE,
@@ -81,7 +82,7 @@ CREATE TABLE teams(
   team_logotip TEXT,
   team_description TEXT,
 )
-
+//Denis
 CREATE TABLE games(
   game_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   game_name VARCHAR(100) NOT NULL UNIQUE,
@@ -89,7 +90,7 @@ CREATE TABLE games(
   game_genre VARCHAR(50) NOT NULL,
   game_players INT NOT NULL,
 )
-
+//Danko
 CREATE TABLE tournaments(
   tournament_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   tournament_name VARCHAR(100) NOT NULL UNIQUE,
@@ -101,35 +102,52 @@ CREATE TABLE tournaments(
   tournament_status ENUM('upcoming','active','completed') DEFAULT 'upcoming',
   FOREIGN KEY (game_id) REFERENCES games(game_id)
 )
-
+//Denis
 CREATE TABLE matches(
   match_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-)
-
-CREATE TABLE team_members(
+  match_resoult VARCHAR(10),
   
 )
-
-
-
+//Danko
 CREATE TABLE team_members(
+  team_id INT,
+  user_id INT,
   role ENUM('captain','member') DEFAULT 'member',
   joined_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (team_id, user_id)
+  FOREIGN KEY (team_id) REFERENCES teams(team_id),
+  FOREIGN KEY (user_id) REFERENCES users(id)
 )
-
+//Denis
 CREATE TABLE tournament_registrations(
+  team_id INT,
+  tournament_id INT,
   seed INT NULL,
   status ENUM('pending','confirmed','disqualified') DEFAULT 'pending',
   registered_at DATETIME DEFAULT CURRENT_TIMESTAMP, 
+  PRIMARY KEY (team_id, tournament_id),
+  FOREIGN KEY (team_id) REFERENCES teams(team_id),
+  FOREIGN KEY (tournament_id) REFERENCES tournaments(tournament_id)
 )
-
+//Denis
 CREATE TABLE match_players(
+  user_id INT,
   team_id INT,
+  match_id INT,
   performance_notes TEXT, 
+  PRIMARY KEY (user_id, match_id, team_id),
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  FOREIGN KEY (team_id) REFERENCES teams(team_id),
+  FOREIGN KEY (match_id) REFERENCES matches(match_id),
 )
-
+//Danko
 CREATE TABLE user_watchlist(
+  user_id INT,
+  tournament_id INT,
   added_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (user_id, tournament_id),
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  FOREIGN KEY (tournament_id) REFERENCES tournaments(tournament_id)
 )
 SQL
 
