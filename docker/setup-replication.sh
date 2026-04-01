@@ -14,8 +14,8 @@ ROOT_PASS="root1234"
 REPL_USER="replicator"
 REPL_PASS="repl1234"
 
-# TODO: Replace "project_db" with your actual database name
-DB_NAME="project_db"
+# TODO: Replace "project_db" with your actual database name - DONE!
+DB_NAME="pulse_grid_db"
 
 M="mysql  -h127.0.0.1    -P3306 -uroot -p${ROOT_PASS} --protocol=TCP --connect-timeout=5"
 S1="mysql -hmysql-slave1 -P3306 -uroot -p${ROOT_PASS} --protocol=TCP --connect-timeout=5"
