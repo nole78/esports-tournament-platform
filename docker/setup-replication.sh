@@ -9,25 +9,18 @@
 #   3. Import schema dump DIRECTLY into each Slave (bypassing replication)
 #   4. Configure Slaves to start replication FROM current position
 #   => Slaves have the schema already, replication only handles new data
-
 ROOT_PASS="root1234"
 REPL_USER="replicator"
 REPL_PASS="repl1234"
-
-# TODO: Replace "project_db" with your actual database name - DONE!
 DB_NAME="pulse_grid"
-
 M="mysql  -h127.0.0.1    -P3306 -uroot -p${ROOT_PASS} --protocol=TCP --connect-timeout=5"
 S1="mysql -hmysql-slave1 -P3306 -uroot -p${ROOT_PASS} --protocol=TCP --connect-timeout=5"
 S2="mysql -hmysql-slave2 -P3306 -uroot -p${ROOT_PASS} --protocol=TCP --connect-timeout=5"
-
 SCHEMA_FILE="/tmp/project_schema.sql"
-
 echo ""
 echo "========================================================"
 echo "  Project -- MySQL Replication Setup"
 echo "========================================================"
-
 # ── 1. Wait for all nodes ─────────────────────────────────────
 wait_mysql() {
   HOST=$1; NAME=$2
