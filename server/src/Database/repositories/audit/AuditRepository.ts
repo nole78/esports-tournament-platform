@@ -42,7 +42,6 @@ export class AuditRepository implements IAuditRepository {
             `SELECT al.*, u.username
             FROM audit_log al
             LEFT JOIN users u ON al.user_id = u.id
-            WHERE u.role = "admin"
             ORDER BY al.createdAt DESC
             LIMIT ${lim} OFFSET ${offset}`,
             []
