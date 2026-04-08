@@ -8,5 +8,9 @@ export class User {
     public role: UserRole    = UserRole.PLAYER,
     public passwordHash: string = "",
     public isActive: number  = 1,
+    public createdAt : Date = new Date(),
+    public updatedAt : Date = new Date(),
+    public idxGamerTag : number = 0,
+    public idxEmail : number = 0,
   ) {}
 }
