@@ -150,14 +150,14 @@ CREATE TABLE user_watchlist(
 
 CREATE TABLE audit_log (
   id         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  userId     INT UNSIGNED NULL,
+  user_id     INT UNSIGNED NULL,
   action     VARCHAR(80)  NOT NULL,
   entity     VARCHAR(40),
-  entityId   INT UNSIGNED NULL,
+  entity_id   INT UNSIGNED NULL,
   meta       TEXT NULL,
   ipAddress  VARCHAR(45),
   createdAt  DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (userId) REFERENCES users(id) ON DELETE SET NULL
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 );
 SQL
 
