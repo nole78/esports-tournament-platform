@@ -2,10 +2,11 @@ import { CreateTeamMemberDto } from "../../DTOs/team_members/CreateTeamMemberDto
 import { TeamMemberDto } from "../../DTOs/team_members/TeamMemberDto";
 import { TeamMember } from "../../models/TeamMember";
 
-export interface IEntityRepository {
-  findById(id: number): Promise<TeamMemberDto | null>;
+export interface ITeamMemberRepository {
+  findByUserId(userId: number): Promise<TeamMemberDto[]>;
+  findByTeamId(teamId: number): Promise<TeamMemberDto[]>;
   findAll(page?: number, limit?: number): Promise<TeamMemberDto[]>;
   create(dto: CreateTeamMemberDto): Promise<TeamMember>;
-  update(id: number, fields: Partial<TeamMember>): Promise<boolean>;
-  delete(id: number): Promise<boolean>;
+  update(teamId: number, userId: number, fields: Partial<TeamMember>): Promise<boolean>;
+  delete(teamId: number, userId: number): Promise<boolean>;
 }
