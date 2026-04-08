@@ -3,7 +3,7 @@ import { GameDto } from "../../DTOs/games/GameDto";
 import { Game } from "../../models/Game";
 
 
-export interface IEntityRepository {
+export interface IGameRepository {
   findById(id: number): Promise<GameDto | null>;
   findAll(page?: number, limit?: number): Promise<GameDto[]>;
   create(dto: CreateGameDto): Promise<Game>;
