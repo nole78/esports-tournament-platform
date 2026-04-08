@@ -84,8 +84,8 @@ CREATE TABLE match_players(
   match_id INT UNSIGNED NOT NULL,
   performance_notes TEXT, 
   PRIMARY KEY (user_id, match_id, team_id),
-  FOREIGN KEY (user_id) REFERENCES users(id),
-  FOREIGN KEY (team_id) REFERENCES teams(team_id),
+  FOREIGN KEY (user_id) REFERENCES team_members(user_id),
+  FOREIGN KEY (team_id) REFERENCES team_members(team_id),
   FOREIGN KEY (match_id) REFERENCES matches(match_id)
 );
 
@@ -96,4 +96,16 @@ CREATE TABLE user_watchlist(
   PRIMARY KEY (user_id, tournament_id),
   FOREIGN KEY (user_id) REFERENCES users(id),
   FOREIGN KEY (tournament_id) REFERENCES tournaments(tournament_id)
+);
+
+CREATE TABLE audit_log (
+  id         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  userId     INT UNSIGNED NULL,
+  action     VARCHAR(80)  NOT NULL,
+  entity     VARCHAR(40),
+  entityId   INT UNSIGNED NULL,
+  meta       TEXT NULL,
+  ipAddress  VARCHAR(45),
+  createdAt  DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (userId) REFERENCES users(id) ON DELETE SET NULL
 );
