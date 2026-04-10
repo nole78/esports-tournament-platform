@@ -102,7 +102,7 @@ export function StatCard({ label, value, sub, color }: { label: string; value: s
 
 export function Table({ children }: { children: ReactNode }) {
   return (
-    <div className="bg-white/2 border border-white/6 rounded-2xl overflow-hidden">
+    <div className="bg-primary border border-secondary/50 rounded-2xl overflow-hidden">
       <table className="w-full text-sm">{children}</table>
     </div>
   );
@@ -111,9 +111,9 @@ export function Table({ children }: { children: ReactNode }) {
 export function TableHead({ columns }: { columns: string[] }) {
   return (
     <thead>
-      <tr className="border-b border-white/6">
+      <tr className="border-b border-secondary/50">
         {columns.map((c) => (
-          <th key={c} className="text-left px-5 py-3.5 text-xs text-white/25 font-mono uppercase tracking-wider">{c}</th>
+          <th key={c} className="text-left px-5 py-3.5 text-xs text-primary bg-bgprimary font-mono uppercase tracking-wider">{c}</th>
         ))}
       </tr>
     </thead>
@@ -124,8 +124,8 @@ export function PageHeader({ eyebrow, title, action }: { eyebrow: string; title:
   return (
     <div className="flex items-start justify-between mb-8">
       <div>
-        <p className="text-xs text-white/25 font-mono uppercase tracking-widest mb-1">{eyebrow}</p>
-        <h1 className="text-xl font-semibold text-white tracking-tight">{title}</h1>
+        <p className="text-xs text-secondary font-mono uppercase tracking-widest mb-1">{eyebrow}</p>
+        <h1 className="text-xl font-semibold text-bgsecondary tracking-tight">{title}</h1>
       </div>
       {action && <div>{action}</div>}
     </div>
