@@ -70,7 +70,7 @@ export function NodeBadge({ status }: { status: string }) {
 export function RoleBadge({ role }: { role: string }) {
   return (
     <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium border ${
-      role === "admin" ? "bg-amber-500/10 text-amber-400 border-amber-500/20" : "bg-white/5 text-white/40 border-white/10"
+      role === "admin" ? "bg-amber-500/10 text-amber-400 border-amber-500/20" : "bg-bgprimary/10 text-bgsecondary/40 border-secondary/40"
     }`}>{role}</span>
   );
 }
