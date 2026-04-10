@@ -79,12 +79,12 @@ export function Pagination({ page, total, pageSize, onChange }: { page: number; 
   const totalPages = Math.ceil(total / pageSize);
   if (totalPages <= 1) return null;
   return (
-    <div className="flex items-center gap-3 mt-5 text-xs text-white/30">
+    <div className="flex items-center gap-3 mt-5 text-xs text-bgsecondary">
       <button disabled={page <= 1} onClick={() => onChange(page - 1)}
-        className="px-3 py-1.5 border border-white/10 rounded-lg hover:border-white/20 disabled:opacity-30 transition-colors">←</button>
+        className="px-3 py-1.5 border border-secondary/40 rounded-lg hover:border-secondary/60 disabled:opacity-30 transition-colors">←</button>
       <span className="font-mono">{page} / {totalPages}</span>
       <button disabled={page >= totalPages} onClick={() => onChange(page + 1)}
-        className="px-3 py-1.5 border border-white/10 rounded-lg hover:border-white/20 disabled:opacity-30 transition-colors">→</button>
+        className="px-3 py-1.5 border border-secondary/40 rounded-lg hover:border-secondary/60 disabled:opacity-30 transition-colors">→</button>
       <span className="text-white/20">{total} total</span>
     </div>
   );
