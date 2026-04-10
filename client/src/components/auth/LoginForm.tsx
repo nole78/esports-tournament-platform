@@ -20,11 +20,11 @@ export function LoginForm({ authApi }: { authApi: IAuthAPIService }) {
   return (
     <div className="w-full max-w-sm">
       <div className="text-center mb-10">
-        <div className="w-12 h-12 rounded-2xl bg-white/8 border border-white/12 flex items-center justify-center mx-auto mb-4">
-          <span className="text-white/60 text-lg">◈</span>
+        <div className="w-12 h-12 rounded-2xl bg-bgprimary/10 border border-secondary/50 flex items-center justify-center mx-auto mb-4">
+          <span className="text-bgsecondary text-lg">◈</span>
         </div>
-        <h1 className="text-xl font-semibold text-secondary">Welcome back</h1>
-        <p className="text-sm text-bgprimary/60 mt-1">Sign in to your account</p>
+        <h1 className="text-xl font-semibold text-bgsecondary">Welcome back</h1>
+        <p className="text-sm text-secondary mt-1">Sign in to your account</p>
       </div>
 
       {error && (
@@ -35,15 +35,15 @@ export function LoginForm({ authApi }: { authApi: IAuthAPIService }) {
 
       <form onSubmit={submit} className="flex flex-col gap-4">
         <div>
-          <label className="block text-xs text-secondary mb-2 font-medium">Username</label>
+          <label className="block text-xs text-bgprimary mb-2 font-medium">Username</label>
           <input type="text" value={username} onChange={e => setUsername(e.target.value)} required
-            className="w-full bg-bgsecondary/50 border border-white/10 rounded-xl px-4 py-3 text-primary text-sm placeholder-primary/80 focus:outline-none focus:border-white/30 transition-colors"
+            className="w-full bg-bgprimary/10 border border-secondary/50 rounded-xl px-4 py-3 text-bgsecondary text-sm placeholder-bgsecondary/30 focus:outline-none focus:border-white/30 transition-colors"
             placeholder="your_username" />
         </div>
         <div>
-          <label className="block text-xs text-secondary mb-2 font-medium">Password</label>
+          <label className="block text-xs text-bgprimary mb-2 font-medium">Password</label>
           <input type="password" value={password} onChange={e => setPassword(e.target.value)} required
-            className="w-full bg-bgsecondary/50 border border-white/10 rounded-xl px-4 py-3 text-primary text-sm placeholder-primary/80 focus:outline-none focus:border-white/30 transition-colors"
+            className="w-full bg-bgprimary/10 border border-secondary/50 rounded-xl px-4 py-3 text-bgsecondary text-sm placeholder-bgsecondary/30 focus:outline-none focus:border-white/30 transition-colors"
             placeholder="••••••••" />
         </div>
         <button type="submit" disabled={loading}
