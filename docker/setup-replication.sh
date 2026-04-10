@@ -72,8 +72,12 @@ CREATE TABLE users (
   updatedAt    DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   INDEX idx_gamer_tag (gamer_tag),
   INDEX idx_email (email),
-  CONSTRAINT gamer_tag_format CHECK (gamer_tag REGEXP '^[a-zA-Z0-9.-]{3,30}$'),
-  CONSTRAINT email_format CHECK (email REGEXP '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$')
+  CONSTRAINT gamer_tag_format CHECK (
+    gamer_tag REGEXP '^[a-zA-Z0-9.-]{3,30}$'
+  ),
+  CONSTRAINT email_format CHECK (
+    email REGEXP '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'
+  )
 
 );
 
@@ -83,8 +87,12 @@ CREATE TABLE teams(
   team_tag VARCHAR(10) NOT NULL UNIQUE,
   team_logotip TEXT,
   team_description TEXT,
-  CONSTRAINT team_name_format CHECK (LENGTH(team_name) BETWEEN 2 AND 80),
-  CONSTRAINT team_tag_format CHECK (team_tag REGEXP '^[A-Z0-9]{2,6}$')
+  CONSTRAINT team_name_length CHECK (
+    LENGTH(team_name) BETWEEN 2 AND 80
+  ),
+  CONSTRAINT team_tag_format CHECK (
+    team_tag REGEXP '^[A-Z0-9]{2,6}$'
+  )
 );
 
 CREATE TABLE games(
@@ -105,10 +113,10 @@ CREATE TABLE tournaments(
   tournament_prize_fund INT UNSIGNED NOT NULL,
   tournament_status ENUM('upcoming','active','completed') DEFAULT 'upcoming',
   FOREIGN KEY (tournament_game_id) REFERENCES games(game_id),
-  CONSTRAINT tournament_name_format CHECK (LENGTH(tournament_name) BETWEEN 3 AND 120),
+  CONSTRAINT tournament_name_length CHECK (LENGTH(tournament_name) BETWEEN 3 AND 120),
   CONSTRAINT tournament_max_teams_check CHECK (
-    tournament_max_teams BETWEEN 2 AND 256 
-    AND ((tournament_max_teams & (tournament_max_teams - 1)) = 0)
+    tournament_max_teams BETWEEN 2 AND 256 AND 
+    ((tournament_max_teams & (tournament_max_teams - 1)) = 0)
   )
   
 );
@@ -122,7 +130,9 @@ CREATE TABLE matches(
   match_round ENUM('round_of_16','quarterfinal','semifinal','final'),
   FOREIGN KEY (blue_team_id) REFERENCES teams(team_id),
   FOREIGN KEY (red_team_id) REFERENCES teams(team_id),
-  CONSTRAINT match_score_format CHECK (match_result REGEXP '^[0-9]:[0-9]$')
+  CONSTRAINT match_score_format CHECK (
+    match_result REGEXP '^[0-9]:[0-9]$'
+  )
 );
 
 CREATE TABLE team_members(
