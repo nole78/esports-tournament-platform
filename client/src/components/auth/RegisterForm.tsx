@@ -20,11 +20,11 @@ export function RegisterForm({ authApi }: { authApi: IAuthAPIService }) {
   return (
     <div className="w-full max-w-sm">
       <div className="text-center mb-10">
-        <div className="w-12 h-12 rounded-2xl bg-white/8 border border-white/12 flex items-center justify-center mx-auto mb-4">
-          <span className="text-white/60 text-lg">◈</span>
+        <div className="w-12 h-12 rounded-2xl bg-bgprimary/10 border border-secondary/50 flex items-center justify-center mx-auto mb-4">
+          <span className="text-bgsecondary text-lg">◈</span>
         </div>
-        <h1 className="text-xl font-semibold text-white">Create account</h1>
-        <p className="text-sm text-white/35 mt-1">Register to get started</p>
+        <h1 className="text-xl font-semibold text-bgsecondary">Create account</h1>
+        <p className="text-sm text-secondary mt-1">Register to get started</p>
       </div>
 
       {error && (
@@ -36,23 +36,23 @@ export function RegisterForm({ authApi }: { authApi: IAuthAPIService }) {
       <form onSubmit={submit} className="flex flex-col gap-4">
         {(["username", "email", "password", "fullName"] as const).map((field) => (
           <div key={field}>
-            <label className="block text-xs text-white/40 mb-2 font-medium capitalize">{field === "fullName" ? "full Name" : field}</label>
+            <label className="block text-xs text-bgprimary mb-2 font-medium capitalize">{field === "fullName" ? "full Name" : field}</label>
             <input
               type={field === "password" ? "password" : field === "email" ? "email" : "text"}
               value={form[field]} onChange={set(field)} required
-              className="w-full bg-white/4 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-white/20 focus:outline-none focus:border-white/30 transition-colors"
+              className="w-full bg-bgprimary/10 border border-secondary/50 rounded-xl px-4 py-3 text-bgsecondary text-sm placeholder-bgsecondary/30 focus:outline-none focus:border-white/30 transition-colors"
               placeholder={field === "password" ? "Min 8 chars, 1 uppercase, 1 number" : ""} />
           </div>
         ))}
         <button type="submit" disabled={loading}
-          className="mt-2 bg-white hover:bg-white/90 disabled:opacity-50 text-black font-semibold rounded-xl py-3 text-sm transition-colors">
+          className="mt-2 bg-bgprimary hover:bg-bgprimary/80 disabled:opacity-50 text-primary font-semibold rounded-xl py-3 text-sm transition-colors">
           {loading ? "Creating account…" : "Create account"}
         </button>
       </form>
 
-      <p className="text-center text-white/30 text-sm mt-6">
+      <p className="text-center text-secondary/50 text-sm mt-6">
         Already have an account?{" "}
-        <a href="/login" className="text-white/60 hover:text-white transition-colors">Sign in</a>
+        <a href="/login" className="text-bgprimary hover:text-white transition-colors">Sign in</a>
       </p>
     </div>
   );
