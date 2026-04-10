@@ -22,12 +22,12 @@ export default function UsersPage() {
           <TableHead columns={["ID", "Username", "Email", "Role", "Status"]} />
           <tbody>
             {users.map(u => (
-              <tr key={u.id} className="border-t border-white/4 hover:bg-white/2 transition-colors">
-                <td className="px-5 py-3.5 text-white/30 font-mono text-xs">{u.id}</td>
-                <td className="px-5 py-3.5 text-white/80 text-sm">{u.username}</td>
-                <td className="px-5 py-3.5 text-white/40 text-sm">{u.email}</td>
+              <tr key={u.id} className="border-t border-secondary/50 hover:bg-bgprimary/10 transition-colors">
+                <td className="px-5 py-3.5 text-bgsecondary/30 font-mono text-xs">{u.id}</td>
+                <td className="px-5 py-3.5 text-bgsecondary/80 text-sm">{u.username}</td>
+                <td className="px-5 py-3.5 text-bgsecondary/40 text-sm">{u.email}</td>
                 <td className="px-5 py-3.5"><RoleBadge role={u.role} /></td>
-                <td className="px-5 py-3.5 text-white/30 text-xs">{u.isActive ? "Active" : "Inactive"}</td>
+                <td className="px-5 py-3.5 text-bgsecondary/30 text-xs">{u.isActive ? "Active" : "Inactive"}</td>
               </tr>
             ))}
           </tbody>
