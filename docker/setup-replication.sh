@@ -106,7 +106,6 @@ CREATE TABLE games(
 CREATE TABLE tournaments(
   tournament_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   tournament_name VARCHAR(100) NOT NULL UNIQUE,
-  tournament_game VARCHAR(50) NOT NULL,
   tournament_game_id INT UNSIGNED NOT NULL,
   tournament_format ENUM('single_elimination', 'double_elimination', 'round_robin') DEFAULT 'single_elimination',
   tournament_max_teams INT UNSIGNED NOT NULL,
