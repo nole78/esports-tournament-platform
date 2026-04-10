@@ -70,7 +70,7 @@ export function NodeBadge({ status }: { status: string }) {
 export function RoleBadge({ role }: { role: string }) {
   return (
     <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium border ${
-      role === "admin" ? "bg-amber-500/10 text-amber-400 border-amber-500/20" : "bg-white/5 text-white/40 border-white/10"
+      role === "admin" ? "bg-amber-500/10 text-amber-400 border-amber-500/20" : "bg-bgprimary/10 text-bgsecondary/40 border-secondary/40"
     }`}>{role}</span>
   );
 }
@@ -79,12 +79,12 @@ export function Pagination({ page, total, pageSize, onChange }: { page: number; 
   const totalPages = Math.ceil(total / pageSize);
   if (totalPages <= 1) return null;
   return (
-    <div className="flex items-center gap-3 mt-5 text-xs text-white/30">
+    <div className="flex items-center gap-3 mt-5 text-xs text-bgsecondary">
       <button disabled={page <= 1} onClick={() => onChange(page - 1)}
-        className="px-3 py-1.5 border border-white/10 rounded-lg hover:border-white/20 disabled:opacity-30 transition-colors">←</button>
+        className="px-3 py-1.5 border border-secondary/40 rounded-lg hover:border-secondary/60 disabled:opacity-30 transition-colors">←</button>
       <span className="font-mono">{page} / {totalPages}</span>
       <button disabled={page >= totalPages} onClick={() => onChange(page + 1)}
-        className="px-3 py-1.5 border border-white/10 rounded-lg hover:border-white/20 disabled:opacity-30 transition-colors">→</button>
+        className="px-3 py-1.5 border border-secondary/40 rounded-lg hover:border-secondary/60 disabled:opacity-30 transition-colors">→</button>
       <span className="text-white/20">{total} total</span>
     </div>
   );
@@ -92,9 +92,9 @@ export function Pagination({ page, total, pageSize, onChange }: { page: number; 
 
 export function StatCard({ label, value, sub, color }: { label: string; value: string | number; sub?: string; color?: string }) {
   return (
-    <div className="bg-white/3 border border-white/6 rounded-2xl p-5 flex flex-col gap-2 hover:border-white/10 transition-colors">
-      <p className="text-xs text-white/30 uppercase tracking-widest font-mono">{label}</p>
-      <p className={`text-2xl font-semibold tracking-tight ${color ?? "text-white"}`}>{value}</p>
+    <div className="bg-primary border border-secondary/40 rounded-2xl p-5 flex flex-col gap-2 hover:border-secondary/60 transition-colors">
+      <p className="text-xs text-bgsecondary uppercase tracking-widest font-mono">{label}</p>
+      <p className={`text-2xl font-semibold tracking-tight ${color ?? "text-bgsecondary"}`}>{value}</p>
       {sub && <p className="text-xs text-white/25">{sub}</p>}
     </div>
   );
@@ -102,7 +102,7 @@ export function StatCard({ label, value, sub, color }: { label: string; value: s
 
 export function Table({ children }: { children: ReactNode }) {
   return (
-    <div className="bg-white/2 border border-white/6 rounded-2xl overflow-hidden">
+    <div className="bg-primary border border-secondary/50 rounded-2xl overflow-hidden">
       <table className="w-full text-sm">{children}</table>
     </div>
   );
@@ -111,9 +111,9 @@ export function Table({ children }: { children: ReactNode }) {
 export function TableHead({ columns }: { columns: string[] }) {
   return (
     <thead>
-      <tr className="border-b border-white/6">
+      <tr className="border-b border-secondary/50">
         {columns.map((c) => (
-          <th key={c} className="text-left px-5 py-3.5 text-xs text-white/25 font-mono uppercase tracking-wider">{c}</th>
+          <th key={c} className="text-left px-5 py-3.5 text-xs text-primary bg-bgprimary font-mono uppercase tracking-wider">{c}</th>
         ))}
       </tr>
     </thead>
@@ -124,8 +124,8 @@ export function PageHeader({ eyebrow, title, action }: { eyebrow: string; title:
   return (
     <div className="flex items-start justify-between mb-8">
       <div>
-        <p className="text-xs text-white/25 font-mono uppercase tracking-widest mb-1">{eyebrow}</p>
-        <h1 className="text-xl font-semibold text-white tracking-tight">{title}</h1>
+        <p className="text-xs text-secondary font-mono uppercase tracking-widest mb-1">{eyebrow}</p>
+        <h1 className="text-xl font-semibold text-bgsecondary tracking-tight">{title}</h1>
       </div>
       {action && <div>{action}</div>}
     </div>

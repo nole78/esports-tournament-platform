@@ -5,6 +5,7 @@ export class User {
     public id: number        = 0,
     public username: string  = "",
     public email: string     = "",
+    public fullName: string  = "",
     public role: UserRole    = UserRole.PLAYER,
     public passwordHash: string = "",
     public isActive: number  = 1,

@@ -28,10 +28,10 @@ export class AuthController {
   }
 
   private async register(req: Request, res: Response): Promise<void> {
-    const { username, email, password, role } = req.body as { username?: string; email?: string; password?: string; role?: string };
+    const { username, email, password, fullName, role } = req.body as { username?: string; email?: string; password?: string, fullName?: string; role?: string };
     const v: ValidationResult = validateRegister(username ?? "", email ?? "", password ?? "");
     if (!v.valid) { res.status(400).json({ success: false, message: v.message }); return; }
-    const result = await this.authService.register(username!, email!, role ?? "player", password!);
+    const result = await this.authService.register(username!, email!, fullName! ,role ?? "player", password!);
     if (result.id === 0) { res.status(409).json({ success: false, message: "Username or email already taken" }); return; }
     const token = jwt.sign(
       { id: result.id, username: result.username, role: result.role },
