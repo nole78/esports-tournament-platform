@@ -52,7 +52,7 @@ export function RegisterForm({ authApi }: { authApi: IAuthAPIService }) {
 
       <p className="text-center text-secondary/50 text-sm mt-6">
         Already have an account?{" "}
-        <a href="/login" className="text-bgprimary hover:text-white transition-colors">Sign in</a>
+        <a href="/login" className="text-bgprimary hover:text-bgsecondary transition-colors">Sign in</a>
       </p>
     </div>
   );

@@ -54,7 +54,7 @@ export function LoginForm({ authApi }: { authApi: IAuthAPIService }) {
 
       <p className="text-center text-secondary/50 text-sm mt-6">
         Don't have an account?{" "}
-        <a href="/register" className="text-bgprimary hover:text-white transition-colors">Create one</a>
+        <a href="/register" className="text-bgprimary hover:text-bgsecondary transition-colors">Create one</a>
       </p>
     </div>
   );
