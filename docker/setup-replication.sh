@@ -71,7 +71,10 @@ CREATE TABLE users (
   createdAt    DATETIME DEFAULT CURRENT_TIMESTAMP,
   updatedAt    DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   INDEX idx_gamer_tag (gamer_tag),
-  INDEX idx_email (email)
+  INDEX idx_email (email),
+  CONSTRAINT gamer_tag_format CHECK (gamer_tag REGEXP '^[a-zA-Z0-9.-]{3,30}$'),
+  CONSTRAINT email_format CHECK (email REGEXP '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$')
+
 );
 
 CREATE TABLE teams(
@@ -79,7 +82,9 @@ CREATE TABLE teams(
   team_name VARCHAR(100) NOT NULL UNIQUE,
   team_tag VARCHAR(10) NOT NULL UNIQUE,
   team_logotip TEXT,
-  team_description TEXT
+  team_description TEXT,
+  CONSTRAINT team_name_format CHECK (LENGTH(team_name) BETWEEN 2 AND 80),
+  CONSTRAINT team_tag_format CHECK (team_tag REGEXP '^[A-Z0-9]{2,6}$')
 );
 
 CREATE TABLE games(
@@ -93,14 +98,19 @@ CREATE TABLE games(
 CREATE TABLE tournaments(
   tournament_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   tournament_name VARCHAR(100) NOT NULL UNIQUE,
-  tournament_game VARCHAR(50) NOT NULL,
   tournament_game_id INT UNSIGNED NOT NULL,
   tournament_format ENUM('single_elimination', 'double_elimination', 'round_robin') DEFAULT 'single_elimination',
   tournament_max_teams INT UNSIGNED NOT NULL,
   tournament_application_deadline DATETIME,
   tournament_prize_fund INT UNSIGNED NOT NULL,
   tournament_status ENUM('upcoming','active','completed') DEFAULT 'upcoming',
-  FOREIGN KEY (tournament_game_id) REFERENCES games(game_id)
+  FOREIGN KEY (tournament_game_id) REFERENCES games(game_id),
+  CONSTRAINT tournament_name_format CHECK (LENGTH(tournament_name) BETWEEN 3 AND 120),
+  CONSTRAINT tournament_max_teams_check CHECK (
+    tournament_max_teams BETWEEN 2 AND 256 
+    AND ((tournament_max_teams & (tournament_max_teams - 1)) = 0)
+  )
+  
 );
 
 CREATE TABLE matches(
@@ -111,7 +121,8 @@ CREATE TABLE matches(
   status ENUM('scheduled','ongoing','completed'),
   match_round ENUM('round_of_16','quarterfinal','semifinal','final'),
   FOREIGN KEY (blue_team_id) REFERENCES teams(team_id),
-  FOREIGN KEY (red_team_id) REFERENCES teams(team_id)
+  FOREIGN KEY (red_team_id) REFERENCES teams(team_id),
+  CONSTRAINT match_score_format CHECK (match_result REGEXP '^[0-9]:[0-9]$')
 );
 
 CREATE TABLE team_members(
@@ -141,8 +152,8 @@ CREATE TABLE match_players(
   match_id INT UNSIGNED NOT NULL,
   performance_notes TEXT, 
   PRIMARY KEY (user_id, match_id, team_id),
-  FOREIGN KEY (user_id) REFERENCES users(id),
-  FOREIGN KEY (team_id) REFERENCES teams(team_id),
+  FOREIGN KEY (user_id) REFERENCES team_members(user_id),
+  FOREIGN KEY (team_id) REFERENCES team_members(team_id),
   FOREIGN KEY (match_id) REFERENCES matches(match_id)
 );
 
@@ -153,6 +164,18 @@ CREATE TABLE user_watchlist(
   PRIMARY KEY (user_id, tournament_id),
   FOREIGN KEY (user_id) REFERENCES users(id),
   FOREIGN KEY (tournament_id) REFERENCES tournaments(tournament_id)
+);
+
+CREATE TABLE audit_log (
+  id         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  user_id     INT UNSIGNED NULL,
+  action     VARCHAR(80)  NOT NULL,
+  entity     VARCHAR(40),
+  entity_id   INT UNSIGNED NULL,
+  meta       TEXT NULL,
+  ipAddress  VARCHAR(45),
+  createdAt  DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 );
 SQL
 
