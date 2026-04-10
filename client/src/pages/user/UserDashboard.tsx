@@ -7,7 +7,7 @@ export default function UserDashboard() {
   return (
     <div>
       <PageHeader eyebrow="Overview" title={`Welcome, ${user?.username}`} />
-      <p className="text-white/30 text-sm">Your dashboard content goes here.</p>
+      <p className="text-secondary text-sm">Your dashboard content goes here.</p>
     </div>
   );
 }
