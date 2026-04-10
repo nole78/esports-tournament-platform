@@ -92,9 +92,9 @@ export function Pagination({ page, total, pageSize, onChange }: { page: number; 
 
 export function StatCard({ label, value, sub, color }: { label: string; value: string | number; sub?: string; color?: string }) {
   return (
-    <div className="bg-white/3 border border-white/6 rounded-2xl p-5 flex flex-col gap-2 hover:border-white/10 transition-colors">
-      <p className="text-xs text-white/30 uppercase tracking-widest font-mono">{label}</p>
-      <p className={`text-2xl font-semibold tracking-tight ${color ?? "text-white"}`}>{value}</p>
+    <div className="bg-primary border border-secondary/40 rounded-2xl p-5 flex flex-col gap-2 hover:border-secondary/60 transition-colors">
+      <p className="text-xs text-bgsecondary uppercase tracking-widest font-mono">{label}</p>
+      <p className={`text-2xl font-semibold tracking-tight ${color ?? "text-bgsecondary"}`}>{value}</p>
       {sub && <p className="text-xs text-white/25">{sub}</p>}
     </div>
   );
