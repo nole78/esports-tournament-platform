@@ -115,7 +115,7 @@ CREATE TABLE tournaments(
   FOREIGN KEY (tournament_game_id) REFERENCES games(game_id),
   CONSTRAINT tournament_name_length CHECK (LENGTH(tournament_name) BETWEEN 3 AND 120),
   CONSTRAINT tournament_max_teams_check CHECK (
-    tournament_max_teams BETWEEN 2 AND 256 AND 
+    tournament_max_teams BETWEEN 4 AND 256 AND 
     ((tournament_max_teams & (tournament_max_teams - 1)) = 0)
   )
   
