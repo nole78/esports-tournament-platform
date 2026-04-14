@@ -20,8 +20,8 @@ export function LoginForm({ authApi }: { authApi: IAuthAPIService }) {
   return (
     <div className="w-full max-w-sm">
       <div className="text-center mb-10">
-        <div className="w-12 h-12 rounded-2xl bg-bgprimary/10 border border-secondary/50 flex items-center justify-center mx-auto mb-4">
-          <span className="text-bgsecondary text-lg">◈</span>
+        <div className="w-20 h-20 rounded-2xl bg-bgprimary/10 border border-secondary/50 flex items-center justify-center mx-auto mb-4">
+          <img src="logo.png" className="w-20 h-20 border border-secondary/50 rounded-2xl flex"/>
         </div>
         <h1 className="text-xl font-semibold text-bgsecondary">Welcome back</h1>
         <p className="text-sm text-secondary mt-1">Sign in to your account</p>
