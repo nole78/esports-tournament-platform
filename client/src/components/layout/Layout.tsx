@@ -23,8 +23,8 @@ export function Layout({ children }: { children: ReactNode }) {
       <aside className="w-56 shrink-0 border-r border-secondary/40 flex flex-col bg-bgprimary/70">
         {/* Logo */}
         <div className="px-5 h-16 flex items-center border-b border-primary/30 gap-3">
-          <div className="w-7 h-7 rounded-lg bg-white/10 border border-primary/50 flex items-center justify-center">
-            <span className="text-bgsecondary text-xs">◈</span>
+          <div className="w-10 h-10 rounded-lg bg-white/10 border border-primary/50 flex items-center justify-center">
+            <img src="logo.png" className="w-10 h-9.6 rounded-lg flex "/>
           </div>
           <div>
             <p className="text-sm font-semibold text-primary tracking-tight">PulseGrid</p>
