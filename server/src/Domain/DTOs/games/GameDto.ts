@@ -1,5 +1,11 @@
 // TODO: implement class for Game DTO
 
 export class GameDto{
-    constructor(gameId: number, name: string, logo: string, genre: string, playerCnt: number){}
+    constructor(
+        public gameId: number      = 0, 
+        public name: string        = "", 
+        public logo: string        = "", 
+        public genre: string       = "", 
+        public playerCnt: number   = 0
+    ){}
 }
