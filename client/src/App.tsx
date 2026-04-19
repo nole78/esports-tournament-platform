@@ -17,8 +17,8 @@ export default function App() {
       <Route path="/register" element={<RegisterPage />} />
 
       {/* User routes */}
-      <Route path="/player" element={<ProtectedRoute requiredRole="player"><UserDashboard /></ProtectedRoute>} />
-      <Route path="/player/game_catalog" element={<ProtectedRoute requiredRole="player"><GameCatalog/></ProtectedRoute>} />
+      <Route path="/dashboard" element={<ProtectedRoute requiredRole="player"><UserDashboard /></ProtectedRoute>} />
+      <Route path="/game_catalog" element={<ProtectedRoute requiredRole="player"><GameCatalog/></ProtectedRoute>} />
 
       {/* Admin routes */}
       <Route path="/admin"       element={<ProtectedRoute requiredRole="admin"><AdminDashboard /></ProtectedRoute>} />
