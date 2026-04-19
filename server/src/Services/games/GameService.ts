@@ -7,7 +7,7 @@ import { IGameService } from '../../Domain/services/games/IGameService';
 export class GameService implements IGameService {
     public constructor(private readonly gameRepo : IGameRepository){}
 
-    async gatAll(page?: number,limit?: number) : Promise<PaginatedListDto<GameDto>>{
+    async getAll(page?: number,limit?: number) : Promise<PaginatedListDto<GameDto>>{
         const items = await this.gameRepo.findAll(page, limit);
         return new PaginatedListDto(items,items.length,page,limit);
     }
