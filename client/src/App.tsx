@@ -8,6 +8,7 @@ import NotFoundPage from "./pages/not_found/NotFoundPage";
 import UserDashboard from "./pages/user/UserDashboard";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import UsersPage from "./pages/admin/UsersPage";
+import GameCatalog from "./pages/common_pages/game_catalog";
 
 export default function App() {
   return (
@@ -16,7 +17,8 @@ export default function App() {
       <Route path="/register" element={<RegisterPage />} />
 
       {/* User routes */}
-      <Route path="/dashboard" element={<ProtectedRoute requiredRole="player"><UserDashboard /></ProtectedRoute>} />
+      <Route path="/player" element={<ProtectedRoute requiredRole="player"><UserDashboard /></ProtectedRoute>} />
+      <Route path="/player/game_catalog" element={<ProtectedRoute requiredRole="player"><GameCatalog/></ProtectedRoute>} />
 
       {/* Admin routes */}
       <Route path="/admin"       element={<ProtectedRoute requiredRole="admin"><AdminDashboard /></ProtectedRoute>} />
