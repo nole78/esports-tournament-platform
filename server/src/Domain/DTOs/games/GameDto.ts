@@ -3,9 +3,9 @@
 export class GameDto{
     constructor(
         public gameId: number      = 0, 
-        public name: string        = "", 
-        public logo: string        = "", 
-        public genre: string       = "", 
-        public playerCnt: number   = 0
+        public gameName: string        = "", 
+        public gameLogotip: string        = "", 
+        public gameGenre: string       = "", 
+        public gamePlayers: number   = 0
     ){}
 }
