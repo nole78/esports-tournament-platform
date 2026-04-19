@@ -15,7 +15,7 @@ export class GameRepository implements IGameRepository{
 
       private map(r: RowDataPacket): GameDto {
         // TODO: implement
-        return new GameDto();
+        return new GameDto(r.gameId, r.name, r.logo, r.genre, r.playerCnt);
       }
 
     async findById(id: number): Promise<GameDto | null> {
@@ -51,13 +51,13 @@ export class GameRepository implements IGameRepository{
         if (!res) return new Game();
         try {
         const [result] = await res.conn.execute<ResultSetHeader>(
-            `INSERT INTO games (game_id) VALUES (?)`,
-            [dto.gameId]
+            `INSERT INTO games (game_name, game_logotip, game_genre, game_players) VALUES (?, ?, ?, ?)`,
+            [dto.name, dto.logo, dto.genre, dto.playerCnt]
         );
         if (result.insertId === 0) return new Game();
-        return new Game(result.insertId, dto.gameId);
+        return new Game(result.insertId, dto.name, dto.logo, dto.genre, dto.playerCnt);
         } catch (err) {
-        this.logger.error("EntityRepository", "create failed", err);
+        this.logger.error("GameRepository", "create failed", err);
         return new Game();
         } finally { res.conn.release(); }
     }
@@ -75,7 +75,7 @@ export class GameRepository implements IGameRepository{
         );
         return result.affectedRows > 0;
         } catch (err) {
-        this.logger.error("EntityRepository", "update failed", err);
+        this.logger.error("GameRepository", "update failed", err);
         return false;
         } finally { res.conn.release(); }
     }
@@ -89,7 +89,7 @@ export class GameRepository implements IGameRepository{
         );
         return result.affectedRows > 0;
         } catch (err) {
-        this.logger.error("EntityRepository", "delete failed", err);
+        this.logger.error("GameRepository", "delete failed", err);
         return false;
         } finally { res.conn.release(); }
     }
