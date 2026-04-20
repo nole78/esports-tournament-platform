@@ -15,7 +15,7 @@ export class AuthService implements IAuthService {
     if (user.id === 0 || user.isActive === 0) return new AuthUserDto();
     const match = await bcrypt.compare(password, user.passwordHash).catch(() => false);
     if (!match) return new AuthUserDto();
-    return new AuthUserDto(user.id, user.username, user.role);
+    return new AuthUserDto(user.id, user.gamerTag, user.role);
   }
 
   async register(username: string, email: string, fullName: string,role: string, password: string): Promise<AuthUserDto> {
@@ -28,6 +28,6 @@ export class AuthService implements IAuthService {
     const userRole = role === UserRole.ADMIN ? UserRole.ADMIN : UserRole.PLAYER;
     const created = await this.userRepo.create(new User(0, username, email, fullName, userRole, hash));
     if (created.id === 0) return new AuthUserDto();
-    return new AuthUserDto(created.id, created.username, created.role);
+    return new AuthUserDto(created.id, created.gamerTag, created.role);
   }
 }

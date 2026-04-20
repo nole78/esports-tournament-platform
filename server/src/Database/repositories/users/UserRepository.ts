@@ -21,10 +21,10 @@ export class UserRepository implements IUserRepository {
     try {
       const [result] = await res.conn.execute<ResultSetHeader>(
         `INSERT INTO users (full_name, gamer_tag, email, role, passwordHash) VALUES (? , ?, ?, ?, ?)`,
-        [user.fullName, user.username, user.email, user.role, user.passwordHash]
+        [user.fullName, user.gamerTag, user.email, user.role, user.passwordHash]
       );
       if (result.insertId === 0) return new User();
-      return new User(result.insertId, user.username, user.email, user.fullName, user.role,user.passwordHash);
+      return new User(result.insertId, user.gamerTag, user.email, user.fullName, user.role, user.passwordHash);
     } catch (err) {
       this.logger.error("UserRepository", "create failed", err);
       return new User();
@@ -85,7 +85,7 @@ export class UserRepository implements IUserRepository {
     try {
       const [result] = await res.conn.execute<ResultSetHeader>(
         `UPDATE users SET gamer_tag = ?, email = ?, role = ?, isActive = ? WHERE id = ?`,
-        [user.username, user.email, user.role, user.isActive, user.id]
+        [user.gamerTag, user.email, user.role, user.isActive, user.id]
       );
       return result.affectedRows > 0;
     } catch (err) {
