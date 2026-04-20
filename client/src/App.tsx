@@ -8,7 +8,7 @@ import NotFoundPage from "./pages/not_found/NotFoundPage";
 import UserDashboard from "./pages/user/UserDashboard";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import UsersPage from "./pages/admin/UsersPage";
-import GameCatalog from "./pages/common_pages/game_catalog";
+import GameCatalog from "./pages/common_pages/GameCatalog";
 
 export default function App() {
   return (
