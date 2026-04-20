@@ -14,7 +14,7 @@ export class GameRepository implements IGameRepository{
     ){}
 
       private map(r: RowDataPacket): GameDto {
-        return new GameDto(r.gameId, r.gameName, r.gameLogotip, r.gameGenre, r.gamePlayers);
+        return new GameDto(r.game_id, r.game_name, r.game_logotip, r.game_genre, r.game_players);
       }
 
     async findById(id: number): Promise<GameDto | null> {
@@ -31,17 +31,16 @@ export class GameRepository implements IGameRepository{
         finally{ res.conn.release();}
     }
     async findAll(page = 1, limit = 20): Promise<GameDto[]> {
-           const res = await this.db.getReadConnection();
+        const res = await this.db.getReadConnection();
         if (!res) return [];
-        const offset = (page - 1) * limit;
+            const offset = (page - 1) * limit;
         try {
-        const [rows] = await res.conn.execute<RowDataPacket[]>(
-            `SELECT * FROM games ORDER BY game_id DESC LIMIT ? OFFSET ?`, [limit, offset]
-        );
-        return rows.map((r) => this.map(r));
+            //const [rows] = await res.conn.execute<RowDataPacket[]>(`SELECT * FROM games ORDER BY game_id LIMIT ? OFFSET ?`, [limit,offset]);
+            const [rows] = await res.conn.query<RowDataPacket[]>(`SELECT * FROM games ORDER BY game_id LIMIT ? OFFSET ?`, [limit,offset]);
+            return rows.map((r) => this.map(r));
         } catch (err) {
-        this.logger.error("GameRepository", "findAll failed", err);
-        return [];
+            this.logger.error("GameRepository", "findAll failed", err);
+            return [];
         } finally { res.conn.release(); }
         }
 
