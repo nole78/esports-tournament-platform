@@ -3,7 +3,6 @@ import { UserRole } from "../enums/UserRole";
 export class User {
   constructor(
     public id: number        = 0,
-    public fullName: string = "",
     public gamerTag: string = "",
     public email: string     = "",
     public fullName: string  = "",
