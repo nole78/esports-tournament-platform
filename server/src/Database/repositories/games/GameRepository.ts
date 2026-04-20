@@ -14,8 +14,7 @@ export class GameRepository implements IGameRepository{
     ){}
 
       private map(r: RowDataPacket): GameDto {
-        // TODO: implement
-        return new GameDto();
+        return new GameDto(r.game_id, r.game_name, r.game_logotip, r.game_genre, r.game_players);
       }
 
     async findById(id: number): Promise<GameDto | null> {
@@ -32,17 +31,16 @@ export class GameRepository implements IGameRepository{
         finally{ res.conn.release();}
     }
     async findAll(page = 1, limit = 20): Promise<GameDto[]> {
-           const res = await this.db.getReadConnection();
+        const res = await this.db.getReadConnection();
         if (!res) return [];
-        const offset = (page - 1) * limit;
+            const offset = (page - 1) * limit;
         try {
-        const [rows] = await res.conn.execute<RowDataPacket[]>(
-            `SELECT * FROM games ORDER BY game_id DESC LIMIT ? OFFSET ?`, [limit, offset]
-        );
-        return rows.map((r) => this.map(r));
+            //const [rows] = await res.conn.execute<RowDataPacket[]>(`SELECT * FROM games ORDER BY game_id LIMIT ? OFFSET ?`, [limit,offset]);
+            const [rows] = await res.conn.query<RowDataPacket[]>(`SELECT * FROM games ORDER BY game_id LIMIT ? OFFSET ?`, [limit,offset]);
+            return rows.map((r) => this.map(r));
         } catch (err) {
-        this.logger.error("GameRepository", "findAll failed", err);
-        return [];
+            this.logger.error("GameRepository", "findAll failed", err);
+            return [];
         } finally { res.conn.release(); }
         }
 
@@ -51,13 +49,13 @@ export class GameRepository implements IGameRepository{
         if (!res) return new Game();
         try {
         const [result] = await res.conn.execute<ResultSetHeader>(
-            `INSERT INTO games (game_id) VALUES (?)`,
-            [dto.gameId]
+            `INSERT INTO games (game_name, game_logotip, game_genre, game_players) VALUES (?, ?, ?, ?)`,
+            [dto.gameName, dto.gameLogotip, dto.gameGenre, dto.gamePlayers]
         );
         if (result.insertId === 0) return new Game();
-        return new Game(result.insertId, dto.gameId);
+        return new Game(result.insertId, dto.gameName, dto.gameLogotip, dto.gameGenre, dto.gamePlayers);
         } catch (err) {
-        this.logger.error("EntityRepository", "create failed", err);
+        this.logger.error("GameRepository", "create failed", err);
         return new Game();
         } finally { res.conn.release(); }
     }
@@ -75,7 +73,7 @@ export class GameRepository implements IGameRepository{
         );
         return result.affectedRows > 0;
         } catch (err) {
-        this.logger.error("EntityRepository", "update failed", err);
+        this.logger.error("GameRepository", "update failed", err);
         return false;
         } finally { res.conn.release(); }
     }
@@ -89,7 +87,7 @@ export class GameRepository implements IGameRepository{
         );
         return result.affectedRows > 0;
         } catch (err) {
-        this.logger.error("EntityRepository", "delete failed", err);
+        this.logger.error("GameRepository", "delete failed", err);
         return false;
         } finally { res.conn.release(); }
     }

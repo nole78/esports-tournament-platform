@@ -6,6 +6,7 @@ export class User {
     public fullName: string = "",
     public gamerTag: string = "",
     public email: string     = "",
+    public fullName: string  = "",
     public role: UserRole    = UserRole.PLAYER,
     public passwordHash: string = "",
     public profilePicture: string = "",

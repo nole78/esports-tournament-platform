@@ -5,6 +5,7 @@ import { useAuth } from "../../hooks/auth/useAuthHook";
 // TODO: Update nav items to match your routes and roles
 const userNav = [
   { to: "/dashboard", label: "Dashboard", icon: "⬡" },
+  { to: "/game_catalog", label: "Game Catalog", icon: "⬡"},
   // add more user routes here
 ];
 const adminNav = [
@@ -19,16 +20,16 @@ export function Layout({ children }: { children: ReactNode }) {
   const nav = user?.role === "admin" ? adminNav : userNav;
 
   return (
-    <div className="flex min-h-screen bg-[#080808]">
-      <aside className="w-56 shrink-0 border-r border-white/5 flex flex-col bg-[#0d0d0d]">
+    <div className="flex min-h-screen bg-primary">
+      <aside className="w-56 shrink-0 border-r border-secondary/40 flex flex-col bg-bgprimary/70">
         {/* Logo */}
-        <div className="px-5 h-16 flex items-center border-b border-white/5 gap-3">
-          <div className="w-7 h-7 rounded-lg bg-white/8 border border-white/12 flex items-center justify-center">
-            <span className="text-white/50 text-xs">◈</span>
+        <div className="px-5 h-16 flex items-center border-b border-primary/30 gap-3">
+          <div className="w-10 h-10 rounded-lg bg-white/10 border border-primary/50 flex items-center justify-center">
+            <img src="logo.png" className="w-10 h-9.6 rounded-lg flex "/>
           </div>
           <div>
-            <p className="text-sm font-semibold text-white tracking-tight">PulseGrid</p>
-            <p className="text-[10px] text-white/25 uppercase tracking-widest">{user?.role}</p>
+            <p className="text-sm font-semibold text-primary tracking-tight">PulseGrid</p>
+            <p className="text-[10px] text-bgsecondary uppercase tracking-widest">{user?.role}</p>
           </div>
         </div>
 
@@ -39,8 +40,8 @@ export function Layout({ children }: { children: ReactNode }) {
               className={({ isActive }) =>
                 `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all ${
                   isActive
-                    ? "bg-white/8 text-white border border-white/12"
-                    : "text-white/35 hover:text-white/70 hover:bg-white/4 border border-transparent"
+                    ? "bg-white/8 text-bgsecondary border border-secondary/50"
+                    : "text-primary/35 hover:text-primary/70 hover:bg-white/4 border border-transparent"
                 }`
               }
             >
@@ -51,17 +52,17 @@ export function Layout({ children }: { children: ReactNode }) {
         </nav>
 
         {/* User */}
-        <div className="border-t border-white/5 px-4 py-4">
+        <div className="border-t border-primary/30 px-4 py-4">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-7 h-7 rounded-full bg-white/6 border border-white/10 flex items-center justify-center">
-              <span className="text-xs text-white/40 font-medium">{user?.username?.[0]?.toUpperCase()}</span>
+            <div className="w-7 h-7 rounded-full bg-white/10 border border-primary/50 flex items-center justify-center">
+              <span className="text-xs text-bgsecondary/60 font-medium">{user?.username?.[0]?.toUpperCase()}</span>
             </div>
             <div className="min-w-0">
-              <p className="text-xs font-medium text-white/70 truncate">{user?.username}</p>
+              <p className="text-xs font-medium text-primary/80 truncate">{user?.username}</p>
             </div>
           </div>
           <button onClick={() => { logout(); navigate("/login"); }}
-            className="text-xs text-white/20 hover:text-white/50 transition-colors w-full text-left">
+            className="text-xs text-bgsecondary hover:text-white/50 transition-colors w-full text-left">
             Sign out →
           </button>
         </div>
