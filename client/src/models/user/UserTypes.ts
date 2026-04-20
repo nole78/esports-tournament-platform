@@ -1,6 +1,6 @@
 export type UserDto = {
   id: number;
-  username: string;
+  gamerTag: string;
   email: string;
   fullName: string;
   role: string;
