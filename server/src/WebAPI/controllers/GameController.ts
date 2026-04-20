@@ -39,7 +39,7 @@ export class GameController{
         const v:ValidationResult = validateGameCreation(gameName ?? "",gameGenre ?? "",gamePlayers ?? 0);
         if(!v.valid) {res.status(400).json({ success: false, message: v.message }); return;}
 
-        const created = await this.gameService.create(new CreateGameDto( gameName, gameGenre, gameLogotip, gamePlayers ));
+        const created = await this.gameService.create(new CreateGameDto( gameName, gameLogotip, gameGenre, gamePlayers ));
         if (!created) { res.status(500).json({ success: false, message: "Failed to create" }); return; }
         res.status(201).json({ success: true, data: created });
     }
