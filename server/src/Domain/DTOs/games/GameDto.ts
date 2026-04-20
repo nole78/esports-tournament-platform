@@ -1,4 +1,4 @@
-// TODO: implement class for Game DTO
+// Should be allright, need to check
 
 export class GameDto{
     constructor(

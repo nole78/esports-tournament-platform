@@ -1,4 +1,3 @@
-//Some changes will probably be needed
 import { UserRole } from "../../enums/UserRole";
 
 export class UserDto {
