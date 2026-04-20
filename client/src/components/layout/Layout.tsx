@@ -11,7 +11,7 @@ const userNav = [
 const adminNav = [
   { to: "/admin",       label: "Dashboard", icon: "⬡" },
   { to: "/admin/users", label: "Users",     icon: "◎" },
-  { to: "/admin/games", label: "Games",     icon: "⬡" },
+  { to: "/admin/game_catalog", label: "Game Catalog", icon: "⬡"},
   // add more admin routes here
 ];
 

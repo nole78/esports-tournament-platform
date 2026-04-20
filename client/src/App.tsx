@@ -24,7 +24,8 @@ export default function App() {
       {/* Admin routes */}
       <Route path="/admin"       element={<ProtectedRoute requiredRole="admin"><AdminDashboard /></ProtectedRoute>} />
       <Route path="/admin/users" element={<ProtectedRoute requiredRole="admin"><UsersPage /></ProtectedRoute>} />
-      <Route path="/admin/games" element={<ProtectedRoute requiredRole="admin"><GameAddPage/></ProtectedRoute>} />
+      <Route path="/admin/game_catalog" element={<ProtectedRoute requiredRole="admin"><GameCatalog/></ProtectedRoute>} />
+      <Route path="/admin/game_catalog/add" element={<ProtectedRoute requiredRole="admin"><GameAddPage/></ProtectedRoute>} />
 
       <Route path="/"    element={<Navigate to="/login" replace />} />
       <Route path="/404" element={<NotFoundPage />} />
