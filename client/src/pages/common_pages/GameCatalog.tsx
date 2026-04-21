@@ -1,12 +1,16 @@
 import { useState, useEffect } from "react";
-import { Empty, ErrorBox, PageHeader, Table, TableHead } from "../../components/ui/UI";
+import { Empty, ErrorBox, PageHeader } from "../../components/ui/UI";
 import type { GameDto } from "../../models/game/GameDto";
 import { gameApi } from "../../api_services/game_catalog/GameAPIService";
+import { useAuth } from "../../hooks/auth/useAuthHook";
+import { useNavigate } from "react-router-dom";
 
 
 export default function GameCatalog(){
+    const {user} = useAuth();
     const [games, setGames] = useState<GameDto[]>([]);
     const [error, setError] = useState<string>("");
+    const navigate = useNavigate();
 
     useEffect(() => {
         gameApi.getAll()
@@ -21,23 +25,23 @@ export default function GameCatalog(){
 
     return (
         <div>
-            <PageHeader eyebrow="user" title="Game Catalog"/>
+            <PageHeader eyebrow="" title="Game Catalog"/>
+            {user?.role === "admin" && (
+                <button onClick={() => navigate("/admin/game_catalog/add")}
+                        className="mb-2 bg-bgsecondary/40 border-2 border-bgsecondary hover:bg-bgsecondary/30 text-bgsecondary font-semibold rounded-xl p-3 text-sm transition-colors">
+                Add Game</button>
+            )}
             {error && <ErrorBox message="{error}"/>}
             {games.length === 0 && !error ? <Empty message="No games found"/> : (
-                <Table>
-                    <TableHead columns={["Id","Name","Logo","Genre","Players"]}/>
-                    <tbody>
+                <section className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
                     {games.map(g => (
-                        <tr key={g.gameId} className="border-t border-secondary/50 hover:bg-bgprimary/10 transition-colors">
-                            <td className="px-5 py-3.5 text-bgsecondary/40 font-mono text-xs">{g.gameId}</td>
-                            <td className="px-5 py-3.5 text-bgsecondary/80 text-sm">{g.gameName}</td>
-                            <td className="px-5 py-3.5 text-bgsecondary/40 text-sm">{g.gameLogotip}</td>
-                            <td className="px-5 py-3.5 text-bgsecondary/80 text-sm">{g.gameGenre}</td>
-                            <td className="px-5 py-3.5 text-bgsecondary/40 text-xs">{g.gamePlayers}</td>
-                        </tr>
+                    <div className="border-2 border-bgsecondary bg-bgprimary/30 p-2 rounded-xl">
+                        <h2 className="text-bgsecondary text-2xl font-bold">{g.gameName}</h2>
+                        <div className="float-left text-sm text-bgprimary border-2 p-1 border-bgprimary rounded-xl mr-1">Players: {g.gamePlayers}</div>
+                        <div className="float-left text-sm text-bgprimary border-2 p-1 border-bgprimary rounded-xl">{g.gameGenre}</div>
+                    </div>
                     ))}
-                    </tbody>
-                </Table>
+                </section>
             )}
         </div>
     );
