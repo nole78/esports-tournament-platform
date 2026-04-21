@@ -5,6 +5,8 @@ import { UserRole } from "../../Domain/enums/UserRole";
 import { IGameService } from "../../Domain/services/games/IGameService";
 import { CreateGameDto } from '../../Domain/DTOs/games/CreateGameDto';
 import { User } from "../../Domain/models/User";
+import { ValidationResult } from '../../Domain/types/ValidationResult';
+import { validateGameCreation } from "../validators/games/validateGameCreation";
 
 export class GameController{
     private readonly router = Router();
@@ -25,7 +27,7 @@ export class GameController{
     }
 
     private async getById(req: Request, res: Response) : Promise<void>{
-        const id = parseInt(req.query.id as string, 10);
+        const id = parseInt(req.params.id as string, 10);
         if(isNaN(id)) {res.status(400).json({ success: false, message: "Invalid id"}); return; }
         const entity = await this.gameService.getById(id);
         if(!entity) {res.status(404).json({ success: false, message: "Not found"}); return; }
@@ -33,9 +35,11 @@ export class GameController{
     }
 
     private async create(req: Request, res: Response): Promise<void> {
-        // TODO: Validate req.body and build CreateEntityDto from it
-        const game = req.body as CreateGameDto;
-        const created = await this.gameService.create({ gameName: game.gameName, gameGenre: game.gameGenre, gameLogotip: game.gameLogotip, gamePlayers: game.gamePlayers });
+        const {gameName,gameGenre,gameLogotip,gamePlayers} = req.body as {gameName?:string, gameGenre?:string, gameLogotip?:string, gamePlayers?:number};
+        const v:ValidationResult = validateGameCreation(gameName ?? "",gameGenre ?? "",gamePlayers ?? 0);
+        if(!v.valid) {res.status(400).json({ success: false, message: v.message }); return;}
+
+        const created = await this.gameService.create(new CreateGameDto( gameName, gameLogotip, gameGenre, gamePlayers ));
         if (!created) { res.status(500).json({ success: false, message: "Failed to create" }); return; }
         res.status(201).json({ success: true, data: created });
     }

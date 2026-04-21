@@ -24,7 +24,7 @@ export default function UsersPage() {
             {users.map(u => (
               <tr key={u.id} className="border-t border-secondary/50 hover:bg-bgprimary/10 transition-colors">
                 <td className="px-5 py-3.5 text-bgsecondary/30 font-mono text-xs">{u.id}</td>
-                <td className="px-5 py-3.5 text-bgsecondary/80 text-sm">{u.username}</td>
+                <td className="px-5 py-3.5 text-bgsecondary/80 text-sm">{u.gamerTag}</td>
                 <td className="px-5 py-3.5 text-bgsecondary/40 text-sm">{u.email}</td>
                 <td className="px-5 py-3.5"><RoleBadge role={u.role} /></td>
                 <td className="px-5 py-3.5 text-bgsecondary/30 text-xs">{u.isActive ? "Active" : "Inactive"}</td>

@@ -63,18 +63,29 @@ export class GameRepository implements IGameRepository{
     async update(id: number, fields: Partial<Game>): Promise<boolean> {
         const res = await this.db.getWriteConnection();
         if (!res) return false;
+
+        const fieldMap: Record<string, string> = {
+            gameName: "game_name",
+            gameGenre: "game_genre",
+            gamePlayers: "game_players",
+            gameLogotip: "game_logotip"
+        }
+
         try {
-        const entries = Object.entries(fields).filter(([, v]) => v !== undefined);
-        if (entries.length === 0) return false;
-        const setClause = entries.map(([k]) => `${k} = ?`).join(", ");
-        const values = entries.map(([, v]) => v);
-        const [result] = await res.conn.execute<ResultSetHeader>(
-            `UPDATE games SET ${setClause} WHERE game_id = ?`, [...values, id]
-        );
-        return result.affectedRows > 0;
-        } catch (err) {
-        this.logger.error("GameRepository", "update failed", err);
-        return false;
+            const entries = Object.entries(fields)
+                .filter(([, v]) => v !== undefined)
+                .map(([k,v]) => [fieldMap[k] ?? k, v]);
+            
+            if (entries.length === 0) return false;
+            const setClause = entries.map(([k]) => `${k} = ?`).join(", ");
+            const values = entries.map(([, v]) => v);
+            const [result] = await res.conn.execute<ResultSetHeader>(
+                `UPDATE games SET ${setClause} WHERE game_id = ?`, [...values, id]
+            );
+            return result.affectedRows > 0;
+            } catch (err) {
+            this.logger.error("GameRepository", "update failed", err);
+            return false;
         } finally { res.conn.release(); }
     }
 
