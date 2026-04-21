@@ -64,7 +64,7 @@ export default function GameCatalog(){
                                 Delete
                             </button>
                             <button className="mb-2 bg-bgsecondary/40 border-2 border-bgsecondary hover:bg-bgsecondary/30 text-bgsecondary font-semibold rounded-xl p-1 text-sm transition-colors"
-                                    onClick={() => navigate(`/admin/games/edit${g.gameId}`)}>
+                                    onClick={() => navigate(`/admin/game_catalog/edit/${g.gameId}`)}>
                                 Edit
                             </button>
                         </div>)}
