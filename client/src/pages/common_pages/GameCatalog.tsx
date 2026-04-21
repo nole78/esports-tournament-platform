@@ -37,6 +37,7 @@ export default function GameCatalog(){
                     {games.map(g => (
                     <div className="border-2 border-bgsecondary bg-bgprimary/30 p-2 rounded-xl">
                         <h2 className="text-bgsecondary text-2xl font-bold">{g.gameName}</h2>
+                        <img src={g.gameLogotip}/>
                         <div className="float-left text-sm text-bgprimary border-2 p-1 border-bgprimary rounded-xl mr-1">Players: {g.gamePlayers}</div>
                         <div className="float-left text-sm text-bgprimary border-2 p-1 border-bgprimary rounded-xl">{g.gameGenre}</div>
                     </div>
