@@ -10,17 +10,18 @@ export default function GameCatalog(){
     const {user} = useAuth();
     const [games, setGames] = useState<GameDto[]>([]);
     const [error, setError] = useState<string>("");
+    const [deleted, setDeleted] = useState<boolean>(false);
     const navigate = useNavigate();
 
     useEffect(() => {
-        gameApi.getAll()
-            .then(res => {
-                if(res.success)
-                    setGames(res.data?.items ?? []);
-                else
-                    setError(res.message);
-            })
-            .catch(() => setError("Failed to load games"))
+                gameApi.getAll()
+        .then(res => {
+            if(res.success)
+                setGames(res.data?.items ?? []);
+            else
+                setError(res.message);
+        })
+        .catch(() => setError("Failed to load games"))
     }, []);
 
     return (
@@ -31,7 +32,12 @@ export default function GameCatalog(){
                         className="mb-2 bg-bgsecondary/40 border-2 border-bgsecondary hover:bg-bgsecondary/30 text-bgsecondary font-semibold rounded-xl p-3 text-sm transition-colors">
                 Add Game</button>
             )}
-            {error && <ErrorBox message="{error}"/>}
+            {error && <ErrorBox message={error}/>}
+            {deleted && (
+                <div className="mb-5 bg-green-500/10 border border-green-500/20 text-green-300 text-sm px-4 py-3 rounded-xl">
+                    Succesfully deleted game
+                </div>
+            )}
             {games.length === 0 && !error ? <Empty message="No games found"/> : (
                 <section className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
                     {games.map(g => (
@@ -40,6 +46,27 @@ export default function GameCatalog(){
                         <img src={g.gameLogotip}/>
                         <div className="float-left text-sm text-bgprimary border-2 p-1 border-bgprimary rounded-xl mr-1">Players: {g.gamePlayers}</div>
                         <div className="float-left text-sm text-bgprimary border-2 p-1 border-bgprimary rounded-xl">{g.gameGenre}</div>
+                        {user?.role === "admin" && (<div>
+                            <button className="mb-2 bg-bgsecondary/40 border-2 border-bgsecondary hover:bg-bgsecondary/30 text-bgsecondary font-semibold rounded-xl p-1 text-sm transition-colors"
+                                    onClick={() => {
+                                        setDeleted(false);
+                                        gameApi.delete(g.gameId)
+                                            .then(res =>{
+                                                if(res.success) {
+                                                    setDeleted(true); 
+                                                    setGames(prev => prev.filter(game => game.gameId !== g.gameId));
+                                                    setTimeout(() => {setDeleted(false)}, 3000);
+                                                    return;}
+                                                else setError(res.message);
+                                            })
+                                            .catch(() => setError("Failed to delete game"))
+                                        }}>
+                                Delete
+                            </button>
+                            <button className="mb-2 bg-bgsecondary/40 border-2 border-bgsecondary hover:bg-bgsecondary/30 text-bgsecondary font-semibold rounded-xl p-1 text-sm transition-colors">
+                                Edit
+                            </button>
+                        </div>)}
                     </div>
                     ))}
                 </section>
