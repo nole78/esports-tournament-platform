@@ -78,8 +78,6 @@ docker exec project_master sh /setup.sh
 cd server
 cp .env.example .env   # fill in your values
 npm install
-npm install multer
-npm install -D @types/multer
 npm run dev
 ```
 
