@@ -23,7 +23,7 @@ export const GameEditForm: React.FC<{id: string }> = ({id}) => {
         const res = await gameApi.update(gameId,{gameName,gameGenre,gamePlayers,gameLogotip});
         
         setEditing(false);
-        if(!res.success || !res.data) { setError(res.message ?? "Invalid values"); return;}
+        if(!res.success) { setError(res.message ?? "Invalid values"); return;}
     
         setSucces(true);
     }
@@ -42,7 +42,7 @@ export const GameEditForm: React.FC<{id: string }> = ({id}) => {
     },[id])
 
     return(
-        <div>
+        <div className="w-full max-w-sm">
             {error && (
             <div className="mb-5 bg-red-500/10 border border-red-500/20 text-red-300 text-sm px-4 py-3 rounded-xl">
                 {error}
