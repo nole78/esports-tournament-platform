@@ -9,7 +9,9 @@ export default function GameAddForm({gameApi} : {gameApi:IGameAPIService}){
     const [gameLogotip,setLogo] = useState<string>("");
     const [gameGenre,setGenre] = useState<string>("");
     const [players,setPlayers] = useState<string>("");
+
     const [error,setError] = useState<string>("");
+    const [preview,setPreview] = useState<string>("");
     const [succes,setSucces] = useState<boolean>(false);
     const [creating,setCreating] = useState<boolean>(false);
 
@@ -19,14 +21,18 @@ export default function GameAddForm({gameApi} : {gameApi:IGameAPIService}){
     setSucces(false);
     setCreating(true);
     const gamePlayers = Number(players);
+
     const res = await gameApi.create({gameName,gameLogotip,gameGenre,gamePlayers});
+    
     setCreating(false);
     if(!res.success || !res.data) {setError(res.message ?? "Invalid values"); return;}
+    
     setSucces(true);
     setName("");
     setGenre("");
     setLogo("");
     setPlayers("");
+    setPreview("");
   };
     return(
         <div className="w-full max-w-sm">
@@ -48,8 +54,24 @@ export default function GameAddForm({gameApi} : {gameApi:IGameAPIService}){
                 </div>
                 <div>
                     <label className="block text-xs text-bgprimary mb-2 font-medium">Logo</label>
-                    <input type="text" value={gameLogotip} onChange={e => setLogo(e.target.value)}
+                    <input type="file" accept="image/*"
+                    onChange={e => {
+                        const file = e.target.files?.[0];
+                        if(!file) { setLogo("");setPreview(""); return;}
+
+                        const reader = new FileReader();
+
+                        reader.onloadend = () => {
+                            const base64String = reader.result as string;
+                            setLogo(base64String);
+                            setPreview(base64String);
+                        }
+
+                        reader.readAsDataURL(file);
+                    }}
                     className="w-full bg-bgprimary/10 border border-secondary/50 rounded-xl px-4 py-3 text-bgsecondary text-sm placeholder-bgsecondary/30 focus:outline-none focus:border-white/30 transition-colors"/>
+                    {preview && 
+                    <img src={preview} className="mt-2 w-24 h-24 object-cover rounded-lg"/>}
                 </div>
                 <div>
                     <label className="block text-xs text-bgprimary mb-2 font-medium">Genre</label>
