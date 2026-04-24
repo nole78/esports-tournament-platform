@@ -10,11 +10,11 @@ export default function AuditLogPage() {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
-  const limit = 10;
+  const limit = 20;
 
   const load = (p: number) => {
     if (!token) return;
-
+    
     Promise.resolve().then(() => setLoading(true));
 
     auditLogApi.getLogs(token, p, limit)
@@ -32,6 +32,7 @@ export default function AuditLogPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, token]);
 
+
   return (
     <div>
       <PageHeader eyebrow="admin" title="Audit Log" />
@@ -39,12 +40,12 @@ export default function AuditLogPage() {
         : logs.length === 0 ? <Empty message="No log entries" />
         : <>
           <Table>
-            <TableHead columns={["#", "User", "Action", "Entity", "IP", "Time"]} />
+            <TableHead columns={["#", "Gamer Tag", "Action", "Entity", "IP", "Time"]} />
             <tbody>
               {logs.map((l, i) => (
                 <tr key={l.id} className={`hover:bg-white/2 transition-colors ${i < logs.length - 1 ? "border-b border-white/4" : ""}`}>
                   <td className="px-5 py-3.5 font-mono text-xs text-white/20">{l.id}</td>
-                  <td className="px-5 py-3.5 text-xs text-white/50">{l.username ?? <span className="text-white/20">—</span>}</td>
+                  <td className="px-5 py-3.5 text-xs text-white/50">{l.gamer_tag ?? <span className="text-white/20">—</span>}</td>
                   <td className="px-5 py-3.5 font-mono text-xs text-amber-400/70">{l.action}</td>
                   <td className="px-5 py-3.5 font-mono text-xs text-white/30">
                     {l.entity ? `${l.entity}${l.entityId ? ` #${l.entityId}` : ""}` : <span className="text-white/15">—</span>}

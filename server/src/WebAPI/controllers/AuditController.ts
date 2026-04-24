@@ -7,7 +7,7 @@ import { UserRole } from "../../Domain/enums/UserRole";
 export class AuditController {
   private readonly router = Router();
   public constructor(private readonly auditService: IAuditService) {
-    this.router.get("/audit-log", authenticate, authorize(UserRole.ADMIN), this.getLogs.bind(this));
+    this.router.get("/audit_log", authenticate, authorize(UserRole.ADMIN), this.getLogs.bind(this));
   }
   private async getLogs(req: Request, res: Response): Promise<void> {
     const page = parseInt(String(req.query.page ?? "1"), 10);

@@ -39,7 +39,7 @@ export class AuditRepository implements IAuditRepository {
     try {
         // TODO: improve querry - remove JOIN
         const [rows] = await res.conn.execute<RowDataPacket[]>(
-            `SELECT al.*, u.username
+            `SELECT al.*, u.gamer_tag
             FROM audit_log al
             LEFT JOIN users u ON al.user_id = u.id
             ORDER BY al.createdAt DESC
@@ -51,8 +51,8 @@ export class AuditRepository implements IAuditRepository {
       );
       const items = rows.map(
         (l) => new AuditLogDto(
-          l.id, l.userId ?? null, l.username ?? null,
-          l.action, l.entity ?? null, l.entityId ?? null,
+          l.id, l.user_id ?? null, l.gamer_tag ?? null,
+          l.action, l.entity ?? null, l.entity_id ?? null,
           l.meta ? (JSON.parse(l.meta as string) as Record<string, unknown>) : null,
           l.ipAddress ?? null, new Date(l.createdAt as string)
         )
