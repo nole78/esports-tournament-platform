@@ -14,7 +14,7 @@ export class TeamRepository implements ITeamRepository {
 
   private map(r: RowDataPacket): TeamDto {
     // TODO: imlement
-    return new TeamDto();
+    return new TeamDto(r.team_id, r.team_name, r.team_tag, r.team_logotip, r.team_description);
   }
 
   async findById(id: number): Promise<TeamDto | null> {
@@ -49,11 +49,11 @@ export class TeamRepository implements ITeamRepository {
     if (!res) return new Team();
     try {
       const [result] = await res.conn.execute<ResultSetHeader>(
-        `INSERT INTO teams (team_id) VALUES (?)`,
-        [dto.teamId]
+        `INSERT INTO teams (team_name, team_tag, team_logotip, team_description) VALUES (?, ?, ?, ?)`,
+        [dto.teamName, dto.teamTag, dto.teamLogotip, dto.teamDescription]
       );
       if (result.insertId === 0) return new Team();
-      return new Team(result.insertId, dto.teamId);
+      return new Team(result.insertId, dto.teamName, dto.teamTag, dto.teamLogotip, dto.teamDescription);
     } catch (err) {
       this.logger.error("TeamRepository", "create failed", err);
       return new Team();
@@ -63,8 +63,18 @@ export class TeamRepository implements ITeamRepository {
   async update(id: number, fields: Partial<Team>): Promise<boolean> {
     const res = await this.db.getWriteConnection();
     if (!res) return false;
+
+    const fieldMap: Record<string, string> ={
+      teamName: "team_name",
+      teamTag: "team_tag",
+      teamLogotip: "team_logotip",
+      teamDescription: "team_descrition"
+    }
+
     try {
-      const entries = Object.entries(fields).filter(([, v]) => v !== undefined);
+      const entries = Object.entries(fields)
+      .filter(([, v]) => v !== undefined)
+      .map(([k,v])=>[fieldMap[k] ?? k, v]);
       if (entries.length === 0) return false;
       const setClause = entries.map(([k]) => `${k} = ?`).join(", ");
       const values = entries.map(([, v]) => v);
