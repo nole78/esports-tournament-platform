@@ -32,11 +32,11 @@ const gameRepo = new GameRepository(db, logger);
 const auditRepo = new AuditRepository(db, logger);
 
 // Services
-const authService   = new AuthService(userRepo);
 const userService   = new UserService(userRepo);
 const entityService = new EntityService(entityRepo);
 const gameService   = new GameService(gameRepo);
 const auditService = new AuditService(auditRepo);
+const authService   = new AuthService(userRepo,auditService);
 
 // Express
 const app = express();
