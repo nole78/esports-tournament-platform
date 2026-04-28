@@ -13,7 +13,6 @@ export class TeamRepository implements ITeamRepository {
   ) {}
 
   private map(r: RowDataPacket): TeamDto {
-    // TODO: imlement
     return new TeamDto(r.team_id, r.team_name, r.team_tag, r.team_logotip, r.team_description);
   }
 
@@ -101,3 +100,4 @@ export class TeamRepository implements ITeamRepository {
       return false;
     } finally { res.conn.release(); }
   }
+}
