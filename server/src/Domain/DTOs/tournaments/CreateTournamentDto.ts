@@ -6,7 +6,7 @@ export class CreateTournamentDto{
     constructor(
         public tournamentName : string = "",
         public tournamentGame : string = "",
-        public tournamentFormat : TournamentFormat.SINGLE_ELIMINATION,
+        public tournamentFormat : TournamentFormat = TournamentFormat.SINGLE_ELIMINATION,
         public tournamentMaxTeams : number = 0,
         public tournamentApplicationDeadline : Date = new Date(),
         public tournamentPrizeFund : number = 0,
