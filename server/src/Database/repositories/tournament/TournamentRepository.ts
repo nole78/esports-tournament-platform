@@ -40,7 +40,7 @@ export class TournamentRepository implements ITournamentRepository {
     if (!res) return [];
     const offset = (page - 1) * limit;
     try {
-      const [rows] = await res.conn.execute<RowDataPacket[]>(
+      const [rows] = await res.conn.query<RowDataPacket[]>(
         `SELECT t.tournament_name, t.tournament_format, t.tournament_max_teams, t.tournament_application_deadline, t.tournament_prize_fund, t.tournament_status, g.game_name 
          FROM tournaments t 
          JOIN games g ON t.tournament_game_id = g.game_id 
