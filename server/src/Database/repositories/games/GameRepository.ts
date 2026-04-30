@@ -30,6 +30,21 @@ export class GameRepository implements IGameRepository{
         }
         finally{ res.conn.release();}
     }
+
+    async findByName(name: string): Promise<GameDto | null> {
+        const res = await this.db.getReadConnection();
+        if(!res) return null;
+        try{
+            const [rows] = await res.conn.execute<RowDataPacket[]>(`SELECT * FROM games WHERE game_name = ?`,[name]);
+            return rows.length > 0 ? this.map(rows[0]) : null;
+        }
+        catch (err) {
+            this.logger.error("GameRepository","findByName failed",err);
+            return null;
+        }
+        finally{ res.conn.release();}
+    }
+    
     async findAll(page = 1, limit = 20): Promise<GameDto[]> {
         const res = await this.db.getReadConnection();
         if (!res) return [];
