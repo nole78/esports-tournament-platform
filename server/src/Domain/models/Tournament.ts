@@ -7,8 +7,7 @@ export class Tournament{
     constructor(
         public tournamentId : number = 0,
         public tournamentName : string = "",
-        public tournamentGame : string = "",
-        public gameId : number = 0,
+        public tournamentGameId : number = 0,
         public tournamentFormat : TournamentFormat = TournamentFormat.SINGLE_ELIMINATION,
         public tournamentMaxTeams : number = 0,
         public tournamentApplicationDeadline : Date = new Date(),
