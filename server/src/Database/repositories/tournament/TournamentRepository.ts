@@ -4,7 +4,8 @@ import { ResultSetHeader, RowDataPacket } from "mysql2";
 import { DbManager } from "../../connection/DbConnectionPool";
 import { ILoggerService } from "../../../Domain/services/logger/ILoggerService";
 import { TournamentDto } from "../../../Domain/DTOs/tournaments/TorunamentDto";
-import { CreateTournamentDto } from "../../../Domain/DTOs/tournaments/CreateTournamentDto";
+import { CreateTournamentInternalDto } from "../../../Domain/DTOs/tournaments/CreateTournamentInternalDto";
+import { TournamentStatus } from '../../../Domain/enums/TournamentStatus';
 
 export class TournamentRepository implements ITournamentRepository {
   public constructor(
@@ -13,14 +14,20 @@ export class TournamentRepository implements ITournamentRepository {
   ) {}
 
   private map(r: RowDataPacket): TournamentDto {
-    return new TournamentDto();
+    return new TournamentDto(r.tournament_name, r.game_name, r.tournament_format, r.tournament_max_teams, r.tournament_application_deadline, r.tournament_prize_fund, r.tournament_status);
   }
 
   async findById(id: number): Promise<TournamentDto | null> {
     const res = await this.db.getReadConnection();
     if (!res) return null;
     try {
-      const [rows] = await res.conn.execute<RowDataPacket[]>(`SELECT * FROM tournaments WHERE tournament_id = ?`, [id]);
+      const [rows] = await res.conn.execute<RowDataPacket[]>(
+        `SELECT t.tournament_name, t.tournament_format, t.tournament_max_teams, t.tournament_application_deadline, t.tournament_prize_fund, t.tournament_status, g.game_name 
+         FROM tournaments t 
+         JOIN games g ON t.tournament_game_id = g.game_id 
+         WHERE t.tournament_id = ?`, 
+        [id]
+      );
       return rows.length > 0 ? this.map(rows[0]) : null;
     } catch (err) {
       this.logger.error("TournamentRepository", "findById failed", err);
@@ -34,7 +41,11 @@ export class TournamentRepository implements ITournamentRepository {
     const offset = (page - 1) * limit;
     try {
       const [rows] = await res.conn.execute<RowDataPacket[]>(
-        `SELECT * FROM tournaments ORDER BY tournament_id DESC LIMIT ? OFFSET ?`, [limit, offset]
+        `SELECT t.tournament_name, t.tournament_format, t.tournament_max_teams, t.tournament_application_deadline, t.tournament_prize_fund, t.tournament_status, g.game_name 
+         FROM tournaments t 
+         JOIN games g ON t.tournament_game_id = g.game_id 
+         ORDER BY t.tournament_id DESC LIMIT ? OFFSET ?`, 
+        [limit, offset]
       );
       return rows.map((r) => this.map(r));
     } catch (err) {
@@ -43,25 +54,26 @@ export class TournamentRepository implements ITournamentRepository {
     } finally { res.conn.release(); }
   }
 
-  async create(dto: CreateTournamentDto): Promise<Tournament> {
+  async create(dto: CreateTournamentInternalDto): Promise<Tournament> {
     const res = await this.db.getWriteConnection();
     if (!res) return new Tournament();
     try {
       const [result] = await res.conn.execute<ResultSetHeader>(
-        `INSERT INTO entities (userId) VALUES (?)`,
-        [dto.tournamentId]
+        `INSERT INTO tournaments (tournament_name, tournament_game_id, tournament_format, tournament_max_teams, tournament_application_deadline, tournament_prize_fund, tournament_status) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [dto.tournamentName, dto.tournamentGameId, dto.tournamentFormat, dto.tournamentMaxTeams, dto.tournamentApplicationDeadline, dto.tournamentPrizeFund, dto.tournamentStatus]
       );
       if (result.insertId === 0) return new Tournament();
-      return new Tournament(result.insertId, dto.tournamentId);
+      return new Tournament(result.insertId, dto.tournamentName, dto.tournamentGameId, dto.tournamentFormat, dto.tournamentMaxTeams, dto.tournamentApplicationDeadline, dto.tournamentPrizeFund, dto.tournamentStatus);
     } catch (err) {
       this.logger.error("TournamentRepository", "create failed", err);
       return new Tournament();
     } finally { res.conn.release(); }
   }
-
+  //Will change update later
   async update(id: number, fields: Partial<Tournament>): Promise<boolean> {
     const res = await this.db.getWriteConnection();
     if (!res) return false;
+
     try {
       const entries = Object.entries(fields).filter(([, v]) => v !== undefined);
       if (entries.length === 0) return false;
