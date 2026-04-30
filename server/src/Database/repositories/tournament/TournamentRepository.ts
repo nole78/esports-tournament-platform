@@ -69,13 +69,23 @@ export class TournamentRepository implements ITournamentRepository {
       return new Tournament();
     } finally { res.conn.release(); }
   }
-  //Will change update later
+  
   async update(id: number, fields: Partial<Tournament>): Promise<boolean> {
     const res = await this.db.getWriteConnection();
     if (!res) return false;
 
+    const fieldMap: Record<string, string> = {
+      tournamentName: "tournament_name",
+      tournamentGameId: "tournament_game_id",
+      tournamentFormat: "tournament_format",
+      tournamentMaxTeams: "tournament_max_teams",
+      tournamentApplicationDeadline: "tournament_application_deadline",
+      tournamentPrizeFund: "tournament_prize_fund",
+      torunamentStatus: "tournament_status"
+    }
+
     try {
-      const entries = Object.entries(fields).filter(([, v]) => v !== undefined);
+      const entries = Object.entries(fields).filter(([, v]) => v !== undefined).map(([k,v]) => [fieldMap[k] ?? k, v]);
       if (entries.length === 0) return false;
       const setClause = entries.map(([k]) => `${k} = ?`).join(", ");
       const values = entries.map(([, v]) => v);
