@@ -18,7 +18,6 @@ export class TournamentController{
         this.router.post("/tournaments", authenticate, authorize(UserRole.ADMIN),this.create.bind(this));
         this.router.put("/tournaments/:id", authenticate, authorize(UserRole.ADMIN), this.update.bind(this));
         this.router.delete("/tournaments/:id", authenticate, authorize(UserRole.ADMIN), this.delete.bind(this));
-        //TO DOO: add rest for registering tournaments
     }
 
     private async getAll(req: Request, res: Response) : Promise<void>{
