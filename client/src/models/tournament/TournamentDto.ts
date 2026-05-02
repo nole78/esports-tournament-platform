@@ -1,5 +1,5 @@
-import type { TournamentFormat } from "../types/TournamentFormat"
-import type { TournamentStatus } from "../types/TournamentStatus"
+import type { TournamentFormat } from "../../types/tournament/TournamentFormat"
+import type { TournamentStatus } from "../../types/tournament/TournamentStatus"
 
 export type TournamentDto = {
     tournamentName : string,
