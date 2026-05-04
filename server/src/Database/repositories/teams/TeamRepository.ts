@@ -20,7 +20,11 @@ export class TeamRepository implements ITeamRepository {
     const res = await this.db.getReadConnection();
     if (!res) return null;
     try {
-      const [rows] = await res.conn.execute<RowDataPacket[]>(`SELECT * FROM teams WHERE team_id = ?`, [id]);
+      //Getting the teams and the roles of the member 
+      const [rows] = await res.conn.execute<RowDataPacket[]>(
+        `SELECT t.team_id, t.team_name, t.team_tag, t.team_logotip, t.team_description, tm.role 
+        FROM teams t JOIN team_members tm ON
+        t.team_id = tm.team_id WHERE t.team_id = ?`, [id]);
       return rows.length > 0 ? this.map(rows[0]) : null;
     } catch (err) {
       this.logger.error("TeamRepository", "findById failed", err);
@@ -33,8 +37,11 @@ export class TeamRepository implements ITeamRepository {
     if (!res) return [];
     const offset = (page - 1) * limit;
     try {
-      const [rows] = await res.conn.execute<RowDataPacket[]>(
-        `SELECT * FROM teams ORDER BY team_id DESC LIMIT ? OFFSET ?`, [limit, offset]
+      const [rows] = await res.conn.query<RowDataPacket[]>(
+        `SELECT t.team_id, t.team_name, t.team_tag, t.team_logotip, t.team_description, tm.role 
+        FROM teams t JOIN team_members tm ON
+        t.team_id = tm.team_id ORDER BY t.team_id
+        DESC LIMIT ? OFFSET ?`, [limit, offset]
       );
       return rows.map((r) => this.map(r));
     } catch (err) {

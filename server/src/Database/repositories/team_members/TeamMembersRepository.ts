@@ -13,8 +13,7 @@ export class TeamMemberRepository implements ITeamMemberRepository {
   ) {}
 
   private map(r: RowDataPacket): TeamMemberDto {
-    //TODO: imlement
-    return new TeamMemberDto();
+    return new TeamMemberDto(r.team_id, r.user_id, r.role);
   }
 
   async findAll(page = 1, limit = 20): Promise<TeamMemberDto[]> {
@@ -60,16 +59,16 @@ export class TeamMemberRepository implements ITeamMemberRepository {
     } finally { res.conn.release(); }
   }
 
-  async create(dto: CreateTeamMemberDto): Promise<TeamMember> {
+  async create(dto: TeamMemberDto): Promise<TeamMember> {
     const res = await this.db.getWriteConnection();
     if (!res) return new TeamMember();
     try {
       const [result] = await res.conn.execute<ResultSetHeader>(
-        `INSERT INTO team_members (team_id,user_id) VALUES (?, ?)`,
-        [dto.teamId, dto.userId]
+        `INSERT INTO team_members (team_id,user_id,role) VALUES (?, ?, ?)`,
+        [dto.teamId, dto.userId, dto.role]
       );
       if (result.insertId === 0) return new TeamMember();
-      return new TeamMember(result.insertId, dto.teamId, dto.userId);
+      return new TeamMember(dto.teamId, dto.userId, dto.role);
     } catch (err) {
       this.logger.error("TeamMemberRepository", "create failed", err);
       return new TeamMember();
@@ -79,6 +78,10 @@ export class TeamMemberRepository implements ITeamMemberRepository {
   async update(teamId: number, userId: number, fields: Partial<TeamMember>): Promise<boolean> {
     const res = await this.db.getWriteConnection();
     if (!res) return false;
+    //Will leave as is, maybe the role should update
+    const fieldMap: Record<string, string> ={
+
+    }
     try {
       const entries = Object.entries(fields).filter(([, v]) => v !== undefined);
       if (entries.length === 0) return false;
