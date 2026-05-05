@@ -5,27 +5,33 @@ import { DbManager } from "../../connection/DbConnectionPool";
 import { TeamDto } from "../../../Domain/DTOs/teams/TeamDto";
 import { CreateTeamDto } from "../../../Domain/DTOs/teams/CreateTeamDto";
 import { Team } from "../../../Domain/models/Team";
+import { ReplyTeamDto } from "../../../Domain/DTOs/teams/ReplyTeamDto";
 
 export class TeamRepository implements ITeamRepository {
   public constructor(
     private readonly db: DbManager,
     private readonly logger: ILoggerService,
   ) {}
-
   private map(r: RowDataPacket): TeamDto {
-    return new TeamDto(r.team_id, r.team_name, r.team_tag, r.team_logotip, r.team_description);
-  }
+    return new TeamDto(/*r.team_id,*/ r.team_name, r.team_tag, r.team_logotip, r.team_description);
+    }
 
-  async findById(id: number): Promise<TeamDto | null> {
+  async findById(id: number): Promise<TeamDto[] | null> {
     const res = await this.db.getReadConnection();
     if (!res) return null;
     try {
       //Getting the teams and the roles of the member 
-      const [rows] = await res.conn.execute<RowDataPacket[]>(
-        `SELECT t.team_id, t.team_name, t.team_tag, t.team_logotip, t.team_description, tm.role 
+      /*(
+        `SELECT t.team_id, t.team_name, t.team_tag, t.team_logotip, t.team_description, tm.role, u.full_name, u.gamer_tag 
         FROM teams t JOIN team_members tm ON
-        t.team_id = tm.team_id WHERE t.team_id = ?`, [id]);
-      return rows.length > 0 ? this.map(rows[0]) : null;
+        t.team_id = tm.team_id  JOIN users u ON tm.user_id = u.id
+         WHERE u.id = ?`, [id]);*/
+      const [rows] = await res.conn.execute<RowDataPacket[]>(
+        `SELECT t.team_name, t.team_tag, t.team_logotip, t.team_description 
+        FROM teams t JOIN team_members tm ON t.team_id = tm.team_id WHERE tm.user_id = ?`, [id]
+      );
+
+      return rows.map((r) => this.map(r));
     } catch (err) {
       this.logger.error("TeamRepository", "findById failed", err);
       return null;
@@ -38,11 +44,13 @@ export class TeamRepository implements ITeamRepository {
     const offset = (page - 1) * limit;
     try {
       const [rows] = await res.conn.query<RowDataPacket[]>(
-        `SELECT t.team_id, t.team_name, t.team_tag, t.team_logotip, t.team_description, tm.role 
+        `SELECT t.team_id, t.team_name, t.team_tag, t.team_logotip, t.team_description, tm.role, u.full_name, u.gamer_tag
         FROM teams t JOIN team_members tm ON
-        t.team_id = tm.team_id ORDER BY t.team_id
-        DESC LIMIT ? OFFSET ?`, [limit, offset]
+        t.team_id = tm.team_id  JOIN users u ON
+         tm.user_id = u.id ORDER BY t.team_id
+         LIMIT ? OFFSET ?`, [limit, offset]
       );
+      //return rows.map((r) => this.map(r));
       return rows.map((r) => this.map(r));
     } catch (err) {
       this.logger.error("TeamRepository", "findAll failed", err);

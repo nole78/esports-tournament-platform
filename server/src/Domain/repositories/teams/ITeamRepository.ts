@@ -3,7 +3,7 @@ import { TeamDto } from "../../DTOs/teams/TeamDto";
 import { CreateTeamDto} from "../../DTOs/teams/CreateTeamDto";
 
 export interface ITeamRepository {
-    findById(id: number): Promise<TeamDto | null>
+    findById(id: number): Promise<TeamDto[] | null>
     findAll(page?: number, limit?: number): Promise<TeamDto[]>;
     create(dto: CreateTeamDto): Promise<Team>;
     update(id: number, fields: Partial<Team>): Promise<boolean>;

@@ -8,6 +8,7 @@ import { ITeamMemberRepository } from "../../Domain/repositories/team_members/IT
 import { TeamMemberDto } from "../../Domain/DTOs/team_members/TeamMemberDto";
 import { TeamRole } from "../../Domain/enums/TeamRole";
 import { ILoggerService } from "../../Domain/services/logger/ILoggerService";
+import { ReplyTeamDto } from "../../Domain/DTOs/teams/ReplyTeamDto";
 
 export class TeamService implements ITeamService {
     public constructor(private readonly teamRepo: ITeamRepository,
@@ -19,7 +20,7 @@ export class TeamService implements ITeamService {
         const items = await this.teamRepo.findAll(page, limit);
         return new PaginatedListDto(items, items.length, page, limit);
     }
-    async getById(id: number): Promise<TeamDto | null> {
+    async getById(id: number): Promise<TeamDto[] | null> {
         return this.teamRepo.findById(id);
     }
     async create(dto: CreateTeamDto, userId:number): Promise<TeamDto | null> {
@@ -30,7 +31,7 @@ export class TeamService implements ITeamService {
         const member = await this.teamMemberRepo.create(memberDto);
 
         //Maybe add the message to logger if the member isn't created
-        return new TeamDto(created.teamId, created.teamName, created.teamTag, created.teamLogotip, created.teamDescription);
+        return new TeamDto(created.teamName, created.teamTag, created.teamLogotip, created.teamDescription);
     }
     async update(id: number, fields: Partial<TeamDto>): Promise<boolean> {
         return this.teamRepo.update(id, fields);

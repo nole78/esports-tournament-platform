@@ -18,6 +18,10 @@ import { AuthController }   from "./WebAPI/controllers/AuthController";
 import { UserController }   from "./WebAPI/controllers/UserController";
 import { EntityController } from "./WebAPI/controllers/EntityController";
 import { GameController } from "./WebAPI/controllers/GameController";
+import { TeamController } from "./WebAPI/controllers/TeamController";
+import { TeamRepository } from "./Database/repositories/teams/TeamRepository";
+import { TeamService } from "./Services/teams/TeamService";
+import { TeamMemberRepository } from "./Database/repositories/team_members/TeamMembersRepository";
 
 export const logger = new ConsoleLoggerService();
 export const db     = new DbManager(logger);
@@ -26,12 +30,15 @@ export const db     = new DbManager(logger);
 const userRepo   = new UserRepository(db, logger);
 const entityRepo = new EntityRepository(db, logger);
 const gameRepo = new GameRepository(db, logger);
+const teamRepo = new TeamRepository(db, logger);
+const teamMemberRepo = new TeamMemberRepository(db, logger);
 
 // Services
 const authService   = new AuthService(userRepo);
 const userService   = new UserService(userRepo);
 const entityService = new EntityService(entityRepo);
 const gameService   = new GameService(gameRepo);
+const teamService   = new TeamService(teamRepo, teamMemberRepo, logger);
 
 // Express
 const app = express();
@@ -42,5 +49,6 @@ app.use("/api/v1", new AuthController(authService).getRouter());
 app.use("/api/v1", new UserController(userService).getRouter());
 app.use("/api/v1", new EntityController(entityService).getRouter());
 app.use("/api/v1", new GameController(gameService).getRouter());
+app.use("/api/v1", new TeamController(teamService).getRouter());
 
 export default app;
