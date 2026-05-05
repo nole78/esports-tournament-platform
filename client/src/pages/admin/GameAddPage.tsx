@@ -9,7 +9,7 @@ export default function GameAddPage(){
     return (
         <div>
             <PageHeader eyebrow="ADMIN" title="Game adder"/>
-            <button onClick={() => navigate("/admin/game_catalog")}
+            <button onClick={() => navigate("/game_catalog")}
                     className="mb-2 bg-bgsecondary/40 border-2 border-bgsecondary hover:bg-bgsecondary/30 text-bgsecondary font-semibold rounded-xl p-3 text-sm transition-colors">
             Back</button>
             <GameAddForm gameApi={gameApi}/>
