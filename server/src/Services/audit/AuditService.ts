@@ -3,9 +3,10 @@ import { IAuditRepository } from "../../Domain/repositories/audit/IAuditReposito
 import { AuditLogDto } from "../../Domain/DTOs/audit/AuditLogDto";
 import { PaginatedListDto } from "../../Domain/DTOs/PaginatedListDto";
 import { AuditLog } from "../../Domain/models/AuditLog";
+import { IUserRepository } from "../../Domain/repositories/users/IUserRepository";
 
 export class AuditService implements IAuditService {
-  public constructor(private readonly auditRepo: IAuditRepository) {}
+  public constructor(private readonly auditRepo: IAuditRepository, private readonly userRepo: IUserRepository) {}
 
   async log(params: {
     userId?: number;
@@ -28,6 +29,11 @@ export class AuditService implements IAuditService {
   }
 
   async getAllLogs(page: number, limit: number): Promise<PaginatedListDto<AuditLogDto>> {
-    return this.auditRepo.findAll(page, limit);
+    let auditLogs = await this.auditRepo.findAll(page, limit);
+    for (const log of auditLogs.items) {
+      const user = await this.userRepo.findById(log.userId || 0);
+      log.gamer_tag = user ? user.gamerTag : "";
+    }
+    return auditLogs;
   }
 }

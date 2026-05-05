@@ -35,7 +35,7 @@ const auditRepo = new AuditRepository(db, logger);
 const userService   = new UserService(userRepo);
 const entityService = new EntityService(entityRepo);
 const gameService   = new GameService(gameRepo);
-const auditService = new AuditService(auditRepo);
+const auditService = new AuditService(auditRepo, userRepo);
 const authService   = new AuthService(userRepo,auditService);
 
 // Express

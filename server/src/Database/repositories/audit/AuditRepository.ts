@@ -11,6 +11,7 @@ export class AuditRepository implements IAuditRepository {
     private readonly db: DbManager,
     private readonly logger: ILoggerService
   ) {}
+  
 
   async create(log: AuditLog): Promise<AuditLog> {
     const res = await this.db.getWriteConnection();
@@ -37,21 +38,19 @@ export class AuditRepository implements IAuditRepository {
     const offset = Math.max(0, Math.floor((page - 1) * limit));
     const lim    = Math.max(1, Math.floor(limit));
     try {
-        // TODO: improve querry - remove JOIN
         const [rows] = await res.conn.execute<RowDataPacket[]>(
-            `SELECT al.*, u.gamer_tag
-            FROM audit_log al
-            LEFT JOIN users u ON al.user_id = u.id
-            ORDER BY al.createdAt DESC
+            `SELECT * FROM audit_log
+            ORDER BY createdAt DESC
             LIMIT ${lim} OFFSET ${offset}`,
             []
       );
+
       const [cnt] = await res.conn.execute<RowDataPacket[]>(
         `SELECT COUNT(*) as total FROM audit_log`
       );
       const items = rows.map(
         (l) => new AuditLogDto(
-          l.id, l.user_id ?? null, l.gamer_tag ?? null,
+          l.id, l.user_id ?? null, null,
           l.action, l.entity ?? null, l.entity_id ?? null,
           l.meta ? (JSON.parse(l.meta as string) as Record<string, unknown>) : null,
           l.ipAddress ?? null, new Date(l.createdAt as string)
