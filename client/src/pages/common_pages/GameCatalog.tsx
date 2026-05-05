@@ -4,6 +4,7 @@ import type { GameDto } from "../../models/game/GameDto";
 import { gameApi } from "../../api_services/game_catalog/GameAPIService";
 import { useAuth } from "../../hooks/auth/useAuthHook";
 import { useNavigate } from "react-router-dom";
+import { Layout } from "../../components/layout/Layout";
 
 
 export default function GameCatalog(){
@@ -25,10 +26,11 @@ export default function GameCatalog(){
     }, []);
 
     return (
+        <Layout>
         <div>
             <PageHeader eyebrow="" title="Game Catalog"/>
             {user?.role === "admin" && (
-                <button onClick={() => navigate("/admin/game_catalog/add")}
+                <button onClick={() => navigate("/game_catalog/add")}
                         className="mb-2 bg-bgsecondary/40 border-2 border-bgsecondary hover:bg-bgsecondary/30 text-bgsecondary font-semibold rounded-xl p-3 text-sm transition-colors">
                 Add Game</button>
             )}
@@ -62,7 +64,7 @@ export default function GameCatalog(){
                                 Delete
                             </button>
                             <button className="mb-2 bg-bgsecondary/40 border-2 border-bgsecondary hover:bg-bgsecondary/30 text-bgsecondary font-semibold rounded-xl p-1 text-sm transition-colors"
-                                    onClick={() => navigate(`/admin/game_catalog/edit/${g.gameId}`)}>
+                                    onClick={() => navigate(`/game_catalog/edit/${g.gameId}`)}>
                                 Edit
                             </button>
                         </div>)}
@@ -73,5 +75,6 @@ export default function GameCatalog(){
                 </section>
             )}
         </div>
+        </Layout>
     );
 }
