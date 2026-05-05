@@ -45,10 +45,10 @@ export default function AuditLogPage() {
               {logs.map((l, i) => (
                 <tr key={l.id} className={`hover:bg-white/2 transition-colors ${i < logs.length - 1 ? "border-b border-white/4" : ""}`}>
                   <td className="px-5 py-3.5 font-mono text-xs text-white/20">{l.id}</td>
-                  <td className="px-5 py-3.5 text-xs text-white/50">{l.gamer_tag ?? <span className="text-white/20">—</span>}</td>
+                  <td className="px-5 py-3.5 text-xs text-white/50">{l.gamer_tag ? ` ${l.gamer_tag}` : <span className="text-white/20">Unregistered user</span>}</td>
                   <td className="px-5 py-3.5 font-mono text-xs text-amber-400/70">{l.action}</td>
                   <td className="px-5 py-3.5 font-mono text-xs text-white/30">
-                    {l.entity ? `${l.entity}${l.entityId ? ` #${l.entityId}` : ""}` : <span className="text-white/15">—</span>}
+                    {l.entity ? `${l.entity}${l.entityId ? ` #${l.entityId}` : " —"}` : <span className="text-white/15">—</span>}
                   </td>
                   <td className="px-5 py-3.5 font-mono text-xs text-white/20">{l.ipAddress ?? "—"}</td>
                   <td className="px-5 py-3.5 text-xs text-white/30">{new Date(l.createdAt).toLocaleString()}</td>
