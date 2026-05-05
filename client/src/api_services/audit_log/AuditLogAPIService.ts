@@ -1,6 +1,7 @@
 import axios from "axios";
 import type { AuditLogDto } from "../../models/audit/AuditLogDTO";
-import type { ApiResponse, PaginatedList } from "../../types/audit/AuditList";
+import type { ApiResponse } from "../../types/audit/AuditApiResponse";
+import type { PaginatedList } from "../../models/audit/AuditList";
 import type { IAuditLogAPIService } from "./IAuditLogAPIService";
 
 const BASE = import.meta.env.VITE_API_URL + "audit_log";
