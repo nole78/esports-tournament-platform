@@ -3,6 +3,11 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/auth/useAuthHook";
 
 // TODO: Update nav items to match your routes and roles
+const guestNav = [
+  {to: "/pulse_grid", label: "Pulse Grid", icon: "◎"},
+  {to: "/game_catalog", label: "Game Catalog", icon: "⬡"}
+]
+
 const userNav = [
   { to: "/dashboard", label: "Dashboard", icon: "⬡" },
   { to: "/game_catalog", label: "Game Catalog", icon: "⬡"},
@@ -11,14 +16,14 @@ const userNav = [
 const adminNav = [
   { to: "/admin",       label: "Dashboard", icon: "⬡" },
   { to: "/admin/users", label: "Users",     icon: "◎" },
-  { to: "/admin/game_catalog", label: "Game Catalog", icon: "⬡"},
+  { to: "/game_catalog", label: "Game Catalog", icon: "⬡"},
   // add more admin routes here
 ];
 
 export function Layout({ children }: { children: ReactNode }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const nav = user?.role === "admin" ? adminNav : userNav;
+  const nav = user?.role === "admin" ? adminNav : user? userNav : guestNav;
 
   return (
     <div className="flex min-h-screen bg-primary">
@@ -54,6 +59,7 @@ export function Layout({ children }: { children: ReactNode }) {
 
         {/* User */}
         <div className="border-t border-primary/30 px-4 py-4">
+          {user &&
           <div className="flex items-center gap-3 mb-3">
             <div className="w-7 h-7 rounded-full bg-white/10 border border-primary/50 flex items-center justify-center">
               <span className="text-xs text-bgsecondary/60 font-medium">{user?.username?.[0]?.toUpperCase()}</span>
@@ -62,9 +68,14 @@ export function Layout({ children }: { children: ReactNode }) {
               <p className="text-xs font-medium text-primary/80 truncate">{user?.username}</p>
             </div>
           </div>
-          <button onClick={() => { logout(); navigate("/login"); }}
+          }
+          <button onClick={() => { 
+            if(user)
+              logout(); 
+            navigate("/login"); 
+          }}
             className="text-xs text-bgsecondary hover:text-white/50 transition-colors w-full text-left">
-            Sign out →
+            {user? "Sign out →" : "Log in →"}
           </button>
         </div>
       </aside>
