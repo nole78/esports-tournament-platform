@@ -1,6 +1,7 @@
 import { type ReactNode } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/auth/useAuthHook";
+import logo from "../../assets/logo.png";
 
 // TODO: Update nav items to match your routes and roles
 const guestNav = [
@@ -31,7 +32,7 @@ export function Layout({ children }: { children: ReactNode }) {
           {/* LEFT - Logo */}
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-white/10 border border-primary/50 flex items-center justify-center">
-              <img src="logo.png" className="w-10 h-9.5 rounded-lg" />
+              <img src={logo} className="w-10 h-9.5 rounded-lg" />
             </div>
 
             <button
