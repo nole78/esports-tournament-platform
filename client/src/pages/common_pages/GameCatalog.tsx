@@ -43,14 +43,14 @@ export default function GameCatalog(){
             {games.length === 0 && !error ? <Empty message="No games found"/> : (
                 <section className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                     {games.map(g => (
-                    <div className="group relative aspect-4/3 border-3 h-2xl border-bgprimary bg-bgprimary/30  rounded-xl">
+                    <div className="group relative aspect-4/3 border-2 h-2xl border-white/5 bg-bgprimary/30  rounded-xl overflow-hidden">
                         <div className="w-full h-full">
-                            <img src={g.gameLogotip} className="object-cover w-full h-full rounded-xl"/>
+                            <img src={g.gameLogotip} className="object-cover w-full h-full rounded-xl transition-transform duration-300 group-hover:scale-110"/>
                         </div>
-                        <div className="absolute rounded-t-lg bg-primary/80 h-min inset-0 origin-top scale-y-0 group-hover:scale-y-100 transition-transform duration-300">
+                        <div className="absolute rounded-t-lg bg-primary/90 h-min inset-0 origin-top scale-y-0 group-hover:scale-y-100 transition-transform duration-300">
                             <h2 className="text-bgsecondary text-center text-2xl font-bold">{g.gameName}</h2>
                         </div>
-                        <div className="absolute rounded-b-lg bottom-0 bg-primary/80 w-full p-2 origin-bottom scale-y-0 group-hover:scale-y-100 transition-transform duration-300">
+                        <div className="absolute rounded-b-lg bottom-0 bg-primary/90 w-full p-2 origin-bottom scale-y-0 group-hover:scale-y-100 transition-transform duration-300">
                             {user?.role === "admin" && (<div className="top-0">
                                 <button className="w-1/3 mb-2 bg-red-400/40 border-2 border-red-500 hover:bg-bgsecondary/30 hover:border-bgsecondary text-red-500 font-semibold rounded-xl p-1 text-sm transition-colors"
                                         onClick={() => {
