@@ -31,7 +31,7 @@ export default function GameCatalog(){
             <PageHeader eyebrow="" title="Game Catalog"/>
             {user?.role === "admin" && (
                 <button onClick={() => navigate("/game_catalog/add")}
-                        className="mb-2 bg-bgsecondary/40 border-2 border-bgsecondary hover:bg-bgsecondary/30 text-bgsecondary font-semibold rounded-xl p-3 text-sm transition-colors">
+                        className="mb-2 w-1/6 bg-bgsecondary/40 border-2 border-bgsecondary hover:bg-bgsecondary/30 text-bgsecondary font-semibold rounded-xl py-3 text-sm transition-colors">
                 Add Game</button>
             )}
             {error && <ErrorBox message={error}/>}
@@ -73,7 +73,7 @@ export default function GameCatalog(){
                                     Edit
                                 </button>
                             </div>)}
-                            <span className="float-left font-semibold text-sm text-bgsecondary">Players: {g.gamePlayers}</span>
+                            <span className="float-left font-semibold text-sm text-bgsecondary">{g.gamePlayers}v{g.gamePlayers}</span>
                             <span className="text-sm text-bgsecondary font-semibold float-right">{g.gameGenre}</span>
                         </div>
                     </div>
