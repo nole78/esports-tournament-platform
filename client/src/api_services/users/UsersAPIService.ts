@@ -30,7 +30,7 @@ export const usersApi: IUsersAPIService = {
       .then(r => r.data).catch(e => err(e, "Failed to deactivate user"));
   },
   async getInfo(){
-    return axios.patch<ApiResponse<UserInfoDto>>(`${BASE}/me/info`,{headers: authHeader()})
+    return axios.get<ApiResponse<UserInfoDto>>(`${BASE}/me/info`,{headers: authHeader()})
       .then(r => r.data).catch(e => err(e, "Failed to recive user info"));
   }
 };
