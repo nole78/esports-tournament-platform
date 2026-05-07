@@ -12,7 +12,7 @@ export class UserRepository implements IUserRepository {
   ) {}
 
   private map(r: RowDataPacket): User {
-    return new User(r.id, r.gamer_tag, r.email, r.fullName, r.role as UserRole, r.passwordHash, r.isActive);
+    return new User(r.id, r.gamer_tag, r.email, r.fullName, r.role as UserRole, r.passwordHash, r.isActive, r.profilePicture);
   }
 
   async create(user: User): Promise<User> {
@@ -20,8 +20,8 @@ export class UserRepository implements IUserRepository {
     if (!res) return new User();
     try {
       const [result] = await res.conn.execute<ResultSetHeader>(
-        `INSERT INTO users (full_name, gamer_tag, email, role, passwordHash) VALUES (? , ?, ?, ?, ?)`,
-        [user.fullName, user.gamerTag, user.email, user.role, user.passwordHash]
+        `INSERT INTO users (full_name, gamer_tag, email, role, passwordHash, profile_picture) VALUES (?, ?, ?, ?, ?, ?)`,
+        [user.fullName, user.gamerTag, user.email, user.role, user.passwordHash, user.profilePicture]
       );
       if (result.insertId === 0) return new User();
       return new User(result.insertId, user.gamerTag, user.email, user.fullName, user.role, user.passwordHash);
@@ -84,8 +84,8 @@ export class UserRepository implements IUserRepository {
     if (!res) return false;
     try {
       const [result] = await res.conn.execute<ResultSetHeader>(
-        `UPDATE users SET gamer_tag = ?, email = ?, role = ?, isActive = ? WHERE id = ?`,
-        [user.gamerTag, user.email, user.role, user.isActive, user.id]
+        `UPDATE users SET gamer_tag = ?, email = ?, role = ?, isActive = ?, profile_picture = ? WHERE id = ?`,
+        [user.gamerTag, user.email, user.role, user.isActive, user.profilePicture , user.id]
       );
       return result.affectedRows > 0;
     } catch (err) {
