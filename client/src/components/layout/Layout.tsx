@@ -1,7 +1,9 @@
-import { type ReactNode } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/auth/useAuthHook";
 import logo from "../../assets/logo.png";
+import avatarPlaceholder from "../../assets/avatar_placeholder.jpg";
+import { usersApi } from "../../api_services/users/UsersAPIService";
 
 // TODO: Update nav items to match your routes and roles
 const guestNav = [
@@ -21,14 +23,25 @@ const adminNav = [
   // add more admin routes here
 ];
 
-export function Layout({ children }: { children: ReactNode }) {
+export function Layout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const nav = user?.role === "admin" ? adminNav : user? userNav : guestNav;
+  const [avatar, setAvatar] = useState("");
+
+  useEffect(() => {
+    if(user)
+    {
+      usersApi.getById(user.id).then(res => {
+          setAvatar(res.data?.profilePicture ?? "");
+        })
+        .catch()
+    }
+  },[user])
 
   return (
-    <div className="flex flex-col min-h-screen bg-primary">
-      <header className="w-full border-b border-secondary/40 bg-bgprimary/70">
+    <div className="flex oveflow-hidden flex-col h-screen bg-primary">
+      <header className="h-16 shrink-0 w-full border-b border-secondary/40 bg-bgprimary/70">
         <div className="h-16 px-6 flex items-center justify-between">
           {/* LEFT - Logo */}
           <div className="flex items-center gap-3">
@@ -69,9 +82,7 @@ export function Layout({ children }: { children: ReactNode }) {
             {user && (
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-white/10 border border-primary/50 flex items-center justify-center">
-                  <span className="text-xs text-bgsecondary/60 font-medium">
-                    {user?.username?.[0]?.toUpperCase()}
-                  </span>
+                  <img src={avatar? avatar : avatarPlaceholder} className="rounded-full"/>
                 </div>
 
                 <p className="text-sm text-primary/80">{user?.username}</p>
@@ -91,8 +102,8 @@ export function Layout({ children }: { children: ReactNode }) {
         </div>
       </header>
 
-      <main className="flex-1 overflow-auto">
-        <div className="max-w-5xl mx-auto px-8 py-8">{children}</div>
+      <main className="main-scroll flex-1 overflow-y-auto">
+        <div className="max-w-5xl mx-auto px-8 py-8"><Outlet/></div>
       </main>
     </div>
   );
