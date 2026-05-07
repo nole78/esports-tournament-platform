@@ -6,12 +6,14 @@ import { useAuth } from "../../hooks/auth/useAuthHook";
 const userNav = [
   { to: "/dashboard", label: "Dashboard", icon: "⬡" },
   { to: "/game_catalog", label: "Game Catalog", icon: "⬡"},
+  { to: "/tournament_list", label: "Tournament List", icon: "⬡"},
   // add more user routes here
 ];
 const adminNav = [
   { to: "/admin",       label: "Dashboard", icon: "⬡" },
   { to: "/admin/users", label: "Users",     icon: "◎" },
   { to: "/admin/game_catalog", label: "Game Catalog", icon: "⬡"},
+  { to: "/admin/tournament_list", label: "Tournament List", icon: "⬡"},
   // add more admin routes here
 ];
 
