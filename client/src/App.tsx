@@ -13,13 +13,15 @@ import GameAddPage from "./pages/admin/GameAddPage";
 import GameEditPage from "./pages/admin/GameEditPage";
 import AuditLogPage from "./pages/admin/AuditLog";
 import LandingPage from "./pages/common_pages/LandingPage";
+import { Layout } from "./components/layout/Layout";
 
 export default function App() {
   return (
     <Routes>
-      <Route path="/pulse_grid" element={<LandingPage/>}/>
       <Route path="/login"    element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+    <Route element={<Layout/>}>
+      <Route path="/home" element={<LandingPage/>}/>
       <Route path="/game_catalog" element={<GameCatalog/>} />
 
       {/* User routes */}
@@ -32,9 +34,10 @@ export default function App() {
       <Route path="/game_catalog/edit/:id" element={<ProtectedRoute requiredRole="admin"><GameEditPage/></ProtectedRoute>}/>
       <Route path="/admin/audit_log" element={<ProtectedRoute requiredRole="admin"><AuditLogPage/></ProtectedRoute>}/>
 
-      <Route path="/"    element={<Navigate to="/pulse_grid" replace />} />
+      <Route path="/"    element={<Navigate to="/home" replace />} />
       <Route path="/404" element={<NotFoundPage />} />
       <Route path="*"    element={<Navigate to="/404" replace />} />
+    </Route>
     </Routes>
   );
 }
