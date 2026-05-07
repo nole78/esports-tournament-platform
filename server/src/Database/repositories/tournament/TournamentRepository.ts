@@ -1,4 +1,4 @@
-import { ITournamentRepository } from "../../../Domain/repositories/tournaments/ITournamentRepository";
+/*import { ITournamentRepository } from "../../../Domain/repositories/tournaments/ITournamentRepository";
 import { Tournament } from '../../../Domain/models/Tournament';
 import { ResultSetHeader, RowDataPacket } from "mysql2";
 import { DbManager } from "../../connection/DbConnectionPool";
@@ -90,4 +90,4 @@ export class TournamentRepository implements ITournamentRepository {
       return false;
     } finally { res.conn.release(); }
   }
-}
+}*/
