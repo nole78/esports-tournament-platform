@@ -58,6 +58,24 @@ project/
     └── setup-replication.sh # Replication bootstrap script
 ```
 
+## Live Demo / Deployment
+
+The project is fully deployed and available online:
+
+- **Frontend (Vercel):** https://odp-c2-s-tim-01.vercel.app
+
+### Production Infrastructure
+
+- Frontend hosted on Vercel
+- Backend API hosted on Render
+- MySQL database hosted on Aiven
+
+### Notes
+
+- Local development uses Dockerized MySQL master/slave replication.
+- Production deployment uses a managed cloud MySQL instance due to free-tier limitations.
+- Environment-based configuration is used to separate development and production infrastructure.
+
 ## Getting Started
 
 ### 1. Start the database
