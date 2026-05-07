@@ -1,4 +1,3 @@
-// Should be allright, need to check
 import { TournamentFormat } from "../../enums/TournamentFormat";
 import { TournamentStatus } from "../../enums/TournamentStatus";
 
