@@ -11,6 +11,8 @@ import UsersPage from "./pages/admin/UsersPage";
 import GameCatalog from "./pages/common_pages/GameCatalog";
 import GameAddPage from "./pages/admin/GameAddPage";
 import GameEditPage from "./pages/admin/GameEditPage";
+import TournamentList from "./pages/common_pages/TournamentList";
+import TournamentAddPage from "./pages/admin/TournamentAddPage";
 
 export default function App() {
   return (
@@ -21,6 +23,7 @@ export default function App() {
       {/* User routes */}
       <Route path="/dashboard" element={<ProtectedRoute requiredRole="player"><UserDashboard /></ProtectedRoute>} />
       <Route path="/game_catalog" element={<ProtectedRoute requiredRole="player"><GameCatalog/></ProtectedRoute>} />
+      <Route path="/tournament_list" element={<ProtectedRoute requiredRole="player"><TournamentList/></ProtectedRoute>} />
 
       {/* Admin routes */}
       <Route path="/admin"       element={<ProtectedRoute requiredRole="admin"><AdminDashboard /></ProtectedRoute>} />
@@ -28,6 +31,8 @@ export default function App() {
       <Route path="/admin/game_catalog" element={<ProtectedRoute requiredRole="admin"><GameCatalog/></ProtectedRoute>} />
       <Route path="/admin/game_catalog/add" element={<ProtectedRoute requiredRole="admin"><GameAddPage/></ProtectedRoute>} />
       <Route path="/admin/game_catalog/edit/:id" element={<ProtectedRoute requiredRole="admin"><GameEditPage/></ProtectedRoute>}/>
+      <Route path="/admin/tournament_list" element={<ProtectedRoute requiredRole="admin"><TournamentList/></ProtectedRoute>} />
+      <Route path="/admin/tournament_list/add" element={<ProtectedRoute requiredRole="admin"><TournamentAddPage/></ProtectedRoute>} />
 
       <Route path="/"    element={<Navigate to="/login" replace />} />
       <Route path="/404" element={<NotFoundPage />} />
