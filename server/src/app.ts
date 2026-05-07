@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 
 import { ConsoleLoggerService } from "./Services/logger/ConsoleLoggerService";
+import { DateTimeConverter } from "./Services/datetime/DateTimeConverter";
 import { DbManager } from "./Database/connection/DbConnectionPool";
 
 import { UserRepository }   from "./Database/repositories/users/UserRepository";
@@ -27,6 +28,9 @@ import { TournamentController } from "./WebAPI/controllers/TournamentController"
 export const logger = new ConsoleLoggerService();
 export const db     = new DbManager(logger);
 
+// Domain Services
+const dateTimeConverter = new DateTimeConverter();
+
 // Repositories
 const userRepo   = new UserRepository(db, logger);
 const entityRepo = new EntityRepository(db, logger);
@@ -38,7 +42,7 @@ const authService   = new AuthService(userRepo);
 const userService   = new UserService(userRepo);
 const entityService = new EntityService(entityRepo);
 const gameService   = new GameService(gameRepo);
-const tournamentService = new TournamentService(tournamentRepo, gameRepo, logger);
+const tournamentService = new TournamentService(tournamentRepo, gameRepo, logger, dateTimeConverter);
 
 // Express
 const app = express();
