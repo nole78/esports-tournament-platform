@@ -37,7 +37,7 @@ CREATE TABLE teams(
 CREATE TABLE games(
   game_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   game_name VARCHAR(100) NOT NULL UNIQUE,
-  game_logotip TEXT,
+  game_logotip LONGTEXT,
   game_genre VARCHAR(50) NOT NULL,
   game_players INT UNSIGNED NOT NULL
 );
