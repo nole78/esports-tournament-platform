@@ -2,13 +2,19 @@ import { TournamentFormat } from '../../../Domain/enums/TournamentFormat';
 import { TournamentStatus } from '../../../Domain/enums/TournamentStatus';
 import { ValidationResult } from '../../../Domain/types/ValidationResult';
 
+const isPowerOfTwo = (n: number): boolean => {
+  return n > 0 && (n & (n - 1)) === 0;
+};
+
 export const validateTournamentCreation = (tname: string, tgame:string, tmaxteams:number, tappldeadline: Date, tprizefund: number, tformat?:TournamentFormat, tstatus?: TournamentStatus) : ValidationResult => {
     if(!tname || tname.trim().length === 0)
         return {valid:false, message:"Tournament name is mandatory"};
     if(!tgame || tgame.trim().length === 0)
         return {valid:false, message:"Game name is mandatory"};
-    if(tmaxteams <= 0)
-        return {valid:false, message:"Max teams must be greater than 0"};
+    if(tmaxteams <= 0 && tmaxteams <= 256)
+        return {valid:false, message:"Maximum number of teams must be greater than 0 and less than 256"};
+    if(!isPowerOfTwo(tmaxteams))
+        return {valid:false, message:"Maximum number of teams must be a power of 2 (2, 4, 8, 16, 32, 64, ...)"};
     if(tprizefund <= 0)
         return {valid:false, message:"Prize fund must be greater than 0"};
     if(!tformat)
