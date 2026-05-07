@@ -49,7 +49,7 @@ export function Layout() {
 
             <button
               className="text-2xl font-bold text-primary tracking-tight hover:text-primary/80 cursor-pointer"
-              onClick={() => navigate("/pulse_grid")}
+              onClick={() => navigate("/home")}
             >
               Pulse<span className="text-bgsecondary">Grid</span>
             </button>
@@ -79,9 +79,10 @@ export function Layout() {
           <div className="flex items-center gap-4">
             {user && (
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-white/10 border border-primary/50 flex items-center justify-center">
+                <button onClick={() => navigate(user.role == "admin"?"/admin_info":"user_info")}
+                  className="cursor-pointer w-8 h-8 rounded-full bg-white/10 border border-primary/50 flex items-center justify-center">
                   <img src={avatar? avatar : avatarPlaceholder} className="rounded-full"/>
-                </div>
+                </button>
 
                 <p className="text-sm text-primary/80">{user?.username}</p>
               </div>
