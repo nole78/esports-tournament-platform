@@ -11,12 +11,10 @@ const guestNav = [
 ]
 
 const userNav = [
-  { to: "/dashboard", label: "Dashboard" },
   { to: "/game_catalog", label: "Game Catalog"},
   // add more user routes here
 ];
 const adminNav = [
-  { to: "/admin",       label: "Dashboard"},
   { to: "/admin/users", label: "Users"},
   { to: "/game_catalog", label: "Game Catalog"},
   { to: "/admin/audit_log", label: "Audit Log"},
