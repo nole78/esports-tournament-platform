@@ -11,6 +11,7 @@ import UsersPage from "./pages/admin/UsersPage";
 import GameCatalog from "./pages/common_pages/GameCatalog";
 import GameAddPage from "./pages/admin/GameAddPage";
 import GameEditPage from "./pages/admin/GameEditPage";
+import AuditLogPage from "./pages/admin/AuditLog";
 import LandingPage from "./pages/common_pages/LandingPage";
 
 export default function App() {
@@ -29,6 +30,7 @@ export default function App() {
       <Route path="/admin/users" element={<ProtectedRoute requiredRole="admin"><UsersPage /></ProtectedRoute>} />
       <Route path="/game_catalog/add" element={<ProtectedRoute requiredRole="admin"><GameAddPage/></ProtectedRoute>} />
       <Route path="/game_catalog/edit/:id" element={<ProtectedRoute requiredRole="admin"><GameEditPage/></ProtectedRoute>}/>
+      <Route path="/admin/audit_log" element={<ProtectedRoute requiredRole="admin"><AuditLogPage/></ProtectedRoute>}/>
 
       <Route path="/"    element={<Navigate to="/pulse_grid" replace />} />
       <Route path="/404" element={<NotFoundPage />} />
