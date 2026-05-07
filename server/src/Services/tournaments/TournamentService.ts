@@ -7,21 +7,72 @@ import { ITournamentRepository } from "../../Domain/repositories/tournaments/ITo
 import { IGameRepository } from "../../Domain/repositories/games/IGameRepository";
 import { ITournamentService } from "../../Domain/services/tournaments/ITournamentService";
 import { ILoggerService } from "../../Domain/services/logger/ILoggerService";
+import { IDateTimeConverter } from "../../Domain/services/datetime/IDateTimeConverter";
+import { TournamentInternalDto } from "../../Domain/DTOs/tournaments/TournamentInternalDto";
+import { GameDto } from "../../Domain/DTOs/games/GameDto";
 
 export class TournamentService implements ITournamentService {
   public constructor(
     private readonly tournamentRepo: ITournamentRepository,
     private readonly gameRepo: IGameRepository,
     private readonly logger: ILoggerService,
+    private readonly dateTimeConverter: IDateTimeConverter,
   ) {}
 
   async getAll(page?: number, limit?: number): Promise<PaginatedListDto<TournamentDto>> {
-    const items = await this.tournamentRepo.findAll(page, limit);
+    const tournaments = await this.tournamentRepo.findAll(page, limit);
+    if (tournaments.length === 0) {
+      return new PaginatedListDto([], 0, page, limit);
+    }
+
+    const gameIds = [...new Set(tournaments.map(t => t.tournamentGameId))];
+    const games:GameDto[] = [];
+    
+    for(let i:number = 0; i < gameIds.length; i++)
+    {
+      const game = await this.gameRepo.findById(gameIds[i]);
+      if(game != null)
+        games.push(game);
+    }
+
+    const gameMap = new Map(games.map(g => [g.gameId, g.gameName]));
+    
+    
+    const items = tournaments.map(t => 
+      new TournamentDto(
+        t.tournamentName,
+        gameMap.get(t.tournamentGameId) || "Unknown",
+        t.tournamentFormat,
+        t.tournamentMaxTeams,
+        t.tournamentApplicationDeadline,
+        t.tournamentPrizeFund,
+        t.torunamentStatus
+      )
+    );
     return new PaginatedListDto(items, items.length, page, limit);
   }
 
   async getById(id: number): Promise<TournamentDto | null> {
-    return this.tournamentRepo.findById(id);
+    const tournament = await this.tournamentRepo.findById(id);
+    if (!tournament) {
+      return null;
+    }
+
+    const game = await this.gameRepo.findById(tournament.tournamentGameId);
+    if (!game) {
+      this.logger.error("TournamentService", "getById failed", `Game with id "${tournament.tournamentGameId}" not found`);
+      return null;
+    }
+
+    return new TournamentDto(
+      tournament.tournamentName,
+      game.gameName,
+      tournament.tournamentFormat,
+      tournament.tournamentMaxTeams,
+      tournament.tournamentApplicationDeadline,
+      tournament.tournamentPrizeFund,
+      tournament.torunamentStatus
+    );
   }
 
   async create(dto: CreateTournamentDto): Promise<Tournament | null> {
@@ -32,13 +83,17 @@ export class TournamentService implements ITournamentService {
       return null;
     }
 
-    // create internal game dto with it's id
+    // Conver date to MySQL format
+    const formattedDeadline = this.dateTimeConverter.toMySQLDateTime(
+      dto.tournamentApplicationDeadline
+    );
+
     const internalDto = new CreateTournamentInternalDto(
       dto.tournamentName,
       game.gameId,
       dto.tournamentFormat,
       dto.tournamentMaxTeams,
-      dto.tournamentApplicationDeadline,
+      formattedDeadline,
       dto.tournamentPrizeFund,
       dto.torunamentStatus,
     );

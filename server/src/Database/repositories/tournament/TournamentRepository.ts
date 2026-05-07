@@ -6,6 +6,7 @@ import { ILoggerService } from "../../../Domain/services/logger/ILoggerService";
 import { TournamentDto } from "../../../Domain/DTOs/tournaments/TorunamentDto";
 import { CreateTournamentInternalDto } from "../../../Domain/DTOs/tournaments/CreateTournamentInternalDto";
 import { TournamentStatus } from '../../../Domain/enums/TournamentStatus';
+import { TournamentInternalDto } from "../../../Domain/DTOs/tournaments/TournamentInternalDto";
 
 export class TournamentRepository implements ITournamentRepository {
   public constructor(
@@ -13,18 +14,17 @@ export class TournamentRepository implements ITournamentRepository {
     private readonly logger: ILoggerService,
   ) {}
 
-  private map(r: RowDataPacket): TournamentDto {
-    return new TournamentDto(r.tournament_name, r.game_name, r.tournament_format, r.tournament_max_teams, r.tournament_application_deadline, r.tournament_prize_fund, r.tournament_status);
+  private map(r: RowDataPacket): TournamentInternalDto {
+    return new TournamentInternalDto(r.tournament_name, r.tournament_game_id, r.tournament_format, r.tournament_max_teams, r.tournament_application_deadline, r.tournament_prize_fund, r.tournament_status);
   }
 
-  async findById(id: number): Promise<TournamentDto | null> {
+  async findById(id: number): Promise<TournamentInternalDto | null> {
     const res = await this.db.getReadConnection();
     if (!res) return null;
     try {
       const [rows] = await res.conn.execute<RowDataPacket[]>(
-        `SELECT t.tournament_name, t.tournament_format, t.tournament_max_teams, t.tournament_application_deadline, t.tournament_prize_fund, t.tournament_status, g.game_name 
+        `SELECT t.tournament_name, t.tournament_game_id, t.tournament_format, t.tournament_max_teams, t.tournament_application_deadline, t.tournament_prize_fund, t.tournament_status
          FROM tournaments t 
-         JOIN games g ON t.tournament_game_id = g.game_id 
          WHERE t.tournament_id = ?`, 
         [id]
       );
@@ -35,21 +35,22 @@ export class TournamentRepository implements ITournamentRepository {
     } finally { res.conn.release(); }
   }
 
-  async findAll(page = 1, limit = 20): Promise<TournamentDto[]> {
+  async findAll(page = 1, limit = 20): Promise<TournamentInternalDto[]> {
     const res = await this.db.getReadConnection();
     if (!res) return [];
     const offset = (page - 1) * limit;
     try {
       const [rows] = await res.conn.query<RowDataPacket[]>(
-        `SELECT t.tournament_name, t.tournament_format, t.tournament_max_teams, t.tournament_application_deadline, t.tournament_prize_fund, t.tournament_status, g.game_name 
-         FROM tournaments t 
-         JOIN games g ON t.tournament_game_id = g.game_id 
-         ORDER BY t.tournament_id DESC LIMIT ? OFFSET ?`, 
+        `SELECT tournament_name, tournament_game_id, tournament_format, tournament_max_teams, tournament_application_deadline, tournament_prize_fund, tournament_status
+         FROM tournaments
+         ORDER BY tournament_id DESC LIMIT ? OFFSET ?`, 
         [limit, offset]
       );
+      console.log("TournamentRepository findAll - rows:", rows.length);
       return rows.map((r) => this.map(r));
     } catch (err) {
       this.logger.error("TournamentRepository", "findAll failed", err);
+      console.error("findAll error:", err);
       return [];
     } finally { res.conn.release(); }
   }
@@ -63,13 +64,22 @@ export class TournamentRepository implements ITournamentRepository {
         [dto.tournamentName, dto.tournamentGameId, dto.tournamentFormat, dto.tournamentMaxTeams, dto.tournamentApplicationDeadline, dto.tournamentPrizeFund, dto.tournamentStatus]
       );
       if (result.insertId === 0) return new Tournament();
-      return new Tournament(result.insertId, dto.tournamentName, dto.tournamentGameId, dto.tournamentFormat, dto.tournamentMaxTeams, dto.tournamentApplicationDeadline, dto.tournamentPrizeFund, dto.tournamentStatus);
+      // Conver string back to Date object for Domain Model
+      return new Tournament(
+        result.insertId, 
+        dto.tournamentName, 
+        dto.tournamentGameId, 
+        dto.tournamentFormat, 
+        dto.tournamentMaxTeams, 
+        new Date(dto.tournamentApplicationDeadline), 
+        dto.tournamentPrizeFund, 
+        dto.tournamentStatus
+      );
     } catch (err) {
       this.logger.error("TournamentRepository", "create failed", err);
       return new Tournament();
     } finally { res.conn.release(); }
-  }
-  
+  }  
   async update(id: number, fields: Partial<Tournament>): Promise<boolean> {
     const res = await this.db.getWriteConnection();
     if (!res) return false;
