@@ -1,4 +1,4 @@
-import { ResultSetHeader, RowDataPacket } from "mysql2";
+/*import { ResultSetHeader, RowDataPacket } from "mysql2";
 import { ITournamentRegistrationRepository } from "../../../Domain/repositories/tournament_registrations/ITournamentRegistrationRepository";
 import { ILoggerService } from "../../../Domain/services/logger/ILoggerService";
 import { DbManager } from "../../connection/DbConnectionPool";
@@ -107,4 +107,4 @@ export class TournamentRegistrationRepository implements ITournamentRegistration
       return false;
     } finally { res.conn.release(); }
   }
-}
+}*/

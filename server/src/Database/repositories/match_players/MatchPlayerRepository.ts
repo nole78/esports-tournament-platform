@@ -1,4 +1,4 @@
-import { ResultSetHeader, RowDataPacket } from "mysql2";
+/*import { ResultSetHeader, RowDataPacket } from "mysql2";
 import { IMatchPlayerRepository } from "../../../Domain/repositories/match_players/IMatchPlayerRepository";
 import { ILoggerService } from "../../../Domain/services/logger/ILoggerService";
 import { DbManager } from "../../connection/DbConnectionPool";
@@ -123,3 +123,4 @@ export class MatchPlayerRepository implements IMatchPlayerRepository {
     } finally { res.conn.release(); }
   }
 }
+*/
