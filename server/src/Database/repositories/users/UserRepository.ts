@@ -12,7 +12,7 @@ export class UserRepository implements IUserRepository {
   ) {}
 
   private map(r: RowDataPacket): User {
-    return new User(r.id, r.gamer_tag, r.email, r.fullName, r.role as UserRole, r.passwordHash, r.profile_picture ,r.isActive);
+    return new User(r.id, r.gamer_tag, r.email, r.full_name, r.role as UserRole, r.passwordHash, r.profile_picture ,r.isActive);
   }
 
   async create(user: User): Promise<User> {
