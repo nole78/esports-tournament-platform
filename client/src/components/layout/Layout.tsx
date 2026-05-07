@@ -17,6 +17,7 @@ const adminNav = [
   { to: "/admin",       label: "Dashboard"},
   { to: "/admin/users", label: "Users"},
   { to: "/game_catalog", label: "Game Catalog"},
+  { to: "/admin/audit_log", label: "Audit Log"},
   // add more admin routes here
 ];
 

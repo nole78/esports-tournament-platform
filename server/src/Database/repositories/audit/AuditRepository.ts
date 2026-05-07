@@ -11,13 +11,14 @@ export class AuditRepository implements IAuditRepository {
     private readonly db: DbManager,
     private readonly logger: ILoggerService
   ) {}
+  
 
   async create(log: AuditLog): Promise<AuditLog> {
     const res = await this.db.getWriteConnection();
     if (!res) return new AuditLog();
     try {
       const [result] = await res.conn.execute<ResultSetHeader>(
-        `INSERT INTO audit_log (user_id, action, entity, entityId, meta, ipAddress)
+        `INSERT INTO audit_log (user_id, action, entity, entity_id, meta, ipAddress)
          VALUES (?, ?, ?, ?, ?, ?)`,
         [log.userId ?? null, log.action, log.entity ?? null,
          log.entityId ?? null, log.meta ?? null, log.ipAddress ?? null]
@@ -37,22 +38,20 @@ export class AuditRepository implements IAuditRepository {
     const offset = Math.max(0, Math.floor((page - 1) * limit));
     const lim    = Math.max(1, Math.floor(limit));
     try {
-        // TODO: improve querry - remove JOIN
         const [rows] = await res.conn.execute<RowDataPacket[]>(
-            `SELECT al.*, u.username
-            FROM audit_log al
-            LEFT JOIN users u ON al.user_id = u.id
-            ORDER BY al.createdAt DESC
+            `SELECT * FROM audit_log
+            ORDER BY createdAt DESC
             LIMIT ${lim} OFFSET ${offset}`,
             []
       );
+
       const [cnt] = await res.conn.execute<RowDataPacket[]>(
         `SELECT COUNT(*) as total FROM audit_log`
       );
       const items = rows.map(
         (l) => new AuditLogDto(
-          l.id, l.userId ?? null, l.username ?? null,
-          l.action, l.entity ?? null, l.entityId ?? null,
+          l.id, l.user_id ?? null, null,
+          l.action, l.entity ?? null, l.entity_id ?? null,
           l.meta ? (JSON.parse(l.meta as string) as Record<string, unknown>) : null,
           l.ipAddress ?? null, new Date(l.createdAt as string)
         )
