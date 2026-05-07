@@ -4,7 +4,6 @@ import type { GameDto } from "../../models/game/GameDto";
 import { gameApi } from "../../api_services/game_catalog/GameAPIService";
 import { useAuth } from "../../hooks/auth/useAuthHook";
 import { useNavigate } from "react-router-dom";
-import { Layout } from "../../components/layout/Layout";
 
 
 export default function GameCatalog(){
@@ -26,7 +25,6 @@ export default function GameCatalog(){
     }, []);
 
     return (
-        <Layout>
         <div>
             <PageHeader eyebrow="" title="Game Catalog"/>
             {user?.role === "admin" && (
@@ -81,6 +79,5 @@ export default function GameCatalog(){
                 </section>
             )}
         </div>
-        </Layout>
     );
 }
