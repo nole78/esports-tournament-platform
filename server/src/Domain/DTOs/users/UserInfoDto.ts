@@ -1,6 +1,6 @@
 import { UserRole } from "../../enums/UserRole";
 
-export class UserDto {
+export class UserInfoDto {
   constructor(
     public gamerTag: string = "",
     public email: string     = "",
