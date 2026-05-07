@@ -11,7 +11,7 @@ export class CreateTournamentInternalDto {
         public tournamentGameId: number = 0,
         public tournamentFormat: TournamentFormat = TournamentFormat.SINGLE_ELIMINATION,
         public tournamentMaxTeams: number = 0,
-        public tournamentApplicationDeadline: Date = new Date(),
+        public tournamentApplicationDeadline: string = "",
         public tournamentPrizeFund: number = 0,
         public tournamentStatus: TournamentStatus = TournamentStatus.UPCOMING,
     ) {}
