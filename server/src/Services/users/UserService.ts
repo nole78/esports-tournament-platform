@@ -30,29 +30,29 @@ export class UserService implements IUserService {
     return new UserInfoDto(u.gamerTag,u.email,u.fullName,u.passwordHash,u.role,u.profilePicture);
   }
 
-  async update(id:number, fields: Partial<UserInfoDto>){
+  async update(id:number, fields: Partial<UserInfoDto>) : Promise<boolean>{
 
     if(fields.gamerTag)
     {
       const byName = await this.userRepo.findByUsername(fields.gamerTag);
-      if (byName.id !== id) {
-        return new UserInfoDto();
+      if (byName.id == id) {
+        return false;
       }
     }
     if(fields.email)
     {
       const byEmail = await this.userRepo.findByEmail(fields.email);
-      if (byEmail.id !== id) 
+      if (byEmail.id == id) 
       {
-        return new UserInfoDto();
+        return false;
       }
     }
     if(fields.password)
     {
-    const hash = await bcrypt.hash(fields.password, this.saltRounds).catch(() => "");
-        if (!hash) return new UserInfoDto();
-        return await this.userRepo.update(id,{gamerTag: fields.gamerTag,email: fields.email,fullName: fields.fullName,role: fields.role,passwordHash: hash})
+      const hash = await bcrypt.hash(fields.password, this.saltRounds).catch(() => "");
+        if (!hash) return false;
+      return await this.userRepo.update(id,{gamerTag: fields.gamerTag,email: fields.email,fullName: fields.fullName,profilePicture: fields.profilePicture,role: fields.role,passwordHash: hash})
     }
-    return await this.userRepo.update(id,{gamerTag: fields.gamerTag,email: fields.email,fullName: fields.fullName,role: fields.role})
+    return await this.userRepo.update(id,{gamerTag: fields.gamerTag,email: fields.email,fullName: fields.fullName,profilePicture: fields.profilePicture,role: fields.role})
   }
 }
