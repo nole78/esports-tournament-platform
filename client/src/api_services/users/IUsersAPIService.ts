@@ -8,4 +8,5 @@ export interface IUsersAPIService {
   getById(id: number): Promise<ApiResponse<UserDto>>;
   deactivate(id: number): Promise<ApiResponse<void>>;
   getInfo(): Promise<ApiResponse<UserInfoDto>>;
+  update(payload: Partial<UserInfoDto>): Promise<ApiResponse<void>>;
 }

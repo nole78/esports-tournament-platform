@@ -32,5 +32,9 @@ export const usersApi: IUsersAPIService = {
   async getInfo(){
     return axios.get<ApiResponse<UserInfoDto>>(`${BASE}/me/info`,{headers: authHeader()})
       .then(r => r.data).catch(e => err(e, "Failed to recive user info"));
+  },
+  async update(payload){
+    return axios.patch<ApiResponse<void>>(`${BASE}/update`, payload, { headers: authHeader() })
+      .then(r => r.data).catch(e => err(e, "Failed to update"));
   }
 };
