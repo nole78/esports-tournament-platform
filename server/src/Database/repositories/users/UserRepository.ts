@@ -79,13 +79,29 @@ export class UserRepository implements IUserRepository {
     } finally { res.conn.release(); }
   }
 
-  async update(user: User): Promise<boolean> {
+  async update(id:number ,fields: Partial<User>): Promise<boolean> {
     const res = await this.db.getWriteConnection();
     if (!res) return false;
+
+    const fieldMap: Record<string, string> = {
+            fullName: "full_name",
+            gamerTag: "gamer_tag",
+            email: "email",
+            passwordHash: "passwordHash",
+            role: "role",
+            profilePicture: "profile_picture"
+        }
+
     try {
+      const entries = Object.entries(fields)
+                .filter(([, v]) => v !== undefined)
+                .map(([k,v]) => [fieldMap[k] ?? k, v]);  
+
+      if (entries.length === 0) return false;
+      const setClause = entries.map(([k]) => `${k} = ?`).join(", ");
+      const values = entries.map(([, v]) => v);
       const [result] = await res.conn.execute<ResultSetHeader>(
-        `UPDATE users SET gamer_tag = ?, email = ?, role = ?, isActive = ?, profile_picture = ? WHERE id = ?`,
-        [user.gamerTag, user.email, user.role, user.isActive, user.profilePicture , user.id]
+        `UPDATE users SET ${setClause} WHERE id = ?`, [...values, id]
       );
       return result.affectedRows > 0;
     } catch (err) {
