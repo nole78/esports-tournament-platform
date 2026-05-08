@@ -38,7 +38,7 @@ const authService   = new AuthService(userRepo);
 const userService   = new UserService(userRepo);
 const entityService = new EntityService(entityRepo);
 const gameService   = new GameService(gameRepo);
-const teamService   = new TeamService(teamRepo, teamMemberRepo, logger);
+const teamService   = new TeamService(teamRepo, teamMemberRepo, userRepo, logger);
 
 // Express
 const app = express();

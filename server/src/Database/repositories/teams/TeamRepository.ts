@@ -5,7 +5,7 @@ import { DbManager } from "../../connection/DbConnectionPool";
 import { TeamDto } from "../../../Domain/DTOs/teams/TeamDto";
 import { CreateTeamDto } from "../../../Domain/DTOs/teams/CreateTeamDto";
 import { Team } from "../../../Domain/models/Team";
-import { ReplyTeamDto } from "../../../Domain/DTOs/teams/ReplyTeamDto";
+
 
 export class TeamRepository implements ITeamRepository {
   public constructor(
@@ -13,7 +13,7 @@ export class TeamRepository implements ITeamRepository {
     private readonly logger: ILoggerService,
   ) {}
   private map(r: RowDataPacket): TeamDto {
-    return new TeamDto(/*r.team_id,*/ r.team_name, r.team_tag, r.team_logotip, r.team_description);
+    return new TeamDto(r.team_id, r.team_name, r.team_tag, r.team_logotip, r.team_description);
     }
 
   async findById(id: number): Promise<TeamDto[] | null> {
@@ -37,6 +37,20 @@ export class TeamRepository implements ITeamRepository {
       return null;
     } finally { res.conn.release(); }
   }
+  /*
+  async findByUserTag(tag: string): Promise<TeamDto[] | null>{
+    const res = await this.db.getReadConnection();
+    if (!res) return null;
+    try{
+      const [rows] = await res.conn.execute<RowDataPacket[]>(
+        `SELECT * FROM teams WHERE team`
+      )
+    }catch(err){
+      this.logger.error("TeamRepository", "findByUserTag", err);
+      return null;
+    }
+    finally { res.conn.release(); }
+  }*/
 
   async findAll(page = 1, limit = 20): Promise<TeamDto[]> {
     const res = await this.db.getReadConnection();
@@ -44,10 +58,8 @@ export class TeamRepository implements ITeamRepository {
     const offset = (page - 1) * limit;
     try {
       const [rows] = await res.conn.query<RowDataPacket[]>(
-        `SELECT t.team_id, t.team_name, t.team_tag, t.team_logotip, t.team_description, tm.role, u.full_name, u.gamer_tag
-        FROM teams t JOIN team_members tm ON
-        t.team_id = tm.team_id  JOIN users u ON
-         tm.user_id = u.id ORDER BY t.team_id
+        `SELECT t.team_id, t.team_name, t.team_tag, t.team_logotip, t.team_description 
+        FROM teams t ORDER BY t.team_id
          LIMIT ? OFFSET ?`, [limit, offset]
       );
       //return rows.map((r) => this.map(r));
@@ -82,7 +94,7 @@ export class TeamRepository implements ITeamRepository {
       teamName: "team_name",
       teamTag: "team_tag",
       teamLogotip: "team_logotip",
-      teamDescription: "team_descrition"
+      teamDescription: "team_description"
     }
 
     try {

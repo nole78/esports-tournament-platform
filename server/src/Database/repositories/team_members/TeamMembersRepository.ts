@@ -36,7 +36,7 @@ export class TeamMemberRepository implements ITeamMemberRepository {
     if (!res) return [];
     try {
       const [rows] = await res.conn.execute<RowDataPacket[]>(
-        `SELECT * FROM team_members WHERE user_id = ? ORDER BY team_id DESC`, [userId]
+        `SELECT * FROM team_members WHERE user_id = ? ORDER BY user_id DESC`, [userId]
       );
       return rows.map((r) => this.map(r));
     } catch (err) {
@@ -50,7 +50,7 @@ export class TeamMemberRepository implements ITeamMemberRepository {
     if (!res) return [];
     try {
       const [rows] = await res.conn.execute<RowDataPacket[]>(
-        `SELECT * FROM team_members WHERE team_id = ? ORDER BY user_id DESC`, [teamId]
+        `SELECT * FROM team_members WHERE team_id = ? ORDER BY team_id DESC`, [teamId]
       );
       return rows.map((r) => this.map(r));
     } catch (err) {
@@ -67,6 +67,7 @@ export class TeamMemberRepository implements ITeamMemberRepository {
         `INSERT INTO team_members (team_id,user_id,role) VALUES (?, ?, ?)`,
         [dto.teamId, dto.userId, dto.role]
       );
+      
       if (result.insertId === 0) return new TeamMember();
       return new TeamMember(dto.teamId, dto.userId, dto.role);
     } catch (err) {
