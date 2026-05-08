@@ -2,8 +2,11 @@ import { IUserService } from "../../Domain/services/users/IUserService";
 import { IUserRepository } from "../../Domain/repositories/users/IUserRepository";
 import { UserDto } from "../../Domain/DTOs/users/UserDto";
 import { UserInfoDto } from "../../Domain/DTOs/users/UserInfoDto";
+import { User } from "../../Domain/models/User";
+import bcrypt from "bcryptjs";
 
 export class UserService implements IUserService {
+  private readonly saltRounds = parseInt(process.env.SALT_ROUNDS ?? "10", 10);
   public constructor(private readonly userRepo: IUserRepository) {}
 
   async getAll(): Promise<UserDto[]> {
@@ -25,5 +28,31 @@ export class UserService implements IUserService {
     const u = await this.userRepo.findById(id);
     if (u.id === 0) return null;
     return new UserInfoDto(u.gamerTag,u.email,u.fullName,u.passwordHash,u.role,u.profilePicture);
+  }
+
+  async update(id:number, fields: Partial<UserInfoDto>){
+
+    if(fields.gamerTag)
+    {
+      const byName = await this.userRepo.findByUsername(fields.gamerTag);
+      if (byName.id !== id) {
+        return new UserInfoDto();
+      }
+    }
+    if(fields.email)
+    {
+      const byEmail = await this.userRepo.findByEmail(fields.email);
+      if (byEmail.id !== id) 
+      {
+        return new UserInfoDto();
+      }
+    }
+    if(fields.password)
+    {
+    const hash = await bcrypt.hash(fields.password, this.saltRounds).catch(() => "");
+        if (!hash) return new UserInfoDto();
+        return await this.userRepo.update(id,{gamerTag: fields.gamerTag,email: fields.email,fullName: fields.fullName,role: fields.role,passwordHash: hash})
+    }
+    return await this.userRepo.update(id,{gamerTag: fields.gamerTag,email: fields.email,fullName: fields.fullName,role: fields.role})
   }
 }
