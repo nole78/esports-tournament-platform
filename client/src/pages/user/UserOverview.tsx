@@ -7,9 +7,9 @@ export default function UserOverview() {
   return (
     <div>
         <PageHeader eyebrow="" title="Change Account Information" />
-        <ChangePasswordForm/>
-        <PageHeader eyebrow="" title="Change Password" />
         <ChangeInfoForm/>
+        <PageHeader eyebrow="" title="Change Password" />
+        <ChangePasswordForm/>
     </div>
   );
 }
