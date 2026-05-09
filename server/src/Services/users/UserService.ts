@@ -28,7 +28,7 @@ export class UserService implements IUserService {
   async getInfo(id: number): Promise<UserInfoDto | null> {
     const u = await this.userRepo.findById(id);
     if (u.id === 0) return null;
-    return new UserInfoDto(u.gamerTag,u.email,u.fullName,u.passwordHash);
+    return new UserInfoDto(u.gamerTag,u.email,u.fullName,u.profilePicture);
   }
 
   async update(id:number, fields: Partial<UserInfoDto>) : Promise<boolean>{
