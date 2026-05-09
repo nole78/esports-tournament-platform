@@ -3,6 +3,7 @@ import { IUserService } from "../../Domain/services/users/IUserService";
 import { authenticate } from "../../Middlewares/authentification/AuthMiddleware";
 import { authorize } from "../../Middlewares/authorization/AuthorizeMiddleware";
 import { UserRole } from "../../Domain/enums/UserRole";
+import { UserPasswordDto } from "../../Domain/DTOs/users/UserPasswordDto";
 
 export class UserController {
   private readonly router = Router();
@@ -12,6 +13,7 @@ export class UserController {
     this.router.get("/users/:id",      authenticate, this.getById.bind(this));
     this.router.get("/users/me/info",  authenticate, this.getInfo.bind(this));
     this.router.patch("/users/update",        authenticate, this.update.bind(this));
+    this.router.patch("/users/update/password",        authenticate, this.updatePassword.bind(this));
     this.router.patch("/users/:id/deactivate", authenticate, authorize(UserRole.ADMIN), this.deactivate.bind(this));
   }
 
@@ -46,6 +48,13 @@ export class UserController {
     const id = Number(req.user?.id);
     const ok = await this.userService.update(id,req.body);
     res.status(ok ? 200 : 500).json({ success: ok, message: ok ? "User updated" : "Failed to update user" });
+  }
+
+  private async updatePassword(req: Request, res: Response): Promise<void> {
+    const id = Number(req.user?.id);
+    const {oldPassword,newPassword} = req.body as {oldPassword: string, newPassword:string}
+    const ok = await this.userService.updatePassword(id,new UserPasswordDto(oldPassword,newPassword))
+    res.status(ok ? 200 : 500).json({ success: ok, message: ok ? "User updated" : "Failed to update password" });
   }
 
   public getRouter(): Router { return this.router; }
