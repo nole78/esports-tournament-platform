@@ -4,6 +4,5 @@ export type UserInfoDto =
     email: string;
     fullName: string;
     password: string;
-    role: string;
     profilePicture: string;
 }
