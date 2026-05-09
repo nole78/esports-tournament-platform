@@ -13,7 +13,7 @@ export const ProtectedRoute: React.FC<{ children: React.ReactNode; requiredRole:
     </div>
   );
 
-  if (!isAuthenticated) return <Navigate to="/login" state={{ from: location }} replace />;
+  if (!isAuthenticated) return <Navigate to="/home" state={{ from: location }} replace />;
 
   if (user?.role !== requiredRole) return (
     <div className="min-h-screen bg-[#080808] flex items-center justify-center">
