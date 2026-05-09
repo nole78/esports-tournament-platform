@@ -35,6 +35,11 @@ export const usersApi: IUsersAPIService = {
   },
   async update(payload){
     return axios.patch<ApiResponse<void>>(`${BASE}/update`, payload, { headers: authHeader() })
-      .then(r => r.data).catch(e => err(e, "Failed to update"));
+      .then(r => r.data).catch(e => err(e, "Failed to update account"));
+  },
+  async updatePassword(payload)
+  {
+    return axios.patch<ApiResponse<void>>(`${BASE}/update/password`, payload, { headers: authHeader() })
+      .then(r => r.data).catch(e => err(e, "Failed to update password"));
   }
 };
