@@ -10,5 +10,5 @@ export interface IUsersAPIService {
   deactivate(id: number): Promise<ApiResponse<void>>;
   getInfo(): Promise<ApiResponse<UserInfoDto>>;
   update(payload: Record<string, unknown>): Promise<ApiResponse<void>>;
-  updatePassword(id:number,payload: UserPasswordDto) : Promise<ApiResponse<void>>;
+  updatePassword(payload: UserPasswordDto) : Promise<ApiResponse<void>>;
 }
