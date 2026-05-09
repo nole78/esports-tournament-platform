@@ -83,8 +83,6 @@ export function Layout() {
                   className="cursor-pointer w-8 h-8 rounded-full bg-white/10 border border-primary/50 flex items-center justify-center">
                   <img src={avatar? avatar : avatarPlaceholder} className="rounded-full"/>
                 </button>
-
-                <p className="text-sm text-primary/80">{user?.username}</p>
               </div>
             )}
 
