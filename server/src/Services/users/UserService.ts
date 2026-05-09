@@ -27,7 +27,7 @@ export class UserService implements IUserService {
   async getInfo(id: number): Promise<UserInfoDto | null> {
     const u = await this.userRepo.findById(id);
     if (u.id === 0) return null;
-    return new UserInfoDto(u.gamerTag,u.email,u.fullName,u.passwordHash,u.role,u.profilePicture);
+    return new UserInfoDto(u.gamerTag,u.email,u.fullName,u.passwordHash,u.profilePicture);
   }
 
   async update(id:number, fields: Partial<UserInfoDto>) : Promise<boolean>{
@@ -51,8 +51,8 @@ export class UserService implements IUserService {
     {
       const hash = await bcrypt.hash(fields.password, this.saltRounds).catch(() => "");
         if (!hash) return false;
-      return await this.userRepo.update(id,{gamerTag: fields.gamerTag,email: fields.email,fullName: fields.fullName,profilePicture: fields.profilePicture,role: fields.role,passwordHash: hash})
+      return await this.userRepo.update(id,{gamerTag: fields.gamerTag,email: fields.email,fullName: fields.fullName,profilePicture: fields.profilePicture, passwordHash: hash})
     }
-    return await this.userRepo.update(id,{gamerTag: fields.gamerTag,email: fields.email,fullName: fields.fullName,profilePicture: fields.profilePicture,role: fields.role})
+    return await this.userRepo.update(id,{gamerTag: fields.gamerTag,email: fields.email,fullName: fields.fullName,profilePicture: fields.profilePicture})
   }
 }
