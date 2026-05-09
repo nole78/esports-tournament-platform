@@ -53,7 +53,7 @@ export class UserController {
   private async updatePassword(req: Request, res: Response): Promise<void> {
     const id = Number(req.user?.id);
     const {oldPassword,newPassword} = req.body as {oldPassword: string, newPassword:string}
-    const ok = await this.userService.updatePassword(id,new UserPasswordDto(oldPassword,newPassword))
+    const ok = await this.userService.updatePassword(id,new UserPasswordDto(newPassword,oldPassword))
     res.status(ok ? 200 : 500).json({ success: ok, message: ok ? "User updated" : "Failed to update password" });
   }
 
