@@ -7,15 +7,14 @@ import { CreateTournamentDto } from "../../Domain/DTOs/tournaments/CreateTournam
 import { ValidationResult } from '../../Domain/types/ValidationResult';
 import { validateTournamentCreation } from "../validators/tournaments/validateTournamentCreation";
 import { TournamentFormat } from '../../Domain/enums/TournamentFormat';
-import { TournamentStatus } from "../../Domain/enums/TournamentStatus";
-
+import { TournamentStatus } from '../../Domain/enums/TournamentStatus';
 export class TournamentController{
     private readonly router = Router();
 
     public constructor(private readonly tournamentService: ITournamentService){
         this.router.get("/tournaments", this.getAll.bind(this));
         this.router.get("/tournaments/:id", this.getById.bind(this));
-        this.router.post("/tournaments", authenticate, authorize(UserRole.ADMIN),this.create.bind(this));
+        this.router.post("/tournaments", authenticate, authorize(UserRole.ADMIN), this.create.bind(this));
         this.router.put("/tournaments/:id", authenticate, authorize(UserRole.ADMIN), this.update.bind(this));
         this.router.delete("/tournaments/:id", authenticate, authorize(UserRole.ADMIN), this.delete.bind(this));
     }
@@ -23,8 +22,20 @@ export class TournamentController{
     private async getAll(req: Request, res: Response) : Promise<void>{
         const page  = parseInt(req.query.page  as string ?? "1",  10);
         const limit = parseInt(req.query.limit as string ?? "20", 10);
-        const result = await this.tournamentService.getAll(page, limit);
-        res.status(200).json({ success: true, data: result });
+        
+        const filters = {
+        tournamentGame: req.query.tournamentGame as string,
+        tournamentFormat: req.query.tournamentFormat as TournamentFormat,
+        tournamentStatus: req.query.tournamentStatus as TournamentStatus
+        };
+    
+        const hasFilters = Object.values(filters).some(v => v !== undefined);
+    
+        const result = hasFilters 
+            ? await this.tournamentService.getFiltered(filters, page, limit)
+            : await this.tournamentService.getAll(page, limit);
+    
+    res.status(200).json({ success: true, data: result });
     }
 
     private async getById(req: Request, res: Response) : Promise<void>{
@@ -36,12 +47,12 @@ export class TournamentController{
     }
 
     private async create(req: Request, res: Response) : Promise<void>{
-        const {tournamentName, tournamentGame, tournamentFormat, tournamentMaxTeams, tournamentApplicationDeadline, tournamentPrizeFund, torunamentStatus} 
-        = req.body as {tournamentName?:string, tournamentGame?:string, tournamentFormat?:TournamentFormat, tournamentMaxTeams?:number, tournamentApplicationDeadline?:Date, tournamentPrizeFund?:number, torunamentStatus?:TournamentStatus};
-        const v:ValidationResult = validateTournamentCreation(tournamentName ?? "", tournamentGame ?? "", tournamentMaxTeams ?? 0, tournamentApplicationDeadline ?? new Date(), tournamentPrizeFund ?? 0, tournamentFormat, torunamentStatus);
+        const {tournamentName, tournamentGame, tournamentFormat, tournamentMaxTeams, tournamentApplicationDeadline, tournamentPrizeFund, tournamentStatus} 
+        = req.body as {tournamentName?:string, tournamentGame?:string, tournamentFormat?:TournamentFormat, tournamentMaxTeams?:number, tournamentApplicationDeadline?:Date, tournamentPrizeFund?:number, tournamentStatus?:TournamentStatus};
+        const v:ValidationResult = validateTournamentCreation(tournamentName ?? "", tournamentGame ?? "", tournamentMaxTeams ?? 0, tournamentApplicationDeadline ?? new Date(), tournamentPrizeFund ?? 0, tournamentFormat, tournamentStatus);
         if(!v.valid) {res.status(400).json({ success: false, message: v.message }); return;}
 
-        const created = await this.tournamentService.create(new CreateTournamentDto( tournamentName, tournamentGame, tournamentFormat, tournamentMaxTeams, tournamentApplicationDeadline, tournamentPrizeFund, torunamentStatus));
+        const created = await this.tournamentService.create(new CreateTournamentDto( tournamentName, tournamentGame, tournamentFormat, tournamentMaxTeams, tournamentApplicationDeadline, tournamentPrizeFund, tournamentStatus));
         if (!created) { res.status(500).json({ success: false, message: "Failed to create" }); return; }
         res.status(201).json({ success: true, data: created });
     }
