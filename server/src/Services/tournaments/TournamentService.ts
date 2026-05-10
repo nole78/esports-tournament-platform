@@ -10,6 +10,8 @@ import { ILoggerService } from "../../Domain/services/logger/ILoggerService";
 import { IDateTimeConverter } from "../../Domain/services/datetime/IDateTimeConverter";
 import { TournamentInternalDto } from "../../Domain/DTOs/tournaments/TournamentInternalDto";
 import { GameDto } from "../../Domain/DTOs/games/GameDto";
+import { TournamentFilterDto } from "../../Domain/DTOs/tournaments/TournamentFilterDto";
+import { TournamentFilterInternalDto } from "../../Domain/DTOs/tournaments/TournamentFilterInternalDto";
 
 export class TournamentService implements ITournamentService {
   public constructor(
@@ -46,9 +48,47 @@ export class TournamentService implements ITournamentService {
         t.tournamentMaxTeams,
         t.tournamentApplicationDeadline,
         t.tournamentPrizeFund,
-        t.torunamentStatus
+        t.tournamentStatus
       )
     );
+    return new PaginatedListDto(items, items.length, page, limit);
+  }
+
+  async getFiltered(fields: Partial<TournamentFilterDto>, page?: number, limit?: number): Promise<PaginatedListDto<TournamentDto>> {
+    
+    let game:GameDto|null = new GameDto();
+    if(fields.tournamentGame != null)
+    {
+      game = await this.gameRepo.findByName(fields.tournamentGame);
+    }
+
+    const internalDto = new TournamentFilterInternalDto(game?.gameId == 0 ? undefined : game?.gameId, fields?.tournamentFormat, fields?.tournamentStatus);
+    const tournaments = await this.tournamentRepo.findFiltered(internalDto, page, limit);
+
+    const gameIds = [...new Set(tournaments.map(t => t.tournamentGameId))];
+    const games:GameDto[] = [];
+    
+    for(let i:number = 0; i < gameIds.length; i++)
+    {
+      const game = await this.gameRepo.findById(gameIds[i]);
+      if(game != null)
+        games.push(game);
+    }
+
+    const gameMap = new Map(games.map(g => [g.gameId, g.gameName]));
+
+    const items = tournaments.map(t => 
+      new TournamentDto(
+        t.tournamentName,
+        gameMap.get(t.tournamentGameId) || "Unknown",
+        t.tournamentFormat,
+        t.tournamentMaxTeams,
+        t.tournamentApplicationDeadline,
+        t.tournamentPrizeFund,
+        t.tournamentStatus
+      )
+    );
+    const filtered = await this.tournamentRepo.findFiltered(internalDto, page, limit);
     return new PaginatedListDto(items, items.length, page, limit);
   }
 
@@ -71,7 +111,7 @@ export class TournamentService implements ITournamentService {
       tournament.tournamentMaxTeams,
       tournament.tournamentApplicationDeadline,
       tournament.tournamentPrizeFund,
-      tournament.torunamentStatus
+      tournament.tournamentStatus
     );
   }
 
@@ -95,7 +135,7 @@ export class TournamentService implements ITournamentService {
       dto.tournamentMaxTeams,
       formattedDeadline,
       dto.tournamentPrizeFund,
-      dto.torunamentStatus,
+      dto.tournamentStatus,
     );
 
     const created = await this.tournamentRepo.create(internalDto);
