@@ -9,6 +9,7 @@ import { validateTeamsCreation } from "../validators/teams/validateTeamsCreation
 import { TeamDto } from "../../Domain/DTOs/teams/TeamDto";
 import { fail } from "node:assert";
 import { CreateTeamDto } from "../../Domain/DTOs/teams/CreateTeamDto";
+import { User } from "../../Domain/models/User";
 
 export class TeamController{
     private readonly  router = Router();
@@ -17,6 +18,9 @@ export class TeamController{
         this.router.get("/teams", this.getAll.bind(this));
         this.router.get("/teams/:gamer_tag", this.getByGamerTag.bind(this));
         this.router.post("/teams/:gamer_tag", authenticate, authorize(UserRole.PLAYER, UserRole.ADMIN), this.create.bind(this));
+        this.router.post("/teams/add/:gamer_tag/:team_tag", authenticate, authorize(UserRole.PLAYER, UserRole.ADMIN), this.addMember.bind(this));
+        this.router.patch("/teams/:gamer_tag", authenticate, authorize(UserRole.PLAYER, UserRole.ADMIN), this.update.bind(this));
+        this.router.delete("/teams/:gamer_tag/:team_tag", authenticate, authorize(UserRole.PLAYER, UserRole.ADMIN), this.delete.bind(this));
     }
 
     private async getAll(req: Request, res: Response) : Promise<void>{
@@ -47,5 +51,29 @@ export class TeamController{
         if (!created){res.status(500).json({success:false, messag: "Failed to create!"}); return;}
         res.status(201).json({success:true, data: created});
     } 
+
+    private async addMember(req: Request, res: Response) : Promise<void>{
+        const gamer_tag = await req.params.gamer_tag as string;
+        const team_tag = await req.params.team_tag as string;
+
+        const ok = await this.teamService.addMember(gamer_tag, team_tag);
+        res.status(ok? 200 : 500).json({success: ok});
+        
+    }
+
+    private async update(req: Request, res: Response) : Promise<void>{
+        const gamer_tag = req.params.gamer_tag.toString();
+
+        const ok = await this.teamService.update(gamer_tag, req.body);
+        res.status(ok? 200 : 500).json({ success: ok});
+    }
+
+    private async delete(req: Request, res: Response) : Promise<void>{
+        const gamer_tag = await req.params.gamer_tag.toString();
+        const team_tag = await req.params.team_tag.toString();
+        
+        const ok = await this.teamService.delete(gamer_tag, team_tag);
+        res.status(ok? 200 : 500).json({success: ok});
+    }
     public getRouter(): Router { return this.router; }
 }

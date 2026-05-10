@@ -127,4 +127,17 @@ export class TeamRepository implements ITeamRepository {
       return false;
     } finally { res.conn.release(); }
   }
+  async findByTeamTag(TeamTag: string): Promise<TeamDto | null> {
+    const res = await this.db.getReadConnection();
+    if (!res) return null;
+    try {
+      const [rows] = await res.conn.query<RowDataPacket[]>(
+        `SELECT * FROM teams WHERE team_tag = ? `, [TeamTag] 
+      );
+      return rows.length > 0 ? this.map(rows[0]) : null;
+    } catch (err) {
+      this.logger.error("TeamRepository", "findAll failed", err);
+      return null;
+    } finally { res.conn.release(); }
+  }
 }

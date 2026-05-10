@@ -9,6 +9,7 @@ export interface ITeamService{
     getById(id: number) : Promise<TeamDto[] | null>
     getByGamerTag(tag: string) : Promise<CreateTeamDto[] | null>
     create(dto: CreateTeamDto, gamerTag: string) : Promise<CreateTeamDto | null>
-    update(id: number, fields: Partial<TeamDto>) : Promise<boolean>
-    delete(id: number) : Promise<boolean>
+    update(gamer_tag: string, fields: Partial<TeamDto>) : Promise<boolean>
+    delete(gamer_tag: string, team_tag: string) : Promise<boolean>
+    addMember(gamer_tag: string, team_tag: string) : Promise<boolean>
 }
