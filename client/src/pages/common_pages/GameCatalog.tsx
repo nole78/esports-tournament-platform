@@ -4,6 +4,7 @@ import type { GameDto } from "../../models/game/GameDto";
 import { gameApi } from "../../api_services/game_catalog/GameAPIService";
 import { useAuth } from "../../hooks/auth/useAuthHook";
 import { useNavigate } from "react-router-dom";
+import { Layout } from "../../components/layout/Layout";
 
 
 export default function GameCatalog(){
@@ -25,11 +26,12 @@ export default function GameCatalog(){
     }, []);
 
     return (
+        <Layout>
         <div>
             <PageHeader eyebrow="" title="Game Catalog"/>
             {user?.role === "admin" && (
-                <button onClick={() => navigate("/admin/game_catalog/add")}
-                        className="mb-2 bg-bgsecondary/40 border-2 border-bgsecondary hover:bg-bgsecondary/30 text-bgsecondary font-semibold rounded-xl p-3 text-sm transition-colors">
+                <button onClick={() => navigate("/game_catalog/add")}
+                        className="mb-2 w-1/6 bg-bgsecondary/40 border-2 border-bgsecondary hover:bg-bgsecondary/30 text-bgsecondary font-semibold rounded-xl py-3 text-sm transition-colors">
                 Add Game</button>
             )}
             {error && <ErrorBox message={error}/>}
@@ -39,39 +41,46 @@ export default function GameCatalog(){
                 </div>
             )}
             {games.length === 0 && !error ? <Empty message="No games found"/> : (
-                <section className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                <section className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                     {games.map(g => (
-                    <div className="border-2 border-bgsecondary bg-bgprimary/30 p-2 rounded-xl">
-                        <h2 className="text-bgsecondary text-2xl font-bold">{g.gameName}</h2>
-                        <img src={g.gameLogotip}/>
-                        {user?.role === "admin" && (<div>
-                            <button className="mb-2 bg-bgsecondary/40 border-2 border-bgsecondary hover:bg-bgsecondary/30 text-bgsecondary font-semibold rounded-xl p-1 text-sm transition-colors"
-                                    onClick={() => {
-                                        setDeleted(false);
-                                        gameApi.delete(g.gameId)
-                                            .then(res =>{
-                                                if(res.success) {
-                                                    setDeleted(true); 
-                                                    setGames(prev => prev.filter(game => game.gameId !== g.gameId));
-                                                    setTimeout(() => {setDeleted(false)}, 3000);
-                                                    return;}
-                                                else setError(res.message);
-                                            })
-                                            .catch(() => setError("Failed to delete game"))
-                                        }}>
-                                Delete
-                            </button>
-                            <button className="mb-2 bg-bgsecondary/40 border-2 border-bgsecondary hover:bg-bgsecondary/30 text-bgsecondary font-semibold rounded-xl p-1 text-sm transition-colors"
-                                    onClick={() => navigate(`/admin/game_catalog/edit/${g.gameId}`)}>
-                                Edit
-                            </button>
-                        </div>)}
-                        <div className="float-left text-sm text-bgprimary border-2 p-1 border-bgprimary rounded-xl mr-1">Players: {g.gamePlayers}</div>
-                        <div className="float-left text-sm text-bgprimary border-2 p-1 border-bgprimary rounded-xl">{g.gameGenre}</div>
+                    <div className="group relative aspect-4/3 border-2 h-2xl border-white/5 bg-bgprimary/30  rounded-xl overflow-hidden">
+                        <div className="w-full h-full">
+                            <img src={g.gameLogotip} className="object-cover w-full h-full rounded-xl transition-transform duration-300 group-hover:scale-110"/>
+                        </div>
+                        <div className="absolute rounded-t-lg bg-primary/90 h-min inset-0 origin-top scale-y-0 group-hover:scale-y-100 transition-transform duration-300">
+                            <h2 className="text-bgsecondary text-center text-2xl font-bold">{g.gameName}</h2>
+                        </div>
+                        <div className="absolute rounded-b-lg bottom-0 bg-primary/90 w-full p-2 origin-bottom scale-y-0 group-hover:scale-y-100 transition-transform duration-300">
+                            {user?.role === "admin" && (<div className="top-0">
+                                <button className="w-1/3 mb-2 bg-red-400/40 border-2 border-red-500 hover:bg-bgsecondary/30 hover:border-bgsecondary text-red-500 font-semibold rounded-xl p-1 text-sm transition-colors"
+                                        onClick={() => {
+                                            setDeleted(false);
+                                            gameApi.delete(g.gameId)
+                                                .then(res =>{
+                                                    if(res.success) {
+                                                        setDeleted(true); 
+                                                        setGames(prev => prev.filter(game => game.gameId !== g.gameId));
+                                                        setTimeout(() => {setDeleted(false)}, 3000);
+                                                        return;}
+                                                    else setError(res.message);
+                                                })
+                                                .catch(() => setError("Failed to delete the game"))
+                                            }}>
+                                    Delete
+                                </button>
+                                <button className="w-1/3 mb-2 float-right bg-green-400/40 border-2 border-green-500 hover:bg-bgsecondary/30 hover:border-bgsecondary text-green-500 font-semibold rounded-xl p-1 text-sm transition-colors"
+                                        onClick={() => navigate(`/game_catalog/edit/${g.gameId}`)}>
+                                    Edit
+                                </button>
+                            </div>)}
+                            <span className="float-left font-semibold text-sm text-bgsecondary">{g.gamePlayers}v{g.gamePlayers}</span>
+                            <span className="text-sm text-bgsecondary font-semibold float-right">{g.gameGenre}</span>
+                        </div>
                     </div>
                     ))}
                 </section>
             )}
         </div>
+        </Layout>
     );
 }

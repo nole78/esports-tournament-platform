@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useAuth } from "../../hooks/auth/useAuthHook";
 import type { IAuthAPIService } from "../../api_services/auth/IAuthAPIService";
+import logo from "../../assets/logo.png";
+
 
 export function RegisterForm({ authApi }: { authApi: IAuthAPIService }) {
   const { login } = useAuth();
@@ -21,7 +23,7 @@ export function RegisterForm({ authApi }: { authApi: IAuthAPIService }) {
     <div className="w-full max-w-sm">
       <div className="text-center mb-10">
         <div className="w-20 h-20 rounded-2xl bg-bgprimary/10 border border-secondary/50 flex items-center justify-center mx-auto mb-4">
-          <img src="logo.png" className="w-20 h-20 border border-secondary/50 rounded-2xl flex"/>
+          <img src={logo} className="w-20 h-20 border border-secondary/50 rounded-2xl flex"/>
         </div>
         <h1 className="text-xl font-semibold text-bgsecondary">Create account</h1>
         <p className="text-sm text-secondary mt-1">Register to get started</p>

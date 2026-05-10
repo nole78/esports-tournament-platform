@@ -1,4 +1,4 @@
-import { ResultSetHeader, RowDataPacket } from "mysql2";
+/*import { ResultSetHeader, RowDataPacket } from "mysql2";
 import { IMatchRepository } from "../../../Domain/repositories/matches/IMatchRepository";
 import { ILoggerService } from "../../../Domain/services/logger/ILoggerService";
 import { DbManager } from "../../connection/DbConnectionPool";
@@ -105,4 +105,4 @@ export class MatchRepository implements IMatchRepository {
       return false;
     } finally { res.conn.release(); }
   }
-}
+}*/

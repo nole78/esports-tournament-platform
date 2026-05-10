@@ -1,4 +1,3 @@
-// Should be allright, need to check
 
 export class GameDto{
     constructor(

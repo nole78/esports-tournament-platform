@@ -1,75 +1,97 @@
 import { type ReactNode } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/auth/useAuthHook";
+import logo from "../../assets/logo.png";
 
 // TODO: Update nav items to match your routes and roles
+const guestNav = [
+  {to: "/game_catalog", label: "Game Catalog"}
+]
+
 const userNav = [
-  { to: "/dashboard", label: "Dashboard", icon: "⬡" },
-  { to: "/game_catalog", label: "Game Catalog", icon: "⬡"},
-  { to: "/tournament_list", label: "Tournament List", icon: "⬡"},
+  { to: "/dashboard", label: "Dashboard" },
+  { to: "/game_catalog", label: "Game Catalog"},
+  { to: "/tournament_list", label: "Tournament List"},
   // add more user routes here
 ];
 const adminNav = [
-  { to: "/admin",       label: "Dashboard", icon: "⬡" },
-  { to: "/admin/users", label: "Users",     icon: "◎" },
-  { to: "/admin/game_catalog", label: "Game Catalog", icon: "⬡"},
-  { to: "/admin/tournament_list", label: "Tournament List", icon: "⬡"},
+  { to: "/admin",       label: "Dashboard"},
+  { to: "/admin/users", label: "Users"},
+  { to: "/game_catalog", label: "Game Catalog"},
+  { to: "/admin/audit_log", label: "Audit Log"},
+  { to: "/admin/tournament_list", label: "Tournament List"},
   // add more admin routes here
 ];
 
 export function Layout({ children }: { children: ReactNode }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const nav = user?.role === "admin" ? adminNav : userNav;
+  const nav = user?.role === "admin" ? adminNav : user? userNav : guestNav;
 
   return (
-    <div className="flex min-h-screen bg-primary">
-      <aside className="w-56 shrink-0 border-r border-secondary/40 flex flex-col bg-bgprimary/70">
-        {/* Logo */}
-        <div className="px-5 h-16 flex items-center border-b border-primary/30 gap-3">
-          <div className="w-10 h-10 rounded-lg bg-white/10 border border-primary/50 flex items-center justify-center">
-            <img src="logo.png" className="w-10 h-9.6 rounded-lg flex "/>
-          </div>
-          <div>
-            <p className="text-sm font-semibold text-primary tracking-tight">PulseGrid</p>
-            <p className="text-[10px] text-bgsecondary uppercase tracking-widest">{user?.role}</p>
-          </div>
-        </div>
+    <div className="flex flex-col min-h-screen bg-primary">
+      <header className="w-full border-b border-secondary/40 bg-bgprimary/70">
+        <div className="h-16 px-6 flex items-center justify-between">
+          {/* LEFT - Logo */}
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-white/10 border border-primary/50 flex items-center justify-center">
+              <img src={logo} className="w-10 h-9.5 rounded-lg" />
+            </div>
 
-        {/* Nav */}
-        <nav className="flex-1 py-4 px-3 flex flex-col gap-0.5">
-          {nav.map((item) => (
-            <NavLink key={item.to} to={item.to} end
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all ${
-                  isActive
-                    ? "bg-white/8 text-bgsecondary border border-secondary/50"
-                    : "text-primary/35 hover:text-primary/70 hover:bg-white/4 border border-transparent"
-                }`
-              }
+            <button
+              className="text-2xl font-bold text-primary tracking-tight hover:text-primary/80 cursor-pointer"
+              onClick={() => navigate("/pulse_grid")}
             >
-              <span className="text-base leading-none">{item.icon}</span>
-              {item.label}
-            </NavLink>
-          ))}
-        </nav>
-
-        {/* User */}
-        <div className="border-t border-primary/30 px-4 py-4">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-7 h-7 rounded-full bg-white/10 border border-primary/50 flex items-center justify-center">
-              <span className="text-xs text-bgsecondary/60 font-medium">{user?.username?.[0]?.toUpperCase()}</span>
-            </div>
-            <div className="min-w-0">
-              <p className="text-xs font-medium text-primary/80 truncate">{user?.username}</p>
-            </div>
+              Pulse<span className="text-bgsecondary">Grid</span>
+            </button>
           </div>
-          <button onClick={() => { logout(); navigate("/login"); }}
-            className="text-xs text-bgsecondary hover:text-white/50 transition-colors w-full text-left">
-            Sign out →
-          </button>
+
+          {/* CENTER - Navigation */}
+          <nav className="flex items-center gap-2">
+            {nav.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end
+                className={({ isActive }) =>
+                  `flex items-center font-semibold gap-2 px-4 py-2 rounded-lg text-sm transition-all ${
+                    isActive
+                      ? "bg-white/8 text-bgsecondary border border-secondary/50"
+                      : "text-primary/40 hover:text-primary/80 hover:bg-white/5"
+                  }`
+                }
+              >
+                {item.label}
+              </NavLink>
+            ))}
+          </nav>
+
+          {/* RIGHT - User */}
+          <div className="flex items-center gap-4">
+            {user && (
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-white/10 border border-primary/50 flex items-center justify-center">
+                  <span className="text-xs text-bgsecondary/60 font-medium">
+                    {user?.username?.[0]?.toUpperCase()}
+                  </span>
+                </div>
+
+                <p className="text-sm text-primary/80">{user?.username}</p>
+              </div>
+            )}
+
+            <button
+              onClick={() => {
+                if (user) logout();
+                else navigate("/login");
+              }}
+              className="text-sm text-secondary bg-bgsecondary p-2 rounded-lg font-semibold cursor-pointer hover:text-white/70 hover:bg-bgsecondary/70 transition-colors"
+            >
+              {user ? "Log out" : "Log in"}
+            </button>
+          </div>
         </div>
-      </aside>
+      </header>
 
       <main className="flex-1 overflow-auto">
         <div className="max-w-5xl mx-auto px-8 py-8">{children}</div>
