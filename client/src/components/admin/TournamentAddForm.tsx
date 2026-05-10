@@ -15,36 +15,23 @@ export default function TournamentAddForm({tournamentApi, gameApi} : {tournament
     const [prizeFund, setPrizeFund] = useState<string>("");
     const [status, setStatus] = useState<TournamentStatus>('upcoming');
     const [games, setGames] = useState<GameDto[]>([]);
-    const [loadingGames, setLoadingGames] = useState<boolean>(true);
 
     const [error, setError] = useState<string>("");
     const [succes, setSucces] = useState<boolean>(false);
     const [creating, setCreating] = useState<boolean>(false);
     
     useEffect(() => {
-        const loadGames = async () => {
-            try {
-                setLoadingGames(true);
-                const res = await gameApi.getAll(1, 100);
-                if (res.success && res.data) {
-                    setGames(res.data.items);
-                    // Set first game as default
-                    if (res.data.items.length > 0) {
-                        setGameName(res.data.items[0].gameName);
-                    }
-                    setError("");
-                } else {
-                    setError(res.message ?? "Failed to load games");
-                    setGames([]);
-                }
-            } catch (err) {
-                setError("Error loading games" + err);
+        gameApi.getAll()
+        .then(res => {
+            if (res.success) {
+                setGames(res.data?.items ?? []);
+                setError("");
+            } else {
+                setError(res.message ?? "Failed to load games");
                 setGames([]);
-            } finally {
-                setLoadingGames(false);
-            }
-        };
-        loadGames();
+            } 
+        })
+        .catch(() => setError("Failed to load games!"));
     }, [gameApi]);
     
     const submit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -63,7 +50,7 @@ export default function TournamentAddForm({tournamentApi, gameApi} : {tournament
         tournamentMaxTeams: maxTeamsNum, 
         tournamentApplicationDeadline: applicationDeadline, 
         tournamentPrizeFund: prizeFundNum, 
-        torunamentStatus: status
+        tournamentStatus: status
     };
     
     const res = await tournamentApi.create(payload);
@@ -103,10 +90,9 @@ export default function TournamentAddForm({tournamentApi, gameApi} : {tournament
                         <select 
                             value={gameName} 
                             onChange={e => setGameName(e.target.value)}
-                            disabled={loadingGames}
                             className="w-full bg-bgprimary/10 border border-secondary/50 rounded-xl px-4 py-3 text-bgsecondary text-sm focus:outline-none focus:border-white/30 transition-colors disabled:opacity-50">
                             {games.map(game => (
-                                <option key={game.gameId} value={game.gameName}>
+                                <option className='bg-lime-950' key={game.gameId} value={game.gameName}>
                                     {game.gameName}
                                 </option>
                             ))}
@@ -120,7 +106,7 @@ export default function TournamentAddForm({tournamentApi, gameApi} : {tournament
                                 onChange={e => setFormat(e.target.value as TournamentFormat)}
                                 className="w-full bg-bgprimary/10 border border-secondary/50 rounded-xl px-4 py-3 text-bgsecondary text-sm focus:outline-none focus:border-white/30 transition-colors">
                                 {Object.entries(TournamentFormatValues).map(([key, value]) => (
-                                    <option key={key} value={value}>
+                                    <option className='bg-lime-950' key={key} value={value}>
                                         {key.replace(/_/g, ' ')}
                                     </option>
                                 ))}
@@ -134,7 +120,7 @@ export default function TournamentAddForm({tournamentApi, gameApi} : {tournament
                                 className="w-full bg-bgprimary/10 border border-secondary/50 rounded-xl px-4 py-3 text-bgsecondary text-sm focus:outline-none focus:border-white/30 transition-colors"
                             >
                                 {Object.entries(TournamentStatusValues).map(([key, value]) => (
-                                    <option key={key} value={value}>
+                                    <option className='bg-lime-950' key={key} value={value}>
                                         {key}
                                     </option>
                                 ))}
@@ -153,7 +139,7 @@ export default function TournamentAddForm({tournamentApi, gameApi} : {tournament
                     </div>
                     <div>
                         <label className="block text-xs text-bgprimary mb-2 font-medium">Application deadline</label>
-                        <input type='date' value={applicationDeadline.toISOString().split('T')[0]}onChange={e => setApplicationDeadline(new Date(e.target.value))}className="w-full bg-bgprimary/10 border border-secondary/50 rounded-xl px-4 py-3 text-bgsecondary text-sm focus:outline-none focus:border-white/30 transition-colors" />
+                        <input type='date' value={applicationDeadline.toISOString().split('T')[0]}onChange={e => setApplicationDeadline(new Date(e.target.value))}className="w-full bg-bgprimary/10 border border-secondary/50 rounded-xl px-4 py-3 text-bgsecondary text-sm focus:outline-none focus:border-white/30 transition-colors" style={{colorScheme: "dark"}}/>
                     </div>
                     <button type="submit" disabled={creating}
                         className="mt-2 bg-bgprimary hover:bg-bgprimary/80 disabled:opacity-50 text-primary font-semibold rounded-xl py-3 text-sm transition-colors">
