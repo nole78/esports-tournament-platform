@@ -8,5 +8,5 @@ export type TournamentDto = {
     tournamentMaxTeams : number,
     tournamentApplicationDeadline : Date,
     tournamentPrizeFund : number,
-    torunamentStatus : TournamentStatus
+    tournamentStatus : TournamentStatus
 }

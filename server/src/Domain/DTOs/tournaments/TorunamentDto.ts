@@ -9,6 +9,6 @@ export class TournamentDto{
             public tournamentMaxTeams : number = 0,
             public tournamentApplicationDeadline : Date = new Date(),
             public tournamentPrizeFund : number = 0,
-            public torunamentStatus : TournamentStatus = TournamentStatus.UPCOMING,
+            public tournamentStatus : TournamentStatus = TournamentStatus.UPCOMING,
         ){}
 }
