@@ -7,6 +7,7 @@ import { TournamentDto } from "../../../Domain/DTOs/tournaments/TorunamentDto";
 import { CreateTournamentInternalDto } from "../../../Domain/DTOs/tournaments/CreateTournamentInternalDto";
 import { TournamentStatus } from '../../../Domain/enums/TournamentStatus';
 import { TournamentInternalDto } from "../../../Domain/DTOs/tournaments/TournamentInternalDto";
+import { TournamentFilterInternalDto } from "../../../Domain/DTOs/tournaments/TournamentFilterInternalDto";
 
 export class TournamentRepository implements ITournamentRepository {
   public constructor(
@@ -46,7 +47,6 @@ export class TournamentRepository implements ITournamentRepository {
          ORDER BY tournament_id DESC LIMIT ? OFFSET ?`, 
         [limit, offset]
       );
-      console.log("TournamentRepository findAll - rows:", rows.length);
       return rows.map((r) => this.map(r));
     } catch (err) {
       this.logger.error("TournamentRepository", "findAll failed", err);
@@ -64,7 +64,7 @@ export class TournamentRepository implements ITournamentRepository {
         [dto.tournamentName, dto.tournamentGameId, dto.tournamentFormat, dto.tournamentMaxTeams, dto.tournamentApplicationDeadline, dto.tournamentPrizeFund, dto.tournamentStatus]
       );
       if (result.insertId === 0) return new Tournament();
-      // Conver string back to Date object for Domain Model
+
       return new Tournament(
         result.insertId, 
         dto.tournamentName, 
@@ -80,6 +80,37 @@ export class TournamentRepository implements ITournamentRepository {
       return new Tournament();
     } finally { res.conn.release(); }
   }  
+
+  async findFiltered(fields: Partial<TournamentFilterInternalDto>, page = 1, limit = 20): Promise<TournamentInternalDto[]>{
+    const res = await this.db.getReadConnection();
+    if (!res) return [];
+    const offset = (page - 1) * limit;
+
+    const fieldMap: Record<string, string> = {
+      tournamentGameId: "tournament_game_id",
+      tournamentFormat: "tournament_format",
+      tournamentStatus: "tournament_status"
+    }
+
+    try {
+      const entries = Object.entries(fields).filter(([, v]) => v !== undefined).map(([k,v]) => [fieldMap[k] ?? k, v]);
+      if (entries.length === 0) return [];
+      const filterClause = entries.map(([k]) => `${k} = ?`).join(" AND ");
+      const values = entries.map(([, v]) => v);
+      
+      const [rows] = await res.conn.query<RowDataPacket[]>(
+        `SELECT tournament_name, tournament_game_id, tournament_format, tournament_max_teams, tournament_application_deadline, tournament_prize_fund, tournament_status
+         FROM tournaments
+         WHERE ${filterClause}
+         ORDER BY tournament_id DESC LIMIT ? OFFSET ?`, [...values, limit, offset]);
+      return rows.map((r) => this.map(r));
+    } catch (err) {
+      this.logger.error("TournamentRepository", "findAll failed", err);
+      console.error("findAll error:", err);
+      return [];
+    } finally { res.conn.release(); }
+  }
+
   async update(id: number, fields: Partial<Tournament>): Promise<boolean> {
     const res = await this.db.getWriteConnection();
     if (!res) return false;
@@ -91,7 +122,7 @@ export class TournamentRepository implements ITournamentRepository {
       tournamentMaxTeams: "tournament_max_teams",
       tournamentApplicationDeadline: "tournament_application_deadline",
       tournamentPrizeFund: "tournament_prize_fund",
-      torunamentStatus: "tournament_status"
+      tournamentStatus: "tournament_status"
     }
 
     try {
