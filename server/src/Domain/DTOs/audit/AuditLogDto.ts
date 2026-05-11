@@ -2,7 +2,7 @@ export class AuditLogDto {
   public constructor(
     public id: number = 0,
     public userId: number | null = null,
-    public username: string | null = null,
+    public gamer_tag: string | null = null,
     public action: string = "",
     public entity: string | null = null,
     public entityId: number | null = null,

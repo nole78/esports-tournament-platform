@@ -4,7 +4,6 @@ import { authorize } from "../../Middlewares/authorization/AuthorizeMiddleware";
 import { UserRole } from "../../Domain/enums/UserRole";
 import { IGameService } from "../../Domain/services/games/IGameService";
 import { CreateGameDto } from '../../Domain/DTOs/games/CreateGameDto';
-import { User } from "../../Domain/models/User";
 import { ValidationResult } from '../../Domain/types/ValidationResult';
 import { validateGameCreation } from "../validators/games/validateGameCreation";
 

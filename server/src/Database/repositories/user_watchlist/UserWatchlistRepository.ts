@@ -1,4 +1,4 @@
-import { ResultSetHeader, RowDataPacket } from 'mysql2';
+/*import { ResultSetHeader, RowDataPacket } from 'mysql2';
 import { UserWatchlistDto } from '../../../Domain/DTOs/user_watchlists/UserWatchlistDto';
 import { IUserWatchlistRepository } from '../../../Domain/repositories/user_watchlist/IUserWatchlistRepository';
 import { ILoggerService } from '../../../Domain/services/logger/ILoggerService';
@@ -93,4 +93,4 @@ export class UserWatchlistRepository implements IUserWatchlistRepository {
       return false;
     } finally { res.conn.release(); }
   }
-}
+}*/

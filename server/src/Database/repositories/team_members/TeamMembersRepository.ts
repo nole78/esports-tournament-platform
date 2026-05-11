@@ -1,4 +1,4 @@
-import { ResultSetHeader, RowDataPacket } from "mysql2";
+/*import { ResultSetHeader, RowDataPacket } from "mysql2";
 import { ITeamMemberRepository } from "../../../Domain/repositories/team_members/ITeamMemberRepository";
 import { ILoggerService } from "../../../Domain/services/logger/ILoggerService";
 import { DbManager } from "../../connection/DbConnectionPool";
@@ -112,3 +112,4 @@ export class TeamMemberRepository implements ITeamMemberRepository {
     } finally { res.conn.release(); }
   }
 }
+*/

@@ -1,6 +1,6 @@
-# Project Template
+# PulseGrid Esports platform
 
-Full-stack TypeScript template with:
+Full-stack TypeScript project with:
 - **Client**: React 19 + Vite + TailwindCSS v4 + React Router v7
 - **Server**: Node.js + Express 5 + TypeScript
 - **Database**: MySQL 8 with Master + 2 Slave replication via Docker
@@ -23,6 +23,7 @@ project/
 ├── client/                  # React frontend (Vite)
 │   └── src/
 │       ├── api_services/    # Axios API service classes (Interface + Implementation)
+│       ├── assets/          # Assets (images)
 │       ├── components/      # Reusable UI components
 │       ├── contexts/        # React contexts (AuthContext)
 │       ├── helpers/         # Utility functions (localStorage wrapper)
@@ -57,6 +58,24 @@ project/
     └── setup-replication.sh # Replication bootstrap script
 ```
 
+## Live Demo / Deployment
+
+The project is fully deployed and available online:
+
+- **Frontend (Vercel):** https://odp-c2-s-tim-01.vercel.app
+
+### Production Infrastructure
+
+- Frontend hosted on Vercel
+- Backend API hosted on Render
+- MySQL database hosted on Aiven
+
+### Notes
+
+- Local development uses Dockerized MySQL master/slave replication.
+- Production deployment uses a managed cloud MySQL instance due to free-tier limitations.
+- Environment-based configuration is used to separate development and production infrastructure.
+
 ## Getting Started
 
 ### 1. Start the database
@@ -88,13 +107,3 @@ cd client
 npm install
 npm run dev
 ```
-
-## Customisation Checklist
-
-- [x] Rename `project_db` → your database name (docker-compose.yml, setup-replication.sh, .env.example)
-- [ ] Replace `Entity` / `entities` with your domain model name throughout -> David
-- [x] Update `UserRole` enum if you need different roles
-- [ ] Update nav items in `Layout.tsx` to match your routes -> Marton Viktor Melar
-- [ ] Add your domain-specific routes in `App.tsx` -> Denis Đuriš
-- [x] Update table schema in `setup-replication.sh` -> Danković Marko
-- [x] Replace `AppName` in `Layout.tsx` with your app name
