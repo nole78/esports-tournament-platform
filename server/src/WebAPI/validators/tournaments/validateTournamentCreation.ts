@@ -11,8 +11,8 @@ export const validateTournamentCreation = (tname: string, tgame:string, tmaxteam
         return {valid:false, message:"Tournament name is mandatory"};
     if(!tgame || tgame.trim().length === 0)
         return {valid:false, message:"Game name is mandatory"};
-    if(tmaxteams <= 0 && tmaxteams <= 256)
-        return {valid:false, message:"Maximum number of teams must be greater than 0 and less than 256"};
+    if(tmaxteams <= 4 && tmaxteams <= 256)
+        return {valid:false, message:"Maximum number of teams must be greater or equal to 4 and less than 256"};
     if(!isPowerOfTwo(tmaxteams))
         return {valid:false, message:"Maximum number of teams must be a power of 2 (2, 4, 8, 16, 32, 64, ...)"};
     if(tprizefund <= 0)
