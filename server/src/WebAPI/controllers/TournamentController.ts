@@ -21,7 +21,7 @@ export class TournamentController{
 
     private async getAll(req: Request, res: Response) : Promise<void>{
         const page  = parseInt(req.query.page  as string ?? "1",  10);
-        const limit = parseInt(req.query.limit as string ?? "20", 10);
+        const limit = Math.min(parseInt(String(req.query.limit ?? "12"), 10), 100);
         
         const filters = {
         tournamentGame: req.query.tournamentGame as string,
@@ -34,8 +34,7 @@ export class TournamentController{
         const result = hasFilters 
             ? await this.tournamentService.getFiltered(filters, page, limit)
             : await this.tournamentService.getAll(page, limit);
-    
-    res.status(200).json({ success: true, data: result });
+        res.status(200).json({ success: true, data: result });
     }
 
     private async getById(req: Request, res: Response) : Promise<void>{

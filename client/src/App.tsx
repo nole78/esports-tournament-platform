@@ -23,6 +23,7 @@ export default function App() {
       <Route path="/login"    element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/game_catalog" element={<GameCatalog/>} />
+      <Route path="/tournament_list" element={<TournamentList />} />
 
       {/* User routes */}
       <Route path="/dashboard" element={<ProtectedRoute requiredRole="player"><UserDashboard /></ProtectedRoute>} />
