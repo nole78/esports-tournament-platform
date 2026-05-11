@@ -27,7 +27,13 @@ export default function TournamentAddForm({tournamentApi, gameApi} : {tournament
         gameApi.getAll()
         .then(res => {
             if (res.success) {
-                setGames(res.data?.items ?? []);
+                const loadedGames = res.data?.items ?? [];
+                setGames(loadedGames);
+                if (loadedGames.length > 0) {
+                    setGameName(loadedGames[0].gameName);
+                }
+                setFormat("single_elimination");
+                setStatus("upcoming");
                 setError("");
             } else {
                 setError(res.message ?? "Failed to load games");
@@ -63,7 +69,7 @@ export default function TournamentAddForm({tournamentApi, gameApi} : {tournament
     
     setSucces(true);
     setTournamentName("");
-    setGameName("");
+    setGameName(games[0].gameName);
     setFormat('single_elimination');
     setMaxTeams("");
     setApplicationDeadline(new Date());
