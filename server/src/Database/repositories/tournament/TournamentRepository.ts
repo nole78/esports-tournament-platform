@@ -1,4 +1,4 @@
-/*import { ITournamentRepository } from "../../../Domain/repositories/tournaments/ITournamentRepository";
+import { ITournamentRepository } from "../../../Domain/repositories/tournaments/ITournamentRepository";
 import { Tournament } from '../../../Domain/models/Tournament';
 import { ResultSetHeader, RowDataPacket } from "mysql2";
 import { DbManager } from "../../connection/DbConnectionPool";
@@ -8,6 +8,7 @@ import { CreateTournamentInternalDto } from "../../../Domain/DTOs/tournaments/Cr
 import { TournamentStatus } from '../../../Domain/enums/TournamentStatus';
 import { TournamentInternalDto } from "../../../Domain/DTOs/tournaments/TournamentInternalDto";
 import { TournamentFilterInternalDto } from "../../../Domain/DTOs/tournaments/TournamentFilterInternalDto";
+import { PaginatedListDto } from '../../../Domain/DTOs/PaginatedListDto';
 
 export class TournamentRepository implements ITournamentRepository {
   public constructor(
@@ -36,22 +37,30 @@ export class TournamentRepository implements ITournamentRepository {
     } finally { res.conn.release(); }
   }
 
-  async findAll(page = 1, limit = 20): Promise<TournamentInternalDto[]> {
+  async findAll(page:number, limit:number): Promise<PaginatedListDto<TournamentInternalDto>> {
     const res = await this.db.getReadConnection();
-    if (!res) return [];
-    const offset = (page - 1) * limit;
+    if (!res) return new PaginatedListDto([], 0, page, limit);
+    const offset = Math.max(0, Math.floor((page - 1) * limit));
+    const lim    = Math.max(1, Math.floor(limit));
     try {
       const [rows] = await res.conn.query<RowDataPacket[]>(
         `SELECT tournament_name, tournament_game_id, tournament_format, tournament_max_teams, tournament_application_deadline, tournament_prize_fund, tournament_status
          FROM tournaments
          ORDER BY tournament_id DESC LIMIT ? OFFSET ?`, 
-        [limit, offset]
+        [lim, offset]
       );
-      return rows.map((r) => this.map(r));
+
+      const [cnt] = await res.conn.execute<RowDataPacket[]>(
+        `SELECT COUNT(*) as total FROM tournaments`
+      );
+
+      const items = rows.map((r) => this.map(r))
+
+      return new PaginatedListDto(items, cnt[0]?.total ?? 0, page, limit);
     } catch (err) {
       this.logger.error("TournamentRepository", "findAll failed", err);
       console.error("findAll error:", err);
-      return [];
+      return new PaginatedListDto([], 0, page, limit);
     } finally { res.conn.release(); }
   }
 
@@ -81,10 +90,11 @@ export class TournamentRepository implements ITournamentRepository {
     } finally { res.conn.release(); }
   }  
 
-  async findFiltered(fields: Partial<TournamentFilterInternalDto>, page = 1, limit = 20): Promise<TournamentInternalDto[]>{
+  async findFiltered(fields: Partial<TournamentFilterInternalDto>, page:number, limit:number): Promise<PaginatedListDto<TournamentInternalDto>>{
     const res = await this.db.getReadConnection();
-    if (!res) return [];
-    const offset = (page - 1) * limit;
+    if (!res) return new PaginatedListDto([], 0, page, limit);
+    const offset = Math.max(0, Math.floor((page - 1) * limit));
+    const lim    = Math.max(1, Math.floor(limit));
 
     const fieldMap: Record<string, string> = {
       tournamentGameId: "tournament_game_id",
@@ -94,7 +104,7 @@ export class TournamentRepository implements ITournamentRepository {
 
     try {
       const entries = Object.entries(fields).filter(([, v]) => v !== undefined).map(([k,v]) => [fieldMap[k] ?? k, v]);
-      if (entries.length === 0) return [];
+      if (entries.length === 0) return new PaginatedListDto([], 0, page, limit);
       const filterClause = entries.map(([k]) => `${k} = ?`).join(" AND ");
       const values = entries.map(([, v]) => v);
       
@@ -102,12 +112,21 @@ export class TournamentRepository implements ITournamentRepository {
         `SELECT tournament_name, tournament_game_id, tournament_format, tournament_max_teams, tournament_application_deadline, tournament_prize_fund, tournament_status
          FROM tournaments
          WHERE ${filterClause}
-         ORDER BY tournament_id DESC LIMIT ? OFFSET ?`, [...values, limit, offset]);
-      return rows.map((r) => this.map(r));
+         ORDER BY tournament_id DESC LIMIT ? OFFSET ?`, [...values, lim, offset]
+      );
+
+      const [cnt] = await res.conn.execute<RowDataPacket[]>(
+        `SELECT COUNT(*) as total FROM tournaments 
+        WHERE ${filterClause}`,
+        [...values]
+      );
+      const items = rows.map((r) => this.map(r));
+
+      return new PaginatedListDto(items, cnt[0]?.total ?? 0, page, limit);
     } catch (err) {
       this.logger.error("TournamentRepository", "findAll failed", err);
       console.error("findAll error:", err);
-      return [];
+      return new PaginatedListDto([], 0, page, limit);
     } finally { res.conn.release(); }
   }
 
@@ -153,4 +172,4 @@ export class TournamentRepository implements ITournamentRepository {
       return false;
     } finally { res.conn.release(); }
   }
-}*/
+}

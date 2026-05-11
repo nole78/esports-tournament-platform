@@ -3,7 +3,7 @@ import { useAuth } from "../../hooks/auth/useAuthHook";
 import type { TournamentDto } from "../../models/tournament/TournamentDto";
 import { useNavigate } from "react-router-dom";
 import { tournamentApi } from "../../api_services/tournament_list/TournamentAPIService";
-import { Empty, ErrorBox, PageHeader } from "../../components/ui/UI";
+import { Empty, ErrorBox, PageHeader, Pagination } from "../../components/ui/UI";
 import { formatDeadline, daysUntilDeadline, getDeadlineStatus, getDeadlineColor } from '../../helpers/date_formatter';
 import type { GameDto } from "../../models/game/GameDto";
 import { gameApi } from "../../api_services/game_catalog/GameAPIService";
@@ -19,15 +19,24 @@ export default function TournamentList(){
     const [gameNameFilter, setGameNameFilter] = useState<string>("");
     const [statusFilter, setStatusFilter] = useState<string>("");
     const [formatFilter, setFormatFilter] = useState<string>("");
+    const [page, setPage] = useState(1);
+    const [total, setTotal] = useState(0);
     const navigate = useNavigate();
+    const limit = 12;
 
-    useEffect(() =>{
-        tournamentApi.getAll()
+    const loadPage = (p : number) =>{
+        tournamentApi.getAll(p, limit)
         .then(res => {
-            if(res.success)
-                setTournaments(res.data?.items ?? []);
+            if(res.success && res.data)
+            {
+                setTournaments(res.data?.items);
+                setTotal(res.data.total);
+            }
             else
+            {
                 setError(res.message);
+                setTournaments([]);
+            }
         })
         .catch(() => setError("Failed to load tournaments!"))
 
@@ -42,38 +51,42 @@ export default function TournamentList(){
             } 
         })
         .catch(() => setError("Failed to load games!"));
+    }
 
-    }, []);
+    useEffect(() =>{
+        loadPage(page);
+
+    }, [page]);
 
     useEffect(() => {
-        const applyFilter = async () => {
-            const filter: TournamentFilterDto = {
-                tournamentGame: gameNameFilter === "" ? undefined : gameNameFilter,
-                tournamentFormat: formatFilter === "" ? undefined : (formatFilter as TournamentFormat),
-                tournamentStatus: statusFilter === "" ? undefined : (statusFilter as TournamentStatus)
-            };
-            tournamentApi.getFiltered(filter)
-            .then(res => {
-                if(res.success)
-                    setTournaments(res.data?.items ?? []);
-                else
-                    setError(res.message);
-            })
-            .catch(() => setError("Failed to load tournaments!"))
+        const filter: TournamentFilterDto = {
+            tournamentGame: gameNameFilter === "" ? undefined : gameNameFilter,
+            tournamentFormat: formatFilter === "" ? undefined : (formatFilter as TournamentFormat),
+            tournamentStatus: statusFilter === "" ? undefined : (statusFilter as TournamentStatus)
         };
-        applyFilter();
-    }, [gameNameFilter, statusFilter, formatFilter]);
+        tournamentApi.getFiltered(filter, page, limit)
+        .then(res => {
+            if(res.success && res.data)
+            {
+                setTournaments(res.data?.items ?? []);
+                setTotal(res.data.total);
+            }
+                else
+                setError(res.message);
+        })
+        .catch(() => setError("Failed to load tournaments!"))
+    }, [gameNameFilter, statusFilter, formatFilter, page]);
 
     return(
         <div>
             <PageHeader eyebrow="" title="Tournament List" />
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center mb-5">
                 {user?.role === "admin" && (
                     <button onClick={() => navigate("/admin/tournament_list/add")}
                             className="mb-2 bg-bgsecondary/40 border-2 border-bgsecondary hover:bg-bgsecondary/30 text-bgsecondary font-semibold rounded-xl p-3 text-sm transition-colors">
                     Add Tournament</button>
                 )}
-                <div>
+                <div className="flex gap-2">
                     <select 
                         value={gameNameFilter} 
                         onChange={(e) => setGameNameFilter(e.target.value)}
@@ -150,6 +163,7 @@ export default function TournamentList(){
                     })}
                 </section>
             )}
+            <Pagination page={page} total={total} pageSize={limit} onChange={setPage} />
         </div>
     );
 }

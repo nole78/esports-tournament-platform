@@ -23,11 +23,11 @@ export class TournamentService implements ITournamentService {
 
   async getAll(page?: number, limit?: number): Promise<PaginatedListDto<TournamentDto>> {
     const tournaments = await this.tournamentRepo.findAll(page, limit);
-    if (tournaments.length === 0) {
+    if (tournaments.total === 0) {
       return new PaginatedListDto([], 0, page, limit);
     }
 
-    const gameIds = [...new Set(tournaments.map(t => t.tournamentGameId))];
+    const gameIds = [...new Set(tournaments.items.map(t => t.tournamentGameId))];
     const games:GameDto[] = [];
     
     for(let i:number = 0; i < gameIds.length; i++)
@@ -40,7 +40,7 @@ export class TournamentService implements ITournamentService {
     const gameMap = new Map(games.map(g => [g.gameId, g.gameName]));
     
     
-    const items = tournaments.map(t => 
+    const items = tournaments.items.map(t => 
       new TournamentDto(
         t.tournamentName,
         gameMap.get(t.tournamentGameId) || "Unknown",
@@ -51,7 +51,7 @@ export class TournamentService implements ITournamentService {
         t.tournamentStatus
       )
     );
-    return new PaginatedListDto(items, items.length, page, limit);
+    return new PaginatedListDto(items, tournaments.total, page, limit);
   }
 
   async getFiltered(fields: Partial<TournamentFilterDto>, page?: number, limit?: number): Promise<PaginatedListDto<TournamentDto>> {
@@ -65,7 +65,7 @@ export class TournamentService implements ITournamentService {
     const internalDto = new TournamentFilterInternalDto(game?.gameId == 0 ? undefined : game?.gameId, fields?.tournamentFormat, fields?.tournamentStatus);
     const tournaments = await this.tournamentRepo.findFiltered(internalDto, page, limit);
 
-    const gameIds = [...new Set(tournaments.map(t => t.tournamentGameId))];
+    const gameIds = [...new Set(tournaments.items.map(t => t.tournamentGameId))];
     const games:GameDto[] = [];
     
     for(let i:number = 0; i < gameIds.length; i++)
@@ -77,7 +77,7 @@ export class TournamentService implements ITournamentService {
 
     const gameMap = new Map(games.map(g => [g.gameId, g.gameName]));
 
-    const items = tournaments.map(t => 
+    const items = tournaments.items.map(t => 
       new TournamentDto(
         t.tournamentName,
         gameMap.get(t.tournamentGameId) || "Unknown",
@@ -89,7 +89,7 @@ export class TournamentService implements ITournamentService {
       )
     );
     const filtered = await this.tournamentRepo.findFiltered(internalDto, page, limit);
-    return new PaginatedListDto(items, items.length, page, limit);
+    return new PaginatedListDto(items, tournaments.total, page, limit);
   }
 
   async getById(id: number): Promise<TournamentDto | null> {
