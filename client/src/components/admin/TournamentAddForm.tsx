@@ -4,6 +4,7 @@ import { TournamentFormatValues, type TournamentFormat } from '../../types/tourn
 import { TournamentStatusValues, type TournamentStatus } from '../../types/tournament/TournamentStatus';
 import type { IGameAPIService } from '../../api_services/game_catalog/IGameAPIService';
 import type { GameDto } from '../../models/game/GameDto';
+import { useNavigate } from 'react-router-dom';
 
 
 export default function TournamentAddForm({tournamentApi, gameApi} : {tournamentApi:ITournamentAPIService, gameApi:IGameAPIService}){
@@ -19,6 +20,8 @@ export default function TournamentAddForm({tournamentApi, gameApi} : {tournament
     const [error, setError] = useState<string>("");
     const [succes, setSucces] = useState<boolean>(false);
     const [creating, setCreating] = useState<boolean>(false);
+
+    const navigate = useNavigate();
     
     useEffect(() => {
         gameApi.getAll()
@@ -69,6 +72,10 @@ export default function TournamentAddForm({tournamentApi, gameApi} : {tournament
       };
         return(
             <div className="w-full max-w-sm">
+                <div className="text-center mb-10">
+                    <h1 className="text-3xl font-semibold text-bgsecondary">Tournament Adder</h1>
+                    <p className="text-sm text-secondary mt-1">Add new tournament</p>
+                </div>
                 {error && (
                     <div className="mb-5 bg-red-500/10 border border-red-500/20 text-red-300 text-sm px-4 py-3 rounded-xl">
                         {error}
@@ -141,10 +148,16 @@ export default function TournamentAddForm({tournamentApi, gameApi} : {tournament
                         <label className="block text-xs text-bgprimary mb-2 font-medium">Application deadline</label>
                         <input type='date' value={applicationDeadline.toISOString().split('T')[0]}onChange={e => setApplicationDeadline(new Date(e.target.value))}className="w-full bg-bgprimary/10 border border-secondary/50 rounded-xl px-4 py-3 text-bgsecondary text-sm focus:outline-none focus:border-white/30 transition-colors" style={{colorScheme: "dark"}}/>
                     </div>
-                    <button type="submit" disabled={creating}
-                        className="mt-2 bg-bgprimary hover:bg-bgprimary/80 disabled:opacity-50 text-primary font-semibold rounded-xl py-3 text-sm transition-colors">
-                        {creating ? "Creating…" : "Create"}
-                    </button>
+                    <div className="flex gap-2">
+                        <button type="submit" disabled={creating}
+                            className="w-1/2 cursor-pointer bg-bgprimary hover:bg-bgprimary/80 disabled:opacity-50 text-primary font-semibold rounded-xl py-3 text-sm transition-colors">
+                            {creating ? "Creating…" : "Create"}
+                        </button>
+                        <button type="button" onClick={() => navigate("/admin/tournament_list")}
+                        className="py-3 bg-red-400/40  cursor-pointer border-red-500 hover:bg-red-400/30 hover:border-bgsecondary/70 text-red-500 font-semibold rounded-xl w-1/2 text-sm transition-colors">
+                            Cancel
+                        </button>
+                    </div>
                 </form>
             </div>
         );
