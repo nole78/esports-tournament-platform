@@ -9,7 +9,7 @@ export class GameService implements IGameService {
 
     async getAll(page?: number,limit?: number) : Promise<PaginatedListDto<GameDto>>{
         const items = await this.gameRepo.findAll(page, limit);
-        return new PaginatedListDto(items,items.length,page,limit);
+        return items;
     }
     async getById(id: number) : Promise<GameDto | null>{
         return this.gameRepo.findById(id);
