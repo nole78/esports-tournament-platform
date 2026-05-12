@@ -1,6 +1,9 @@
 export class UserPasswordDto {
-  constructor(
-    public newPassword: string = "",
-    public oldPassword: string = "",
-  ) {}
+  newPassword: string;
+  oldPassword: string;
+
+  constructor(newPassword = "", oldPassword = "") {
+    this.newPassword = newPassword;
+    this.oldPassword = oldPassword;
+  }
 }
