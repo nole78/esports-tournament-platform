@@ -34,7 +34,7 @@ export default function GameCatalog(){
             <PageHeader eyebrow="" title="Game Catalog"/>
             {user?.role === "admin" && (
                 <button onClick={() => navigate("/game_catalog/add")}
-                        className="mb-2 w-1/6 bg-bgsecondary/40 border-2 border-bgsecondary hover:bg-bgsecondary/30 text-bgsecondary font-semibold rounded-xl py-3 text-sm transition-colors">
+                        className="cursor-pointer mb-2 w-1/6 bg-bgsecondary/40 border-2 border-bgsecondary hover:bg-bgsecondary/30 text-bgsecondary font-semibold rounded-xl py-3 text-sm transition-colors">
                 Add Game</button>
             )}
             {error && <ErrorBox message={error}/>}
@@ -55,7 +55,7 @@ export default function GameCatalog(){
                         </div>
                         <div className="absolute rounded-b-lg bottom-0 bg-primary/90 w-full p-2 origin-bottom scale-y-0 group-hover:scale-y-100 transition-transform duration-300">
                             {user?.role === "admin" && (<div className="top-0">
-                                <button className="w-1/3 mb-2 bg-red-400/40 border-2 border-red-500 hover:bg-bgsecondary/30 hover:border-bgsecondary text-red-500 font-semibold rounded-xl p-1 text-sm transition-colors"
+                                <button className="cursor-pointer w-1/3 mb-2 bg-red-400/40 border-2 border-red-500 hover:bg-bgsecondary/30 hover:border-bgsecondary text-red-500 font-semibold rounded-xl p-1 text-sm transition-colors"
                                         onClick={() => {
                                             setDeleted(false);
                                             gameApi.delete(g.gameId)
@@ -71,7 +71,7 @@ export default function GameCatalog(){
                                             }}>
                                     Delete
                                 </button>
-                                <button className="w-1/3 mb-2 float-right bg-green-400/40 border-2 border-green-500 hover:bg-bgsecondary/30 hover:border-bgsecondary text-green-500 font-semibold rounded-xl p-1 text-sm transition-colors"
+                                <button className="cursor-pointer w-1/3 mb-2 float-right bg-green-400/40 border-2 border-green-500 hover:bg-bgsecondary/30 hover:border-bgsecondary text-green-500 font-semibold rounded-xl p-1 text-sm transition-colors"
                                         onClick={() => navigate(`/game_catalog/edit/${g.gameId}`)}>
                                     Edit
                                 </button>
