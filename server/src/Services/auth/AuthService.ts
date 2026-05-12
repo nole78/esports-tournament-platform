@@ -48,7 +48,7 @@ export class AuthService implements IAuthService {
     return new AuthUserDto(user.id, user.gamerTag, user.role);
   }
 
-  async register(username: string, email: string, fullName: string,role: string, password: string): Promise<AuthUserDto> {
+  async register(username: string, email: string, fullName: string,role: string, password: string, profilePicture: string): Promise<AuthUserDto> {
     const byName = await this.userRepo.findByUsername(username);
     if (byName.id !== 0) {
       await this.auditService.log({
@@ -75,7 +75,7 @@ export class AuthService implements IAuthService {
 
     const userRole = role === UserRole.ADMIN ? UserRole.ADMIN : UserRole.PLAYER;
     
-    const created = await this.userRepo.create(new User(0, username, email, fullName, userRole, hash));
+    const created = await this.userRepo.create(new User(0, username, email, fullName, userRole, hash, profilePicture));
     if (created.id === 0) return new AuthUserDto();  
     
     await this.auditService.log({

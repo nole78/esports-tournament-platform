@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useAuth } from "../../hooks/auth/useAuthHook";
 import type { IAuthAPIService } from "../../api_services/auth/IAuthAPIService";
 import logo from "../../assets/logo.png";
@@ -6,14 +6,17 @@ import logo from "../../assets/logo.png";
 
 export function RegisterForm({ authApi }: { authApi: IAuthAPIService }) {
   const { login } = useAuth();
-  const [form, setForm] = useState({ username: "", email: "", password: "", fullName: ""});
+  const [form, setForm] = useState({ username: "", fullName: "", email: "", password: ""});
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [preview, setPreview] = useState<string>("");
+  const [picture, setPicture] = useState<string>("");
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => setForm(f => ({ ...f, [k]: e.target.value }));
+  const ref = useRef<HTMLInputElement>(null);
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); setError(""); setLoading(true);
-    const res = await authApi.register(form.username, form.email, form.password, form.fullName,"player");
+    const res = await authApi.register(form.username, form.email, form.password, form.fullName, picture, "player");
     setLoading(false);
     if (!res.success || !res.data) { setError(res.message ?? "Registration failed"); return; }
     login(res.data);
@@ -36,7 +39,7 @@ export function RegisterForm({ authApi }: { authApi: IAuthAPIService }) {
       )}
 
       <form onSubmit={submit} className="flex flex-col gap-4">
-        {(["username", "email", "password", "fullName"] as const).map((field) => (
+        {(["username", "fullName", "email", "password"] as const).map((field) => (
           <div key={field}>
             <label className="block text-xs text-bgprimary mb-2 font-medium capitalize">{field === "fullName" ? "full Name" : field}</label>
             <input
@@ -46,6 +49,27 @@ export function RegisterForm({ authApi }: { authApi: IAuthAPIService }) {
               placeholder={field === "password" ? "Min 8 chars, 1 uppercase, 1 number" : ""} />
           </div>
         ))}
+        <div>
+          <label className="mr-5 text-xs text-bgprimary mb-2 font-medium capitalize">Picture</label>
+          <button type="button" onClick={() => {if(ref.current) ref.current.click()}}
+                      className="w-1/3 bg-bgprimary hover:bg-bgprimary/80 disabled:opacity-50 text-primary font-semibold rounded-xl py-3 text-sm transition-colors"
+            >Choose Picture</button>
+          <input className="hidden" ref={ref} accept="image/*" type="file" onChange={e => {
+                        const file = e.target.files?.[0];
+                        if(!file) { setPicture("");setPreview(""); return;}
+
+                        const reader = new FileReader();
+
+                        reader.onloadend = () => {
+                            const base64String = reader.result as string;
+                            setPicture(base64String);
+                            setPreview(base64String);
+                        }
+
+                        reader.readAsDataURL(file);
+          }}></input>
+          {preview && <img src={preview} className="mt-5 rounded-xl w-1/2 h-1/2 aspect-square"/>}
+        </div>
         <button type="submit" disabled={loading}
           className="mt-2 bg-bgprimary hover:bg-bgprimary/80 disabled:opacity-50 text-primary font-semibold rounded-xl py-3 text-sm transition-colors">
           {loading ? "Creating account…" : "Create account"}

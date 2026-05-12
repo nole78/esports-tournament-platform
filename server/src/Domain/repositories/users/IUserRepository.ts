@@ -6,6 +6,6 @@ export interface IUserRepository {
   findByEmail(email: string): Promise<User>;
   findAll(): Promise<User[]>;
   create(user: User): Promise<User>;
-  update(user: User): Promise<boolean>;
+  update(id:number ,fields: Partial<User>): Promise<boolean>;
   deactivate(id: number): Promise<boolean>;
 }

@@ -80,17 +80,17 @@ export default function TournamentList(){
     return(
         <div>
             <PageHeader eyebrow="" title="Tournament List" />
-            <div className="flex justify-between items-center mb-5">
+            <div className="flex justify-between gap-2 items-center mb-5">
                 {user?.role === "admin" && (
                     <button onClick={() => navigate("/admin/tournament_list/add")}
-                            className="mb-2 bg-bgsecondary/40 border-2 border-bgsecondary hover:bg-bgsecondary/30 text-bgsecondary font-semibold rounded-xl p-3 text-sm transition-colors">
+                            className="mb-2 w-1/5  bg-bgsecondary/40 border-2 border-bgsecondary hover:bg-bgsecondary/30 text-bgsecondary font-semibold rounded-xl p-3 text-sm transition-colors">
                     Add Tournament</button>
                 )}
-                <div className="flex gap-2">
+                <div className="flex flex-row w-full gap-2">
                     <select 
                         value={gameNameFilter} 
                         onChange={(e) => setGameNameFilter(e.target.value)}
-                        className="bg-bgprimary/10 border border-secondary/50 rounded-xl px-4 py-3 text-bgsecondary text-sm focus:outline-none focus:border-white/30 transition-colors disabled:opacity-50">
+                        className="bg-bgprimary/10 border w-1/3 border-secondary/50 rounded-xl px-4 py-3 text-bgsecondary text-sm focus:outline-none focus:border-white/30 transition-colors disabled:opacity-50">
                         <option value="" className='bg-lime-950'>
                             Any game
                         </option>
@@ -103,7 +103,7 @@ export default function TournamentList(){
                     <select 
                         value={statusFilter} 
                         onChange={(e) => setStatusFilter(e.target.value)}
-                        className="bg-bgprimary/10 border border-secondary/50 rounded-xl px-4 py-3 text-bgsecondary text-sm focus:outline-none focus:border-white/30 transition-colors">
+                        className="bg-bgprimary/10 w-1/3 border border-secondary/50 rounded-xl px-4 py-3 text-bgsecondary text-sm focus:outline-none focus:border-white/30 transition-colors">
                         <option value="" className='bg-lime-950'>
                             Any status
                         </option>
@@ -116,7 +116,7 @@ export default function TournamentList(){
                     <select 
                         value={formatFilter} 
                         onChange={(e) => setFormatFilter(e.target.value)}
-                        className="bg-bgprimary/10 border border-secondary/50 rounded-xl px-4 py-3 text-bgsecondary text-sm focus:outline-none focus:border-white/30 transition-colors">
+                        className="bg-bgprimary/10 border w-1/3 border-secondary/50 rounded-xl px-4 py-3 text-bgsecondary text-sm focus:outline-none focus:border-white/30 transition-colors">
                         <option value="" className='bg-lime-950'>
                             Any format
                         </option>

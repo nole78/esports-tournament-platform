@@ -15,21 +15,25 @@ import TournamentList from "./pages/common_pages/TournamentList";
 import TournamentAddPage from "./pages/admin/TournamentAddPage";
 import AuditLogPage from "./pages/admin/AuditLog";
 import LandingPage from "./pages/common_pages/LandingPage";
+import { Layout } from "./components/layout/Layout";
+import UserOverview from "./pages/user/UserOverview";
 
 export default function App() {
   return (
     <Routes>
-      <Route path="/pulse_grid" element={<LandingPage/>}/>
       <Route path="/login"    element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+    <Route element={<Layout/>}>
+      <Route path="/home" element={<LandingPage/>}/>
       <Route path="/game_catalog" element={<GameCatalog/>} />
       <Route path="/tournament_list" element={<TournamentList />} />
 
       {/* User routes */}
       <Route path="/dashboard" element={<ProtectedRoute requiredRole="player"><UserDashboard /></ProtectedRoute>} />
-      <Route path="/tournament_list" element={<ProtectedRoute requiredRole="player"><TournamentList/></ProtectedRoute>} />
+      <Route path="/user_info" element={<ProtectedRoute requiredRole="player"><UserOverview/></ProtectedRoute>}/>
 
       {/* Admin routes */}
+      <Route path="/admin_info" element={<ProtectedRoute requiredRole="admin"><UserOverview/></ProtectedRoute>}/>
       <Route path="/admin"       element={<ProtectedRoute requiredRole="admin"><AdminDashboard /></ProtectedRoute>} />
       <Route path="/admin/users" element={<ProtectedRoute requiredRole="admin"><UsersPage /></ProtectedRoute>} />
       <Route path="/game_catalog/add" element={<ProtectedRoute requiredRole="admin"><GameAddPage/></ProtectedRoute>} />
@@ -38,9 +42,10 @@ export default function App() {
       <Route path="/admin/tournament_list" element={<ProtectedRoute requiredRole="admin"><TournamentList/></ProtectedRoute>} />
       <Route path="/admin/tournament_list/add" element={<ProtectedRoute requiredRole="admin"><TournamentAddPage/></ProtectedRoute>} />
 
-      <Route path="/"    element={<Navigate to="/pulse_grid" replace />} />
+      <Route path="/"    element={<Navigate to="/home" replace />} />
       <Route path="/404" element={<NotFoundPage />} />
       <Route path="*"    element={<Navigate to="/404" replace />} />
+    </Route>
     </Routes>
   );
 }
