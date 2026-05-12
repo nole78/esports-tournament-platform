@@ -52,9 +52,10 @@ export class GameRepository implements IGameRepository{
             const offset = (page - 1) * limit;
         try {
             const [rows] = await res.conn.query<RowDataPacket[]>(`SELECT * FROM games ORDER BY game_id LIMIT ? OFFSET ?`, [limit,offset]);
-            const [cnt] = await res.conn.execute<RowDataPacket[]>(`SELECT COUNT(*) as total FROM audit_log`);
+            const [cnt] = await res.conn.execute<RowDataPacket[]>(`SELECT COUNT(*) as total FROM games`);
             const items =  rows.map((r) => this.map(r));
 
+            console.log(cnt[0]?.total ?? 0);
             return new PaginatedListDto(items,cnt[0]?.total ?? 0, page, limit);
             
         } catch (err) {
