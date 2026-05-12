@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Empty, ErrorBox, PageHeader } from "../../components/ui/UI";
+import { Empty, ErrorBox, PageHeader, Pagination } from "../../components/ui/UI";
 import type { GameDto } from "../../models/game/GameDto";
 import { gameApi } from "../../api_services/game_catalog/GameAPIService";
 import { useAuth } from "../../hooks/auth/useAuthHook";
@@ -11,18 +11,23 @@ export default function GameCatalog(){
     const [games, setGames] = useState<GameDto[]>([]);
     const [error, setError] = useState<string>("");
     const [deleted, setDeleted] = useState<boolean>(false);
+    const [page, setPage] = useState(1);
+    const [total, setTotal] = useState(0);
     const navigate = useNavigate();
+    const limit = 9;
 
     useEffect(() => {
-                gameApi.getAll()
+                gameApi.getAll(page,limit)
         .then(res => {
-            if(res.success)
+            if(res.success){
                 setGames(res.data?.items ?? []);
+                setTotal(res.data?.total ?? 0);
+            }
             else
                 setError(res.message);
         })
         .catch(() => setError("Failed to load games"))
-    }, []);
+    }, [page]);
 
     return (
         <div>
@@ -78,6 +83,7 @@ export default function GameCatalog(){
                     ))}
                 </section>
             )}
+            <Pagination page={page} total={total} pageSize={limit} onChange={setPage} />
         </div>
     );
 }
