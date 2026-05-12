@@ -1,12 +1,9 @@
 import { ResultSetHeader, RowDataPacket } from "mysql2";
 import { CreateGameDto } from "../../../Domain/DTOs/games/CreateGameDto";
-import { GameDto } from "../../../Domain/DTOs/games/GameDto";
 import { Game } from "../../../Domain/models/Game";
 import { IGameRepository } from "../../../Domain/repositories/games/IGameRepository";
 import { ILoggerService } from "../../../Domain/services/logger/ILoggerService";
 import { DbManager } from "../../connection/DbConnectionPool";
-import { PaginatedListDto } from "../../../Domain/DTOs/PaginatedListDto";
-
 
 export class GameRepository implements IGameRepository{
     public constructor(
@@ -14,69 +11,66 @@ export class GameRepository implements IGameRepository{
         private readonly logger: ILoggerService,
     ){}
 
-      private map(r: RowDataPacket): GameDto {
-        return new GameDto(r.game_id, r.game_name, r.game_logotip, r.game_genre, r.game_players);
+      private map(r: RowDataPacket): Game {
+        return new Game(r.game_id, r.game_name, r.game_logotip, r.game_genre, r.game_players);
       }
 
-    async findById(id: number): Promise<GameDto | null> {
+    async findById(id: number): Promise<Game> {
         const res = await this.db.getReadConnection();
-        if(!res) return null;
+        if(!res) return new Game;
         try{
             const [rows] = await res.conn.execute<RowDataPacket[]>(`SELECT * FROM games WHERE game_id = ?`,[id]);
-            return rows.length > 0 ? this.map(rows[0]) : null;
+            return rows.length > 0 ? this.map(rows[0]) : new Game;
         }
         catch (err) {
             this.logger.error("GameRepository","findById failed",err);
-            return null;
+            return new Game;
         }
         finally{ res.conn.release();}
     }
 
-    async findByName(name: string): Promise<GameDto | null> {
+    async findByName(name: string): Promise<Game> {
         const res = await this.db.getReadConnection();
-        if(!res) return null;
+        if(!res) return new Game;
         try{
             const [rows] = await res.conn.execute<RowDataPacket[]>(`SELECT * FROM games WHERE game_name = ?`,[name]);
-            return rows.length > 0 ? this.map(rows[0]) : null;
+            return rows.length > 0 ? this.map(rows[0]) : new Game;
         }
         catch (err) {
             this.logger.error("GameRepository","findByName failed",err);
-            return null;
+            return new Game;
         }
         finally{ res.conn.release();}
     }
     
-    async findAll(page = 1, limit = 20): Promise<PaginatedListDto<GameDto>> {
+    async findAll(page = 1, limit = 20): Promise<Game[]> {
         const res = await this.db.getReadConnection();
-        if (!res) return new PaginatedListDto([], 0, page, limit);
+        if (!res) return [];
             const offset = (page - 1) * limit;
         try {
             const [rows] = await res.conn.query<RowDataPacket[]>(`SELECT * FROM games ORDER BY game_id LIMIT ? OFFSET ?`, [limit,offset]);
-            const [cnt] = await res.conn.execute<RowDataPacket[]>(`SELECT COUNT(*) as total FROM games`);
             const items =  rows.map((r) => this.map(r));
 
-            console.log(cnt[0]?.total ?? 0);
-            return new PaginatedListDto(items,cnt[0]?.total ?? 0, page, limit);
-            
+            return items;      
         } catch (err) {
             this.logger.error("GameRepository", "findAll failed", err);
-            return new PaginatedListDto([], 0, page, limit);
+            return [];
         } finally { res.conn.release(); }
         }
 
     async create(dto: CreateGameDto): Promise<Game> {
                 const res = await this.db.getWriteConnection();
-        if (!res) return new Game();
+        if (!res) return new Game;
         try {
         const [result] = await res.conn.execute<ResultSetHeader>(
             `INSERT INTO games (game_name, game_logotip, game_genre, game_players) VALUES (?, ?, ?, ?)`,
             [dto.gameName, dto.gameLogotip, dto.gameGenre, dto.gamePlayers]
         );
-        if (result.insertId === 0) return new Game();
+        if (result.insertId === 0) return new Game;
         return new Game(result.insertId, dto.gameName, dto.gameLogotip, dto.gameGenre, dto.gamePlayers);
         } catch (err) {
         this.logger.error("GameRepository", "create failed", err);
-        return new Game();
+        return new Game;
         } finally { res.conn.release(); }
     }
 
@@ -123,4 +117,16 @@ export class GameRepository implements IGameRepository{
         } finally { res.conn.release(); }
     }
 
+    async getTotal(): Promise<number> {
+        const res = await this.db.getWriteConnection();
+            if (!res) return 0;
+        try{
+            const [cnt] = await res.conn.execute<RowDataPacket[]>(`SELECT COUNT(*) as total FROM games`);
+            return cnt[0]?.total ?? 0;
+        }
+        catch (err){
+            this.logger.error("GameRepository", "get total failed", err);
+            return 0;
+        } finally { res.conn.release(); }
+    }
 }
