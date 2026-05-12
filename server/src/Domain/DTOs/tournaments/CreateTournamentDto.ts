@@ -1,15 +1,14 @@
-// TODO: implement class for Torunament DTO creation 
 import { TournamentFormat } from '../../enums/TournamentFormat';
 import {TournamentStatus} from "../../enums/TournamentStatus"
 
 export class CreateTournamentDto{
     constructor(
         public tournamentName : string = "",
-        public tournamentGmae : string = "",
-        public tournamentFormat : TournamentFormat.SINGLE_ELIMINATION,
+        public tournamentGame : string = "",
+        public tournamentFormat : TournamentFormat = TournamentFormat.SINGLE_ELIMINATION,
         public tournamentMaxTeams : number = 0,
         public tournamentApplicationDeadline : Date = new Date(),
         public tournamentPrizeFund : number = 0,
-        public torunamentStatus : TournamentStatus = TournamentStatus.UPCOMING,
+        public tournamentStatus : TournamentStatus = TournamentStatus.UPCOMING,
     ){}
 }
