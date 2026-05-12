@@ -5,6 +5,7 @@ import { Game } from "../../../Domain/models/Game";
 import { IGameRepository } from "../../../Domain/repositories/games/IGameRepository";
 import { ILoggerService } from "../../../Domain/services/logger/ILoggerService";
 import { DbManager } from "../../connection/DbConnectionPool";
+import { PaginatedListDto } from "../../../Domain/DTOs/PaginatedListDto";
 
 
 export class GameRepository implements IGameRepository{
@@ -45,17 +46,21 @@ export class GameRepository implements IGameRepository{
         finally{ res.conn.release();}
     }
     
-    async findAll(page = 1, limit = 20): Promise<GameDto[]> {
+    async findAll(page = 1, limit = 20): Promise<PaginatedListDto<GameDto>> {
         const res = await this.db.getReadConnection();
-        if (!res) return [];
+        if (!res) return new PaginatedListDto([], 0, page, limit);
             const offset = (page - 1) * limit;
         try {
-            //const [rows] = await res.conn.execute<RowDataPacket[]>(`SELECT * FROM games ORDER BY game_id LIMIT ? OFFSET ?`, [limit,offset]);
             const [rows] = await res.conn.query<RowDataPacket[]>(`SELECT * FROM games ORDER BY game_id LIMIT ? OFFSET ?`, [limit,offset]);
-            return rows.map((r) => this.map(r));
+            const [cnt] = await res.conn.execute<RowDataPacket[]>(`SELECT COUNT(*) as total FROM games`);
+            const items =  rows.map((r) => this.map(r));
+
+            console.log(cnt[0]?.total ?? 0);
+            return new PaginatedListDto(items,cnt[0]?.total ?? 0, page, limit);
+            
         } catch (err) {
             this.logger.error("GameRepository", "findAll failed", err);
-            return [];
+            return new PaginatedListDto([], 0, page, limit);
         } finally { res.conn.release(); }
         }
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Empty, ErrorBox, PageHeader } from "../../components/ui/UI";
+import { Empty, ErrorBox, PageHeader, Pagination } from "../../components/ui/UI";
 import type { GameDto } from "../../models/game/GameDto";
 import { gameApi } from "../../api_services/game_catalog/GameAPIService";
 import { useAuth } from "../../hooks/auth/useAuthHook";
@@ -11,25 +11,30 @@ export default function GameCatalog(){
     const [games, setGames] = useState<GameDto[]>([]);
     const [error, setError] = useState<string>("");
     const [deleted, setDeleted] = useState<boolean>(false);
+    const [page, setPage] = useState(1);
+    const [total, setTotal] = useState(0);
     const navigate = useNavigate();
+    const limit = 9;
 
     useEffect(() => {
-                gameApi.getAll()
+                gameApi.getAll(page,limit)
         .then(res => {
-            if(res.success)
+            if(res.success){
                 setGames(res.data?.items ?? []);
+                setTotal(res.data?.total ?? 0);
+            }
             else
                 setError(res.message);
         })
         .catch(() => setError("Failed to load games"))
-    }, []);
+    }, [page]);
 
     return (
         <div>
             <PageHeader eyebrow="" title="Game Catalog"/>
             {user?.role === "admin" && (
                 <button onClick={() => navigate("/game_catalog/add")}
-                        className="mb-2 w-1/6 bg-bgsecondary/40 border-2 border-bgsecondary hover:bg-bgsecondary/30 text-bgsecondary font-semibold rounded-xl py-3 text-sm transition-colors">
+                        className="cursor-pointer mb-2 w-1/6 bg-bgsecondary/40 border-2 border-bgsecondary hover:bg-bgsecondary/30 text-bgsecondary font-semibold rounded-xl py-3 text-sm transition-colors">
                 Add Game</button>
             )}
             {error && <ErrorBox message={error}/>}
@@ -50,7 +55,7 @@ export default function GameCatalog(){
                         </div>
                         <div className="absolute rounded-b-lg bottom-0 bg-primary/90 w-full p-2 origin-bottom scale-y-0 group-hover:scale-y-100 transition-transform duration-300">
                             {user?.role === "admin" && (<div className="top-0">
-                                <button className="w-1/3 mb-2 bg-red-400/40 border-2 border-red-500 hover:bg-bgsecondary/30 hover:border-bgsecondary text-red-500 font-semibold rounded-xl p-1 text-sm transition-colors"
+                                <button className="cursor-pointer w-1/3 mb-2 bg-red-400/40 border-2 border-red-500 hover:bg-bgsecondary/30 hover:border-bgsecondary text-red-500 font-semibold rounded-xl p-1 text-sm transition-colors"
                                         onClick={() => {
                                             setDeleted(false);
                                             gameApi.delete(g.gameId)
@@ -66,7 +71,7 @@ export default function GameCatalog(){
                                             }}>
                                     Delete
                                 </button>
-                                <button className="w-1/3 mb-2 float-right bg-green-400/40 border-2 border-green-500 hover:bg-bgsecondary/30 hover:border-bgsecondary text-green-500 font-semibold rounded-xl p-1 text-sm transition-colors"
+                                <button className="cursor-pointer w-1/3 mb-2 float-right bg-green-400/40 border-2 border-green-500 hover:bg-bgsecondary/30 hover:border-bgsecondary text-green-500 font-semibold rounded-xl p-1 text-sm transition-colors"
                                         onClick={() => navigate(`/game_catalog/edit/${g.gameId}`)}>
                                     Edit
                                 </button>
@@ -78,6 +83,7 @@ export default function GameCatalog(){
                     ))}
                 </section>
             )}
+            <Pagination page={page} total={total} pageSize={limit} onChange={setPage} />
         </div>
     );
 }
