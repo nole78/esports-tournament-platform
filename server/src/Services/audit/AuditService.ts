@@ -30,10 +30,20 @@ export class AuditService implements IAuditService {
 
   async getAllLogs(page: number, limit: number): Promise<PaginatedListDto<AuditLogDto>> {
     let auditLogs = await this.auditRepo.findAll(page, limit);
-    for (const log of auditLogs.items) {
+    if(auditLogs[0] == null) return new PaginatedListDto([], 0, page, limit);
+    let total = await this.auditRepo.getTotal();
+    const DTOs = auditLogs.map(
+      (l) => new AuditLogDto(
+          l.id, l.userId ?? null, null,
+          l.action, l.entity ?? null, l.entityId ?? null,
+          l.meta ? (JSON.parse(l.meta as string) as Record<string, unknown>) : null,
+          l.ipAddress ?? null, l.createdAt ?? null
+      )
+    );
+    for (const log of DTOs) {
       const user = await this.userRepo.findById(log.userId || 0);
       log.gamer_tag = user ? user.gamerTag : "";
     }
-    return auditLogs;
+    return new PaginatedListDto(DTOs, total, page, limit);
   }
 }

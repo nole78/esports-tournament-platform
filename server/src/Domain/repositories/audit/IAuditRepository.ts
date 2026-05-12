@@ -4,5 +4,6 @@ import { AuditLog } from "../../models/AuditLog";
 
 export interface IAuditRepository {
   create(log: AuditLog): Promise<AuditLog>;
-  findAll(page: number, limit: number): Promise<PaginatedListDto<AuditLogDto>>;
+  findAll(page: number, limit: number): Promise<AuditLog[]>;
+  getTotal(): Promise<number>;
 }
