@@ -52,24 +52,21 @@ export default function ChangePasswordForm() {
     }
 
     const submit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); setError(""); setUpdating(true);
+        e.preventDefault(); setError(""); setUpdating(true);
+        
+        setError("");
+        setSucces("");
     
-    setError("");
-    setSucces("");
- 
-    const fields : Partial<UserInfoDto> = {}; 
-        if(!userInfo || userInfo?.email != form["email"])
-            fields.email = form["email"];
-        if(!userInfo || userInfo?.fullName != form["fullName"])
-            fields.fullName = form["fullName"];
-        if(!userInfo || userInfo?.profilePicture != avatar)
-            fields.profilePicture = avatar;
-        if(!userInfo || userInfo?.gamerTag != form["username"])
-            fields.gamerTag = form["username"];
+        const fields : Partial<UserInfoDto> = {}; 
+            if(!userInfo || userInfo?.email != form["email"])
+                fields.email = form["email"];
+            if(!userInfo || userInfo?.fullName != form["fullName"])
+                fields.fullName = form["fullName"];
+            if(!userInfo || userInfo?.profilePicture != avatar)
+                fields.profilePicture = avatar;
 
         if(fields)
         await usersApi.update({
-            gamerTag: fields.gamerTag,
             fullName: fields.fullName,
             profilePicture: fields.profilePicture,
             email: fields.email,
@@ -104,9 +101,9 @@ export default function ChangePasswordForm() {
                     <div>
                         <label className="block text-xs text-bgprimary mb-2 font-medium capitalize">Gamer Tag</label>
                         <input
-                        disabled = {updating}
+                        disabled = {true}
                         type="text"
-                        value={form["username"]} onChange={(e) => {set("username")(e);if(!userInfo || userInfo?.gamerTag != e.target.value)setChanged(true);else setChanged(false)}} required
+                        value={form["username"]}
                         className="w-full bg-bgprimary/10 border border-secondary/50 rounded-xl px-4 py-3 text-bgsecondary text-sm placeholder-bgsecondary/30 focus:outline-none focus:border-white/30 transition-colors" />
                     </div>
                     <div>
