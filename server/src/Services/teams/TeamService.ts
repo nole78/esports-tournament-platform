@@ -8,7 +8,6 @@ import { ITeamMemberRepository } from "../../Domain/repositories/team_members/IT
 import { TeamMemberDto } from "../../Domain/DTOs/team_members/TeamMemberDto";
 import { TeamRole } from "../../Domain/enums/TeamRole";
 import { ILoggerService } from "../../Domain/services/logger/ILoggerService";
-//import { readItem } from '../../../../client/src/helpers/local_storage';
 import { IUserRepository } from "../../Domain/repositories/users/IUserRepository";
 import { UserRole } from "../../Domain/enums/UserRole";
 
@@ -24,32 +23,27 @@ export class TeamService implements ITeamService {
         
         return new PaginatedListDto(items, items.length, page, limit);
     }
-    async getById(id: number): Promise<TeamDto[] | null> {
-        return this.teamRepo.findById(id);
+    async getById(id: number): Promise<TeamDto> {
+        const team = await this.teamRepo.findById(id);
+        this.logger.info("Usao sam u getById", team.teamId.toString());
+        return team;
     }
-    async getByGamerTag(tag: string) : Promise<CreateTeamDto[] | null>{
+    async getByGamerTag(tag: string) : Promise<TeamDto[] | null>{
+
         const user = await this.userRepo.findByUsername(tag);
         if (user.id === 0)
         return null;
-        //all teams
         const teams =  await this.teamRepo.findAll(1, 20);
-        //for id =1 it gives 4 rows
         const members = await this.teamMemberRepo.findByUserId(user.id);
-        var retTeams = [];
-        var test = [];
-        
-         for (var i = 0; i<members.length; i++){
-             for (var j = 0; j<teams.length; j++){
-                 if (members.at(i)?.teamId === teams.at(j)?.teamId){
-                     retTeams.push(new CreateTeamDto(teams.at(j)?.teamName, teams.at(j)?.teamTag, teams.at(j)?.teamLogotip, teams.at(j)?.teamDescription));
-                 }
-             }
-         }
-        
-       if (retTeams.length === 0){
-          return null;
-        }
-        return retTeams;
+
+        const teamMap = new Map(teams.map(t => [t.teamId,t]));
+        var retTeams = members.filter(m => teamMap.has(m.teamId))
+                       .map(m => {
+                            const t = teamMap.get(m.teamId)!;
+                            return new TeamDto(t.teamId, t.teamName, t.teamTag, t.teamLogotip, t.teamDescription, m.role);
+                       });
+
+        return retTeams.length===0 ? null : retTeams;
     }
     async create(dto: CreateTeamDto, gamerTag: string): Promise<CreateTeamDto | null> {
         const currentUser = await this.userRepo.findByUsername(gamerTag);
@@ -60,45 +54,40 @@ export class TeamService implements ITeamService {
         const memberDto = new TeamMemberDto(created.teamId, currentUser.id, TeamRole.CAPTAIN);
         const member = await this.teamMemberRepo.create(memberDto);
 
-        //Maybe add the message to logger if the member isn't created
+
         return new CreateTeamDto(created.teamName, created.teamTag, created.teamLogotip, created.teamDescription);
     }
-    async update(gamer_tag: string, fields: Partial<TeamDto>): Promise<boolean> {
+    async update(gamer_tag: string, fields: Partial<TeamDto>, id: number): Promise<boolean> {
         const currentUser = await this.userRepo.findByUsername(gamer_tag);
         if (currentUser.id === 0) return false;
-        const teams = await this.teamRepo.findAll(1, 20);
-        const members = await this.teamMemberRepo.findByUserId(currentUser.id);
-         for (var i = 0; i<members.length; i++){
-             for (var j = 0; j<teams.length; j++){
-                 if (members.at(i)?.teamId === teams.at(j)?.teamId){
-                     if (members.at(i)?.role === TeamRole.CAPTAIN && (fields.teamTag === teams.at(j)?.teamTag || fields.teamName === teams.at(j)?.teamName)){
-                         return this.teamRepo.update(teams.at(j)?.teamId as number, fields);
-                    }
-                }
-             }
-        }
-        return false;
+
+        const team = await this.teamRepo.findById(id);
+        const memebers = await this.teamMemberRepo.findByTeamId(team.teamId);
+
+        const isCapitan = memebers.some(m => m.role===TeamRole.CAPTAIN || m.userId === m.userId);
+        if (!isCapitan) return false;
+        return this.teamRepo.update(team.teamId, fields);
+
     }
-    async delete(gamer_tag: string, team_tag: string): Promise<boolean> {
-        //first delete from team members than from teams
+    async delete(gamer_tag: string, id: number): Promise<boolean> {
         const currentUser = await this.userRepo.findByUsername(gamer_tag);
         
         if (currentUser.id === 0) return false;
-        const team = await this.teamRepo.findByTeamTag(team_tag);
-        
+        const team = await this.teamRepo.findById(id);
         const members = await this.teamMemberRepo.findByTeamId(team?.teamId as number);
-        for (var i=0; i<members.length; i++){
-            if (members.at(i)?.role === TeamRole.CAPTAIN && members.at(i)?.userId===currentUser.id){
-                for (var j=0; j<members.length; j++){
-                    this.teamMemberRepo.delete(team?.teamId as number, members.at(j)?.userId as number);
-                }
-                return await this.teamRepo.delete(team?.teamId as number);
-            }
-        }
-        return false;
+        
+        const memberMap = members.map(t => [t.teamId, t]);
+        const isCapitan = members.some(m => m.role === TeamRole.CAPTAIN || m.userId === currentUser.id);
+        if (!isCapitan) return false;
+
+        await Promise.all(members.map(m =>
+            this.teamMemberRepo.delete(team?.teamId, m.userId)
+        ));
+        
+        return await this.teamRepo.delete(team?.teamId as number);
     }
     async addMember(gamer_tag: string, team_tag: string): Promise<boolean> {
-        //Find the user you want to add as a member of the team 
+
         const currentUser = await this.userRepo.findByUsername(gamer_tag);
         if (currentUser.id === 0) return false;
 
