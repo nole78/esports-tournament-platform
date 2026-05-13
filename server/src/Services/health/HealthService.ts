@@ -2,9 +2,9 @@ import { IHealthService } from "../../Domain/services/health/IHealthService";
 import { IGameRepository } from "../../Domain/repositories/games/IGameRepository";
 import { ITournamentRepository } from "../../Domain/repositories/tournaments/ITournamentRepository";
 import { IUserRepository } from "../../Domain/repositories/users/IUserRepository";
-import { HealthStatusDto } from "../../Domain/DTOs/health/HealthStatusDto";
-import { NodeStatusDto } from "../../Domain/DTOs/health/NodeStatusDto";
-import { StatisticsDto } from "../../Domain/DTOs/statistics/StatisticsDto";
+import { HealthStatus } from "../../Domain/models/HealthStatus";
+import { DbNode } from "../../Domain/models/DbNode";
+import { Statistics } from "../../Domain/models/Statistics";
 import { DbManager } from "../../Database/connection/DbConnectionPool";
 import { logger } from '../../app';
 
@@ -18,24 +18,32 @@ export class HealthService implements IHealthService {
     private readonly db: DbManager
   ) {}
 
-  getDbStatus(): HealthStatusDto {
-    const nodes = this.db.getNodes().map((n) =>
-      new NodeStatusDto(n.name, n.host, n.port, n.status, n.lastCheck, n.successfulWrites, n.failedWrites)
+  getDbStatus(): HealthStatus {
+    const start = Date.now();
+    const nodes = this.db.getNodes().map((n) => {
+            const node = new DbNode(n.name, n.host, n.port)
+            node.failedWrites = n.failedWrites;
+            node.lastCheck = n.lastCheck;
+            node.status = n.status;
+            node.successfulWrites = n.successfulWrites;
+            node.latency = Date.now() - start;
+            return node;
+        }
     );
-    return new HealthStatusDto(nodes, this.db.getSlaveRrIndex());
+    return new HealthStatus(nodes, this.db.getSlaveRrIndex());
   }
 
   async runHealthCheck(): Promise<void> {
     await this.db.runHealthCheck();
   }
-
-  async getStatistics(): Promise<StatisticsDto> {
+  // Change later when other repos are implemented
+  async getStatistics(): Promise<Statistics> {
     const games = await this.gameRepo.getTotal();
     const tournaments = await this.tournamentRepo.findAll(); //Change later for getTotal
     const users = await this.userRepo.findAll();
     const matches = 0;
     const teams = 0;
-    return new StatisticsDto(
+    return new Statistics(
       users.length, games, tournaments.items.length, teams, matches
     );
   }

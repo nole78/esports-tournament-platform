@@ -8,6 +8,7 @@ export class NodeStatusDto {
     public status: NodeStatus = NodeStatus.HEALTHY,
     public lastCheck: Date | null = null,
     public successfulWrites: number = 0,
-    public failedWrites: number = 0
+    public failedWrites: number = 0,
+    public latency: number = 0
   ) {}
 }
