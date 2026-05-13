@@ -1,4 +1,3 @@
-// TODO: Replace with statistics relevant to your domain
 export class StatisticsDto {
   constructor(
     public totalUsers: number         = 0,
