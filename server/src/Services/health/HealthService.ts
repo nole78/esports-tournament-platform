@@ -2,7 +2,6 @@ import { IHealthService } from "../../Domain/services/health/IHealthService";
 import { IGameRepository } from "../../Domain/repositories/games/IGameRepository";
 import { ITournamentRepository } from "../../Domain/repositories/tournaments/ITournamentRepository";
 import { IUserRepository } from "../../Domain/repositories/users/IUserRepository";
-import { DbNode } from "../../Domain/models/DbNode";
 import { StatisticsDto } from "../../Domain/DTOs/statistics/StatisticsDto";
 import { DbManager } from "../../Database/connection/DbConnectionPool";
 import { logger } from '../../app';

@@ -24,9 +24,9 @@ import { UserController }   from "./WebAPI/controllers/UserController";
 import { EntityController } from "./WebAPI/controllers/EntityController";
 import { GameController } from "./WebAPI/controllers/GameController";
 import { TournamentController } from "./WebAPI/controllers/TournamentController";
-
-
+import { HealthController } from "./WebAPI/controllers/HealthController";
 import { AuditController } from "./WebAPI/controllers/AuditController";
+import { HealthService } from "./Services/health/HealthService";
 
 export const logger = new ConsoleLoggerService();
 export const db     = new DbManager(logger);
@@ -48,6 +48,7 @@ const gameService   = new GameService(gameRepo);
 const tournamentService = new TournamentService(tournamentRepo, gameRepo, logger, dateTimeConverter);
 const auditService = new AuditService(auditRepo, userRepo);
 const authService   = new AuthService(userRepo,auditService);
+const healthService = new HealthService(gameRepo, tournamentRepo, userRepo, db);
 
 // Express
 const app = express();
@@ -60,5 +61,6 @@ app.use("/api/v1", new EntityController(entityService).getRouter());
 app.use("/api/v1", new GameController(gameService).getRouter());
 app.use("/api/v1", new TournamentController(tournamentService).getRouter());
 app.use("/api/v1", new AuditController(auditService).getRouter());
+app.use("/api/v1", new HealthController(healthService).getRouter());
 
 export default app;

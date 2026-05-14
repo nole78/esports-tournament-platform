@@ -17,6 +17,7 @@ import AuditLogPage from "./pages/admin/AuditLog";
 import LandingPage from "./pages/common_pages/LandingPage";
 import { Layout } from "./components/layout/Layout";
 import UserOverview from "./pages/user/UserOverview";
+import HealthPage from "./pages/admin/HealthPage";
 
 export default function App() {
   return (
@@ -41,6 +42,7 @@ export default function App() {
       <Route path="/admin/audit_log" element={<ProtectedRoute requiredRole="admin"><AuditLogPage/></ProtectedRoute>}/>
       <Route path="/admin/tournament_list" element={<ProtectedRoute requiredRole="admin"><TournamentList/></ProtectedRoute>} />
       <Route path="/admin/tournament_list/add" element={<ProtectedRoute requiredRole="admin"><TournamentAddPage/></ProtectedRoute>} />
+      <Route path="/admin/health" element={<ProtectedRoute requiredRole="admin"><HealthPage/></ProtectedRoute>}/>
 
       <Route path="/"    element={<Navigate to="/home" replace />} />
       <Route path="/404" element={<NotFoundPage />} />
