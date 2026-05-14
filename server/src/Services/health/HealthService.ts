@@ -6,8 +6,11 @@ import { StatisticsDto } from "../../Domain/DTOs/statistics/StatisticsDto";
 import { DbManager } from "../../Database/connection/DbConnectionPool";
 import { logger } from '../../app';
 import { HealthStatusDto } from "../../Domain/DTOs/health/HealthStatusDto";
+import { ApiHealthDto } from "../../Domain/DTOs/health/ApiHealthDto";
 import { NodeStatusDto } from "../../Domain/DTOs/health/NodeStatusDto";
-import { NextFunction } from 'express';
+import { ApiStatusDto } from "../../Domain/DTOs/health/ApiStatusDto";
+import { ApiStatus } from "../../Domain/enums/ApiStatus";
+import { HEALTH_CHECK_INTERVAL_MS } from "../../Domain/constants/Constants";
 
 //Add other repos
 
@@ -19,10 +22,12 @@ export class HealthService implements IHealthService {
     private readonly db: DbManager
   ) {}
 
+  private apiNodes: ApiStatusDto[] = [];
+
   getDbStatus(): HealthStatusDto {
     const start = Date.now();
     const nodes = this.db.getNodes().map((n) =>
-        new NodeStatusDto(n.name, n.host, n.port, n.status, n.lastCheck, n.successfulWrites, n.failedWrites, Date.now() - start)
+        new NodeStatusDto(n.name, n.host, n.port, n.status, n.lastCheck, n.successfulWrites, n.failedWrites, n.latency)
     );
     return new HealthStatusDto(nodes, this.db.getSlaveRrIndex());
   }
@@ -30,6 +35,48 @@ export class HealthService implements IHealthService {
   async runHealthCheck(): Promise<void> {
     await this.db.runHealthCheck();
   }
+
+  async runApiCheck(): Promise<void> {
+  const nodes = [
+    { name: "Users API", url: "http://localhost:4000/api/v1/users" },
+    { name: "Tournament API", url: "http://localhost:4000/api/v1/tournaments" },
+    { name: "Game Catalog API", url: "http://localhost:4000/api/v1/games" },
+    { name: "Audit Log API", url: "http://localhost:4000/api/v1/audit_log" },
+  ];
+
+  const results = await Promise.all(
+    nodes.map(async (node) => {
+      const start = Date.now();
+
+      try {
+        const res = await fetch(node.url);
+        const latency = Date.now() - start;
+
+        return new ApiStatusDto(
+          node.name,
+          node.url,
+          latency < HEALTH_CHECK_INTERVAL_MS ? ApiStatus.ONLINE : ApiStatus.OFFLINE,
+          new Date(),
+          latency
+        );
+      } catch {
+        return new ApiStatusDto(
+          node.name,
+          node.url,
+          ApiStatus.OFFLINE,
+          new Date(),
+          -1
+        );
+      }
+    })
+  );
+
+  this.apiNodes = results;
+}
+
+  getApiStatus(): ApiHealthDto {
+    return new ApiHealthDto(this.apiNodes ?? []);
+}
   // Change later when other repos are implemented
   async getStatistics(): Promise<StatisticsDto> {
     const games = await this.gameRepo.getTotal();

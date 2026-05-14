@@ -68,6 +68,7 @@ export class DbManager {
       conn = await info.pool.getConnection();
       await conn.query("SELECT 1");
       const ms = Date.now() - start;
+      info.node.latency = ms;
       info.node.status = ms > HEALTH_CHECK_TIMEOUT ? NodeStatus.DEGRADED : NodeStatus.HEALTHY;
     } catch (err) {
       info.node.status = NodeStatus.OFFLINE;
