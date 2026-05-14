@@ -5,4 +5,5 @@ export type UserDto = {
   fullName: string;
   role: string;
   isActive: number;
+  profilePicture: string;
 };

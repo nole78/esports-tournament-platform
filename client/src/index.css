@@ -6,3 +6,10 @@
     --color-bgprimary: #8BAE66;
     --color-bgsecondary: #EBD5AB;
 }
+
+.main-scroll {
+  scrollbar-width: auto;
+  scrollbar-color: var(--color-secondary) transparent;
+}
+
+

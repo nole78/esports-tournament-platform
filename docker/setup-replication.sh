@@ -59,7 +59,7 @@ CREATE TABLE users (
   email        VARCHAR(120) NOT NULL UNIQUE,
   passwordHash VARCHAR(255) NOT NULL,
   role         ENUM('player','admin') DEFAULT 'player',
-  profile_picture TEXT,
+  profile_picture LONGTEXT,
   isActive     TINYINT(1)   DEFAULT 1,
   createdAt    DATETIME DEFAULT CURRENT_TIMESTAMP,
   updatedAt    DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -78,7 +78,7 @@ CREATE TABLE teams(
   team_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   team_name VARCHAR(100) NOT NULL UNIQUE,
   team_tag VARCHAR(10) NOT NULL UNIQUE,
-  team_logotip TEXT,
+  team_logotip LONGTEXT,
   team_description TEXT,
   CONSTRAINT team_name_length CHECK (
     LENGTH(team_name) BETWEEN 2 AND 80
