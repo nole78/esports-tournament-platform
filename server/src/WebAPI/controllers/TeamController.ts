@@ -46,7 +46,7 @@ export class TeamController{
         const gamer_tag = req.user?.username as string;
         const entity = await this.teamService.getByGamerTag(gamer_tag, limit, page);
         if (!entity) {
-            res.status(200).json({success: false, data:[]}); return;};
+            res.status(200).json({success: false, data:{items: [], total: 0, page, pageSize: limit}}); return;};
         res.status(200).json({success: true, data: entity});
     }
 
@@ -92,7 +92,10 @@ export class TeamController{
         if(isNaN(id)) {res.status(400).json({ success: false, message: "Invalid id"}); return; }
         
         const ok = await this.teamService.delete(gamer_tag, id);
-        res.status(ok? 200 : 500).json({success: ok});
+        if (!ok){
+            res.status(403).json({ success: false, message: "Forbidden"});
+        }
+        res.status(200).json({success: ok});
     }
     public getRouter(): Router { return this.router; }
 }

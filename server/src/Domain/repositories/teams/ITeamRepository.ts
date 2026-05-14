@@ -9,6 +9,6 @@ export interface ITeamRepository {
     create(dto: CreateTeamDto): Promise<Team>;
     update(id: number, fields: Partial<Team>): Promise<boolean>;
     delete(id: number): Promise<boolean>;
-    findByTeamTag(TeamTag: string): Promise<TeamDto>;
+    findByTeamTag(teamTag: string): Promise<TeamDto>;
     getTotal(): Promise<number>;
 }

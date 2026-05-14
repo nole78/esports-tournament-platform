@@ -9,9 +9,9 @@ import { TeamMemberDto } from "../../Domain/DTOs/team_members/TeamMemberDto";
 import { TeamRole } from "../../Domain/enums/TeamRole";
 import { ILoggerService } from "../../Domain/services/logger/ILoggerService";
 import { IUserRepository } from "../../Domain/repositories/users/IUserRepository";
-import { UserRole } from "../../Domain/enums/UserRole";
 import { TeamMember } from "../../Domain/models/TeamMember";
 import { Team } from "../../Domain/models/Team";
+
 
 export class TeamService implements ITeamService {
     public constructor(private readonly teamRepo: ITeamRepository,
@@ -35,21 +35,35 @@ export class TeamService implements ITeamService {
         const user = await this.userRepo.findByUsername(tag);
         if (user.id === 0)
             return null;
-        //const teams =  await this.teamRepo.findAll(page, limit);
+        
         const members = await this.teamMemberRepo.findByUserId(user.id);
-        const teams = [];
-        for(var i=0; i<members.length; i++){
-            teams.push(await this.teamRepo.findById(members.at(i)?.teamId as number));
+        if (members.length === 0){
+            return new PaginatedListDto([], 0, page, limit);
+        }
+
+        const resolvedPage = page > 0 ? page : 1;
+        const resolvedLimit = limit > 0 ? limit : members.length;
+        const offset = (resolvedPage-1) * resolvedLimit;
+        const pagedMembers = members.slice(offset, offset + resolvedLimit);
+
+        if (pagedMembers.length === 0){
+            return new PaginatedListDto([], members.length, resolvedPage, resolvedLimit);
         }
         
-        const teamMap = new Map(teams.map(t => [t.teamId,t]));
-        var retTeams = members.filter(m => teamMap.has(m.teamId))
-                       .map(m => {
-                            const t = teamMap.get(m.teamId)!;
-                            return new TeamDto(t.teamId, t.teamName, t.teamTag, t.teamLogotip, t.teamDescription, m.role);
-                       });
+        const teams = await Promise.all(
+            pagedMembers.map(member => this.teamRepo.findById(member.teamId))
+        );
+        const teamMap = new Map(teams.map(t => [t.teamId, t]));
 
-        return retTeams.length===0 ? null : new PaginatedListDto(retTeams, retTeams.length, page, limit);
+        const retTeams = pagedMembers.filter(m => teamMap.has(m.teamId))
+                         .map(m => {
+                            const t = teamMap.get(m.teamId)!;
+                            return new TeamDto(t.teamId, t.teamName, t.teamTag,
+                                t.teamLogotip, t.teamDescription, m.role
+                            );
+                         });
+        
+        return new PaginatedListDto(retTeams, members.length, resolvedPage, resolvedLimit);
     }
     async create(dto: CreateTeamDto, gamerTag: string): Promise<CreateTeamDto | null> {
         const currentUser = await this.userRepo.findByUsername(gamerTag);
@@ -59,7 +73,8 @@ export class TeamService implements ITeamService {
 
         const memberDto = new TeamMember(created.teamId, currentUser.id, TeamRole.CAPTAIN);
         const member = await this.teamMemberRepo.create(memberDto);
-        if (!member) return null;
+        if (member.teamId !== created.teamId || member.userId !== currentUser.id)
+             return null;
 
         return new CreateTeamDto(created.teamName, created.teamTag, created.teamLogotip, created.teamDescription);
     }
@@ -101,7 +116,8 @@ export class TeamService implements ITeamService {
         if (!team || team?.teamId as number === 0) return false;
 
         const memberDto = new TeamMemberDto(team?.teamId as number, currentUser.id, TeamRole.MEMBER);
-        const members = await this.teamMemberRepo.create(memberDto);
-        return true;
+        const member = await this.teamMemberRepo.create(memberDto);
+        return !!member && member.userId === memberDto.userId && member.teamId === memberDto.teamId
+        && member.role === memberDto.role ;
     }
 }
