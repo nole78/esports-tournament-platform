@@ -1,7 +1,7 @@
-import { HealthStatus } from "../../models/HealthStatus";
-import { Statistics } from "../../models/Statistics";
+import { HealthStatusDto } from "../../DTOs/health/HealthStatusDto";
+import { StatisticsDto } from "../../DTOs/statistics/StatisticsDto";
 export interface IHealthService {
-  getDbStatus(): HealthStatus;
+  getDbStatus(): HealthStatusDto;
   runHealthCheck(): Promise<void>;
-  getStatistics(): Promise<Statistics>;
+  getStatistics(): Promise<StatisticsDto>;
 }
