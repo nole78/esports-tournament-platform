@@ -5,9 +5,9 @@ import type { TeamDto } from "../../models/team/TeamDto";
 export type ApiResponse<T> = {success: boolean; message: string; data?: T};
 
 export interface ITeamAPIService {
-    getByGamerTag(gamer_tag: string): Promise<ApiResponse<TeamDto[]>>;
+    getByGamerTag(page: number, limit: number): Promise<ApiResponse<{items: TeamDto[], total: number}>>;
     create(payload: Record<string, unknown>): Promise<ApiResponse<TeamDto>>;
     delete(id: number): Promise<ApiResponse<void>>;
-    getByUserId(id: number): Promise<ApiResponse<TeamDto>>;
+    getById(id: number): Promise<ApiResponse<TeamDto>>;
     update(id: number, payload: Partial<TeamDto>) : Promise<ApiResponse<void>>;
 }

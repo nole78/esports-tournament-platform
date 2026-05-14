@@ -19,12 +19,11 @@ const err = <T>(e: unknown, fallback: string): ApiResponse<T> => ({
 });
 
 export const teamApi: ITeamAPIService ={
-    async getByGamerTag(){
-        return axios.get<ApiResponse<TeamDto[]>>(`${BASE}`, { headers: authHeader()})
+    async getByGamerTag(page, limit){
+        return axios.get(`${BASE}?page=${page}&limit=${limit}`, { headers: authHeader()})
         .then(r => r.data).catch(e => err(e, "Failed to load items"));
     },
     async create(payload){
-        console.log(payload);
         return axios.post<ApiResponse<TeamDto>>(BASE, payload, {headers: authHeader()})
         .then(r => r.data).catch(e => err(e, "Failed to create!"));
     },
@@ -32,7 +31,7 @@ export const teamApi: ITeamAPIService ={
         return axios.delete<ApiResponse<void>>(`${BASE}/${id}`, {headers: authHeader()})
         .then(r => r.data).catch(e => err(e, "Failed to delete"))
     },
-    async getByUserId(id){
+    async getById(id){
         return axios.get<ApiResponse<TeamDto>>(`${BASE}/${id}`, {headers: authHeader()})
         .then(r => r.data).catch(e => err(e, "Failed to find by id"))
     },

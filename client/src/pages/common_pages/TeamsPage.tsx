@@ -4,9 +4,12 @@ import type { TeamDto } from "../../models/team/TeamDto";
 import { useLocation, useNavigate } from 'react-router-dom';
 import { teamApi } from "../../api_services/teams/TeamAPIService";
 import { Layout } from "../../components/layout/Layout";
-import { Empty, ErrorBox, PageHeader } from "../../components/ui/UI";
-import { TeamRole } from "../../../../server/src/Domain/enums/TeamRole";
+import { Empty, ErrorBox, PageHeader, Pagination } from "../../components/ui/UI";
 
+
+const TeamRole: Record<string, string> = new Proxy({}, {
+    get: (_target, prop) => String(prop),
+});
 
 export default function TeamsPage(){
     const {user} = useAuth();
@@ -16,6 +19,8 @@ export default function TeamsPage(){
     const location = useLocation();
     const [added, setAdded] = useState<boolean>(location.state?.added ?? false);
     const [edited, setEdited] = useState<boolean>(location.state?.edited ?? false);
+    const [page, setPage] = useState(1);
+    const limit = 20;
     const navigate = useNavigate();
 
     useEffect(()=>{
@@ -35,23 +40,23 @@ export default function TeamsPage(){
         }
     });
 
-    useEffect(()=> {
+    const loadPage = (p : number)=>{
         if (!user?.username) return;
 
-        teamApi.getByGamerTag(user.username)
+        teamApi.getByGamerTag(p, limit)
         .then((res) => {
             if (res.success){
-                console.log("Something");
-                console.log(res.data);
-                setTeams(res.data ?? []);
-                //console.log(teams);
+                setTeams(res.data?.items ?? []);
             }else{
                 setError(res.message);
             }
         })
         .catch(() => setError("Failed to load teams"))
     }
-    ,[user]);
+    useEffect(() =>{
+        loadPage(page);
+
+    }, [page]);
 
     return (
         <Layout>
@@ -115,15 +120,15 @@ export default function TeamsPage(){
                                     </button>
                                 </div>)}
                                 <span className="float-left font-semibold text-sm text-bgsecondary">{t.teamTag}</span>
-                                {/* <span className="text-sm text-bgsecondary font-semibold float-right">{g.gameGenre}</span> */}
                             </div>
                         </div>
                     ))
                     }
                 </section>
                 )}
-                
+                <Pagination page={page} total={limit} pageSize={limit} onChange={setPage} />
             </div>
+            
         </Layout>
     );
 }

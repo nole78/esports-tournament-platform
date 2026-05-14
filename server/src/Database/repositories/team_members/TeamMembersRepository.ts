@@ -68,7 +68,7 @@ export class TeamMemberRepository implements ITeamMemberRepository {
         [dto.teamId, dto.userId, dto.role]
       );
       
-      if (result.insertId === 0) return new TeamMember();
+      if (result.affectedRows === 0) return new TeamMember();
       return new TeamMember(dto.teamId, dto.userId, dto.role);
     } catch (err) {
       this.logger.error("TeamMemberRepository", "create failed", err);
@@ -79,10 +79,6 @@ export class TeamMemberRepository implements ITeamMemberRepository {
   async update(teamId: number, userId: number, fields: Partial<TeamMember>): Promise<boolean> {
     const res = await this.db.getWriteConnection();
     if (!res) return false;
-    //Will leave as is, maybe the role should update
-    const fieldMap: Record<string, string> ={
-
-    }
     try {
       const entries = Object.entries(fields).filter(([, v]) => v !== undefined);
       if (entries.length === 0) return false;

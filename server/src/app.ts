@@ -29,7 +29,6 @@ import { TournamentController } from "./WebAPI/controllers/TournamentController"
 import { AuditController } from "./WebAPI/controllers/AuditController";
 import { TeamService } from './Services/teams/TeamService';
 import { TeamRepository } from "./Database/repositories/teams/TeamRepository";
-import { TeamMember } from './Domain/models/TeamMember';
 import { TeamMemberRepository } from "./Database/repositories/team_members/TeamMembersRepository";
 import { TeamController } from "./WebAPI/controllers/TeamController";
 

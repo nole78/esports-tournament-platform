@@ -77,10 +77,14 @@ export class TeamRepository implements ITeamRepository {
     }
 
     try {
-      const entries = Object.entries(fields)
-      .filter(([, v]) => v !== undefined)
-      .map(([k,v])=>[fieldMap[k] ?? k, v]);
-      if (entries.length === 0) return false;
+      const providedEntries = Object.entries(fields)
+      .filter(([, v]) => v !== undefined);
+      if (providedEntries.length === 0) return false;
+
+      const hasUnknownFields = providedEntries.some(([k]) => !(k in fieldMap));
+      if (hasUnknownFields) return false;
+
+      const entries = providedEntries.map(([k, v])=> [fieldMap[k], v] as const);
       const setClause = entries.map(([k]) => `${k} = ?`).join(", ");
       const values = entries.map(([, v]) => v);
       const [result] = await res.conn.execute<ResultSetHeader>(
@@ -115,8 +119,21 @@ export class TeamRepository implements ITeamRepository {
       );
       return rows.length > 0 ? this.map(rows[0]) : new TeamDto;
     } catch (err) {
-      this.logger.error("TeamRepository", "findAll failed", err);
+      this.logger.error("TeamRepository", "findByTeamTag failed", err);
       return new TeamDto;
     } finally { res.conn.release(); }
+  }
+  async getTotal(): Promise<number>{
+    const res = await this.db.getWriteConnection();
+    if (!res) return 0;
+
+    try{
+      const [cnt] = await res.conn.execute<RowDataPacket[]>(`SELECT COUNT(*) as total FROM games`);
+      return cnt[0]?.total ?? 0;
+    }
+    catch (err){
+      this.logger.error("TeamRepository", "get total failed", err);
+      return 0;
+    } finally {res.conn.release();}
   }
 }

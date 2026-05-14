@@ -1,4 +1,5 @@
-import { TeamRole } from '../../../../server/src/Domain/enums/TeamRole';
+
+type TeamRole = string;
 
 export type TeamDto = {
          teamId : number,

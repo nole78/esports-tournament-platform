@@ -23,7 +23,6 @@ export const TeamsEditForm: React.FC<{id: string}> = ({id}) =>{
         const res = await teamApi.update(Number(id), team);
 
         setEditing(false);
-        console.log("Was here");
         if (!res.success){setError(res.message ?? "Invalid values"); return;}
 
         
@@ -32,7 +31,7 @@ export const TeamsEditForm: React.FC<{id: string}> = ({id}) =>{
     }
 
     useEffect(() =>{
-        teamApi.getByUserId(Number(id))
+        teamApi.getById(Number(id))
         .then(res => {
             const teamHelp : TeamDtoEdit = {
                 teamName:res.data?.teamName as string,

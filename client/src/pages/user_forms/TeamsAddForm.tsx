@@ -2,12 +2,11 @@ import { useRef, useState } from 'react';
 import type { TeamDto } from '../../models/team/TeamDto';
 import type { ITeamAPIService } from '../../api_services/teams/ITeamAPIService';
 import { useNavigate } from 'react-router-dom';
-import { TeamRole } from '../../../../server/src/Domain/enums/TeamRole';
-//import { teamApi } from '../../api_services/teams/TeamAPIService';
-//import { TeamDto, TeamDto } from '../../../../server/src/Domain/DTOs/teams/TeamDto';
+
+const DEFAULT_TEAM_ROLE: TeamDto['userRole'] = 'member' as TeamDto['userRole'];
 
 export default function TeamsAddForm({teamApi} : {teamApi:ITeamAPIService}){
-    const emptyTeam : TeamDto = {teamId: 0, teamName:"", teamLogotip:"", teamDescription:"", teamTag:"", userRole: TeamRole.MEMBER};
+    const emptyTeam : TeamDto = {teamId: 0, teamName:"", teamLogotip:"", teamDescription:"", teamTag:"", userRole: DEFAULT_TEAM_ROLE};
     const [team, setTeam] = useState<TeamDto>(emptyTeam);
     
     const [error, setError] = useState<string>("");

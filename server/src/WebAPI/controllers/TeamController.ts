@@ -1,17 +1,12 @@
 import {Request, Response, Router} from "express";
 import { ITeamService } from "../../Domain/services/teams/ITeamService";
-import { TeamRole } from "../../Domain/enums/TeamRole";
 import { authenticate } from "../../Middlewares/authentification/AuthMiddleware";
 import { authorize } from "../../Middlewares/authorization/AuthorizeMiddleware";
 import { UserRole } from "../../Domain/enums/UserRole";
 import { ValidationResult } from '../../Domain/types/ValidationResult';
 import { validateTeamsCreation } from "../validators/teams/validateTeamsCreation";
-import { TeamDto } from '../../Domain/DTOs/teams/TeamDto';
-import { fail } from "node:assert";
 import { CreateTeamDto } from "../../Domain/DTOs/teams/CreateTeamDto";
-import { User } from "../../Domain/models/User";
-import { logger } from '../../app';
-import { ILoggerService } from "../../Domain/services/logger/ILoggerService";
+
 
 export class TeamController{
     private readonly  router = Router();
@@ -34,33 +29,40 @@ export class TeamController{
     }
 
     private async getTeamsById(req: Request, res: Response) : Promise<void>{
+        
         const id = parseInt(req.params.id as string, 10);
         if(isNaN(id)) {res.status(400).json({ success: false, message: "Invalid id"}); return; }
         const result = await this.teamService.getById(id);
-        if (!result){
+        if (!result || result.teamId === 0){
             res.status(404).json({success:false, message:"ID not found!"});
         }
         res.status(200).json({success:true, data: result});
     }
     
     private async getByGamerTag(req: Request, res: Response) : Promise<void>{
+        const limit = Math.min(parseInt(String(req.query.limit ?? "20"), 10), 100);
+        const page = parseInt(String(req.query.page ?? "1"), 10);
         const gamer_tag = req.user?.username as string;
-        const entity = await this.teamService.getByGamerTag(gamer_tag);
+        const entity = await this.teamService.getByGamerTag(gamer_tag, limit, page);
         if (!entity) {
-            res.status(404).json({success: false, message: "Tag not found!"}); return;};
+            res.status(200).json({success: false, data:[]}); return;};
         res.status(200).json({success: true, data: entity});
     }
 
     private async create(req: Request, res: Response) : Promise<void>{
         const gamer_tag = req.user?.username as string;
         
-        const {teamName, teamTag, teamLogotip, teamDescription} = req.body.team as {teamName?:string, teamTag?:string, teamLogotip?:string, teamDescription?:string};
+        const {teamName, teamTag, teamLogotip, teamDescription} = (req.body.team ?? {}) as {teamName?:string, teamTag?:string, teamLogotip?:string, teamDescription?:string};
+        const safeTeamName = teamName ?? "";
+        const safeTeamTag = teamTag ?? "";
+        const safeTeamLogotip = teamLogotip ?? "";
+        const safeTeamDescription = teamDescription ?? "";
         
-        const v:ValidationResult = validateTeamsCreation(teamName ?? "", teamTag ?? "", teamLogotip ?? "", teamDescription ?? "");
+        const v:ValidationResult = validateTeamsCreation(safeTeamName, safeTeamTag, safeTeamLogotip, safeTeamDescription);
         if (!v.valid){res.status(400).json({success:false, message: v.message}); return;}
         
-        const created = await this.teamService.create(new CreateTeamDto(teamName, teamTag, teamLogotip, teamDescription), gamer_tag);
-        if (!created){res.status(500).json({success:false, messag: "Failed to create!"}); return;}
+        const created = await this.teamService.create(new CreateTeamDto(safeTeamName, safeTeamTag, safeTeamLogotip, safeTeamDescription), gamer_tag);
+        if (!created){res.status(500).json({success:false, message: "Failed to create!"}); return;}
         res.status(201).json({success:true, data: created});
     } 
 

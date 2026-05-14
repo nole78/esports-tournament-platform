@@ -21,19 +21,19 @@ export class TeamService implements ITeamService {
     async getAll(page?: number, limit?: number): Promise<PaginatedListDto<TeamDto>> {
         const items = await this.teamRepo.findAll(page, limit);
         
-        return new PaginatedListDto(items, items.length, page, limit);
+        const total = await this.teamRepo.getTotal();
+        return new PaginatedListDto(items, total, page, limit);
     }
     async getById(id: number): Promise<TeamDto> {
         const team = await this.teamRepo.findById(id);
-        this.logger.info("Usao sam u getById", team.teamId.toString());
         return team;
     }
-    async getByGamerTag(tag: string) : Promise<TeamDto[] | null>{
+    async getByGamerTag(tag: string, limit: number, page: number) : Promise<PaginatedListDto<TeamDto> | null>{
 
         const user = await this.userRepo.findByUsername(tag);
         if (user.id === 0)
         return null;
-        const teams =  await this.teamRepo.findAll(1, 20);
+        const teams =  await this.teamRepo.findAll(page, limit);
         const members = await this.teamMemberRepo.findByUserId(user.id);
 
         const teamMap = new Map(teams.map(t => [t.teamId,t]));
@@ -43,7 +43,7 @@ export class TeamService implements ITeamService {
                             return new TeamDto(t.teamId, t.teamName, t.teamTag, t.teamLogotip, t.teamDescription, m.role);
                        });
 
-        return retTeams.length===0 ? null : retTeams;
+        return retTeams.length===0 ? null : new PaginatedListDto(retTeams, retTeams.length, page, limit);
     }
     async create(dto: CreateTeamDto, gamerTag: string): Promise<CreateTeamDto | null> {
         const currentUser = await this.userRepo.findByUsername(gamerTag);
@@ -53,7 +53,7 @@ export class TeamService implements ITeamService {
 
         const memberDto = new TeamMemberDto(created.teamId, currentUser.id, TeamRole.CAPTAIN);
         const member = await this.teamMemberRepo.create(memberDto);
-
+        if (!member) return null;
 
         return new CreateTeamDto(created.teamName, created.teamTag, created.teamLogotip, created.teamDescription);
     }
@@ -64,8 +64,8 @@ export class TeamService implements ITeamService {
         const team = await this.teamRepo.findById(id);
         const memebers = await this.teamMemberRepo.findByTeamId(team.teamId);
 
-        const isCapitan = memebers.some(m => m.role===TeamRole.CAPTAIN || m.userId === m.userId);
-        if (!isCapitan) return false;
+        const isCaptain = memebers.some(m => m.role===TeamRole.CAPTAIN && m.userId === currentUser.id);
+        if (!isCaptain) return false;
         return this.teamRepo.update(team.teamId, fields);
 
     }
@@ -77,8 +77,8 @@ export class TeamService implements ITeamService {
         const members = await this.teamMemberRepo.findByTeamId(team?.teamId as number);
         
         const memberMap = members.map(t => [t.teamId, t]);
-        const isCapitan = members.some(m => m.role === TeamRole.CAPTAIN || m.userId === currentUser.id);
-        if (!isCapitan) return false;
+        const isCaptain = members.some(m => m.role === TeamRole.CAPTAIN && m.userId === currentUser.id);
+        if (!isCaptain) return false;
 
         await Promise.all(members.map(m =>
             this.teamMemberRepo.delete(team?.teamId, m.userId)
