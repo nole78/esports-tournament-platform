@@ -145,7 +145,7 @@ export default function TournamentList(){
                                 <p className="text-bgsecondary font-semibold mb-2">{t.tournamentFormat == "single_elimination" ? "SINGLE ELIMINATION" : t.tournamentFormat =="double_elimination" ? "DOUBLE ELIMINATION" : "ROUND ROBIN" }</p>
                             </div>
                             <div className="space-y-2 mb-3">
-                                <p className="text-sm text-gray-400 mb-0.5">Deadline:</p>
+                                <p className="text-sm text-gray-400 mb-0.5">Application deadline:</p>
                                 <div className="flex justify-between items-center">
                                     <p className="text-bgsecondary font-semibold">{formatDeadline(t.tournamentApplicationDeadline)}</p>
                                     <p className={`text-sm font-bold ${color}`}>
