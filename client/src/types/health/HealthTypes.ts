@@ -1,0 +1,1 @@
+export type NodeStatus = "healthy" | "degraded" | "offline";
