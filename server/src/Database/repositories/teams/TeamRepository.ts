@@ -128,7 +128,7 @@ export class TeamRepository implements ITeamRepository {
     if (!res) return 0;
 
     try{
-      const [cnt] = await res.conn.execute<RowDataPacket[]>(`SELECT COUNT(*) as total FROM games`);
+      const [cnt] = await res.conn.execute<RowDataPacket[]>(`SELECT COUNT(*) as total FROM teams`);
       return cnt[0]?.total ?? 0;
     }
     catch (err){
