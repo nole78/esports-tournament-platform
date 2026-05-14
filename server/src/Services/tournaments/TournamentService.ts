@@ -1,5 +1,4 @@
 import { CreateTournamentDto } from "../../Domain/DTOs/tournaments/CreateTournamentDto";
-import { CreateTournamentInternalDto } from "../../Domain/DTOs/tournaments/CreateTournamentInternalDto";
 import { TournamentDto } from "../../Domain/DTOs/tournaments/TorunamentDto";
 import { PaginatedListDto } from "../../Domain/DTOs/PaginatedListDto";
 import { Tournament } from "../../Domain/models/Tournament";
@@ -10,7 +9,6 @@ import { ILoggerService } from "../../Domain/services/logger/ILoggerService";
 import { IDateTimeConverter } from "../../Domain/services/datetime/IDateTimeConverter";
 import { GameDto } from "../../Domain/DTOs/games/GameDto";
 import { TournamentFilterDto } from "../../Domain/DTOs/tournaments/TournamentFilterDto";
-import { TournamentFilterInternalDto } from "../../Domain/DTOs/tournaments/TournamentFilterInternalDto";
 import { Game } from "../../Domain/models/Game";
 
 export class TournamentService implements ITournamentService {
