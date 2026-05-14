@@ -124,7 +124,7 @@ export class TeamRepository implements ITeamRepository {
     } finally { res.conn.release(); }
   }
   async getTotal(): Promise<number>{
-    const res = await this.db.getWriteConnection();
+    const res = await this.db.getReadConnection();
     if (!res) return 0;
 
     try{

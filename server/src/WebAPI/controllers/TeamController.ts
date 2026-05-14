@@ -35,6 +35,7 @@ export class TeamController{
         const result = await this.teamService.getById(id);
         if (!result || result.teamId === 0){
             res.status(404).json({success:false, message:"ID not found!"});
+            return;
         }
         res.status(200).json({success:true, data: result});
     }
