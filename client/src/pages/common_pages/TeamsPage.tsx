@@ -86,7 +86,7 @@ export default function TeamsPage(){
                 {teams.length === 0 && !error ? <Empty message="No teams found"/> : (
                 <section className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">     
                     {teams.map(t => (
-                        <div className="group relative aspect-4/3 border-2 h-2x1 border-white/5 bg-bgprimary rounded-x1 overflow-hidden">
+                        <div className=" rounded-2xl group relative aspect-4/3 border-2 border-white/5 bg-bgprimary/30 overflow-hidden">
                             <div className="w-full h-full">
                                 <img src ={t.teamLogotip} className="object-cover w-full h-full rounded-x1 transition-transform duration-300 group-hover:scale-110"/>
                             </div>
@@ -95,7 +95,7 @@ export default function TeamsPage(){
                             </div>
                             
                             <div className="absolute rounded-b-lg bottom-0 bg-primary/90 w-full p-2 origin-bottom scale-y-0 group-hover:scale-y-100 transition-transform duration-300">
-                                {(t.userRole === TeamRole.CAPTAIN && <div className="top-0">
+                                {(t.userRole === TeamRole.captain && <div className="top-0">
                                     <button className="w-1/3 mb-2 bg-red-400/40 border-2 border-red-500 hover:bg-bgsecondary/30 hover:border-bgsecondary text-red-500 font-semibold rounded-xl p-1 text-sm transition-colors"
                                             onClick={() => {
                                                 setDeleted(false);
