@@ -38,7 +38,7 @@ export default function TeamsPage(){
         if (location.state?.edited || location.state?.added){
             navigate(location.pathname, {replace: true, state: {}})
         }
-    });
+    }, [location.state, location.pathname, navigate]);
 
     const loadPage = (p : number)=>{
         if (!user?.username) return;

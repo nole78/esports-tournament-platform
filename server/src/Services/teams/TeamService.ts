@@ -10,6 +10,8 @@ import { TeamRole } from "../../Domain/enums/TeamRole";
 import { ILoggerService } from "../../Domain/services/logger/ILoggerService";
 import { IUserRepository } from "../../Domain/repositories/users/IUserRepository";
 import { UserRole } from "../../Domain/enums/UserRole";
+import { TeamMember } from "../../Domain/models/TeamMember";
+import { Team } from "../../Domain/models/Team";
 
 export class TeamService implements ITeamService {
     public constructor(private readonly teamRepo: ITeamRepository,
@@ -55,13 +57,13 @@ export class TeamService implements ITeamService {
         const created = await this.teamRepo.create(dto);
         if (created.teamId === 0) return null;
 
-        const memberDto = new TeamMemberDto(created.teamId, currentUser.id, TeamRole.CAPTAIN);
+        const memberDto = new TeamMember(created.teamId, currentUser.id, TeamRole.CAPTAIN);
         const member = await this.teamMemberRepo.create(memberDto);
         if (!member) return null;
 
         return new CreateTeamDto(created.teamName, created.teamTag, created.teamLogotip, created.teamDescription);
     }
-    async update(gamer_tag: string, fields: Partial<TeamDto>, id: number): Promise<boolean> {
+    async update(gamer_tag: string, fields: Partial<Team>, id: number): Promise<boolean> {
         const currentUser = await this.userRepo.findByUsername(gamer_tag);
         if (currentUser.id === 0) return false;
 
