@@ -3,13 +3,17 @@ import { IUserService } from "../../Domain/services/users/IUserService";
 import { authenticate } from "../../Middlewares/authentification/AuthMiddleware";
 import { authorize } from "../../Middlewares/authorization/AuthorizeMiddleware";
 import { UserRole } from "../../Domain/enums/UserRole";
+import { UserPasswordDto } from "../../Domain/DTOs/users/UserPasswordDto";
 
 export class UserController {
   private readonly router = Router();
 
   public constructor(private readonly userService: IUserService) {
     this.router.get("/users",          authenticate, authorize(UserRole.ADMIN), this.getAll.bind(this));
-    this.router.get("/users/:id",      authenticate, authorize(UserRole.ADMIN), this.getById.bind(this));
+    this.router.get("/users/:id",      authenticate, this.getById.bind(this));
+    this.router.get("/users/me/info",  authenticate, this.getInfo.bind(this));
+    this.router.patch("/users/update",        authenticate, this.update.bind(this));
+    this.router.patch("/users/update/password",        authenticate, this.updatePassword.bind(this));
     this.router.patch("/users/:id/deactivate", authenticate, authorize(UserRole.ADMIN), this.deactivate.bind(this));
   }
 
@@ -31,6 +35,26 @@ export class UserController {
     if (isNaN(id)) { res.status(400).json({ success: false, message: "Invalid id" }); return; }
     const ok = await this.userService.deactivate(id);
     res.status(ok ? 200 : 500).json({ success: ok, message: ok ? "User deactivated" : "Failed to deactivate user" });
+  }
+
+  private async getInfo(req: Request, res: Response): Promise<void> {
+    const id = Number(req.user?.id);
+    const user = await this.userService.getInfo(id);
+    if(!user) { res.status(404).json({ success: false, message: "User not found" }); return; }
+    res.status(200).json({succes: true, data: user });
+  }
+
+  private async update(req: Request, res: Response): Promise<void> {
+    const id = Number(req.user?.id);
+    const ok = await this.userService.update(id,req.body);
+    res.status(ok ? 200 : 500).json({ success: ok, message: ok ? "User updated" : "Failed to update user" });
+  }
+
+  private async updatePassword(req: Request, res: Response): Promise<void> {
+    const id = Number(req.user?.id);
+    const {oldPassword,newPassword} = req.body as {oldPassword: string, newPassword:string}
+    const ok = await this.userService.updatePassword(id,new UserPasswordDto(newPassword,oldPassword))
+    res.status(ok ? 200 : 500).json({ success: ok, message: ok ? "User updated" : "Failed to update password" });
   }
 
   public getRouter(): Router { return this.router; }

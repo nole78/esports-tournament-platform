@@ -12,7 +12,7 @@ export class UserRepository implements IUserRepository {
   ) {}
 
   private map(r: RowDataPacket): User {
-    return new User(r.id, r.gamer_tag, r.email, r.fullName, r.role as UserRole, r.passwordHash, r.isActive);
+    return new User(r.id, r.gamer_tag, r.email, r.full_name, r.role as UserRole, r.passwordHash, r.profile_picture ,r.isActive);
   }
 
   async create(user: User): Promise<User> {
@@ -20,8 +20,8 @@ export class UserRepository implements IUserRepository {
     if (!res) return new User();
     try {
       const [result] = await res.conn.execute<ResultSetHeader>(
-        `INSERT INTO users (full_name, gamer_tag, email, role, passwordHash) VALUES (? , ?, ?, ?, ?)`,
-        [user.fullName, user.gamerTag, user.email, user.role, user.passwordHash]
+        `INSERT INTO users (full_name, gamer_tag, email, role, passwordHash, profile_picture) VALUES (?, ?, ?, ?, ?, ?)`,
+        [user.fullName, user.gamerTag, user.email, user.role, user.passwordHash, user.profilePicture]
       );
       if (result.insertId === 0) return new User();
       return new User(result.insertId, user.gamerTag, user.email, user.fullName, user.role, user.passwordHash);
@@ -79,13 +79,29 @@ export class UserRepository implements IUserRepository {
     } finally { res.conn.release(); }
   }
 
-  async update(user: User): Promise<boolean> {
+  async update(id:number ,fields: Partial<User>): Promise<boolean> {
     const res = await this.db.getWriteConnection();
     if (!res) return false;
+
+    const fieldMap: Record<string, string> = {
+            fullName: "full_name",
+            gamerTag: "gamer_tag",
+            email: "email",
+            passwordHash: "passwordHash",
+            role: "role",
+            profilePicture: "profile_picture"
+        }
+
     try {
+      const entries = Object.entries(fields)
+                .filter(([, v]) => v !== undefined)
+                .map(([k,v]) => [fieldMap[k] ?? k, v]);  
+
+      if (entries.length === 0) return false;
+      const setClause = entries.map(([k]) => `${k} = ?`).join(", ");
+      const values = entries.map(([, v]) => v);
       const [result] = await res.conn.execute<ResultSetHeader>(
-        `UPDATE users SET gamer_tag = ?, email = ?, role = ?, isActive = ? WHERE id = ?`,
-        [user.gamerTag, user.email, user.role, user.isActive, user.id]
+        `UPDATE users SET ${setClause} WHERE id = ?`, [...values, id]
       );
       return result.affectedRows > 0;
     } catch (err) {

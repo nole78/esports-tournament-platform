@@ -3,12 +3,6 @@ import { Tournament } from '../../../Domain/models/Tournament';
 import { ResultSetHeader, RowDataPacket } from "mysql2";
 import { DbManager } from "../../connection/DbConnectionPool";
 import { ILoggerService } from "../../../Domain/services/logger/ILoggerService";
-import { TournamentDto } from "../../../Domain/DTOs/tournaments/TorunamentDto";
-import { CreateTournamentInternalDto } from "../../../Domain/DTOs/tournaments/CreateTournamentInternalDto";
-import { TournamentStatus } from '../../../Domain/enums/TournamentStatus';
-import { TournamentInternalDto } from "../../../Domain/DTOs/tournaments/TournamentInternalDto";
-import { TournamentFilterInternalDto } from "../../../Domain/DTOs/tournaments/TournamentFilterInternalDto";
-import { PaginatedListDto } from '../../../Domain/DTOs/PaginatedListDto';
 
 export class TournamentRepository implements ITournamentRepository {
   public constructor(
@@ -16,13 +10,58 @@ export class TournamentRepository implements ITournamentRepository {
     private readonly logger: ILoggerService,
   ) {}
 
-  private map(r: RowDataPacket): TournamentInternalDto {
-    return new TournamentInternalDto(r.tournament_name, r.tournament_game_id, r.tournament_format, r.tournament_max_teams, r.tournament_application_deadline, r.tournament_prize_fund, r.tournament_status);
+  private map(r: RowDataPacket): Tournament {
+    return new Tournament(r.tournament_id, r.tournament_name, r.tournament_game_id, r.tournament_format, r.tournament_max_teams, r.tournament_application_deadline, r.tournament_prize_fund, r.tournament_status);
   }
 
-  async findById(id: number): Promise<TournamentInternalDto | null> {
+  async findTotal(): Promise<number>{
     const res = await this.db.getReadConnection();
-    if (!res) return null;
+    if(!res) return 0;
+    try{
+      const [cnt] = await res.conn.execute<RowDataPacket[]>(
+        `SELECT COUNT(*) as total FROM tournaments`
+      );
+
+      return cnt[0]?.total ?? 0;
+    } catch (err) {
+      this.logger.error("TournamentRepository", "findTotal failed", err);
+      console.error("findAll error:", err);
+      return 0;
+    } finally { res.conn.release(); }
+  }
+
+  async findTotalFiltered(tournamentGameId?:number, tournamentFormat?:string, tournamentStatus?:string): Promise<number>{
+    const res = await this.db.getReadConnection();
+    if(!res) return 0;
+
+    const fieldMap: Record<string, string> = {
+      tournamentGameId: "tournament_game_id",
+      tournamentFormat: "tournament_format",
+      tournamentStatus: "tournament_status"
+    }
+    const filter = {tournamentGameId, tournamentFormat, tournamentStatus};
+    try {
+      const entries = Object.entries(filter).filter(([, v]) => v !== undefined).map(([k,v]) => [fieldMap[k] ?? k, v]);
+      if (entries.length === 0) return 0;
+      const filterClause = entries.map(([k]) => `${k} = ?`).join(" AND ");
+      const values = entries.map(([, v]) => v);
+      const [cnt] = await res.conn.query<RowDataPacket[]>(
+        `SELECT COUNT(*) as total FROM tournaments 
+        WHERE ${filterClause}`,
+        [...values]
+      );
+
+      return cnt[0]?.total ?? 0;
+    } catch (err) {
+      this.logger.error("TournamentRepository", "findTotalFiltered failed", err);
+      console.error("findAll error:", err);
+      return 0;
+    } finally { res.conn.release(); }
+  }
+
+  async findById(id: number): Promise<Tournament> {
+    const res = await this.db.getReadConnection();
+    if (!res) return new Tournament();
     try {
       const [rows] = await res.conn.execute<RowDataPacket[]>(
         `SELECT t.tournament_name, t.tournament_game_id, t.tournament_format, t.tournament_max_teams, t.tournament_application_deadline, t.tournament_prize_fund, t.tournament_status
@@ -30,16 +69,16 @@ export class TournamentRepository implements ITournamentRepository {
          WHERE t.tournament_id = ?`, 
         [id]
       );
-      return rows.length > 0 ? this.map(rows[0]) : null;
+      return rows.length > 0 ? this.map(rows[0]) : new Tournament();
     } catch (err) {
       this.logger.error("TournamentRepository", "findById failed", err);
-      return null;
+      return new Tournament();
     } finally { res.conn.release(); }
   }
 
-  async findAll(page:number, limit:number): Promise<PaginatedListDto<TournamentInternalDto>> {
+  async findAll(page:number, limit:number): Promise<Tournament[]> {
     const res = await this.db.getReadConnection();
-    if (!res) return new PaginatedListDto([], 0, page, limit);
+    if (!res) return [];
     const offset = Math.max(0, Math.floor((page - 1) * limit));
     const lim    = Math.max(1, Math.floor(limit));
     try {
@@ -56,33 +95,33 @@ export class TournamentRepository implements ITournamentRepository {
 
       const items = rows.map((r) => this.map(r))
 
-      return new PaginatedListDto(items, cnt[0]?.total ?? 0, page, limit);
+      return items;
     } catch (err) {
       this.logger.error("TournamentRepository", "findAll failed", err);
       console.error("findAll error:", err);
-      return new PaginatedListDto([], 0, page, limit);
+      return [];
     } finally { res.conn.release(); }
   }
 
-  async create(dto: CreateTournamentInternalDto): Promise<Tournament> {
+  async create(t: Tournament): Promise<Tournament> {
     const res = await this.db.getWriteConnection();
     if (!res) return new Tournament();
     try {
       const [result] = await res.conn.execute<ResultSetHeader>(
         `INSERT INTO tournaments (tournament_name, tournament_game_id, tournament_format, tournament_max_teams, tournament_application_deadline, tournament_prize_fund, tournament_status) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        [dto.tournamentName, dto.tournamentGameId, dto.tournamentFormat, dto.tournamentMaxTeams, dto.tournamentApplicationDeadline, dto.tournamentPrizeFund, dto.tournamentStatus]
+        [t.tournamentName, t.tournamentGameId, t.tournamentFormat, t.tournamentMaxTeams, t.tournamentApplicationDeadline, t.tournamentPrizeFund, t.tournamentStatus]
       );
       if (result.insertId === 0) return new Tournament();
 
       return new Tournament(
         result.insertId, 
-        dto.tournamentName, 
-        dto.tournamentGameId, 
-        dto.tournamentFormat, 
-        dto.tournamentMaxTeams, 
-        new Date(dto.tournamentApplicationDeadline), 
-        dto.tournamentPrizeFund, 
-        dto.tournamentStatus
+        t.tournamentName, 
+        t.tournamentGameId, 
+        t.tournamentFormat, 
+        t.tournamentMaxTeams, 
+        new Date(t.tournamentApplicationDeadline), 
+        t.tournamentPrizeFund, 
+        t.tournamentStatus
       );
     } catch (err) {
       this.logger.error("TournamentRepository", "create failed", err);
@@ -90,9 +129,9 @@ export class TournamentRepository implements ITournamentRepository {
     } finally { res.conn.release(); }
   }  
 
-  async findFiltered(fields: Partial<TournamentFilterInternalDto>, page:number, limit:number): Promise<PaginatedListDto<TournamentInternalDto>>{
+  async findFiltered(tournamentGameId:number, tournamentFormat:string, tournamentStatus:string, page:number, limit:number): Promise<Tournament[]>{
     const res = await this.db.getReadConnection();
-    if (!res) return new PaginatedListDto([], 0, page, limit);
+    if (!res) return [];
     const offset = Math.max(0, Math.floor((page - 1) * limit));
     const lim    = Math.max(1, Math.floor(limit));
 
@@ -101,10 +140,10 @@ export class TournamentRepository implements ITournamentRepository {
       tournamentFormat: "tournament_format",
       tournamentStatus: "tournament_status"
     }
-
+    const filter = {tournamentGameId, tournamentFormat, tournamentStatus};
     try {
-      const entries = Object.entries(fields).filter(([, v]) => v !== undefined).map(([k,v]) => [fieldMap[k] ?? k, v]);
-      if (entries.length === 0) return new PaginatedListDto([], 0, page, limit);
+      const entries = Object.entries(filter).filter(([, v]) => v !== undefined).map(([k,v]) => [fieldMap[k] ?? k, v]);
+      if (entries.length === 0) return [];
       const filterClause = entries.map(([k]) => `${k} = ?`).join(" AND ");
       const values = entries.map(([, v]) => v);
       
@@ -120,13 +159,14 @@ export class TournamentRepository implements ITournamentRepository {
         WHERE ${filterClause}`,
         [...values]
       );
+
       const items = rows.map((r) => this.map(r));
 
-      return new PaginatedListDto(items, cnt[0]?.total ?? 0, page, limit);
+      return items;
     } catch (err) {
       this.logger.error("TournamentRepository", "findAll failed", err);
       console.error("findAll error:", err);
-      return new PaginatedListDto([], 0, page, limit);
+      return [];
     } finally { res.conn.release(); }
   }
 
