@@ -32,10 +32,14 @@ export class TeamService implements ITeamService {
 
         const user = await this.userRepo.findByUsername(tag);
         if (user.id === 0)
-        return null;
-        const teams =  await this.teamRepo.findAll(page, limit);
+            return null;
+        //const teams =  await this.teamRepo.findAll(page, limit);
         const members = await this.teamMemberRepo.findByUserId(user.id);
-
+        const teams = [];
+        for(var i=0; i<members.length; i++){
+            teams.push(await this.teamRepo.findById(members.at(i)?.teamId as number));
+        }
+        
         const teamMap = new Map(teams.map(t => [t.teamId,t]));
         var retTeams = members.filter(m => teamMap.has(m.teamId))
                        .map(m => {
