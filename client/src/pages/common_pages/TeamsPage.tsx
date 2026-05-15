@@ -3,7 +3,6 @@ import { useAuth } from "../../hooks/auth/useAuthHook";
 import type { TeamDto } from "../../models/team/TeamDto";
 import { useLocation, useNavigate } from 'react-router-dom';
 import { teamApi } from "../../api_services/teams/TeamAPIService";
-import { Layout } from "../../components/layout/Layout";
 import { Empty, ErrorBox, PageHeader, Pagination } from "../../components/ui/UI";
 
 
@@ -59,7 +58,6 @@ export default function TeamsPage(){
     }, [page]);
 
     return (
-        <Layout>
             <div>
                 <PageHeader eyebrow="" title="Team Catalog"/>
                 <button onClick={() => navigate("/teams/add")}
@@ -128,7 +126,5 @@ export default function TeamsPage(){
                 )}
                 <Pagination page={page} total={limit} pageSize={limit} onChange={setPage} />
             </div>
-            
-        </Layout>
     );
 }
