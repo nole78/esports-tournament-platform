@@ -64,7 +64,7 @@ export class AuthService implements IAuthService {
         meta: { email, reason: "email_taken" },
         //ipAddress: ip // TODO
       });
-      return Result.Failiure("This email is already in use",ErrorType.Conflict);
+      return Result.Failiure("Email is already in use",ErrorType.Conflict);
     }
     const hash = await bcrypt.hash(password, this.saltRounds).catch(() => "");
     if (!hash) return Result.Failiure("Couldn't register account",ErrorType.Internal);
