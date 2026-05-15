@@ -7,7 +7,7 @@ export function handleResult<T>(result: Result<T>, res: Response): Response {
     if (result.isSuccess) {
         return res.status(200).json({
             success: true,
-            value: result.value
+            data: result.value
         });
     }
 
