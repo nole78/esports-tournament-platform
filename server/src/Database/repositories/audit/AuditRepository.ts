@@ -1,10 +1,8 @@
 import { RowDataPacket, ResultSetHeader } from "mysql2";
 import { IAuditRepository } from "../../../Domain/repositories/audit/IAuditRepository";
 import { AuditLog } from "../../../Domain/models/AuditLog";
-import { AuditLogDto } from "../../../Domain/DTOs/audit/AuditLogDto";
 import { DbManager } from "../../connection/DbConnectionPool";
 import { ILoggerService } from "../../../Domain/services/logger/ILoggerService";
-import { PaginatedListDto } from "../../../Domain/DTOs/PaginatedListDto";
 
 export class AuditRepository implements IAuditRepository {
   public constructor(
@@ -37,12 +35,13 @@ export class AuditRepository implements IAuditRepository {
     if (!res) return [];
     const offset = Math.max(0, Math.floor((page - 1) * limit));
     const lim    = Math.max(1, Math.floor(limit));
+    console.log(`LIM: ${lim}, OFFSET: ${offset}`)
     try {
-        const [rows] = await res.conn.execute<RowDataPacket[]>(
+        const [rows] = await res.conn.query<RowDataPacket[]>(
             `SELECT * FROM audit_log
             ORDER BY createdAt DESC
-            LIMIT ${lim} OFFSET ${offset}`,
-            []
+            LIMIT ? OFFSET ?`,
+            [lim, offset]
       );
       const items = rows.map(
         (l) => new AuditLog(

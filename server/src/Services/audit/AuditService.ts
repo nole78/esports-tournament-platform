@@ -4,6 +4,7 @@ import { AuditLogDto } from "../../Domain/DTOs/audit/AuditLogDto";
 import { PaginatedListDto } from "../../Domain/DTOs/PaginatedListDto";
 import { AuditLog } from "../../Domain/models/AuditLog";
 import { IUserRepository } from "../../Domain/repositories/users/IUserRepository";
+import { Result } from "../../Domain/common/Result";
 
 export class AuditService implements IAuditService {
   public constructor(private readonly auditRepo: IAuditRepository, private readonly userRepo: IUserRepository) {}
@@ -28,9 +29,9 @@ export class AuditService implements IAuditService {
     await this.auditRepo.create(entry);
   }
 
-  async getAllLogs(page: number, limit: number): Promise<PaginatedListDto<AuditLogDto>> {
+  async getAllLogs(page: number, limit: number): Promise<Result<PaginatedListDto<AuditLogDto>>> {
     let auditLogs = await this.auditRepo.findAll(page, limit);
-    if(auditLogs[0] == null) return new PaginatedListDto([], 0, page, limit);
+    if(auditLogs[0] == null) return Result.Success(new PaginatedListDto([], 0, page, limit));
     let total = await this.auditRepo.getTotal();
     const DTOs = auditLogs.map(
       (l) => new AuditLogDto(
@@ -44,6 +45,6 @@ export class AuditService implements IAuditService {
       const user = await this.userRepo.findById(log.userId || 0);
       log.gamer_tag = user ? user.gamerTag : "";
     }
-    return new PaginatedListDto(DTOs, total, page, limit);
+    return Result.Success(new PaginatedListDto(DTOs, total, page, limit));
   }
 }

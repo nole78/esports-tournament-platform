@@ -4,6 +4,8 @@ import { IAuthService } from "../../Domain/services/auth/IAuthService";
 import { ValidationResult } from "../../Domain/types/ValidationResult";
 import { validateLogin } from "../validators/auth/validateLogin";
 import { validateRegister } from "../validators/auth/validateRegister";
+import { handleResult } from "../mappers/ResultMapper";
+import { Result } from "../../Domain/common/Result";
 
 export class AuthController {
   private readonly router = Router();
@@ -17,28 +19,32 @@ export class AuthController {
     const { username, password } = req.body as { username?: string; password?: string };
     const v: ValidationResult = validateLogin(username ?? "", password ?? "");
     if (!v.valid) { res.status(400).json({ success: false, message: v.message }); return; }
+
     const result = await this.authService.login(username!, password!);
-    if (result.id === 0) { res.status(401).json({ success: false, message: "Invalid username or password" }); return; }
+    if(!result.isSuccess) {handleResult(result,res); return;}
+
     const token = jwt.sign(
-      { id: result.id, username: result.username, role: result.role },
+      { id: result.value!.id, username: result.value!.username, role: result.value!.role },
       process.env.JWT_SECRET ?? "",
       { expiresIn: "24h" }
     );
-    res.status(200).json({ success: true, message: "Login successful", data: token });
+    handleResult(Result.Success(token),res);
   }
 
   private async register(req: Request, res: Response): Promise<void> {
     const { username, email, password, fullName, profilePicture , role } = req.body as { username?: string; email?: string; password?: string; fullName?: string; profilePicture?: string ;role?: string };
     const v: ValidationResult = validateRegister(username ?? "", email ?? "", password ?? "");
     if (!v.valid) { res.status(400).json({ success: false, message: v.message }); return; }
+
     const result = await this.authService.register(username!, email!, fullName! ,role ?? "player", password!, profilePicture ?? "");
-    if (result.id === 0) { res.status(409).json({ success: false, message: "Username or email already taken" }); return; }
+    if(!result.isSuccess) {handleResult(result,res); return;}
+
     const token = jwt.sign(
-      { id: result.id, username: result.username, role: result.role },
+      { id: result.value!.id, username: result.value!.username, role: result.value!.role },
       process.env.JWT_SECRET ?? "",
       { expiresIn: "24h" }
     );
-    res.status(201).json({ success: true, message: "Registration successful", data: token });
+    handleResult(Result.Success(token),res);
   }
 
   public getRouter(): Router { return this.router; }
