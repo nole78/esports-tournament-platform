@@ -13,6 +13,9 @@ export function mapErrorTypeToStatus(errorType: ErrorType | null): number {
         case ErrorType.Validation:
             return 400;
 
+        case ErrorType.Unauthorized:
+            return 401;
+
         default:
             return 500;
     }
