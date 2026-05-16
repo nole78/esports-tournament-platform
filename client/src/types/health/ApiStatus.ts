@@ -1,0 +1,1 @@
+export type ApiStatus = "healthy" | "degraded" | "unreachable";
