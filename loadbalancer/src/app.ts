@@ -6,7 +6,7 @@ const app = express();
 
 export const logger = new ConsoleLoggerService();
 
-app.use(express.json());
+app.use(express.json({limit: "10mb"}));
 
 app.use("/api",proxyMiddleware)
 
