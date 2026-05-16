@@ -3,13 +3,26 @@ import { createProxyMiddleware } from 'http-proxy-middleware';
 
 import { serverPoolService } from '../services/serverPoolService';
 
-export const proxyMiddleware = (
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
+const proxyCache = new Map();
+
+function getProxy(target: string) {
+    if (!proxyCache.has(target)) {
+        proxyCache.set(
+            target,
+            createProxyMiddleware({
+                target,
+                changeOrigin: true
+            })
+        );
+    }
+
+    return proxyCache.get(target);
+}
+
+export const proxyMiddleware = (req: Request, res: Response, next: NextFunction) => {
 
     const server = serverPoolService.getNextServer();
+    console.log(`Server na URL: ${server?.url}`);
 
     if (!server) {
         return res.status(503).json({
@@ -17,10 +30,7 @@ export const proxyMiddleware = (
         });
     }
 
-    const proxy = createProxyMiddleware({
-        target: server.url,
-        changeOrigin: true
-    });
+    const proxy = getProxy(server.url);
 
-    proxy(req, res, next);
+    return proxy(req, res, next);
 };
