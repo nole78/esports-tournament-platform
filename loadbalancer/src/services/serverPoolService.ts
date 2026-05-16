@@ -24,16 +24,13 @@ class ServerPoolService {
         }
 
         switch (algorithm) {
-
-        case LoadBalancingAlgorithm.ROUND_ROBIN:
-            return roundRobin(availableServers);
-
-        case LoadBalancingAlgorithm.LEAST_CONNECTIONS:
-            return leastConnections(availableServers);
-
-        default:
-            return roundRobin(availableServers);
-}
+            case LoadBalancingAlgorithm.ROUND_ROBIN:
+                return roundRobin(availableServers);
+            case LoadBalancingAlgorithm.LEAST_CONNECTIONS:
+                return leastConnections(availableServers);
+            default:
+                return roundRobin(availableServers);
+        }
     }
 
     public incrementConnections(serverId: string): void {
