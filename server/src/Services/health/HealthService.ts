@@ -38,10 +38,10 @@ export class HealthService implements IHealthService {
 
   async runApiCheck(): Promise<void> {
   const nodes = [
-    { name: "Users API", url: "http://localhost:4000/api/v1/users" },
-    { name: "Tournament API", url: "http://localhost:4000/api/v1/tournaments" },
-    { name: "Game Catalog API", url: "http://localhost:4000/api/v1/games" },
-    { name: "Audit Log API", url: "http://localhost:4000/api/v1/audit_log" },
+    { name: "users-api", url: "http://localhost:4000/api/v1/users" },
+    { name: "tournaments-api", url: "http://localhost:4000/api/v1/tournaments" },
+    { name: "games-api", url: "http://localhost:4000/api/v1/games" },
+    { name: "audit_log-api", url: "http://localhost:4000/api/v1/audit_log" },
   ];
 
   const results = await Promise.all(
@@ -51,14 +51,26 @@ export class HealthService implements IHealthService {
       try {
         const res = await fetch(node.url);
         const latency = Date.now() - start;
-
-        return new ApiStatusDto(
+        if(res.status < 404)
+        {
+          return new ApiStatusDto(
           node.name,
           node.url,
           latency < HEALTH_CHECK_TIMEOUT ? ApiStatus.HEALTHY : ApiStatus.DEGRADED,
           new Date(),
           latency
         );
+        }
+        else
+        {
+            return new ApiStatusDto(
+            node.name,
+            node.url,
+            ApiStatus.UNREACHABLE,
+            new Date(),
+            -1
+          );
+        }
       } catch {
         return new ApiStatusDto(
           node.name,

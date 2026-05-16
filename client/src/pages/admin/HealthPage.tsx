@@ -126,7 +126,7 @@ export default function HealthPage() {
                   </div>
                   <div>
                     <p className="text-white/20 uppercase tracking-wider text-[10px] mb-1.5">Latency</p>
-                    <p className="text-white/40">{n.latency !== undefined ? `${n.latency} ms` : "—"}</p>
+                    <p className="text-white/40">{n.latency !== -1 ? `${n.latency} ms` : "None"}</p>
                   </div>
                 </div>
               </div>
@@ -163,7 +163,7 @@ export default function HealthPage() {
                   </div>
                   <div>
                     <p className="text-white/20 uppercase tracking-wider text-[10px] mb-1.5">Latency</p>
-                    <p className="text-white/40">{n.latency !== undefined ? `${n.latency} ms` : "—"}</p>
+                    <p className="text-white/40">{n.latency !== -1 ? `${n.latency} ms` : "None"}</p>
                   </div>
                 </div>
               </div>

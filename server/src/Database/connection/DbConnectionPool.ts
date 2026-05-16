@@ -73,6 +73,7 @@ export class DbManager {
     } catch (err) {
       info.node.status = NodeStatus.UNREACHABLE;
       info.node.failedWrites++;
+      info.node.latency = -1;
       this.logger.warn("DB", `Node ${info.name} failed health check`);
     } finally {
       if (conn) conn.release();
