@@ -8,6 +8,6 @@ export const logger = new ConsoleLoggerService();
 
 app.use(express.json({limit: "10mb"}));
 
-app.use("/api",proxyMiddleware)
+app.use(proxyMiddleware)
 
 export default app;
