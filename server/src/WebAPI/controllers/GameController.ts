@@ -6,6 +6,7 @@ import { IGameService } from "../../Domain/services/games/IGameService";
 import { CreateGameDto } from '../../Domain/DTOs/games/CreateGameDto';
 import { ValidationResult } from '../../Domain/types/ValidationResult';
 import { validateGameCreation } from "../validators/games/validateGameCreation";
+import { handleResult } from "../mappers/ResultMapper";
 
 export class GameController{
     private readonly router = Router();
@@ -22,15 +23,14 @@ export class GameController{
         const page  = parseInt(req.query.page  as string ?? "1",  10);
         const limit = parseInt(req.query.limit as string ?? "20", 10);
         const result = await this.gameService.getAll(page, limit);
-        res.status(200).json({ success: true, data: result });
+        handleResult(result,res);
     }
 
     private async getById(req: Request, res: Response) : Promise<void>{
         const id = parseInt(req.params.id as string, 10);
         if(isNaN(id)) {res.status(400).json({ success: false, message: "Invalid id"}); return; }
-        const entity = await this.gameService.getById(id);
-        if(!entity) {res.status(404).json({ success: false, message: "Not found"}); return; }
-        res.status(200).json({ success: true, data: entity});
+        const result = await this.gameService.getById(id);
+        handleResult(result,res);
     }
 
     private async create(req: Request, res: Response): Promise<void> {
@@ -38,23 +38,22 @@ export class GameController{
         const v:ValidationResult = validateGameCreation(gameName ?? "",gameGenre ?? "",gamePlayers ?? 0);
         if(!v.valid) {res.status(400).json({ success: false, message: v.message }); return;}
 
-        const created = await this.gameService.create(new CreateGameDto( gameName, gameLogotip, gameGenre, gamePlayers ));
-        if (!created) { res.status(500).json({ success: false, message: "Failed to create" }); return; }
-        res.status(201).json({ success: true, data: created });
+        const result = await this.gameService.create(new CreateGameDto( gameName, gameLogotip, gameGenre, gamePlayers ));
+        handleResult(result,res);
     }
 
     private async update(req: Request, res: Response): Promise<void> {
         const id = parseInt(req.params.id as string, 10);
         if (isNaN(id)) { res.status(400).json({ success: false, message: "Invalid id" }); return; }
-        const ok = await this.gameService.update(id, req.body);
-        res.status(ok ? 200 : 500).json({ success: ok });
+        const result = await this.gameService.update(id, req.body);
+        handleResult(result, res);
     }
 
     private async delete(req: Request, res: Response): Promise<void> {
         const id = parseInt(req.params.id as string, 10);
         if (isNaN(id)) { res.status(400).json({ success: false, message: "Invalid id" }); return; }
-        const ok = await this.gameService.delete(id);
-        res.status(ok ? 200 : 500).json({ success: ok });
+        const result = await this.gameService.delete(id);
+        handleResult(result,res);
     }
 
     public getRouter(): Router { return this.router; }

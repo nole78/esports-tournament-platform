@@ -2,7 +2,6 @@ import axios from "axios";
 import type { IUsersAPIService, ApiResponse } from "./IUsersAPIService";
 import type { UserDto } from "../../models/user/UserTypes";
 import { readItem } from "../../helpers/local_storage";
-import type { UserInfoDto } from "../../models/user/UserInfoDto";
 
 const BASE = import.meta.env.VITE_API_URL + "users";
 
@@ -25,21 +24,8 @@ export const usersApi: IUsersAPIService = {
     return axios.get<ApiResponse<UserDto>>(`${BASE}/${id}`, { headers: authHeader() })
       .then(r => r.data).catch(e => err(e, "Failed to load user"));
   },
-  async deactivate(id) {
-    return axios.patch<ApiResponse<void>>(`${BASE}/${id}/deactivate`, {}, { headers: authHeader() })
+  async changeRole(id, role) {
+    return axios.patch<ApiResponse<void>>(`${BASE}/${id}/role`, role, { headers: authHeader() })
       .then(r => r.data).catch(e => err(e, "Failed to deactivate user"));
-  },
-  async getInfo(){
-    return axios.get<ApiResponse<UserInfoDto>>(`${BASE}/me/info`,{headers: authHeader()})
-      .then(r => r.data).catch(e => err(e, "Failed to recive user info"));
-  },
-  async update(payload){
-    return axios.patch<ApiResponse<void>>(`${BASE}/update`, payload, { headers: authHeader() })
-      .then(r => r.data).catch(e => err(e, "Failed to update account"));
-  },
-  async updatePassword(payload)
-  {
-    return axios.patch<ApiResponse<void>>(`${BASE}/update/password`, payload, { headers: authHeader() })
-      .then(r => r.data).catch(e => err(e, "Failed to update password"));
   }
 };
