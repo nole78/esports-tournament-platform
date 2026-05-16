@@ -5,7 +5,6 @@ import { loadBalancerConfig } from './config/loadBalancerConfig';
 const PORT = loadBalancerConfig.port;
 
 async function start(): Promise<void> {
-
   app.listen(PORT, () => {
     logger.info("Server", `Running on port: ${PORT}`);
   });
