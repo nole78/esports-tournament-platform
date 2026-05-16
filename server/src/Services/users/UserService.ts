@@ -15,19 +15,19 @@ export class UserService implements IUserService {
 
   async getById(id: number): Promise<Result<UserDto>> {
     const u = await this.userRepo.findById(id);
-    if (u.id === 0) return Result.Failiure(`User with id ${id} doesn't exist`,ErrorType.NotFound);
+    if (u.id === 0) return Result.Failure(`User with id ${id} doesn't exist`,ErrorType.NotFound);
     return Result.Success(new UserDto(u.id, u.gamerTag, u.email, u.role, u.profilePicture, u.isActive));
   }
 
   async changeRole(id: number,role:UserRole): Promise<Result<void>> {
     var user = await this.userRepo.findById(id);
-    if(user.id === 0) return Result.Failiure(`User with id ${id} doesn't exist`,ErrorType.NotFound);
+    if(user.id === 0) return Result.Failure(`User with id ${id} doesn't exist`,ErrorType.NotFound);
     
-    if(!user.isActive) return Result.Failiure("Can't change role of a deactivated user",ErrorType.Conflict);
+    if(!user.isActive) return Result.Failure("Can't change role of a deactivated user",ErrorType.Conflict);
     
-    if(user.role == UserRole.ADMIN) return Result.Failiure("Can't change role of an admin",ErrorType.Unauthorized);
+    if(user.role == UserRole.ADMIN) return Result.Failure("Can't change role of an admin",ErrorType.Unauthorized);
 
     var res = await this.userRepo.update(id,{role: role});
-    return res? Result.Success():Result.Failiure("Couldn't deactivate user",ErrorType.Internal);
+    return res? Result.Success():Result.Failure("Couldn't deactivate user",ErrorType.Internal);
   }
 }

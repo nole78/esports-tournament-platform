@@ -34,7 +34,7 @@ export class UserController {
     
     const role = req.body.role as string;
     if (!Object.values(UserRole).includes(role as UserRole)) {
-        handleResult(Result.Failiure("Invalid role",ErrorType.Validation),res);
+        handleResult(Result.Failure("Invalid role",ErrorType.Validation),res);
         return;
     }
     const parsedRole: UserRole = role as UserRole;

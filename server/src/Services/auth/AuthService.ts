@@ -16,7 +16,7 @@ export class AuthService implements IAuthService {
   async login(username: string, password: string): Promise<Result<AuthUserDto>> {
     const user = await this.userRepo.findByUsername(username);
     if (user.id === 0 || user.isActive === 0) {
-      return Result.Failiure("Wrong username or password", ErrorType.Unauthorized);
+      return Result.Failure("Wrong username or password", ErrorType.Unauthorized);
     }
 
     const match = await bcrypt.compare(password, user.passwordHash).catch(() => false);
@@ -30,7 +30,7 @@ export class AuthService implements IAuthService {
         meta: { reason: "wrong_password" },
         //ipAddress: ip // TODO
       });
-      return Result.Failiure("Wrong ussername or password", ErrorType.Unauthorized);
+      return Result.Failure("Wrong ussername or password", ErrorType.Unauthorized);
     }
 
     await this.auditService.log({
@@ -53,7 +53,7 @@ export class AuthService implements IAuthService {
         meta: { username, reason: "username_taken" },
         //ipAddress: ip // TODO
       });
-      return Result.Failiure("Username taken",ErrorType.Conflict);
+      return Result.Failure("Username taken",ErrorType.Conflict);
     }
     const byEmail = await this.userRepo.findByEmail(email);
     if (byEmail.id !== 0) 
@@ -64,15 +64,15 @@ export class AuthService implements IAuthService {
         meta: { email, reason: "email_taken" },
         //ipAddress: ip // TODO
       });
-      return Result.Failiure("Email is already in use",ErrorType.Conflict);
+      return Result.Failure("Email is already in use",ErrorType.Conflict);
     }
     const hash = await bcrypt.hash(password, this.saltRounds).catch(() => "");
-    if (!hash) return Result.Failiure("Couldn't register account",ErrorType.Internal);
+    if (!hash) return Result.Failure("Couldn't register account",ErrorType.Internal);
 
     const userRole = role === UserRole.ADMIN ? UserRole.ADMIN : UserRole.PLAYER;
     
     const created = await this.userRepo.create(new User(0, username, email, fullName, userRole, hash, profilePicture));
-    if (created.id === 0) return Result.Failiure("Couldn't register account",ErrorType.Internal);  
+    if (created.id === 0) return Result.Failure("Couldn't register account",ErrorType.Internal);  
     
     await this.auditService.log({
       userId: created.id,

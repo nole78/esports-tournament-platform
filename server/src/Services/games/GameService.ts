@@ -23,34 +23,34 @@ export class GameService implements IGameService {
     async getById(id: number) : Promise<Result<GameDto>>{
         const item = await this.gameRepo.findById(id);
         if(item.gameId === 0)
-            return Result.Failiure(`Game with id ${id} doesn't exist`, ErrorType.NotFound);
+            return Result.Failure(`Game with id ${id} doesn't exist`, ErrorType.NotFound);
         return Result.Success(this.toGameDto(item));
     }
     async create(dto: CreateGameDto) : Promise<Result<GameDto>>{
         const game = await this.gameRepo.findByName(dto.gameName);
         if(game.gameId !== 0)
-            return Result.Failiure("Game with same name already exists", ErrorType.Conflict);
+            return Result.Failure("Game with same name already exists", ErrorType.Conflict);
 
         const created = await this.gameRepo.create(dto);
         if(created.gameId === 0) 
-            return Result.Failiure("Couldn't create game", ErrorType.Internal);
+            return Result.Failure("Couldn't create game", ErrorType.Internal);
 
         return Result.Success(this.toGameDto(created));
     }
     async update(id: number, fields: Partial<GameDto>) : Promise<Result<void>>{
         const game = await this.gameRepo.findById(id);
         if(game.gameId === 0)
-            return Result.Failiure(`Game with id ${id} doesn't exist`, ErrorType.NotFound);
+            return Result.Failure(`Game with id ${id} doesn't exist`, ErrorType.NotFound);
 
         const res = await this.gameRepo.update(id, fields);
-        return res? Result.Success(): Result.Failiure("Couldn't update game", ErrorType.Internal);
+        return res? Result.Success(): Result.Failure("Couldn't update game", ErrorType.Internal);
     }
     async delete(id: number) : Promise<Result<void>>{
         const game = await this.gameRepo.findById(id);
         if(game.gameId === 0)
-            return Result.Failiure(`Game with id ${id} doesn't exist`, ErrorType.NotFound);
+            return Result.Failure(`Game with id ${id} doesn't exist`, ErrorType.NotFound);
 
         const res = await this.gameRepo.delete(id);
-        return res? Result.Success(): Result.Failiure("Couldn't delete game", ErrorType.Internal);
+        return res? Result.Success(): Result.Failure("Couldn't delete game", ErrorType.Internal);
     }
 }

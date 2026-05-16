@@ -20,7 +20,7 @@ export class Result<T = void>{
         return new Result<T | void>(true,value ?? null,null,null)
     }
 
-    public static Failiure<T>(errorMessage: string, errorType: ErrorType) : Result<T>{
+    public static Failure<T>(errorMessage: string, errorType: ErrorType) : Result<T>{
         return new Result<T>(false,null,errorMessage,errorType);
     }
 }
