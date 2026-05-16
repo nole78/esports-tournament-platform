@@ -1,1 +1,1 @@
-export type NodeStatus = "healthy" | "degraded" | "offline";
+export type NodeStatus = "healthy" | "degraded" | "unreachable";

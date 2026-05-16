@@ -1,4 +1,5 @@
 export enum ApiStatus {
-  ONLINE  = "online",
-  OFFLINE  = "offline",
+  HEALTHY  = "healthy",
+  DEGRADED = "degraded",
+  UNREACHABLE  = "unreachable",
 }

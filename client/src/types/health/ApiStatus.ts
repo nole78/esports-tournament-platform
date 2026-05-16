@@ -1,1 +1,1 @@
-export type ApiStatus = "online" | "offline";
+export type ApiStatus = "healthy" | "degraded" | "unreachable";

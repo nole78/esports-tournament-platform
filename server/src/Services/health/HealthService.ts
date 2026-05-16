@@ -10,7 +10,7 @@ import { ApiHealthDto } from "../../Domain/DTOs/health/ApiHealthDto";
 import { NodeStatusDto } from "../../Domain/DTOs/health/NodeStatusDto";
 import { ApiStatusDto } from "../../Domain/DTOs/health/ApiStatusDto";
 import { ApiStatus } from "../../Domain/enums/ApiStatus";
-import { HEALTH_CHECK_INTERVAL_MS } from "../../Domain/constants/Constants";
+import { HEALTH_CHECK_INTERVAL_MS, HEALTH_CHECK_TIMEOUT } from "../../Domain/constants/Constants";
 
 //Add other repos
 
@@ -55,7 +55,7 @@ export class HealthService implements IHealthService {
         return new ApiStatusDto(
           node.name,
           node.url,
-          latency < HEALTH_CHECK_INTERVAL_MS ? ApiStatus.ONLINE : ApiStatus.OFFLINE,
+          latency < HEALTH_CHECK_TIMEOUT ? ApiStatus.HEALTHY : ApiStatus.DEGRADED,
           new Date(),
           latency
         );
@@ -63,7 +63,7 @@ export class HealthService implements IHealthService {
         return new ApiStatusDto(
           node.name,
           node.url,
-          ApiStatus.OFFLINE,
+          ApiStatus.UNREACHABLE,
           new Date(),
           -1
         );
