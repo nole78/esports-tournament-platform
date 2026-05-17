@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { createProxyMiddleware } from 'http-proxy-middleware';
-import { ServerPoolService } from '../services/ServerPoolService';
+import { ServerPoolService } from '../services/serverPoolService';
 
 
 const proxyCache = new Map();
@@ -31,7 +31,6 @@ export function proxyMiddleware(
                         'unknown';
 
         const server = serverPool.getNextServer(clientIp);
-        console.log(`server: ${server?.id}, client ip: ${clientIp}`);
         if (!server) {
             return res.status(503).json({
                 message: 'No available servers'

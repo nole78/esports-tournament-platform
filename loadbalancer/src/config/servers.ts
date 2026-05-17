@@ -1,5 +1,5 @@
-import { ServerStatus } from '../domain/enums/ServerStatus';
-import { ServerInstance } from '../domain/models/ServerInstance';
+import { ServerStatus } from '../Domain/enums/ServerStatus';
+import { ServerInstance } from '../Domain/models/ServerInstance';
 
 export const servers: ServerInstance[] = [
     {
