@@ -29,12 +29,10 @@ export class HealthCheckService {
                 server.alive = alive;
 
                 if (!alive) {
-                    this.logger.warn(
-                        "LB",
-                        `Server ${server.id} failed health check`
-                    );
+                    this.logger.warn("LB",`Server ${server.id} failed health check`);
                 }
             }
+            this.logger.info("LB",servers.map((s) => `${s.id}=${s.alive?"healthy":"unreachable"}`).join(" | "));
         } finally {
             this.running = false;
         }
