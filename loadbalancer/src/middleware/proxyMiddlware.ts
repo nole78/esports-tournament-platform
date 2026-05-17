@@ -24,8 +24,14 @@ export function proxyMiddleware(
 ) {
     return (req: Request, res: Response, next: NextFunction) => {
 
-        const server = serverPool.getNextServer();
+        // Extract client IP from request (handles proxies and direct connections)
+        const clientIp = req.ip || 
+                        req.headers['x-forwarded-for']?.toString().split(',')[0].trim() ||
+                        req.socket.remoteAddress ||
+                        'unknown';
 
+        const server = serverPool.getNextServer(clientIp);
+        console.log(`server: ${server?.id}, client ip: ${clientIp}`);
         if (!server) {
             return res.status(503).json({
                 message: 'No available servers'

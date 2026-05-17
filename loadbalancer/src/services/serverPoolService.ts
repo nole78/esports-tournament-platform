@@ -10,7 +10,7 @@ export class ServerPoolService {
         return servers.filter(server => server.status !== ServerStatus.UNREACHABLE);
     }
 
-    public getNextServer(): ServerInstance | null {
+    public getNextServer(clientIp?: string): ServerInstance | null {
 
         const availableServers = this.getAvailableServers();
 
@@ -18,7 +18,7 @@ export class ServerPoolService {
             return null;
         }
 
-        return this.strategy.getNextServer(availableServers);
+        return this.strategy.getNextServer(availableServers, clientIp);
     }
 
     public incrementConnections(serverId: string): void {
