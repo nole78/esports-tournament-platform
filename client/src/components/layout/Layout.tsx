@@ -23,6 +23,7 @@ const adminNav = [
   { to: "/admin/audit_log", label: "Audit Log"},
   { to: "/teams", label: "Teams List"},
   { to: "/tournament_list", label: "Tournaments"},
+  { to: "/admin/health", label: "Health"},
   // add more admin routes here
 ];
 

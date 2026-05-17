@@ -23,6 +23,7 @@ import TournamentRegistrationPage from "./pages/common_pages/TournamentRegistrat
 
 import { Layout } from "./components/layout/Layout";
 import UserOverview from "./pages/user/UserOverview";
+import HealthPage from "./pages/admin/HealthPage";
 
 export default function App() {
   return (
@@ -50,6 +51,7 @@ export default function App() {
       <Route path="/admin/audit_log" element={<ProtectedRoute requiredRole="admin"><AuditLogPage/></ProtectedRoute>}/>
       <Route path="/tournament_list" element={<ProtectedRoute requiredRole="admin"><TournamentList/></ProtectedRoute>} />
       <Route path="/admin/tournament_list/add" element={<ProtectedRoute requiredRole="admin"><TournamentAddPage/></ProtectedRoute>} />
+      <Route path="/admin/health" element={<ProtectedRoute requiredRole="admin"><HealthPage/></ProtectedRoute>}/>
       <Route path="/admin/tournament_registration/:id" element={<ProtectedRoute requiredRole="admin"><TournamentRegistrationPage /></ProtectedRoute>}/>
       {/* <Route path="/admin/teams" element ={<ProtectedRoute requiredRole="admin"> <TeamsPage/></ProtectedRoute>} /> */}
 
