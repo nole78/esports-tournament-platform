@@ -19,6 +19,11 @@ export class HealthCheckService {
         }, loadBalancerConfig.healthCheckInterval);
     }
 
+    public async runHealthCheck(): Promise<ServerInstance[]> {
+        await this.run();
+        return servers;
+    }
+
     private async run(): Promise<void> {
         if (this.running) return;
         this.running = true;
