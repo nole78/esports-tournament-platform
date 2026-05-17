@@ -1,6 +1,6 @@
 import { ServerStatus } from "../enums/ServerStatus";
 
-export class ServerStatusDto {
+export class ApiStatusDto {
     constructor(
     public name: string = "",
     public url: string = "",

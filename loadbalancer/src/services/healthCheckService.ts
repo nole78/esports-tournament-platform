@@ -3,7 +3,7 @@ import { servers } from "../config/servers";
 import { ServerInstance } from "../domain/models/ServerInstance";
 import { ILoggerService } from "../domain/interfaces/ILoggerService";
 import { ServerStatus } from "../domain/enums/ServerStatus";
-import { ServerStatusDto } from "../domain/DTOs/ServerStatusDto";
+import { ApiStatusDto } from "../domain/DTOs/ApiStatusDto";
 
 export class HealthCheckService {
 
@@ -20,8 +20,8 @@ export class HealthCheckService {
         }, loadBalancerConfig.healthCheckInterval);
     }
 
-    public async getHealthCheck(): Promise<ServerStatusDto[]> {
-        return servers.map((server) => (new ServerStatusDto(server.id, server.url, server.status, server.lastCheck, server.latency)));
+    public async getApiHealth(): Promise<ApiStatusDto[]> {
+        return servers.map((server) => (new ApiStatusDto(server.id, server.url, server.status, server.lastCheck, server.latency)));
     }
 
     private async run(): Promise<void> {
