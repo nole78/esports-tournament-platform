@@ -1,12 +1,12 @@
 import express from 'express';
 import { ConsoleLoggerService } from './utils/ConsoleLoggerService';
 import { proxyMiddleware } from './middleware/proxyMiddlware';
+import { HealthCheckService } from './services/healthCheckService';
 
 const app = express();
 
 export const logger = new ConsoleLoggerService();
-
-app.use(express.json({limit: "10mb"}));
+export const healthCheck = new HealthCheckService(logger);
 
 app.use(proxyMiddleware)
 
