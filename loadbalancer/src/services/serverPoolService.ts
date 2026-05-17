@@ -6,10 +6,52 @@ import { roundRobin } from '../algorithms/roundRobin';
 import { LoadBalancingAlgorithm } from '../types/LoadBalancingAlgorithm';
 import { leastConnections } from '../algorithms/leastConnections';
 import { loadBalancerConfig } from '../config/loadBalancerConfig';
+import { ILoggerService } from '../utils/ILoggerService';
 
 const algorithm = loadBalancerConfig.algorithm;
 
-class ServerPoolService {
+export class ServerPoolService {
+    private healthCheckRunning = false;
+    public constructor(private readonly logger: ILoggerService){}
+
+    public async init() {
+        await this.runHealthCheck();
+        setInterval(() => {
+            void this.runHealthCheck();
+        }, loadBalancerConfig.healthCheckInterval);
+    }
+
+    private async runHealthCheck() : Promise<void>{
+        if(this.healthCheckRunning) return;
+
+        this.healthCheckRunning = true;
+        try
+        {
+            for (const server of servers) {
+                const alive = await this.checkServer(server);
+                server.alive = alive;
+                if(!alive)
+                    this.logger.warn("LB", `Server ${server.id} failed health check`);
+            }
+            this.logger.info("LB",servers.map((s) => `${s.id}=${s.alive?"healthy":"unreachable"}`).join(" | "));
+        }
+        finally{
+            this.healthCheckRunning = false;
+        }
+    }
+
+    private async checkServer(server: ServerInstance): Promise<boolean> {
+        try {
+            const res = await fetch(`${server.url}/api/v1/health`, {
+                method: "GET",
+                signal: AbortSignal.timeout(loadBalancerConfig.healthCheckTimeout)
+            });
+
+            return res.ok;
+        } catch {
+            return false;
+        }
+    }
 
     public getAvailableServers(): ServerInstance[] {
         return servers.filter(server => server.alive);
@@ -52,34 +94,6 @@ class ServerPoolService {
             return;
         }
 
-        server.currentConnections--;
-    }
-
-    public markServerAsDead(serverId: string): void {
-
-        const server = servers.find(s => s.id === serverId);
-
-        if (!server) {
-            return;
-        }
-
-        server.alive = false;
-    }
-
-    public markServerAsAlive(serverId: string): void {
-
-        const server = servers.find(s => s.id === serverId);
-
-        if (!server) {
-            return;
-        }
-
-        server.alive = true;
-    }
-
-    public getServers(): ServerInstance[] {
-        return servers;
+        server.currentConnections = Math.max(0, server.currentConnections - 1);
     }
 }
-
-export const serverPoolService = new ServerPoolService();
