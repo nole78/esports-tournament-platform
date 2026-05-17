@@ -1,4 +1,4 @@
-import { ILoggerService } from "./ILoggerService";
+import { ILoggerService } from "../Domain/interfaces/ILoggerService";
 
 const RESET  = "\x1b[0m";
 const GRAY   = "\x1b[90m";

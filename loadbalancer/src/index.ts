@@ -1,11 +1,11 @@
 import 'dotenv/config';
-import app, {logger,  serverPool} from "./app"
+import app, {logger,  healthCheck} from "./app"
 import { loadBalancerConfig } from './config/loadBalancerConfig';
 
 const PORT = loadBalancerConfig.port;
 
 async function start(): Promise<void> {
-  await serverPool.init();
+  await healthCheck.init();
 
   app.listen(PORT, () => {
     logger.info("LB", `Running on port: ${PORT}`);
