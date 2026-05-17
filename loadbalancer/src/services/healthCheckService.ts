@@ -1,9 +1,9 @@
 import { loadBalancerConfig } from "../config/loadBalancerConfig";
 import { servers } from "../config/servers";
-import { ServerInstance } from "../domain/models/ServerInstance";
-import { ILoggerService } from "../domain/interfaces/ILoggerService";
-import { ServerStatus } from "../domain/enums/ServerStatus";
-import { ApiStatusDto } from "../domain/DTOs/ApiStatusDto";
+import { ServerInstance } from "../Domain/models/ServerInstance";
+import { ILoggerService } from "../Domain/interfaces/ILoggerService";
+import { ServerStatus } from "../Domain/enums/ServerStatus";
+import { ApiStatusDto } from "../Domain/DTOs/ApiStatusDto";
 
 export class HealthCheckService {
 

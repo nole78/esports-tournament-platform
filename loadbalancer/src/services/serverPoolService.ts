@@ -1,7 +1,7 @@
 import { servers } from '../config/servers';
-import { ServerInstance } from '../domain/models/ServerInstance';
-import { ILoadBalancingStrategy } from '../domain/interfaces/ILoadbalancingStrategy';
-import { ServerStatus } from '../domain/enums/ServerStatus';
+import { ServerInstance } from '../Domain/models/ServerInstance';
+import { ILoadBalancingStrategy } from '../Domain/interfaces/ILoadbalancingStrategy';
+import { ServerStatus } from '../Domain/enums/ServerStatus';
 
 export class ServerPoolService {
     public constructor( private readonly strategy: ILoadBalancingStrategy){}

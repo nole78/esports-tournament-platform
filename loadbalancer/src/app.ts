@@ -1,9 +1,9 @@
 import express from 'express';
 import { ConsoleLoggerService } from './services/ConsoleLoggerService';
 import { proxyMiddleware } from './middleware/proxyMiddlware';
-import { ServerPoolService } from './services/ServerPoolService';
+import { ServerPoolService } from './services/serverPoolService';
 import { createStrategy } from './factories/createStrategy';
-import { HealthCheckService } from './services/HealthCheckService';
+import { HealthCheckService } from './services/healthCheckService';
 import { createHealthRouter } from './routes/healthRoutes';
 import cors from 'cors';
 

@@ -1,4 +1,4 @@
-import { LoadBalancingAlgorithm } from '../domain/enums/LoadBalancingAlgorithm';
+import { LoadBalancingAlgorithm } from '../Domain/enums/LoadBalancingAlgorithm';
 
 const algorithm = Object.values(LoadBalancingAlgorithm)
     .includes(process.env.LB_ALGORITHM as LoadBalancingAlgorithm)
