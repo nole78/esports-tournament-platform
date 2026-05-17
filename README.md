@@ -47,6 +47,18 @@ project/
 │       ├── pages/           # Page components (admin/, user/, auth/, not_found/)
 │       └── types/           # TypeScript type definitions
 │
+├── loadbalancer/            # Node.js load balancer service
+│   └── src/
+│       ├── algorithms/      # Load balancing strategy implementations
+│       ├── config/          # Load balancer configuration and server definitions
+│       ├── domain/          # Core domain abstractions and shared types
+│       │   ├── enums/       # Domain enums (LoadBalancingAlgorithm)
+│       │   ├── interfaces/  # Contracts/interfaces (ILoggerService, ILoadBalancingStrategy)
+│       │   └── models/      # Domain models (ServerInstance)
+│       ├── factories/       # Factory functions for dependency creation/composition
+│       ├── middleware/      # Express proxy middleware
+│       └── services/        # Core services (health checks, server pool, logging)
+│
 ├── server/                  # Express backend
 │   └── src/
 │       ├── Database/
