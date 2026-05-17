@@ -1,19 +1,25 @@
 import { Router } from 'express';
-import { HealthCheckService } from '../services/HealthCheckService';
+import { HealthCheckService } from '../services/healthCheckService';
+import { authenticate, authorize, UserRole } from '../middleware/authMiddleware';
 
 export function createHealthRouter(healthCheck: HealthCheckService) {
     const router = Router();
 
-    router.get('/api/v1/health/api', async (req, res) => {
-        try {
-            const servers = await healthCheck.getApiHealth();
-            return res.status(200).json({ success:true, data:servers });
-        } catch (error) {
-            return res.status(500).json({
-                message: 'Health check failed',
-            });
+    router.get(
+        '/api/v1/health/api',
+        authenticate,
+        authorize(UserRole.ADMIN),
+        async (req, res) => {
+            try {
+                const servers = await healthCheck.getApiHealth();
+                return res.status(200).json({ success: true, data: servers });
+            } catch (error) {
+                return res.status(500).json({
+                    message: 'Health check failed',
+                });
+            }
         }
-    });
+    );
 
     return router;
 }
