@@ -6,6 +6,7 @@ export class WeightedRoundRobinStrategy implements ILoadBalancingStrategy{
     private timesHit = 0;
     public getNextServer(servers: ServerInstance[]) {
         const n = servers.length;
+        if(n === 0) return null;
 
         const server = servers[this.currentIdx];
         this.timesHit++;
