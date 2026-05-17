@@ -35,7 +35,6 @@ export class AuditRepository implements IAuditRepository {
     if (!res) return [];
     const offset = Math.max(0, Math.floor((page - 1) * limit));
     const lim    = Math.max(1, Math.floor(limit));
-    console.log(`LIM: ${lim}, OFFSET: ${offset}`)
     try {
         const [rows] = await res.conn.query<RowDataPacket[]>(
             `SELECT * FROM audit_log
