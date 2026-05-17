@@ -3,6 +3,10 @@ import { ILoadBalancingStrategy } from '../domain/interfaces/ILoadbalancingStrat
 
 export class  LeastConnectionsStrategy implements ILoadBalancingStrategy{
     public getNextServer(servers: ServerInstance[]): ServerInstance {
-        return servers[0];
+        return servers.reduce((least,current) => {
+            return (current.currentConnections < least.currentConnections) 
+                ? current
+                : least;
+        })
     }
 }
