@@ -3,6 +3,8 @@ import { IHealthService } from "../../Domain/services/health/IHealthService";
 import { authenticate } from "../../Middlewares/authentification/AuthMiddleware";
 import { authorize } from "../../Middlewares/authorization/AuthorizeMiddleware";
 import { UserRole } from "../../Domain/enums/UserRole";
+import { handleResult } from "../mappers/ResultMapper";
+import { Result } from "../../Domain/common/Result";
 
 export class HealthController {
   private readonly router = Router();
@@ -14,21 +16,26 @@ export class HealthController {
     this.router.get("/health/api/check", authenticate, authorize(UserRole.ADMIN), this.runApiCheck.bind(this));
   }
   private ping(_req: Request, res: Response): void {
-    res.status(200).json({ success: true, message: "Server is running", data: new Date() });
+    const result = Result.Success(new Date());
+    handleResult(result, res);
   }
   private dbStatus(_req: Request, res: Response): void {
-    res.status(200).json({ success: true, data: this.healthService.getDbStatus() });
+    const result = this.healthService.getDbStatus();
+    handleResult(result, res);
   }
   private async runCheck(_req: Request, res: Response): Promise<void> {
     await this.healthService.runHealthCheck();
-    res.status(200).json({ success: true, message: "Health check completed", data: this.healthService.getDbStatus() });
+    const result = this.healthService.getDbStatus();
+    handleResult(result, res);
   }
   private apiStatus(_req: Request, res: Response): void {
-    res.status(200).json({ success: true, data: this.healthService.getApiStatus() });
+    const result = this.healthService.getApiStatus();
+    handleResult(result, res);
   }
   private async runApiCheck(_req: Request, res: Response): Promise<void> {
     await this.healthService.runApiCheck();
-    res.status(200).json({ success: true, message: "API check completed", data: this.healthService.getApiStatus() });
+    const result = this.healthService.getApiStatus();
+    handleResult(result, res);
   }
   public getRouter(): Router { return this.router; }
 }
