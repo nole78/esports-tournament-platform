@@ -9,6 +9,7 @@ export const servers: ServerInstance[] = [
 
         status: ServerStatus.UNREACHABLE,
         latency: 0,
+        lastCheck: new Date(),
 
         currentConnections: 0
     },
@@ -20,6 +21,7 @@ export const servers: ServerInstance[] = [
 
         status: ServerStatus.UNREACHABLE,
         latency: 0,
+        lastCheck: new Date(),
 
         currentConnections: 0
     },
@@ -31,6 +33,7 @@ export const servers: ServerInstance[] = [
 
         status: ServerStatus.UNREACHABLE,
         latency: 0,
+        lastCheck: new Date(),
 
         currentConnections: 0
     }
