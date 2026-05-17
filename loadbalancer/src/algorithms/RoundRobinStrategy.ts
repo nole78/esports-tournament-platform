@@ -12,5 +12,5 @@ export class RoundRobinStrategy implements ILoadBalancingStrategy{
         this.currentIdx = (this.currentIdx + 1) % n;
         
         return server;
-}
+    }
 }
