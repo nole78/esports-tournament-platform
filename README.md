@@ -181,13 +181,13 @@ Useful for uneven workloads and long-running requests.
 
 ---
 
-#### IP Hash (planned)
+#### IP Hash
 
 Routes clients based on their IP address to improve session consistency.
 
 ---
 
-#### Weighted Round Robin (planned)
+#### Weighted Round Robin
 
 Allows stronger servers to receive a larger percentage of traffic.
 
@@ -265,15 +265,8 @@ Example `.env`:
 ```env
 LB_PORT=8080
 LB_ALGORITHM=ROUND_ROBIN
-HEALTH_CHECK_INTERVAL=5000
-HEALTH_CHECK_TIMEOUT=2000
+HEALTH_CHECK_INTERVAL=10000
+HEALTH_CHECK_TIMEOUT=3000
 ```
 
 ---
-
-### Future Improvements
-
-* Sticky sessions
-* WebSocket balancing
-* Prometheus/Grafana metrics
-* Admin monitorin
