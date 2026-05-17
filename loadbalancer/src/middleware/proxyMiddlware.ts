@@ -22,7 +22,6 @@ function getProxy(target: string) {
 export const proxyMiddleware = (req: Request, res: Response, next: NextFunction) => {
 
     const server = serverPoolService.getNextServer();
-    console.log(`Server na URL: ${server?.url}`);
 
     if (!server) {
         return res.status(503).json({
