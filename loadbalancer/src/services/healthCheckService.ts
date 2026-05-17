@@ -2,6 +2,7 @@ import { loadBalancerConfig } from "../config/loadBalancerConfig";
 import { servers } from "../config/servers";
 import { ServerInstance } from "../domain/models/ServerInstance";
 import { ILoggerService } from "../domain/interfaces/ILoggerService";
+import { ServerStatus } from "../domain/enums/ServerStatus";
 
 export class HealthCheckService {
 
@@ -19,26 +20,39 @@ export class HealthCheckService {
     }
 
     private async run(): Promise<void> {
-        if (this.running) {
-            return;
-        }
+        if (this.running) return;
         this.running = true;
         try {
-            for (const server of servers) {
-                const alive = await this.checkServer(server);
-                server.alive = alive;
+            const results = await Promise.all(
+                servers.map(async (server) => {
+                    const result = await this.checkServer(server);
+                    return { server, result };
+                    }
+                )
+            );
 
-                if (!alive) {
-                    this.logger.warn("LB",`Server ${server.id} failed health check`);
+            for (const { server, result } of results) {
+                server.latency = result.latency;
+
+                if (!result.alive) {
+                    server.status = ServerStatus.UNREACHABLE;
+                    this.logger.warn("LB", `Server ${server.id} failed health check`);
+                    continue;
                 }
+
+                if (server.latency > loadBalancerConfig.healthCheckThreshold)
+                    server.status = ServerStatus.DEGRADED;
+                else
+                    server.status = ServerStatus.HEALTHY;
             }
-            this.logger.info("LB",servers.map((s) => `${s.id}=${s.alive?"healthy":"unreachable"}`).join(" | "));
+            this.logger.info("LB",servers.map((s) => `${s.id}=${s.status}`).join(" | "));
         } finally {
             this.running = false;
         }
     }
 
-    private async checkServer(server: ServerInstance): Promise<boolean> {
+    private async checkServer(server: ServerInstance): Promise<{ alive: boolean; latency: number }> {
+        const start = performance.now();
         try {
             const res = await fetch(
                 `${server.url}/api/v1/health`,
@@ -47,9 +61,10 @@ export class HealthCheckService {
                     signal: AbortSignal.timeout(loadBalancerConfig.healthCheckTimeout)
                 }
             );
-            return res.ok;
-        } catch {
-            return false;
+            return {alive:res.ok, latency: performance.now() - start};
+        } catch(err) {
+            this.logger.warn("LB", `Health check failed for ${server.id}: ${err}`);
+            return {alive:false, latency: performance.now() - start};
         }
     }
 }

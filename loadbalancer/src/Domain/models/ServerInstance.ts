@@ -1,10 +1,13 @@
+import { ServerStatus } from "../enums/ServerStatus";
+
 export interface ServerInstance {
     id: string;
     url: string;
 
     weight: number;
 
-    alive: boolean;
+    status: ServerStatus;
+    latency: number,
 
     currentConnections: number;
 }

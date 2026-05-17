@@ -1,4 +1,8 @@
+import { ServerStatus } from '../domain/enums/ServerStatus';
 import { ServerInstance } from '../domain/models/ServerInstance';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 export const servers: ServerInstance[] = [
     {
@@ -6,7 +10,8 @@ export const servers: ServerInstance[] = [
         url: process.env.SERVER_1 ?? "http://localhost:4000",
         weight: parseInt(process.env.SERVER_1_WEIGHT ?? "1", 10),
 
-        alive: true,
+        status: ServerStatus.UNREACHABLE,
+        latency: 0,
 
         currentConnections: 0
     },
@@ -16,7 +21,8 @@ export const servers: ServerInstance[] = [
         url: process.env.SERVER_2 ?? "http://localhost:4001",
         weight: parseInt(process.env.SERVER_2_WEIGHT ?? "2", 10),
 
-        alive: true,
+        status: ServerStatus.UNREACHABLE,
+        latency: 0,
 
         currentConnections: 0
     },
@@ -26,7 +32,8 @@ export const servers: ServerInstance[] = [
         url: process.env.SERVER_3 ?? "http://localhost:4002",
         weight: parseInt(process.env.SERVER_3_WEIGHT ?? "1", 10),
 
-        alive: true,
+        status: ServerStatus.UNREACHABLE,
+        latency: 0,
 
         currentConnections: 0
     }

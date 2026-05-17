@@ -1,12 +1,13 @@
 import { servers } from '../config/servers';
 import { ServerInstance } from '../domain/models/ServerInstance';
 import { ILoadBalancingStrategy } from '../domain/interfaces/ILoadbalancingStrategy';
+import { ServerStatus } from '../domain/enums/ServerStatus';
 
 export class ServerPoolService {
     public constructor( private readonly strategy: ILoadBalancingStrategy){}
 
     public getAvailableServers(): ServerInstance[] {
-        return servers.filter(server => server.alive);
+        return servers.filter(server => server.status !== ServerStatus.UNREACHABLE);
     }
 
     public getNextServer(): ServerInstance | null {
