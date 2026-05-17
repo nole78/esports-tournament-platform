@@ -1,0 +1,109 @@
+import { IHealthService } from "../../Domain/services/health/IHealthService";
+import { IGameRepository } from "../../Domain/repositories/games/IGameRepository";
+import { ITournamentRepository } from "../../Domain/repositories/tournaments/ITournamentRepository";
+import { IUserRepository } from "../../Domain/repositories/users/IUserRepository";
+import { ITeamRepository } from "../../Domain/repositories/teams/ITeamRepository";
+import { StatisticsDto } from "../../Domain/DTOs/statistics/StatisticsDto";
+import { DbManager } from "../../Database/connection/DbConnectionPool";
+import { logger } from '../../app';
+import { HealthStatusDto } from "../../Domain/DTOs/health/HealthStatusDto";
+import { ApiHealthDto } from "../../Domain/DTOs/health/ApiHealthDto";
+import { NodeStatusDto } from "../../Domain/DTOs/health/NodeStatusDto";
+import { ApiStatusDto } from "../../Domain/DTOs/health/ApiStatusDto";
+import { ApiStatus } from "../../Domain/enums/ApiStatus";
+import { HEALTH_CHECK_TIMEOUT } from "../../Domain/constants/Constants";
+import { Result } from "../../Domain/common/Result";
+
+//Add other repos
+
+export class HealthService implements IHealthService {
+  public constructor(
+    private readonly gameRepo: IGameRepository,
+    private readonly tournamentRepo: ITournamentRepository,
+    private readonly userRepo: IUserRepository,
+    private readonly teamRepo: ITeamRepository,
+    private readonly db: DbManager
+  ) {}
+
+  private apiNodes: ApiStatusDto[] = [];
+
+  getDbStatus(): Result<HealthStatusDto> {
+    const start = Date.now();
+    const nodes = this.db.getNodes().map((n) =>
+        new NodeStatusDto(n.name, n.host, n.port, n.status, n.lastCheck, n.successfulWrites, n.failedWrites, n.latency)
+    );
+    return Result.Success(new HealthStatusDto(nodes, this.db.getSlaveRrIndex()));
+  }
+
+  async runHealthCheck(): Promise<Result<void>> {
+    await this.db.runHealthCheck();
+    return Result.Success();
+  }
+
+  async runApiCheck(): Promise<Result<void>> {
+  const nodes = [
+    { name: "games-api", url: "http://localhost:4000/api/v1/games" },
+    { name: "teams-api", url: "http://localhost:4000/api/v1/teams" },
+    { name: "tournaments-api", url: "http://localhost:4000/api/v1/tournaments" },
+    { name: "audit_log-api", url: "http://localhost:4000/api/v1/audit_log" },
+    { name: "users-api", url: "http://localhost:4000/api/v1/users" },
+  ];
+
+  const results = await Promise.all(
+    nodes.map(async (node) => {
+      const start = Date.now();
+
+      try {
+        const res = await fetch(node.url);
+        const latency = Date.now() - start;
+        if(res.status < 404)
+        {
+          return new ApiStatusDto(
+          node.name,
+          node.url,
+          latency < HEALTH_CHECK_TIMEOUT ? ApiStatus.HEALTHY : ApiStatus.DEGRADED,
+          new Date(),
+          latency
+        );
+        }
+        else
+        {
+            return new ApiStatusDto(
+            node.name,
+            node.url,
+            ApiStatus.UNREACHABLE,
+            new Date(),
+            -1
+          );
+        }
+      } catch {
+        return new ApiStatusDto(
+          node.name,
+          node.url,
+          ApiStatus.UNREACHABLE,
+          new Date(),
+          -1
+        );
+      }
+    })
+  );
+
+  this.apiNodes = results;
+  return Result.Success();
+}
+
+  getApiStatus(): Result<ApiHealthDto> {
+    return Result.Success(new ApiHealthDto(this.apiNodes ?? []));
+  }
+  // Change later when other repos are implemented
+  async getStatistics(): Promise<Result<StatisticsDto>> {
+    const games = await this.gameRepo.getTotal();
+    const tournaments = await this.tournamentRepo.findAll(); //Change later for getTotal
+    const users = await this.userRepo.findAll();
+    const teams = await this.teamRepo.findAll();
+    const matches = 0;
+    return Result.Success(new StatisticsDto(
+      users.length, games, tournaments.length , teams.length, matches
+    ));
+  }
+}
