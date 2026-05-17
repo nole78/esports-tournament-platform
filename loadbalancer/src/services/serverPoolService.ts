@@ -1,18 +1,13 @@
 import { servers } from '../config/servers';
-
 import { ServerInstance } from '../types/ServerInstance';
-
-import { roundRobin } from '../algorithms/roundRobin';
-import { LoadBalancingAlgorithm } from '../types/LoadBalancingAlgorithm';
-import { leastConnections } from '../algorithms/leastConnections';
 import { loadBalancerConfig } from '../config/loadBalancerConfig';
 import { ILoggerService } from '../utils/ILoggerService';
-
-const algorithm = loadBalancerConfig.algorithm;
+import { ILoadBalancingStrategy } from '../algorithms/ILoadbalancingStrategy';
 
 export class ServerPoolService {
     private healthCheckRunning = false;
-    public constructor(private readonly logger: ILoggerService){}
+    public constructor( private readonly logger: ILoggerService, 
+                        private readonly strategy: ILoadBalancingStrategy){}
 
     public async init() {
         await this.runHealthCheck();
@@ -65,14 +60,7 @@ export class ServerPoolService {
             return null;
         }
 
-        switch (algorithm) {
-            case LoadBalancingAlgorithm.ROUND_ROBIN:
-                return roundRobin(availableServers);
-            case LoadBalancingAlgorithm.LEAST_CONNECTIONS:
-                return leastConnections(availableServers);
-            default:
-                return roundRobin(availableServers);
-        }
+        return this.strategy.getNextServer(servers);
     }
 
     public incrementConnections(serverId: string): void {
