@@ -1,12 +1,12 @@
-import { TournamentRegistrationDto } from "../../DTOs/tournament_registrations/TournamentRegistrationDto";
 import { TournamentRegistration } from "../../models/TournamentRegistration";
-import { CreateTournamentRegistrationDto } from '../../DTOs/tournament_registrations/CreateTournamentRegistrationDto';
 
 export interface ITournamentRegistrationRepository {
-  findByTeamId(teamId: number): Promise<TournamentRegistrationDto[]>;
-  findByTournamentId(tournamentId: number): Promise<TournamentRegistrationDto[]>;
-  findAll(page?: number, limit?: number): Promise<TournamentRegistrationDto[]>;
-  create(dto: CreateTournamentRegistrationDto): Promise<TournamentRegistration>;
+  findTotalByTeamId(teamId: number): Promise<number>;
+  findTotalByTournamentId(tournamentId: number): Promise<number>;
+  findByTeamId(teamId: number, page?:number, limit?:number): Promise<TournamentRegistration[]>;
+  findByTournamentId(tournamentId: number, page?:number, limit?:number): Promise<TournamentRegistration[]>;
+  findAll(page?: number, limit?: number): Promise<TournamentRegistration[]>;
+  create(tr: TournamentRegistration): Promise<TournamentRegistration>;
   update(tournamentId: number, teamId: number, fields: Partial<TournamentRegistration>): Promise<boolean>;
   delete(tournamentId: number, teamId: number): Promise<boolean>;
 }
