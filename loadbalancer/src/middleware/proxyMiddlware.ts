@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { createProxyMiddleware } from 'http-proxy-middleware';
+import { ServerPoolService } from '../services/serverPoolService';
 
-import { serverPoolService } from '../services/serverPoolService';
 
 const proxyCache = new Map();
 
@@ -19,17 +19,27 @@ function getProxy(target: string) {
     return proxyCache.get(target);
 }
 
-export const proxyMiddleware = (req: Request, res: Response, next: NextFunction) => {
+export function proxyMiddleware(
+    serverPool: ServerPoolService
+) {
+    return (req: Request, res: Response, next: NextFunction) => {
 
-    const server = serverPoolService.getNextServer();
+        const server = serverPool.getNextServer();
 
-    if (!server) {
-        return res.status(503).json({
-            message: 'No available servers'
+        if (!server) {
+            return res.status(503).json({
+                message: 'No available servers'
+            });
+        }
+
+        const proxy = getProxy(server.url);
+
+        serverPool.incrementConnections(server.id);
+
+        res.on('finish', () => {
+            serverPool.decrementConnections(server.id);
         });
-    }
 
-    const proxy = getProxy(server.url);
-
-    return proxy(req, res, next);
-};
+        return proxy(req, res, next);
+    };
+}
