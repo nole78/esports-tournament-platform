@@ -25,7 +25,6 @@ export class TournamentRepository implements ITournamentRepository {
       return cnt[0]?.total ?? 0;
     } catch (err) {
       this.logger.error("TournamentRepository", "findTotal failed", err);
-      console.error("findAll error:", err);
       return 0;
     } finally { res.conn.release(); }
   }
@@ -54,7 +53,6 @@ export class TournamentRepository implements ITournamentRepository {
       return cnt[0]?.total ?? 0;
     } catch (err) {
       this.logger.error("TournamentRepository", "findTotalFiltered failed", err);
-      console.error("findAll error:", err);
       return 0;
     } finally { res.conn.release(); }
   }
@@ -64,9 +62,9 @@ export class TournamentRepository implements ITournamentRepository {
     if (!res) return new Tournament();
     try {
       const [rows] = await res.conn.execute<RowDataPacket[]>(
-        `SELECT t.tournament_name, t.tournament_game_id, t.tournament_format, t.tournament_max_teams, t.tournament_application_deadline, t.tournament_prize_fund, t.tournament_status
-         FROM tournaments t 
-         WHERE t.tournament_id = ?`, 
+        `SELECT tournament_id, tournament_name, tournament_game_id, tournament_format, tournament_max_teams, tournament_application_deadline, tournament_prize_fund, tournament_status
+         FROM tournaments
+         WHERE tournament_id = ?`, 
         [id]
       );
       return rows.length > 0 ? this.map(rows[0]) : new Tournament();
@@ -83,14 +81,10 @@ export class TournamentRepository implements ITournamentRepository {
     const lim    = Math.max(1, Math.floor(limit));
     try {
       const [rows] = await res.conn.query<RowDataPacket[]>(
-        `SELECT tournament_name, tournament_game_id, tournament_format, tournament_max_teams, tournament_application_deadline, tournament_prize_fund, tournament_status
+        `SELECT tournament_id, tournament_name, tournament_game_id, tournament_format, tournament_max_teams, tournament_application_deadline, tournament_prize_fund, tournament_status
          FROM tournaments
          ORDER BY tournament_id DESC LIMIT ? OFFSET ?`, 
         [lim, offset]
-      );
-
-      const [cnt] = await res.conn.execute<RowDataPacket[]>(
-        `SELECT COUNT(*) as total FROM tournaments`
       );
 
       const items = rows.map((r) => this.map(r))
@@ -98,7 +92,6 @@ export class TournamentRepository implements ITournamentRepository {
       return items;
     } catch (err) {
       this.logger.error("TournamentRepository", "findAll failed", err);
-      console.error("findAll error:", err);
       return [];
     } finally { res.conn.release(); }
   }
@@ -165,7 +158,6 @@ export class TournamentRepository implements ITournamentRepository {
       return items;
     } catch (err) {
       this.logger.error("TournamentRepository", "findAll failed", err);
-      console.error("findAll error:", err);
       return [];
     } finally { res.conn.release(); }
   }

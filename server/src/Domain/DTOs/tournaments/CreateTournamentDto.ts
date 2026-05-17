@@ -1,5 +1,5 @@
 import { TournamentFormat } from '../../enums/TournamentFormat';
-import {TournamentStatus} from "../../enums/TournamentStatus"
+import { TournamentStatus} from "../../enums/TournamentStatus"
 
 export class CreateTournamentDto{
     constructor(
