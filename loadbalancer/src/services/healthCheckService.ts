@@ -20,13 +20,8 @@ export class HealthCheckService {
         }, loadBalancerConfig.healthCheckInterval);
     }
 
-    public async runHealthCheck(): Promise<ServerStatusDto[]> {
-        await this.run();
-        return servers.map((server) => ({
-                id: server.id,
-                status: server.status,
-                latency: server.latency,
-            }));
+    public async getHealthCheck(): Promise<ServerStatusDto[]> {
+        return servers.map((server) => (new ServerStatusDto(server.id, server.url, server.status, server.lastCheck, server.latency)));
     }
 
     private async run(): Promise<void> {
@@ -43,7 +38,7 @@ export class HealthCheckService {
             let running = 0;
             for (const { server, result } of results) {
                 server.latency = result.latency;
-
+                server.lastCheck = new Date();
                 if (!result.alive) {
                     server.status = ServerStatus.UNREACHABLE;
                     this.logger.warn("API", `${server.id} failed health check`);
