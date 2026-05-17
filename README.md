@@ -134,3 +134,146 @@ cd client
 npm install
 npm run dev
 ```
+
+## Load Balancer
+
+The project includes a dedicated Node.js-based load balancer service built with Express and `http-proxy-middleware`.
+
+Its purpose is to distribute incoming traffic across multiple backend instances while continuously monitoring server availability.
+
+---
+
+### Features
+
+* Reverse proxy support using Express middleware
+* Multiple load balancing strategies
+* Periodic health checks for backend servers
+* Automatic failover for unavailable instances
+* Least Connections support with active connection tracking
+* Configurable through environment variables
+* Strategy Pattern + Dependency Injection architecture
+* Reusable proxy instances through proxy caching
+
+---
+
+### Supported Algorithms
+
+#### Round Robin
+
+Distributes requests sequentially across all healthy servers.
+
+Example:
+
+```text
+Request 1 -> Server A
+Request 2 -> Server B
+Request 3 -> Server C
+Request 4 -> Server A
+```
+
+---
+
+#### Least Connections
+
+Routes requests to the server currently handling the fewest active connections.
+
+Useful for uneven workloads and long-running requests.
+
+---
+
+#### IP Hash (planned)
+
+Routes clients based on their IP address to improve session consistency.
+
+---
+
+#### Weighted Round Robin (planned)
+
+Allows stronger servers to receive a larger percentage of traffic.
+
+---
+
+### Health Checks
+
+The load balancer continuously checks backend server health using a configurable interval.
+
+Each server exposes:
+
+```text
+GET /api/v1/health
+```
+
+If a server becomes unreachable or times out:
+
+* it is marked as unavailable
+* it is automatically removed from request routing
+* warning logs are emitted
+
+Once the server becomes healthy again, it automatically re-enters the pool.
+
+---
+
+### Architecture
+
+The load balancer follows a lightweight layered architecture:
+
+* `algorithms/` contains balancing strategy implementations
+* `services/` contains operational services such as health checks and server pooling
+* `middleware/` contains proxy middleware integration
+* `factories/` is responsible for dependency composition
+* `domain/` contains shared abstractions, models, and enums
+
+The balancing algorithm is injected into `ServerPoolService` through dependency injection using the Strategy Pattern.
+
+This makes it easy to add new balancing algorithms without modifying existing services.
+
+---
+
+### Request Flow
+
+```text
+Client
+   ↓
+Load Balancer
+   ↓
+Proxy Middleware
+   ↓
+ServerPoolService
+   ↓
+Selected Healthy Backend Server
+```
+
+---
+
+### Connection Tracking
+
+For the Least Connections algorithm, the load balancer tracks active requests per server.
+
+Connections are:
+
+* incremented before proxy forwarding
+* decremented on request completion/termination
+
+This ensures accurate balancing decisions during runtime.
+
+---
+
+### Environment Configuration
+
+Example `.env`:
+
+```env
+LB_PORT=8080
+LB_ALGORITHM=ROUND_ROBIN
+HEALTH_CHECK_INTERVAL=5000
+HEALTH_CHECK_TIMEOUT=2000
+```
+
+---
+
+### Future Improvements
+
+* Sticky sessions
+* WebSocket balancing
+* Prometheus/Grafana metrics
+* Admin monitorin
