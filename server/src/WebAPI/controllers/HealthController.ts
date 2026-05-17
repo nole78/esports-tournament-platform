@@ -12,8 +12,6 @@ export class HealthController {
     this.router.get("/health", this.ping.bind(this));
     this.router.get("/health/db", authenticate, authorize(UserRole.ADMIN), this.dbStatus.bind(this));
     this.router.post("/health/db/check", authenticate, authorize(UserRole.ADMIN), this.runCheck.bind(this));
-    this.router.get("/health/api", authenticate, authorize(UserRole.ADMIN), this.apiStatus.bind(this));
-    this.router.get("/health/api/check", authenticate, authorize(UserRole.ADMIN), this.runApiCheck.bind(this));
   }
   private ping(_req: Request, res: Response): void {
     const result = Result.Success(new Date());
@@ -28,14 +26,6 @@ export class HealthController {
     const result = this.healthService.getDbStatus();
     handleResult(result, res);
   }
-  private apiStatus(_req: Request, res: Response): void {
-    const result = this.healthService.getApiStatus();
-    handleResult(result, res);
-  }
-  private async runApiCheck(_req: Request, res: Response): Promise<void> {
-    await this.healthService.runApiCheck();
-    const result = this.healthService.getApiStatus();
-    handleResult(result, res);
-  }
+  
   public getRouter(): Router { return this.router; }
 }
