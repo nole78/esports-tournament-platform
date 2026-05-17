@@ -31,7 +31,6 @@ export function proxyMiddleware(
                         'unknown';
 
         const server = serverPool.getNextServer(clientIp);
-        console.log(`server: ${server?.id}, client ip: ${clientIp}`);
         if (!server) {
             return res.status(503).json({
                 message: 'No available servers'

@@ -1,14 +1,14 @@
 import { Router } from 'express';
 import { HealthCheckService } from '../services/healthCheckService';
-import { authenticate, authorize, UserRole } from '../middleware/authMiddleware';
+import { authenticate } from '../middleware/authMiddleware';
+import { UserRole } from '../Domain/enums/UserRole';
+import { authorize } from '../middleware/authorizeMiddleware';
 
 export function createHealthRouter(healthCheck: HealthCheckService) {
     const router = Router();
 
     router.get(
-        '/api/v1/health/api',
-        authenticate,
-        authorize(UserRole.ADMIN),
+        '/api/v1/health/api', authenticate, authorize(UserRole.ADMIN),
         async (req, res) => {
             try {
                 const servers = await healthCheck.getApiHealth();
