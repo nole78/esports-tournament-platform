@@ -97,7 +97,7 @@ export class HealthService implements IHealthService {
     const matches = 0;
     const teams = 0;
     return new StatisticsDto(
-      users.length, games, tournaments.items.length, teams, matches
+      users.length, games, tournaments.length, teams, matches
     );
   }
 }
