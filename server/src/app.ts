@@ -55,7 +55,7 @@ const tournamentService = new TournamentService(tournamentRepo, gameRepo, logger
 const auditService = new AuditService(auditRepo, userRepo);
 const authService   = new AuthService(userRepo,auditService);
 const teamService = new TeamService(teamRepo, teamMemberRepo, userRepo, logger);
-const healthService = new HealthService(gameRepo, tournamentRepo, userRepo, db);
+const healthService = new HealthService(gameRepo, tournamentRepo, userRepo, teamRepo, db);
 
 // Express
 const app = express();
