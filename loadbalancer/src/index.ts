@@ -1,16 +1,15 @@
 import 'dotenv/config';
-import app, {logger} from "./app"
+import app, {logger,  healthCheck} from "./app"
 import { loadBalancerConfig } from './config/loadBalancerConfig';
-import { startHealthCheck } from './services/healthCheckService';
 
 const PORT = loadBalancerConfig.port;
 
 async function start(): Promise<void> {
+  healthCheck.start();
+
   app.listen(PORT, () => {
     logger.info("LB", `Running on port: ${PORT}`);
   });
-
-  startHealthCheck();
 }
 
 start().catch((err) => logger.error("Load balancer", "Fatal startup error", err));
