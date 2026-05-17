@@ -15,6 +15,11 @@ import TournamentList from "./pages/common_pages/TournamentList";
 import TournamentAddPage from "./pages/admin/TournamentAddPage";
 import AuditLogPage from "./pages/admin/AuditLog";
 import LandingPage from "./pages/common_pages/LandingPage";
+import TeamsPage from "./pages/common_pages/TeamsPage";
+import TeamsAddPage from "./pages/common_pages/TeamsAddPage";
+import TeamsEditPage from "./pages/common_pages/TeamsEditPage";
+//import TeamsAddPage from "./pages/common_pages/TeamsAddPage";
+
 import { Layout } from "./components/layout/Layout";
 import UserOverview from "./pages/user/UserOverview";
 import HealthPage from "./pages/admin/HealthPage";
@@ -28,7 +33,9 @@ export default function App() {
       <Route path="/home" element={<LandingPage/>}/>
       <Route path="/game_catalog" element={<GameCatalog/>} />
       <Route path="/tournament_list" element={<TournamentList />} />
-
+      <Route path="/teams" element = {<TeamsPage/>}/>
+      {<Route path="/teams/add" element = {<TeamsAddPage/>}/>}
+      {<Route path="/teams/edit/:id" element = {<TeamsEditPage/>}/>}
       {/* User routes */}
       <Route path="/dashboard" element={<ProtectedRoute requiredRole="player"><UserDashboard /></ProtectedRoute>} />
       <Route path="/user_info" element={<ProtectedRoute requiredRole="player"><UserOverview/></ProtectedRoute>}/>
@@ -43,6 +50,8 @@ export default function App() {
       <Route path="/admin/tournament_list" element={<ProtectedRoute requiredRole="admin"><TournamentList/></ProtectedRoute>} />
       <Route path="/admin/tournament_list/add" element={<ProtectedRoute requiredRole="admin"><TournamentAddPage/></ProtectedRoute>} />
       <Route path="/admin/health" element={<ProtectedRoute requiredRole="admin"><HealthPage/></ProtectedRoute>}/>
+      {/* <Route path="/admin/teams" element ={<ProtectedRoute requiredRole="admin"> <TeamsPage/></ProtectedRoute>} /> */}
+
 
       <Route path="/"    element={<Navigate to="/home" replace />} />
       <Route path="/404" element={<NotFoundPage />} />

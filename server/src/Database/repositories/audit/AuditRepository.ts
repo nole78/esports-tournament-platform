@@ -1,10 +1,8 @@
 import { RowDataPacket, ResultSetHeader } from "mysql2";
 import { IAuditRepository } from "../../../Domain/repositories/audit/IAuditRepository";
 import { AuditLog } from "../../../Domain/models/AuditLog";
-import { AuditLogDto } from "../../../Domain/DTOs/audit/AuditLogDto";
 import { DbManager } from "../../connection/DbConnectionPool";
 import { ILoggerService } from "../../../Domain/services/logger/ILoggerService";
-import { PaginatedListDto } from "../../../Domain/DTOs/PaginatedListDto";
 
 export class AuditRepository implements IAuditRepository {
   public constructor(
@@ -32,34 +30,46 @@ export class AuditRepository implements IAuditRepository {
     } finally { res.conn.release(); }
   }
 
-  async findAll(page: number, limit: number): Promise<PaginatedListDto<AuditLogDto>> {
+  async findAll(page: number, limit: number): Promise<AuditLog[]> {
     const res = await this.db.getReadConnection();
-    if (!res) return new PaginatedListDto([], 0, page, limit);
+    if (!res) return [];
     const offset = Math.max(0, Math.floor((page - 1) * limit));
     const lim    = Math.max(1, Math.floor(limit));
+    console.log(`LIM: ${lim}, OFFSET: ${offset}`)
     try {
-        const [rows] = await res.conn.execute<RowDataPacket[]>(
+        const [rows] = await res.conn.query<RowDataPacket[]>(
             `SELECT * FROM audit_log
             ORDER BY createdAt DESC
-            LIMIT ${lim} OFFSET ${offset}`,
-            []
-      );
-
-      const [cnt] = await res.conn.execute<RowDataPacket[]>(
-        `SELECT COUNT(*) as total FROM audit_log`
+            LIMIT ? OFFSET ?`,
+            [lim, offset]
       );
       const items = rows.map(
-        (l) => new AuditLogDto(
-          l.id, l.user_id ?? null, null,
+        (l) => new AuditLog(
+          l.id, l.user_id ?? null,
           l.action, l.entity ?? null, l.entity_id ?? null,
-          l.meta ? (JSON.parse(l.meta as string) as Record<string, unknown>) : null,
+          l.meta ?? null,
           l.ipAddress ?? null, new Date(l.createdAt as string)
         )
       );
-      return new PaginatedListDto(items, cnt[0]?.total ?? 0, page, limit);
+      return items;
     } catch (err) {
       this.logger.error("AuditRepository", "findAll failed", err);
-      return new PaginatedListDto([], 0, page, limit);
+      return [];
     } finally { res.conn.release(); }
   }
+
+  async getTotal(): Promise<number>
+  {
+    const res = await this.db.getWriteConnection();
+            if (!res) return 0;
+        try{
+            const [cnt] = await res.conn.execute<RowDataPacket[]>(`SELECT COUNT(*) as total FROM audit_log`);
+            return cnt[0]?.total ?? 0;
+        }
+        catch (err){
+            this.logger.error("AuditRepository", "get total failed", err);
+            return 0;
+        } finally { res.conn.release(); }
+  }
 }
+ 

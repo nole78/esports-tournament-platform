@@ -1,5 +1,10 @@
 # PulseGrid Esports platform
 
+![CI](https://github.com/nole78/odp_C2S_tim_01/actions/workflows/CI.yml/badge.svg)
+[![Vercel](https://img.shields.io/badge/Vercel-Live-black?logo=vercel)](https://odp-c2-s-tim-01.vercel.app)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-19-61dafb?logo=react)](https://react.dev/)
+
 Full-stack TypeScript project with:
 - **Client**: React 19 + Vite + TailwindCSS v4 + React Router v7
 - **Server**: Node.js + Express 5 + TypeScript
@@ -15,6 +20,16 @@ Full-stack TypeScript project with:
 | Auth       | JWT (jsonwebtoken), bcryptjs            |
 | Database   | MySQL 8, mysql2, Master-Slave replication |
 | DevOps     | Docker, docker-compose                  |
+
+## Features
+
+- JWT authentication
+- Role-based authorization
+- MySQL replication
+- Health-checked DB pooling
+- CI pipeline with GitHub Actions
+- Protected main branch workflow
+- Environment-based configuration
 
 ## Project Structure
 

@@ -6,7 +6,7 @@ export interface ITeamMemberRepository {
   findByUserId(userId: number): Promise<TeamMemberDto[]>;
   findByTeamId(teamId: number): Promise<TeamMemberDto[]>;
   findAll(page?: number, limit?: number): Promise<TeamMemberDto[]>;
-  create(dto: CreateTeamMemberDto): Promise<TeamMember>;
+  create(dto: TeamMemberDto): Promise<TeamMember>;
   update(teamId: number, userId: number, fields: Partial<TeamMember>): Promise<boolean>;
   delete(teamId: number, userId: number): Promise<boolean>;
 }

@@ -38,10 +38,11 @@ export class HealthService implements IHealthService {
 
   async runApiCheck(): Promise<void> {
   const nodes = [
-    { name: "users-api", url: "http://localhost:4000/api/v1/users" },
-    { name: "tournaments-api", url: "http://localhost:4000/api/v1/tournaments" },
     { name: "games-api", url: "http://localhost:4000/api/v1/games" },
+    { name: "teams-api", url: "http://localhost:4000/api/v1/teams" },
+    { name: "tournaments-api", url: "http://localhost:4000/api/v1/tournaments" },
     { name: "audit_log-api", url: "http://localhost:4000/api/v1/audit_log" },
+    { name: "users-api", url: "http://localhost:4000/api/v1/users" },
   ];
 
   const results = await Promise.all(
@@ -97,7 +98,7 @@ export class HealthService implements IHealthService {
     const matches = 0;
     const teams = 0;
     return new StatisticsDto(
-      users.length, games, tournaments.items.length, teams, matches
+      users.length, games, tournaments.length , teams, matches
     );
   }
 }
