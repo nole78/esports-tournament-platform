@@ -1,8 +1,8 @@
-import { ILoadBalancingStrategy } from "../Domain/interfaces/ILoadbalancingStrategy";
+import { ILoadBalancingStrategy } from "../domain/interfaces/ILoadbalancingStrategy";
 import { LeastConnectionsStrategy } from "../algorithms/LeastConnectionsStrategy";
 import { RoundRobinStrategy } from "../algorithms/RoundRobinStrategy";
 import { loadBalancerConfig } from "../config/loadBalancerConfig";
-import { LoadBalancingAlgorithm } from "../Domain/enums/LoadBalancingAlgorithm";
+import { LoadBalancingAlgorithm } from "../domain/enums/LoadBalancingAlgorithm";
 
 export function createStrategy(): ILoadBalancingStrategy {
 

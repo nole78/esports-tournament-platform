@@ -1,4 +1,4 @@
-import { LoadBalancingAlgorithm } from '../Domain/enums/LoadBalancingAlgorithm';
+import { LoadBalancingAlgorithm } from '../domain/enums/LoadBalancingAlgorithm';
 import dotenv from 'dotenv';
 
 dotenv.config();

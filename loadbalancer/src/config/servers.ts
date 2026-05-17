@@ -1,4 +1,4 @@
-import { ServerInstance } from '../Domain/models/ServerInstance';
+import { ServerInstance } from '../domain/models/ServerInstance';
 
 export const servers: ServerInstance[] = [
     {

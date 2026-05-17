@@ -1,5 +1,5 @@
-import { ServerInstance } from "../Domain/models/ServerInstance";
-import { ILoadBalancingStrategy } from '../Domain/interfaces/ILoadbalancingStrategy';
+import { ServerInstance } from "../domain/models/ServerInstance";
+import { ILoadBalancingStrategy } from '../domain/interfaces/ILoadbalancingStrategy';
 
 
 

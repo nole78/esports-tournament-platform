@@ -1,7 +1,7 @@
 import { loadBalancerConfig } from "../config/loadBalancerConfig";
 import { servers } from "../config/servers";
-import { ServerInstance } from "../Domain/models/ServerInstance";
-import { ILoggerService } from "../Domain/interfaces/ILoggerService";
+import { ServerInstance } from "../domain/models/ServerInstance";
+import { ILoggerService } from "../domain/interfaces/ILoggerService";
 
 export class HealthCheckService {
 
