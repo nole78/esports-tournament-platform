@@ -1,8 +1,5 @@
 import { ServerStatus } from '../domain/enums/ServerStatus';
 import { ServerInstance } from '../domain/models/ServerInstance';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 export const servers: ServerInstance[] = [
     {

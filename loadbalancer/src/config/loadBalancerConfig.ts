@@ -1,7 +1,4 @@
 import { LoadBalancingAlgorithm } from '../domain/enums/LoadBalancingAlgorithm';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 const algorithm = Object.values(LoadBalancingAlgorithm)
     .includes(process.env.LB_ALGORITHM as LoadBalancingAlgorithm)

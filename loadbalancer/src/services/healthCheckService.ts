@@ -30,22 +30,23 @@ export class HealthCheckService {
                     }
                 )
             );
-
+            let running = 0;
             for (const { server, result } of results) {
                 server.latency = result.latency;
 
                 if (!result.alive) {
                     server.status = ServerStatus.UNREACHABLE;
-                    this.logger.warn("LB", `Server ${server.id} failed health check`);
+                    this.logger.warn("API", `${server.id} failed health check`);
                     continue;
                 }
-
+                running++;
                 if (server.latency > loadBalancerConfig.healthCheckThreshold)
                     server.status = ServerStatus.DEGRADED;
                 else
                     server.status = ServerStatus.HEALTHY;
             }
-            this.logger.info("LB",servers.map((s) => `${s.id}=${s.status}`).join(" | "));
+            if(running === 0) this.logger.error("API","There is no server running");
+            this.logger.info("API",servers.map((s) => `${s.id}=${s.status}`).join(" | "));
         } finally {
             this.running = false;
         }
@@ -62,8 +63,7 @@ export class HealthCheckService {
                 }
             );
             return {alive:res.ok, latency: performance.now() - start};
-        } catch(err) {
-            this.logger.warn("LB", `Health check failed for ${server.id}: ${err}`);
+        } catch {
             return {alive:false, latency: performance.now() - start};
         }
     }
