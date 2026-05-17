@@ -1,14 +1,16 @@
 import { ServerInstance } from "../types/ServerInstance";
-import { servers } from '../config/servers';
+import { ILoadBalancingStrategy } from './ILoadbalancingStrategy';
 
-let currentIdx = 0;
 
-export function roundRobin (servers: ServerInstance[]):ServerInstance | null {
-    const n = servers.length;
-    if(n === 0) return null;
 
-    const server = servers[currentIdx];
-    currentIdx = (currentIdx + 1) % n;
-    
-    return server;
+export class RoundRobin implements ILoadBalancingStrategy{
+    private currentIdx = 0;
+    public getNextServer(servers: ServerInstance[]):ServerInstance{
+        const n = servers.length;
+        
+        const server = servers[this.currentIdx];
+        this.currentIdx = (this.currentIdx + 1) % n;
+        
+        return server;
+}
 }
