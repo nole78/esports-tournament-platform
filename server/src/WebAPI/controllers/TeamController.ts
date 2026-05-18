@@ -6,6 +6,8 @@ import { UserRole } from "../../Domain/enums/UserRole";
 import { ValidationResult } from '../../Domain/types/ValidationResult';
 import { validateTeamsCreation } from "../validators/teams/validateTeamsCreation";
 import { CreateTeamDto } from "../../Domain/DTOs/teams/CreateTeamDto";
+import { handleResult } from "../mappers/ResultMapper";
+import { Result } from '../../Domain/common/Result';
 
 
 export class TeamController{
@@ -25,7 +27,7 @@ export class TeamController{
         const page = parseInt(req.query.page as string ?? "1", 10);
         const limit = parseInt(req.query.limit as string ?? "20", 10);
         const result = await this.teamService.getAll(page, limit);
-        res.status(200).json({ success: true, data: result});
+        handleResult(result, res);
     }
 
     private async getTeamsById(req: Request, res: Response) : Promise<void>{
@@ -33,22 +35,16 @@ export class TeamController{
         const id = parseInt(req.params.id as string, 10);
         if(isNaN(id)) {res.status(400).json({ success: false, message: "Invalid id"}); return; }
         const result = await this.teamService.getById(id);
-        if (!result || result.teamId === 0){
-            res.status(404).json({success:false, message:"ID not found!"});
-            return;
-        }
-        res.status(200).json({success:true, data: result});
+        handleResult(result, res);
     }
     
     private async getByGamerTag(req: Request, res: Response) : Promise<void>{
         const limit = Math.min(parseInt(String(req.query.limit ?? "20"), 10), 100);
         const page = parseInt(String(req.query.page ?? "1"), 10);
         const gamer_tag = req.user?.username as string;
-        const entity = await this.teamService.getByGamerTag(gamer_tag, limit, page);
-        if (!entity) {
-            res.status(200).json({success: false, data:{items: [], total: 0, page, pageSize: limit}}); return;};
-        res.status(200).json({success: true, data: entity});
-    }
+        const result = await this.teamService.getByGamerTag(gamer_tag, limit, page);
+        handleResult(result, res);
+    }   
 
     private async create(req: Request, res: Response) : Promise<void>{
         const gamer_tag = req.user?.username as string;
@@ -62,17 +58,16 @@ export class TeamController{
         const v:ValidationResult = validateTeamsCreation(safeTeamName, safeTeamTag, safeTeamLogotip, safeTeamDescription);
         if (!v.valid){res.status(400).json({success:false, message: v.message}); return;}
         
-        const created = await this.teamService.create(new CreateTeamDto(safeTeamName, safeTeamTag, safeTeamLogotip, safeTeamDescription), gamer_tag);
-        if (!created){res.status(500).json({success:false, message: "Failed to create!"}); return;}
-        res.status(201).json({success:true, data: created});
+        const result = await this.teamService.create(new CreateTeamDto(safeTeamName, safeTeamTag, safeTeamLogotip, safeTeamDescription), gamer_tag);
+        handleResult(result, res);
     } 
 
     private async addMember(req: Request, res: Response) : Promise<void>{
         const gamer_tag = await req.params.gamer_tag as string;
         const team_tag = await req.params.team_tag as string;
 
-        const ok = await this.teamService.addMember(gamer_tag, team_tag);
-        res.status(ok? 200 : 500).json({success: ok});
+        const result = await this.teamService.addMember(gamer_tag, team_tag);
+        handleResult(result, res);
         
     }
 
@@ -81,8 +76,8 @@ export class TeamController{
         const id = parseInt(req.params.id as string, 10);
         if(isNaN(id)) {res.status(400).json({ success: false, message: "Invalid id"}); return; }
 
-        const ok = await this.teamService.update(gamer_tag, req.body, id);
-        res.status(ok? 200 : 500).json({ success: ok});
+        const result = await this.teamService.update(gamer_tag, req.body, id);
+        handleResult(result, res);
     }
 
     private async delete(req: Request, res: Response) : Promise<void>{
@@ -91,11 +86,8 @@ export class TeamController{
         const id = parseInt(req.params.id as string, 10);
         if(isNaN(id)) {res.status(400).json({ success: false, message: "Invalid id"}); return; }
         
-        const ok = await this.teamService.delete(gamer_tag, id);
-        if (!ok){
-            res.status(403).json({ success: false, message: "Forbidden"});
-        }
-        res.status(200).json({success: ok});
+        const result = await this.teamService.delete(gamer_tag, id);
+        handleResult(result, res);
     }
     public getRouter(): Router { return this.router; }
 }
