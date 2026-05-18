@@ -1,266 +1,196 @@
-# PulseGrid Esports platform
+# PulseGrid Esports Platform
 
 ![CI](https://github.com/nole78/odp_C2S_tim_01/actions/workflows/CI.yml/badge.svg)
 [![Vercel](https://img.shields.io/badge/Vercel-Live-black?logo=vercel)](https://odp-c2-s-tim-01.vercel.app)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-19-61dafb?logo=react)](https://react.dev/)
 
-Full-stack TypeScript project with:
-- **Client**: React 19 + Vite + TailwindCSS v4 + React Router v7
-- **Server**: Node.js + Express 5 + TypeScript
-- **Database**: MySQL 8 with Master + 2 Slave replication via Docker
-- **Auth**: JWT-based authentication with role-based access control
+PulseGrid is a full-stack esports platform designed as a distributed, scalable web system with a focus on **high availability, modular architecture, and production-grade backend design patterns**.
 
-## Stack
+It simulates a real-world cloud-native application with load balancing, database replication, authentication, and CI/CD integration.
 
-| Layer      | Technology                              |
-|------------|-----------------------------------------|
-| Frontend   | React, Vite, TailwindCSS, Axios         |
-| Backend    | Node.js, Express, TypeScript            |
-| Auth       | JWT (jsonwebtoken), bcryptjs            |
-| Database   | MySQL 8, mysql2, Master-Slave replication |
-| DevOps     | Docker, docker-compose                  |
+---
 
-## Features
+## System Overview
 
-- JWT authentication
-- Role-based authorization
-- MySQL replication
-- Health-checked DB pooling
-- CI pipeline with GitHub Actions
-- Protected main branch workflow
-- Environment-based configuration
+PulseGrid is built as a multi-layer distributed system:
+
+- **Client Layer** → React-based SPA for users and admins
+- **Load Balancer Layer** → Intelligent traffic distribution across backend instances
+- **Backend Layer** → Node.js/Express API with layered architecture
+- **Data Layer** → MySQL with master–slave replication
+- **Infrastructure Layer** → Docker + cloud deployment (Render, Aiven, Vercel)
+
+---
+
+## Tech Stack
+
+| Layer        | Technology |
+|--------------|------------|
+| Frontend     | React 19, Vite, TailwindCSS v4, React Router v7 |
+| Backend      | Node.js, Express 5, TypeScript |
+| Auth         | JWT (jsonwebtoken), bcryptjs |
+| Database     | MySQL 8, mysql2, Master–Slave replication |
+| Load Balancer| Node.js, http-proxy-middleware |
+| DevOps       | Docker, docker-compose, GitHub Actions |
+| Deployment   | Vercel (FE), Render (BE), Aiven (DB) |
+
+---
+
+## Key Features
+
+- JWT authentication with role-based access control (RBAC)
+- Distributed MySQL architecture (master + replica slaves)
+- Custom Node.js load balancer with pluggable strategies
+- Health-check driven service discovery
+- Connection-aware routing (Least Connections)
+- IP-based session affinity (IP Hash)
+- CI pipeline with automated build validation
+- Environment-based configuration (dev/prod separation)
+
+---
+
+## Architecture Design
+
+PulseGrid follows a **clean layered architecture with separation of concerns across all services**.
+
+### High-Level System Flow
+
+```text
+Client (React)
+      ↓
+Load Balancer (Node.js)
+      ↓
+Proxy Middleware
+      ↓
+Server Pool Service
+      ↓
+Selected Backend Instance
+      ↓
+MySQL (Master / Slaves)
+```
+
+---
+
+
 
 ## Project Structure
 
-```
-project/
-├── client/                  # React frontend (Vite)
-│   └── src/
-│       ├── api_services/    # Axios API service classes (Interface + Implementation)
-│       ├── assets/          # Assets (images)
-│       ├── components/      # Reusable UI components
-│       ├── contexts/        # React contexts (AuthContext)
-│       ├── helpers/         # Utility functions (localStorage wrapper)
-│       ├── hooks/           # Custom React hooks
-│       ├── models/          # Client-side DTOs / types
-│       ├── pages/           # Page components (admin/, user/, auth/, not_found/)
-│       └── types/           # TypeScript type definitions
-│
-├── loadbalancer/            # Node.js load balancer service
-│   └── src/
-│       ├── algorithms/      # Load balancing strategy implementations
-│       ├── config/          # Load balancer configuration and server definitions
-│       ├── domain/          # Core domain abstractions and shared types
-│       │   ├── enums/       # Domain enums (LoadBalancingAlgorithm)
-│       │   ├── interfaces/  # Contracts/interfaces (ILoggerService, ILoadBalancingStrategy)
-│       │   └── models/      # Domain models (ServerInstance)
-│       ├── factories/       # Factory functions for dependency creation/composition
-│       ├── middleware/      # Express proxy middleware
-│       └── services/        # Core services (health checks, server pool, logging)
-│
-├── server/                  # Express backend
-│   └── src/
-│       ├── Database/
-│       │   ├── connection/  # DbManager — Master/Slave pool with health checks
-│       │   └── repositories/ # Concrete repository implementations
-│       ├── Domain/          # Domain layer (no framework dependencies)
-│       │   ├── DTOs/        # Data Transfer Objects
-│       │   ├── constants/   # App-wide constants
-│       │   ├── enums/       # TypeScript enums
-│       │   ├── models/      # Domain entity classes
-│       │   ├── repositories/ # Repository interfaces (IXxxRepository)
-│       │   ├── services/    # Service interfaces (IXxxService)
-│       │   └── types/       # Shared types (JwtPayload, ValidationResult)
-│       ├── Middlewares/     # Express middlewares (auth, authorization)
-│       ├── Services/        # Service implementations
-│       └── WebAPI/
-│           ├── controllers/ # Express route controllers
-│           └── validators/  # Input validation functions
-│
-└── docker/                  # MySQL replication setup
-    ├── master/              # Master node config + init.sql
-    ├── slave1/              # Slave 1 config
-    ├── slave2/              # Slave 2 config
-    └── setup-replication.sh # Replication bootstrap script
-```
-
-## Live Demo / Deployment
-
-The project is fully deployed and available online:
-
-- **Frontend (Vercel):** https://odp-c2-s-tim-01.vercel.app
-
-### Production Infrastructure
-
-- Frontend hosted on Vercel
-- Backend API hosted on Render
-- MySQL database hosted on Aiven
-
-### Notes
-
-- Local development uses Dockerized MySQL master/slave replication.
-- Production deployment uses a managed cloud MySQL instance due to free-tier limitations.
-- Environment-based configuration is used to separate development and production infrastructure.
-
-## Getting Started
-
-### 1. Start the database
-
-```bash
-docker-compose up -d
-```
-
-### 2. Set up replication
-
-```bash
-docker cp docker/setup-replication.sh project_master:/setup.sh
-docker exec project_master sh /setup.sh
-```
-
-### 3. Start the server
-
-```bash
-cd server
-cp .env.example .env   # fill in your values
-npm install
-npm run dev
-```
-
-### 4. Start the client
-
-```bash
-cd client
-npm install
-npm run dev
-```
-
-## Load Balancer
-
-The project includes a dedicated Node.js-based load balancer service built with Express and `http-proxy-middleware`.
-
-Its purpose is to distribute incoming traffic across multiple backend instances while continuously monitoring server availability.
-
----
-
-### Features
-
-* Reverse proxy support using Express middleware
-* Multiple load balancing strategies
-* Periodic health checks for backend servers
-* Automatic failover for unavailable instances
-* Least Connections support with active connection tracking
-* Configurable through environment variables
-* Strategy Pattern + Dependency Injection architecture
-* Reusable proxy instances through proxy caching
-
----
-
-### Supported Algorithms
-
-#### Round Robin
-
-Distributes requests sequentially across all healthy servers.
-
-Example:
-
 ```text
-Request 1 -> Server A
-Request 2 -> Server B
-Request 3 -> Server C
-Request 4 -> Server A
+project/
+├── client/        # React frontend (SPA)
+├── server/        # Express backend (domain-driven structure)
+├── loadbalancer/  # Custom Node.js load balancer
+└── docker/        # MySQL master-slave replication setup
 ```
 
----
+### Backend Architecture (Server)
 
-#### Least Connections
+The backend follows a **domain-driven, layered architecture**:
 
-Routes requests to the server currently handling the fewest active connections.
+- `Domain/` → Core business models, DTOs, contracts (framework-agnostic)
+- `Services/` → Business logic implementations
+- `Database/` → Repository pattern + DB abstraction layer
+- `WebAPI/` → Controllers + routing layer
+- `Middlewares/` → Auth, validation, authorization
 
-Useful for uneven workloads and long-running requests.
-
----
-
-#### IP Hash
-
-Routes clients based on their IP address to improve session consistency.
+This ensures high testability and loose coupling between layers.
 
 ---
 
-#### Weighted Round Robin
+### Load Balancer Architecture
 
-Allows stronger servers to receive a larger percentage of traffic.
+The load balancer is a standalone service implementing:
+
+- Strategy Pattern (pluggable algorithms)
+- Dependency Injection (runtime algorithm selection)
+- Proxy-based routing (`http-proxy-middleware`)
+- Health-aware server pool management
+
+#### Supported Algorithms
+
+- Round Robin
+- Least Connections
+- IP Hash
+- Weighted Round Robin
 
 ---
 
-### Health Checks
+### Database Layer
 
-The load balancer continuously checks backend server health using a configurable interval.
+PulseGrid uses a **master–slave MySQL replication model**:
 
-Each server exposes:
+- **Master** → Write operations
+- **Slaves** → Read operations (scaling reads)
+
+Features:
+
+- Automatic failover detection
+- Health-checked connection pools
+- Transparent routing based on operation type
+
+---
+
+## Authentication & Security
+
+- JWT-based stateless authentication
+- Role-based access control (Admin/User separation)
+- Password hashing using bcrypt
+- Protected routes via middleware chain
+- Token validation on every protected request
+
+---
+
+## Health Monitoring
+
+Each backend instance exposes:
 
 ```text
 GET /api/v1/health
 ```
 
-If a server becomes unreachable or times out:
+The load balancer periodically:
 
-* it is marked as unavailable
-* it is automatically removed from request routing
-* warning logs are emitted
-
-Once the server becomes healthy again, it automatically re-enters the pool.
-
----
-
-### Architecture
-
-The load balancer follows a lightweight layered architecture:
-
-* `algorithms/` contains balancing strategy implementations
-* `services/` contains operational services such as health checks and server pooling
-* `middleware/` contains proxy middleware integration
-* `factories/` is responsible for dependency composition
-* `domain/` contains shared abstractions, models, and enums
-
-The balancing algorithm is injected into `ServerPoolService` through dependency injection using the Strategy Pattern.
-
-This makes it easy to add new balancing algorithms without modifying existing services.
+- checks server availability
+- marks unhealthy nodes as inactive
+- removes them from routing pool
+- reintegrates them when recovered
 
 ---
 
-### Request Flow
+## Load Balancing Strategies
 
-```text
-Client
-   ↓
-Load Balancer
-   ↓
-Proxy Middleware
-   ↓
-ServerPoolService
-   ↓
-Selected Healthy Backend Server
-```
+### Round Robin
 
----
+Sequential distribution of requests across healthy nodes.
 
-### Connection Tracking
+### Least Connections
 
-For the Least Connections algorithm, the load balancer tracks active requests per server.
+Routes traffic to the least loaded server based on active connections.
 
-Connections are:
+### IP Hash
 
-* incremented before proxy forwarding
-* decremented on request completion/termination
+Ensures session consistency by mapping client IP → server instance.
 
-This ensures accurate balancing decisions during runtime.
+### Weighted Round Robin
+
+Assigns higher traffic share to more powerful servers.
 
 ---
 
-### Environment Configuration
+## CI / CD Pipeline
 
-Example `.env`:
+GitHub Actions pipeline ensures:
+
+- TypeScript compilation success
+- Build verification
+- Protection of main branch via required checks
+
+---
+
+## Environment Configuration
+
+### Load Balancer
 
 ```env
 LB_PORT=8080
@@ -269,4 +199,76 @@ HEALTH_CHECK_INTERVAL=10000
 HEALTH_CHECK_TIMEOUT=3000
 ```
 
+### Backend
+
+- Environment-based config switching (dev / production)
+- Separate DB credentials per environment
+- Secure JWT secret management
+
 ---
+
+## Deployment
+
+### Production Architecture
+
+- Frontend → Vercel
+- Backend → Render
+- Database → Aiven (managed MySQL)
+
+This separation ensures scalability and reliability under free-tier constraints.
+
+---
+
+## Getting Started
+
+### 1. Start MySQL cluster
+
+```bash
+docker-compose up -d
+```
+
+### 2. Initialize replication
+
+```bash
+docker cp docker/setup-replication.sh project_master:/setup.sh
+docker exec project_master sh /setup.sh
+```
+
+### 3. Run backend
+
+```bash
+cd server
+cp .env.example .env
+npm install
+npm run dev
+```
+
+### 4. Run loadbalancer
+
+```bash
+cd loadbalancer
+npm install
+npm run dev
+```
+
+### 5. Run frontend
+
+```bash
+cd client
+npm install
+npm run dev
+```
+
+---
+
+## Why This Architecture Matters
+
+PulseGrid is designed to simulate real-world distributed systems concepts:
+
+- horizontal scaling via load balancing
+- fault tolerance via health checks
+- read scalability via replication
+- modular backend design
+- production CI/CD workflow
+
+It is not just a CRUD application — it demonstrates **system-level design thinking applied in a full-stack TypeScript ecosystem**.
