@@ -1,6 +1,6 @@
 import type { ApiStatus } from "../../types/health/ApiStatus";
 
-export interface ApiStatusDto {
+export type ApiStatusDto = {
     name: string;
     url: string;
     status: ApiStatus;

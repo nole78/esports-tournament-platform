@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../../hooks/auth/useAuthHook";
 import { healthApi } from "../../api_services/health/HealthAPIService";
 import type { HealthStatusDto } from "../../models/health/HealthStatusDto";
-import type { ApiHealthDto } from "../../models/health/ApiHealthDto";
 import { Spinner, NodeBadge, PageHeader } from "../../components/ui/UI";
+import type { ApiStatusDto } from "../../models/health/ApiStatusDto";
 
 export default function HealthPage() {
   const { token } = useAuth();
@@ -12,9 +12,7 @@ export default function HealthPage() {
   const [checking, setChecking] = useState(false);
   const [msg, setMsg] = useState("");
 
-  const [apiStatus, setApiStatus] = useState<ApiHealthDto | null>(null);
-  const [apiChecking, setApiChecking] = useState(false);
-  const [apiMsg, setApiMsg] = useState("");
+  const [apiStatus, setApiStatus] = useState<ApiStatusDto[]>([]);
 
   const load = async () => {
     if (!token) return;
@@ -56,31 +54,6 @@ export default function HealthPage() {
         console.error(err);
     } finally {
         setChecking(false);
-    }
-};
-
-    const runApiCheck = async () => {
-    if (!token) return;
-
-    setApiChecking(true);
-    setApiMsg("");
-
-    try {
-        const res = await healthApi.runApiCheck(token);
-
-        console.log("RUN API CHECK RESPONSE:", res);
-
-        if (res.success && res.data) {
-            setApiStatus(res.data);
-            setApiMsg("API check completed.");
-            setTimeout(() => {
-                setApiMsg("");
-                }, 3000);
-        }
-    } catch (err) {
-        console.error(err);
-    } finally {
-        setApiChecking(false);
     }
 };
 
@@ -136,19 +109,12 @@ export default function HealthPage() {
       )}
       <br/>
       <br/>
-      <PageHeader eyebrow="admin" title="API Health"
-        action={
-          <button onClick={runApiCheck} disabled={apiChecking}
-            className="mb-2 bg-bgsecondary/40 border-2 border-bgsecondary hover:bg-bgsecondary/30 text-bgsecondary font-semibold rounded-xl p-3 text-sm transition-colors">
-            {apiChecking ? <><Spinner size={12} /> Checking…</> : "Run check"}
-          </button>
-        } />
-        {apiMsg && <div className="mb-6 text-xs font-mono text-amber-400/60 border border-amber-500/20 bg-amber-500/10 px-4 py-3 rounded-xl">{apiMsg}</div>}
+      <PageHeader eyebrow="admin" title="API Health"/>
 
       {apiStatus && (
         <>
           <div className="flex flex-col gap-3">
-            {apiStatus.nodes?.map(n => (
+            {apiStatus.map(n => (
               <div key={n.name} className="bg-white/2 border border-white/6 rounded-2xl px-6 py-5">
                 <div className="flex items-center justify-between mb-5">
                   <div className="flex items-center gap-3">
