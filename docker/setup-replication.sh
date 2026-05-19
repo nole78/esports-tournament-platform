@@ -180,6 +180,14 @@ CREATE TABLE audit_log (
   createdAt  DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 );
+
+CREATE TABLE invites(
+  user_id INT UNSIGNED NOT NULL,
+  team_id INT UNSIGNED NOT NULL,
+  invited_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  FOREIGN KEY (team_id) REFERENCES teams(team_id)
+);
 SQL
 
 MASTER_TABLES=$($M -s --skip-column-names \
