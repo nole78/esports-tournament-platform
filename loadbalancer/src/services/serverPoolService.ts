@@ -1,4 +1,4 @@
-import { servers } from '../config/servers';
+import { servers } from '../Config/servers';
 import { ServerInstance } from '../Domain/models/ServerInstance';
 import { ILoadBalancingStrategy } from '../Domain/interfaces/ILoadbalancingStrategy';
 import { ServerStatus } from '../Domain/enums/ServerStatus';
