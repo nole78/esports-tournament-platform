@@ -1,10 +1,10 @@
 import express from 'express';
-import { ConsoleLoggerService } from './Service/ConsoleLoggerService';
+import { ConsoleLoggerService } from './Services/ConsoleLoggerService';
 import { proxyMiddleware } from './Middlewares/proxyMiddlware';
-import { ServerPoolService } from './Service/serverPoolService';
-import { createStrategy } from './Factorie/createStrategy';
-import { HealthCheckService } from './Service/healthCheckService';
-import { createHealthRouter } from './Route/healthRoutes';
+import { ServerPoolService } from './Services/serverPoolService';
+import { createStrategy } from './Factories/createStrategy';
+import { HealthCheckService } from './Services/healthCheckService';
+import { createHealthRouter } from './Routes/healthRoutes';
 import cors from 'cors';
 
 const app = express();

@@ -1,10 +1,10 @@
 import { ILoadBalancingStrategy } from "../Domain/interfaces/ILoadbalancingStrategy";
-import { LeastConnectionsStrategy } from "../Algorithms/LeastConnectionsStrategy";
-import { RoundRobinStrategy } from "../Algorithms/RoundRobinStrategy";
+import { LeastConnectionsStrategy } from "../Algorithm/LeastConnectionsStrategy";
+import { RoundRobinStrategy } from "../Algorithm/RoundRobinStrategy";
 import { loadBalancerConfig } from "../Configs/loadBalancerConfig";
 import { LoadBalancingAlgorithm } from "../Domain/enums/LoadBalancingAlgorithm";
-import { WeightedRoundRobinStrategy } from "../Algorithms/WeightedRoundRobinStrategy";
-import { IpHashStrategy } from "../Algorithms/IpHashStrategy";
+import { WeightedRoundRobinStrategy } from "../Algorithm/WeightedRoundRobinStrategy";
+import { IpHashStrategy } from "../Algorithm/IpHashStrategy";
 
 export function createStrategy(): ILoadBalancingStrategy {
 
