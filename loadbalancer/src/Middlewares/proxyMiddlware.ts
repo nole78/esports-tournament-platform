@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { createProxyMiddleware } from 'http-proxy-middleware';
-import { ServerPoolService } from '../Services/serverPoolService';
+import { ServerPoolService } from '../Service/serverPoolService';
 
 
 const proxyCache = new Map();
