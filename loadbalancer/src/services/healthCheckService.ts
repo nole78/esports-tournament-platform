@@ -1,5 +1,5 @@
-import { loadBalancerConfig } from "../Config/loadBalancerConfig";
-import { servers } from "../Config/servers";
+import { loadBalancerConfig } from "../Configs/loadBalancerConfig";
+import { servers } from "../Configs/servers";
 import { ServerInstance } from "../Domain/models/ServerInstance";
 import { ILoggerService } from "../Domain/interfaces/ILoggerService";
 import { ServerStatus } from "../Domain/enums/ServerStatus";

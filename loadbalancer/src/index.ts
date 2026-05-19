@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import app, {logger,  healthCheck} from "./app"
-import { loadBalancerConfig } from './Config/loadBalancerConfig';
+import { loadBalancerConfig } from './Configs/loadBalancerConfig';
 
 const PORT = loadBalancerConfig.port;
 

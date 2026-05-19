@@ -1,7 +1,7 @@
 import { ILoadBalancingStrategy } from "../Domain/interfaces/ILoadbalancingStrategy";
 import { LeastConnectionsStrategy } from "../Algorithms/LeastConnectionsStrategy";
 import { RoundRobinStrategy } from "../Algorithms/RoundRobinStrategy";
-import { loadBalancerConfig } from "../Config/loadBalancerConfig";
+import { loadBalancerConfig } from "../Configs/loadBalancerConfig";
 import { LoadBalancingAlgorithm } from "../Domain/enums/LoadBalancingAlgorithm";
 import { WeightedRoundRobinStrategy } from "../Algorithms/WeightedRoundRobinStrategy";
 import { IpHashStrategy } from "../Algorithms/IpHashStrategy";

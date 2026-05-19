@@ -1,6 +1,6 @@
 import express from 'express';
 import { ConsoleLoggerService } from './Services/ConsoleLoggerService';
-import { proxyMiddleware } from './Middleware/proxyMiddlware';
+import { proxyMiddleware } from './Middlewares/proxyMiddlware';
 import { ServerPoolService } from './Services/serverPoolService';
 import { createStrategy } from './Factories/createStrategy';
 import { HealthCheckService } from './Services/healthCheckService';
