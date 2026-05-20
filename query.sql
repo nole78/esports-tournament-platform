@@ -5,7 +5,7 @@ CREATE TABLE users (
   email        VARCHAR(120) NOT NULL UNIQUE,
   passwordHash VARCHAR(255) NOT NULL,
   role         ENUM('player','admin') DEFAULT 'player',
-  profile_picture TEXT,
+  profile_picture LONGTEXT,
   isActive     TINYINT(1)   DEFAULT 1,
   createdAt    DATETIME DEFAULT CURRENT_TIMESTAMP,
   updatedAt    DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -24,7 +24,7 @@ CREATE TABLE teams(
   team_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   team_name VARCHAR(100) NOT NULL UNIQUE,
   team_tag VARCHAR(10) NOT NULL UNIQUE,
-  team_logotip TEXT,
+  team_logotip LONGTEXT,
   team_description TEXT,
   CONSTRAINT team_name_length CHECK (
     LENGTH(team_name) BETWEEN 2 AND 80
@@ -39,7 +39,7 @@ CREATE TABLE games(
   game_name VARCHAR(100) NOT NULL UNIQUE,
   game_logotip LONGTEXT,
   game_genre VARCHAR(50) NOT NULL,
-  game_players INT UNSIGNED NOT NULL
+  players_per_team INT UNSIGNED NOT NULL
 );
 
 CREATE TABLE tournaments(
@@ -61,12 +61,16 @@ CREATE TABLE tournaments(
 );
 
 CREATE TABLE matches(
+  /*TODO: Add date perhaps*/
   match_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  tournament_id INT UNSIGNED NOT NULL,
   blue_team_id INT UNSIGNED NOT NULL,
   red_team_id INT UNSIGNED NOT NULL,
   match_result VARCHAR(4),
   status ENUM('scheduled','ongoing','completed'),
   match_round ENUM('round_of_16','quarterfinal','semifinal','final'),
+  FOREIGN KEY (tournament_id) REFERENCES tournament(tournament_id)
+  ON DELETE CASCADE,
   FOREIGN KEY (blue_team_id) REFERENCES teams(team_id),
   FOREIGN KEY (red_team_id) REFERENCES teams(team_id),
   CONSTRAINT match_score_format CHECK (
@@ -80,8 +84,10 @@ CREATE TABLE team_members(
   role ENUM('captain','member'),
   joined_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (team_id, user_id),
-  FOREIGN KEY (team_id) REFERENCES teams(team_id),
+  FOREIGN KEY (team_id) REFERENCES teams(team_id)
+  ON DELETE CASCADE,
   FOREIGN KEY (user_id) REFERENCES users(id)
+  ON DELETE CASCADE
 );
 
 CREATE TABLE tournament_registrations(
@@ -91,8 +97,10 @@ CREATE TABLE tournament_registrations(
   status ENUM('pending','confirmed','disqualified') DEFAULT 'pending',
   registered_at DATETIME DEFAULT CURRENT_TIMESTAMP, 
   PRIMARY KEY (team_id, tournament_id),
-  FOREIGN KEY (team_id) REFERENCES teams(team_id),
+  FOREIGN KEY (team_id) REFERENCES teams(team_id)
+  ON DELETE CASCADE,
   FOREIGN KEY (tournament_id) REFERENCES tournaments(tournament_id)
+  ON DELETE CASCADE
 );
 
 CREATE TABLE match_players( 
@@ -101,8 +109,7 @@ CREATE TABLE match_players(
   match_id INT UNSIGNED NOT NULL,
   performance_notes TEXT, 
   PRIMARY KEY (user_id, match_id, team_id),
-  FOREIGN KEY (user_id) REFERENCES team_members(user_id),
-  FOREIGN KEY (team_id) REFERENCES team_members(team_id),
+  FOREIGN KEY (team_id, user_id) REFERENCES team_members(team_id, user_id),
   FOREIGN KEY (match_id) REFERENCES matches(match_id)
 );
 
@@ -111,8 +118,10 @@ CREATE TABLE user_watchlist(
   tournament_id INT UNSIGNED NOT NULL,
   added_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (user_id, tournament_id),
-  FOREIGN KEY (user_id) REFERENCES users(id),
+  FOREIGN KEY (user_id) REFERENCES users(id)
+  ON DELETE CASCADE,
   FOREIGN KEY (tournament_id) REFERENCES tournaments(tournament_id)
+  ON DELETE CASCADE
 );
 
 CREATE TABLE audit_log (
