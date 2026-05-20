@@ -1,9 +1,7 @@
-/*import { ResultSetHeader, RowDataPacket } from "mysql2";
+import { ResultSetHeader, RowDataPacket } from "mysql2";
 import { IMatchRepository } from "../../../Domain/repositories/matches/IMatchRepository";
 import { ILoggerService } from "../../../Domain/services/logger/ILoggerService";
 import { DbManager } from "../../connection/DbConnectionPool";
-import { MatchDto } from "../../../Domain/DTOs/matches/MatchDto";
-import { CreateMatchDto } from "../../../Domain/DTOs/matches/CreateMatchDto";
 import { Match } from "../../../Domain/models/Match";
 
 export class MatchRepository implements IMatchRepository {
@@ -12,29 +10,28 @@ export class MatchRepository implements IMatchRepository {
     private readonly logger: ILoggerService,
   ) {}
 
-  private map(r: RowDataPacket): MatchDto {
-    // Todo: implement
-    return new MatchDto();
+  private map(r: RowDataPacket): Match {
+    return new Match(r.match_id,r.blue_team_id,r.red_team_id,r.match_result,r.status,r.match_result);
   }
 
-  async findById(id: number): Promise<MatchDto | null> {
+  async findById(id: number): Promise<Match> {
     const res = await this.db.getReadConnection();
-    if (!res) return null;
+    if (!res) return new Match;
     try {
       const [rows] = await res.conn.execute<RowDataPacket[]>(`SELECT * FROM matches WHERE match_id = ?`, [id]);
-      return rows.length > 0 ? this.map(rows[0]) : null;
+      return rows.length > 0 ? this.map(rows[0]) : new Match;
     } catch (err) {
       this.logger.error("MatchRepository", "findById failed", err);
-      return null;
+      return new Match;
     } finally { res.conn.release(); }
   }
 
-  async findAll(page = 1, limit = 20): Promise<MatchDto[]> {
+  async findAll(page = 1, limit = 20): Promise<Match[]> {
     const res = await this.db.getReadConnection();
     if (!res) return [];
     const offset = (page - 1) * limit;
     try {
-      const [rows] = await res.conn.execute<RowDataPacket[]>(
+      const [rows] = await res.conn.query<RowDataPacket[]>(
         `SELECT * FROM matches ORDER BY match_id DESC LIMIT ? OFFSET ?`, [limit, offset]
       );
       return rows.map((r) => this.map(r));
@@ -44,7 +41,7 @@ export class MatchRepository implements IMatchRepository {
     } finally { res.conn.release(); }
   }
 
-  async findByTeamId(teamId: number): Promise<MatchDto[]> {
+  async findByTeamId(teamId: number): Promise<Match[]> {
     const res = await this.db.getReadConnection();
     if (!res) return [];
     try {
@@ -58,27 +55,40 @@ export class MatchRepository implements IMatchRepository {
     } finally { res.conn.release(); }
   }
 
-  async create(dto: CreateMatchDto): Promise<Match> {
+  async create(dto: Match): Promise<Match> {
     const res = await this.db.getWriteConnection();
-    if (!res) return new Match();
+    if (!res) return new Match;
     try {
       const [result] = await res.conn.execute<ResultSetHeader>(
-        `INSERT INTO matches (match_id) VALUES (?)`,
-        [dto.matchId]
+        `INSERT INTO matches (blue_team_id, red_team_id, match_result, status, match_round) 
+        VALUES (?, ?, ?, ?, ?)`,
+        [dto.blueTeamId, dto.redTeamId, dto.matchResult, dto.status, dto.matchRound]
       );
-      if (result.insertId === 0) return new Match();
-      return new Match(result.insertId, dto.matchId);
+      if (result.insertId === 0) return new Match;
+      return new Match(result.insertId, dto.blueTeamId, dto.redTeamId, dto.matchResult, dto.status, dto.matchRound);
     } catch (err) {
       this.logger.error("MatchRepository", "create failed", err);
-      return new Match();
+      return new Match;
     } finally { res.conn.release(); }
   }
 
   async update(id: number, fields: Partial<Match>): Promise<boolean> {
     const res = await this.db.getWriteConnection();
     if (!res) return false;
+
+    const  fieldMap: Record<string, string> = {
+      blueTeamId: "blue_team_id",
+      redTeamId: "red_team_id",
+      matchResult: "match_result",
+      status: "status",
+      matchRound: "match_round"
+    }
+
     try {
-      const entries = Object.entries(fields).filter(([, v]) => v !== undefined);
+      const entries = Object.entries(fields)
+          .filter(([, v]) => v !== undefined)
+          .map(([k,v]) => [fieldMap[k] ?? k, v]);
+      
       if (entries.length === 0) return false;
       const setClause = entries.map(([k]) => `${k} = ?`).join(", ");
       const values = entries.map(([, v]) => v);
@@ -105,4 +115,18 @@ export class MatchRepository implements IMatchRepository {
       return false;
     } finally { res.conn.release(); }
   }
-}*/
+
+  async getTotal(): Promise<number> {
+    const res = await this.db.getReadConnection();
+    if(!res) return 0;
+    try
+    {
+      const [cnt] = await res.conn.execute<RowDataPacket[]>(`SELECT COUTN(*) as total FROM matches`);
+      return cnt[0]?.total ?? 0;
+    }
+    catch(err){
+      this.logger.error("MatchRepository","get total failed",err);
+      return 0;
+    } finally { res.conn.release(); }
+  }
+}
