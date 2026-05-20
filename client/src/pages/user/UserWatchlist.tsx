@@ -2,23 +2,22 @@ import { useState, useEffect } from "react";
 import { Empty, PageHeader, Pagination } from "../../components/ui/UI";
 import type { UserWatchlistDto } from "../../models/user_watchlist/UserWatchlistDto";
 import { userWatchlistApi } from '../../api_services/user_watchlist/UserWatchlistAPIService';
-import { formatDeadline } from "../../helpers/date_formatter";
 import { useAuth } from "../../hooks/auth/useAuthHook";
 
-export default function UserWatchlist(){
-    const {user} = useAuth();
+export default function UserWatchlist() {
+    const { user } = useAuth();
     const [watchlist, setWatchlist] = useState<UserWatchlistDto[]>([]);
     const [error, setError] = useState<string>("");
-    //const [deleted, setDeleted] = useState<boolean>(false);
+    const [deleted, setDeleted] = useState<boolean>(false);
     const [page, setPage] = useState(1);
     const [total, setTotal] = useState(0);
     const limit = 20;
     const id = user?.id ?? 0;
 
     useEffect(() => {
-                    userWatchlistApi.getById(id, page, limit)
+        userWatchlistApi.getById(id, page, limit)
             .then(res => {
-                if(res.success){
+                if (res.success) {
                     setWatchlist(res.data?.items ?? []);
                     setTotal(res.data?.total ?? 0);
                 }
@@ -26,33 +25,104 @@ export default function UserWatchlist(){
                     setError(res.message);
             })
             .catch(() => setError("Failed to load watchlist"))
-        }, [id, page]);
-        return(
-            <div>
-            <PageHeader eyebrow="" title="My Watchlist"/>
-            {watchlist.length === 0 && !error ? <Empty message="Nothing on your watchlist"/> : (
-            <section className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-               
-                                {watchlist.map(w => (
-                                <div className="group relative aspect-4/3 border-2 h-2xl border-white/5 bg-bgprimary/30  rounded-xl overflow-hidden">
-                                    <div>
-                                    <h2>Watchlist {w.userId} {w.tournamentName} {w.gameName}</h2>
-                                    <p>{w.tournamentStatus}</p>
+    }, [id, page]);
+    return (
+        <div>
+            <PageHeader eyebrow="" title="My Watchlist" />
+            {deleted && (
+                <div className="mb-5 bg-green-500/10 border border-green-500/20 text-green-300 text-sm px-4 py-3 rounded-xl">
+                    Succesfully removed an item from your watchlist
+                </div>
+            )}
+            {watchlist.length === 0 && !error ? <Empty message="Nothing on your watchlist" /> : (
+                <section className="grid gap-5 sm:grid-cols-1 lg:grid-cols-1">
+                    {watchlist.map(w => (
+                        <div key={w.tournamentName} className="bg-white/2 border border-white/6 rounded-2xl p-4 sm:p-5 lg:p-6 relative">
+                            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
+                                <img src={w.gameLogotip} className="w-full sm:w-32 lg:w-40 aspect-square object-cover rounded-xl shrink-0 " />
+                                <div className="flex flex-col lg:gap-10 sm:gap-10 overflow-hidden">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 sm:gap-10 lg:gap-25 text-xs font-mono">
+
+                                        <div className="min-w-0">
+                                            <p className="text-white/20 uppercase tracking-wider text-[15px] mb-1.5">
+                                                Tournament Name
+                                            </p>
+                                            <p className="text-bgsecondary wrap-break-words text-[15px]">
+                                                {w.tournamentName}
+                                            </p>
+                                        </div>
+
+                                        <div className="min-w-0">
+                                            <p className="text-white/20 uppercase tracking-wider text-[15px] mb-1.5">
+                                                Tournament Status
+                                            </p>
+                                            <p className="text-bgsecondary wrap-break-words text-[15px]">
+                                                {w.tournamentStatus}
+                                            </p>
+                                        </div>
+
+                                        <div className="min-w-0">
+                                            <p className="text-white/20 uppercase tracking-wider text-[15px] mb-1.5">
+                                                Added to watchlist
+                                            </p>
+                                            <p className="text-white/40 wrap-break-words">
+                                                {w.addedAt ? new Date(w.addedAt).toLocaleString(): "—"}
+                                            </p>
+                                        </div>
+
                                     </div>
-                                    <div className="absolute rounded-t-lg bg-primary/90 h-min inset-0 origin-top scale-y-0 group-hover:scale-y-100 transition-transform duration-300">
-                                        <h2 className="text-bgsecondary text-center text-2xl font-bold">{w.userId}</h2>
-                                    </div>
-                                    <div className="absolute rounded-b-lg bottom-0 bg-primary/90 w-full p-2 origin-bottom scale-y-0 group-hover:scale-y-100 transition-transform duration-300">
-                                        
-                                        <span className="float-left font-semibold text-sm text-bgsecondary">{w.tournamentId}</span>
-                                        <span className="text-sm text-bgsecondary font-semibold float-right">{formatDeadline(w.addedAt)}</span>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 text-xs font-mono items-end">
+
+                                        <div className="min-w-0">
+                                            <p className="text-white/20 uppercase tracking-wider text-[15px] mb-1.5">
+                                                Game Name
+                                            </p>
+
+                                            <p className="text-bgsecondary wrap-break-word text-[15px]">
+                                                {w.gameName}
+                                            </p>
+                                        </div>
+
+                                        <div className="lg:col-start-3 flex justify-end">
+                                            <button
+                                                className="cursor-pointer w-1/3 min-w-30 bg-red-400/40 border-2 border-red-500 hover:bg-bgsecondary/30 hover:border-bgsecondary text-red-500 font-semibold rounded-xl p-1 text-sm transition-colors"
+                                                onClick={() => {
+                                                    setDeleted(false);
+                                                    userWatchlistApi.delete(w.userId, w.tournamentId)
+                                                        .then(res => {
+                                                            if (res.success) {
+                                                                setDeleted(true);
+                                                                setWatchlist(prev =>
+                                                                    prev.filter(
+                                                                        watchlist =>
+                                                                            watchlist.tournamentId !== w.tournamentId
+                                                                    )
+                                                                );
+                                                                setTimeout(() => {
+                                                                    setDeleted(false);
+                                                                }, 3000);
+                                                                return;
+                                                            }
+                                                            setError(res.message);
+                                                        })
+                                                        .catch(() =>
+                                                            setError("Failed to remove tournament from watchlist")
+                                                        );
+                                                }}
+                                            >
+                                                Remove from watchlist
+                                            </button>
+                                        </div>
+
                                     </div>
                                 </div>
-                                ))}
-                            </section>
-                        )}
-                        <Pagination page={page} total={total} pageSize={limit} onChange={setPage} />
-            </div>
-        )
+                            </div>
+                        </div>
+                    ))}
+                </section>
+            )}
+            <Pagination page={page} total={total} pageSize={limit} onChange={setPage} />
+        </div>
+    )
 
 }
