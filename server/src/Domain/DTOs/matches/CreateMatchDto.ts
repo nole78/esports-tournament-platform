@@ -5,6 +5,7 @@ import { MatchStatus } from "../../enums/MatchStatus";
 
 export class CreateMatchDto{
     constructor(
+        public tournamentId: number = 0,
         public blueTeamId : number = 0,
         public redTeamId : number = 0,
         public matchResult : string = "",
