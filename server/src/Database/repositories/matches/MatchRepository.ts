@@ -11,7 +11,7 @@ export class MatchRepository implements IMatchRepository {
   ) {}
 
   private map(r: RowDataPacket): Match {
-    return new Match(r.match_id,r.blue_team_id,r.red_team_id,r.match_result,r.status,r.match_result);
+    return new Match(r.match_id, r.tournament_id, r.blue_team_id, r.red_team_id, r.match_result, r.status, r.match_result);
   }
 
   async findById(id: number): Promise<Match> {
@@ -55,6 +55,20 @@ export class MatchRepository implements IMatchRepository {
     } finally { res.conn.release(); }
   }
 
+  async  findByTournamentId(tournamentId: number): Promise<Match[]> {
+    const res = await this.db.getReadConnection();
+    if (!res) return [];
+    try {
+      const [rows] = await res.conn.execute<RowDataPacket[]>(
+        `SELECT * FROM matches WHERE tournament_id = ? ORDER BY id DESC`, [tournamentId]
+      );
+      return rows.map((r) => this.map(r));
+    } catch (err) {
+      this.logger.error("MatchRepository", "findByUserId failed", err);
+      return [];
+    } finally { res.conn.release(); }
+  }
+
   async create(dto: Match): Promise<Match> {
     const res = await this.db.getWriteConnection();
     if (!res) return new Match;
@@ -65,7 +79,7 @@ export class MatchRepository implements IMatchRepository {
         [dto.blueTeamId, dto.redTeamId, dto.matchResult, dto.status, dto.matchRound]
       );
       if (result.insertId === 0) return new Match;
-      return new Match(result.insertId, dto.blueTeamId, dto.redTeamId, dto.matchResult, dto.status, dto.matchRound);
+      return new Match(result.insertId, dto.tournamentId, dto.blueTeamId, dto.redTeamId, dto.matchResult, dto.status, dto.matchRound);
     } catch (err) {
       this.logger.error("MatchRepository", "create failed", err);
       return new Match;
