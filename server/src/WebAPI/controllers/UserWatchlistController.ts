@@ -9,7 +9,7 @@ export class UserWatchlistController{
     private readonly router = Router();
 
     public constructor(private readonly watchlistService: IUserWatchlistService){
-        this.router.get("/watchlist", authenticate, authorize(UserRole.PLAYER, UserRole.ADMIN), this.getListByUserId.bind(this));
+        this.router.post("/watchlist", authenticate, authorize(UserRole.PLAYER, UserRole.ADMIN), this.getListByUserId.bind(this));
         this.router.delete("/watchlist/:tournamentId", authenticate, authorize(UserRole.PLAYER, UserRole.ADMIN), this.removeFromWatchList.bind(this));
     }
 

@@ -31,6 +31,9 @@ import { TeamService } from './Services/teams/TeamService';
 import { TeamRepository } from "./Database/repositories/teams/TeamRepository";
 import { TeamMemberRepository } from "./Database/repositories/team_members/TeamMembersRepository";
 import { TeamController } from "./WebAPI/controllers/TeamController";
+import { UserWatchlistRepository } from "./Database/repositories/user_watchlist/UserWatchlistRepository";
+import { UserWatchlistService } from "./Services/user_watchlist/UserWatchlistService";
+import { UserWatchlistController } from "./WebAPI/controllers/UserWatchlistController";
 
 export const logger = new ConsoleLoggerService();
 export const db     = new DbManager(logger);
@@ -46,6 +49,7 @@ const tournamentRepo = new TournamentRepository(db, logger);
 const auditRepo = new AuditRepository(db, logger);
 const teamRepo = new TeamRepository(db, logger);
 const teamMemberRepo = new TeamMemberRepository(db, logger);
+const userWatchlistRepo = new UserWatchlistRepository(db, logger);
 
 // Services
 const userService   = new UserService(userRepo);
@@ -56,6 +60,7 @@ const auditService = new AuditService(auditRepo, userRepo);
 const authService   = new AuthService(userRepo,auditService);
 const teamService = new TeamService(teamRepo, teamMemberRepo, userRepo, logger);
 const healthService = new HealthService(gameRepo, tournamentRepo, userRepo, teamRepo, db);
+const watchlistService = new UserWatchlistService(userWatchlistRepo, tournamentRepo, gameRepo);
 
 // Express
 const app = express();
@@ -71,5 +76,6 @@ app.use("/api/v1", new AuditController(auditService).getRouter());
 app.use("/api/v1", new HealthController(healthService).getRouter());
 app.use("/api/v1", new TeamController(teamService).getRouter());
 app.use("/api/v1", new HealthController(healthService).getRouter());
+app.use("/api/v1", new UserWatchlistController(watchlistService).getRouter());
 
 export default app;

@@ -6,19 +6,31 @@ import { UserWatchlist } from '../../Domain/models/UserWatchlist';
 import { PaginatedListDto } from '../../Domain/DTOs/PaginatedListDto';
 import { IUserWatchlistRepository } from '../../Domain/repositories/user_watchlist/IUserWatchlistRepository';
 import { IUserWatchlistService } from '../../Domain/services/user_watchlist/IUserWatchlistService';
+import { ITournamentRepository } from '../../Domain/repositories/tournaments/ITournamentRepository';
+import { IGameRepository } from '../../Domain/repositories/games/IGameRepository';
 
 export class UserWatchlistService implements IUserWatchlistService {
-    public constructor(private readonly watchlistRepo : IUserWatchlistRepository){}
+    public constructor(private readonly watchlistRepo : IUserWatchlistRepository, private readonly tournamentRepo : ITournamentRepository, private readonly gameRepo : IGameRepository){}
 
-    private toUserWatchlistDto(watchlist: UserWatchlist) : UserWatchlistDto{
-        return new UserWatchlistDto(watchlist.userId, watchlist.tournamentId, watchlist.addedAt);
+    private async toUserWatchlistDto(watchlist: UserWatchlist) : Promise<UserWatchlistDto>{
+        const tournament = await this.tournamentRepo.findById(watchlist.tournamentId);
+        const game = await this.gameRepo.findById(tournament.tournamentGameId);
+        return new UserWatchlistDto(
+            watchlist.userId,
+            watchlist.tournamentId,
+            tournament.tournamentName,
+            tournament.tournamentStatus,
+            game.gameName,
+            game.gameLogotip,
+            watchlist.addedAt
+        );
     }
 
     async getByUserId(userId: number, page?: number, limit?: number) : Promise<Result<PaginatedListDto<UserWatchlistDto>>>
     {
         const items = await this.watchlistRepo.findByUserId(userId, page ?? 1, limit ?? 20);
         const total = await this.watchlistRepo.getTotal(userId);
-        const list = items.map(i => this.toUserWatchlistDto(i));
+        const list = await Promise.all(items.map(i => this.toUserWatchlistDto(i)));
         return Result.Success(new PaginatedListDto(list, total, page ?? 1, limit ?? 20));
     }
 
@@ -28,7 +40,8 @@ export class UserWatchlistService implements IUserWatchlistService {
         if(item.userId !== 0)
             return Result.Failure("Tournament is already in watchlist", ErrorType.Conflict);
         const watchlist = await this.watchlistRepo.create(dto);
-        return Result.Success(this.toUserWatchlistDto(watchlist));
+        const list = await this.toUserWatchlistDto(watchlist);
+        return Result.Success(list);
     }
     
     async remove(userId: number, tournamentId: number) : Promise<Result<void>>

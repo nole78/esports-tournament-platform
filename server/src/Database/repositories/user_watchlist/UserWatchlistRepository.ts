@@ -20,8 +20,8 @@ export class UserWatchlistRepository implements IUserWatchlistRepository {
     if (!res) return [];
     const offset = (page - 1) * limit;
     try {
-      const [rows] = await res.conn.execute<RowDataPacket[]>(
-        `SELECT * FROM user_watchlist WHERE userId = ? ORDER BY tournament_id LIMIT ? OFFSET ?`, [userId, limit, offset]
+      const [rows] = await res.conn.query<RowDataPacket[]>(
+        `SELECT * FROM user_watchlist WHERE user_id = ? ORDER BY tournament_id LIMIT ? OFFSET ?`, [userId, limit, offset]
       );
       const items = rows.map((r) => this.map(r));
       return items;

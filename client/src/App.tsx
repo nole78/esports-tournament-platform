@@ -18,6 +18,7 @@ import LandingPage from "./pages/common_pages/LandingPage";
 import TeamsPage from "./pages/common_pages/TeamsPage";
 import TeamsAddPage from "./pages/common_pages/TeamsAddPage";
 import TeamsEditPage from "./pages/common_pages/TeamsEditPage";
+import UserWatchList from "./pages/user/UserWatchlist";
 //import TeamsAddPage from "./pages/common_pages/TeamsAddPage";
 
 import { Layout } from "./components/layout/Layout";
@@ -39,7 +40,7 @@ export default function App() {
       {/* User routes */}
       <Route path="/dashboard" element={<ProtectedRoute requiredRole="player"><UserDashboard /></ProtectedRoute>} />
       <Route path="/user_info" element={<ProtectedRoute requiredRole="player"><UserOverview/></ProtectedRoute>}/>
-
+      <Route path="/watchlist" element={<ProtectedRoute requiredRole="player"><UserWatchList/></ProtectedRoute>} />
       {/* Admin routes */}
       <Route path="/admin_info" element={<ProtectedRoute requiredRole="admin"><UserOverview/></ProtectedRoute>}/>
       <Route path="/admin"       element={<ProtectedRoute requiredRole="admin"><AdminDashboard /></ProtectedRoute>} />
@@ -50,6 +51,7 @@ export default function App() {
       <Route path="/admin/tournament_list" element={<ProtectedRoute requiredRole="admin"><TournamentList/></ProtectedRoute>} />
       <Route path="/admin/tournament_list/add" element={<ProtectedRoute requiredRole="admin"><TournamentAddPage/></ProtectedRoute>} />
       <Route path="/admin/health" element={<ProtectedRoute requiredRole="admin"><HealthPage/></ProtectedRoute>}/>
+      <Route path="/admin/watchlist" element={<ProtectedRoute requiredRole="admin"><UserWatchList/></ProtectedRoute>}/>
       {/* <Route path="/admin/teams" element ={<ProtectedRoute requiredRole="admin"> <TeamsPage/></ProtectedRoute>} /> */}
 
 
