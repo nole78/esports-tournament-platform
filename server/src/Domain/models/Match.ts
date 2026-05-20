@@ -9,7 +9,7 @@ export class Match{
         public blueTeamId : number = 0,
         public redTeamId : number = 0,
         public matchResult : string = "",
-        public status : MatchStatus.SCHEDULED,
+        public status : MatchStatus = MatchStatus.SCHEDULED,
         public matchRound : MatchRound = MatchRound.ROUND_OF_16,
     ){}
 }
