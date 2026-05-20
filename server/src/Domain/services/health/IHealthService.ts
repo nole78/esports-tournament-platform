@@ -3,6 +3,5 @@ import { StatisticsDto } from "../../DTOs/statistics/StatisticsDto";
 import { Result } from "../../common/Result";
 export interface IHealthService {
   getDbStatus(): Result<HealthStatusDto>;
-  runHealthCheck(): Promise<Result<void>>;
   getStatistics(): Promise<Result<StatisticsDto>>;
 }
