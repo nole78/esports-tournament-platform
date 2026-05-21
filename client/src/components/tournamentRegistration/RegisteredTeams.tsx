@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Empty, ErrorBox, PageHeader, Pagination, Spinner, Table, TableHead } from "../ui/UI";
+import { Empty, ErrorBox, PageHeader, Pagination, Spinner } from "../ui/UI";
 import type { TournamentRegistrationDto } from "../../models/tournamentRegistration/TournamentRegistrationDto";
 import { TournamentRegistrationStatus } from "../../types/tournament_registration/TournamentRegistrationStatus";
 import { useAuth } from "../../hooks/auth/useAuthHook";
@@ -20,7 +20,6 @@ export default function RegisteredTeams() {
   const loadPage = (pages: number) => {
       
     Promise.resolve().then(() => setLoading(true));
-  
     tournamentRegistrationApi.getByTournamentId(Number(id), pages, limit)
     .then(res => {
       if (res.success && res.data) {
@@ -38,37 +37,68 @@ export default function RegisteredTeams() {
 
   useEffect(() => {
       loadPage(page);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [page]);
+
+  const confirmedTeams = regTeams.filter(t => t.status === TournamentRegistrationStatus.CONFIRMED);
 
   return (
     <div>
       <PageHeader eyebrow="" title="Registered Teams" />
       <div className="space-y-4">
-        <div className="bg-primary border border-secondary/40 rounded-xl p-6">
-          {loading ? <div className="flex justify-center py-16"><Spinner /></div>
-                  : regTeams.length === 0 ? <Empty message="No registered teams" />
-                  : <>
-            {error && <ErrorBox message={error}/>}
-            <Table>
-              <TableHead columns={["Logo", "Team name", "Team tag"]} />
-              <tbody>
-                {regTeams
-                  .filter(t => t.status === TournamentRegistrationStatus.CONFIRMED)
-                  .map((t, i) => (
-                  <tr key={t.teamId} className={`hover:bg-white/2 transition-colors ${i < regTeams.length - 1 ? "border-b border-white/4" : ""}`}>
-                    <td className="px-5 py-3.5 font-mono text-xs text-white/20"><img src={t.teamLogotip} /></td>
-                    <td className="px-5 py-3.5 font-mono text-xs text-white/20">{t.teamName}</td>
-                    <td className="px-5 py-3.5 font-mono text-xs text-white/20">{t.teamTag}</td>
+        {loading ? (
+          <div className="flex justify-center py-16">
+            <Spinner />
+          </div>
+        ) : confirmedTeams.length === 0 ? (
+          <Empty message="No registered teams" />
+        ) : (
+          <>
+            {error && <ErrorBox message={error} />}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {confirmedTeams.map((t, i) => (
+                <div
+                  key={t.teamId}
+                  className="bg-primary border border-secondary/40 rounded-lg p-4 hover:border-secondary/60 transition-all duration-200 hover:shadow-lg hover:shadow-secondary/20"
+                >
+                  <div className="flex items-center gap-3 mb-3">
+                    <img
+                      src={t.teamLogotip}
+                      alt={t.teamName}
+                      className="w-12 h-12 rounded-lg object-cover border border-secondary/40"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-sm text-white truncate">
+                        {t.teamName}
+                      </h3>
+                      <p className="text-xs text-white/50 font-mono">{t.teamTag}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between pt-3 border-t border-secondary/20">
+                    <span className="text-xs text-white/40">
+                      #{i + 1 + (page - 1) * limit}
+                    </span>
                     {user?.role === "admin" && (
-                    <td className="px-5 py-3.5 font-mono text-xs text-white/20"><button>DISQUALIFY</button></td>
+                      <button className="px-3 py-1 text-xs bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded transition-colors duration-200">
+                        Disqualify
+                      </button>
                     )}
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-            <Pagination page={page} total={total} pageSize={limit} onChange={setPage} />
-            </>}
-        </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {Math.ceil(total / limit) > 1 && (
+              <div className="mt-6">
+                <Pagination
+                  page={page}
+                  total={total}
+                  pageSize={limit}
+                  onChange={setPage}
+                />
+              </div>
+            )}
+          </>
+        )}
       </div>
     </div>
   );
