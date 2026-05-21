@@ -7,7 +7,7 @@ import { UserDto } from "../../DTOs/users/UserDto";
 
 export interface IMatchService{
     getAll(page?: number, limit?: number): Promise<Result<PaginatedListDto<MatchDto>>>;
-    getAllPlayers(id: number): Promise<Result<UserDto>>;
+    getAllPlayers(id: number): Promise<Result<UserDto[]>>;
     getById(id: number): Promise<Result<MatchDto>>;
     getByTeamId(teamId: number): Promise<Result<MatchDto[]>>;
     getByTournamentId(tournamentId: number): Promise<Result<MatchDto[]>>;
