@@ -8,6 +8,7 @@ import { validateTeamsCreation } from "../validators/teams/validateTeamsCreation
 import { CreateTeamDto } from "../../Domain/DTOs/teams/CreateTeamDto";
 import { handleResult } from "../mappers/ResultMapper";
 import { Result } from '../../Domain/common/Result';
+import { User } from "../../Domain/models/User";
 
 
 export class TeamController{
@@ -15,12 +16,15 @@ export class TeamController{
 
     public constructor(private readonly teamService: ITeamService){
         this.router.get("/teams", authenticate, this.getByGamerTag.bind(this));
-        this.router.post("/teams", authenticate, authorize(UserRole.PLAYER, UserRole.ADMIN), this.create.bind(this));
+        this.router.post("/teams", authenticate, this.create.bind(this));
         this.router.get("/teams/:id", this.getTeamsById.bind(this));
-        this.router.patch("/teams/:id", authenticate, authorize(UserRole.PLAYER, UserRole.ADMIN), this.update.bind(this));
-        this.router.delete("/teams/:id", authenticate, authorize(UserRole.PLAYER, UserRole.ADMIN), this.delete.bind(this));
+        this.router.patch("/teams/:id", authenticate, this.update.bind(this));
+        this.router.delete("/teams/:id", authenticate, this.delete.bind(this));
         
-        //this.router.post("/teams/add/:gamer_tag/:team_tag", authenticate, authorize(UserRole.PLAYER, UserRole.ADMIN), this.addMember.bind(this));
+        this.router.post("/teams/:id/invite", authenticate, this.invite.bind(this));
+        this.router.post("/teams/:id/invite/respond", authenticate, this.inviteRespond.bind(this));
+        this.router.patch("/teams/:id/members/:userId/role", authenticate, this.transferRole.bind(this));
+        this.router.delete("/teams/:id/members/:userId", authenticate, this.leaveTeam.bind(this));
     }
 
     private async getAll(req: Request, res: Response) : Promise<void>{
@@ -47,7 +51,7 @@ export class TeamController{
     }   
 
     private async create(req: Request, res: Response) : Promise<void>{
-        const gamer_tag = req.user?.username as string;
+        const gamerTag = req.user?.username as string;
         
         const {teamName, teamTag, teamLogotip, teamDescription} = (req.body.team ?? {}) as {teamName?:string, teamTag?:string, teamLogotip?:string, teamDescription?:string};
         const safeTeamName = teamName ?? "";
@@ -58,35 +62,73 @@ export class TeamController{
         const v:ValidationResult = validateTeamsCreation(safeTeamName, safeTeamTag, safeTeamLogotip, safeTeamDescription);
         if (!v.valid){res.status(400).json({success:false, message: v.message}); return;}
         
-        const result = await this.teamService.create(new CreateTeamDto(safeTeamName, safeTeamTag, safeTeamLogotip, safeTeamDescription), gamer_tag);
+        const result = await this.teamService.create(new CreateTeamDto(safeTeamName, safeTeamTag, safeTeamLogotip, safeTeamDescription), gamerTag);
         handleResult(result, res);
     } 
 
-    private async addMember(req: Request, res: Response) : Promise<void>{
-        const gamer_tag = await req.params.gamer_tag as string;
-        const team_tag = await req.params.team_tag as string;
-
-        const result = await this.teamService.addMember(gamer_tag, team_tag);
-        handleResult(result, res);
-        
-    }
+    
 
     private async update(req: Request, res: Response) : Promise<void>{
-        const gamer_tag = req.user?.username as string;
+        const gamerTag = req.user?.username as string;
         const id = parseInt(req.params.id as string, 10);
         if(isNaN(id)) {res.status(400).json({ success: false, message: "Invalid id"}); return; }
 
-        const result = await this.teamService.update(gamer_tag, req.body, id);
+        const result = await this.teamService.update(gamerTag, req.body, id);
         handleResult(result, res);
     }
 
     private async delete(req: Request, res: Response) : Promise<void>{
-        const gamer_tag = req.user?.username as string;
+        const gamerTag = req.user?.username as string;
         
         const id = parseInt(req.params.id as string, 10);
         if(isNaN(id)) {res.status(400).json({ success: false, message: "Invalid id"}); return; }
         
-        const result = await this.teamService.delete(gamer_tag, id);
+        const result = await this.teamService.delete(gamerTag, id);
+        handleResult(result, res);
+    }
+
+    private async invite(req: Request, res: Response) : Promise<void>{
+        const gamerTag = req.user?.username as string;
+        const id = parseInt(req.params.id as string, 10);
+        const gamerTagInvite = (req.body.userTag) as string;
+        
+        const safeGamerTagInvite = gamerTagInvite ?? "";
+
+        if (isNaN(id)) {res.status(400).json({success: false, message: "Invalid id"}); return;}
+
+        const result = await this.teamService.invite(gamerTag, id, safeGamerTagInvite);
+        handleResult(result, res);
+    }
+
+    private async inviteRespond(req:Request, res: Response) : Promise<void>{
+        const gamerTag = req.user?.username as string;
+        const id = parseInt(req.params.id as string, 10);
+        //Answer needs to be YES or NO
+        const answer = req.body.answer as string;
+        const safeAnswer = answer ?? "";
+        if (isNaN(id)) {res.status(400).json({success: false, message: "Invalid id"}); return;}
+
+        const result = await this.teamService.inviteResponse(gamerTag, id, safeAnswer);
+        handleResult(result, res);
+    }
+
+    private async transferRole(req: Request, res: Response) : Promise<void>{
+        const gamerTag = req.user?.username ?? "";
+        const teamId = parseInt(req.params.id as string,10);
+        const userId = parseInt(req.params.userId as string,10);
+        if (isNaN(teamId) || isNaN(userId)) {res.status(400).json({success: false, message: "Invalid id"}); return;}
+
+        const result = await this.teamService.transferCaptainship(gamerTag, teamId, userId);
+        handleResult(result, res);
+    }
+
+    private async leaveTeam(req: Request, res: Response) : Promise<void>{
+        const gamerTag = req.user?.username ?? "";
+        const teamId = parseInt(req.params.id as string,10);
+        const userId = parseInt(req.params.userId as string,10);
+        if (isNaN(teamId) || isNaN(userId)) {res.status(400).json({success: false, message: "Invalid id"}); return;}
+
+        const result = await this.teamService.leaveTeam(gamerTag, teamId, userId);
         handleResult(result, res);
     }
     public getRouter(): Router { return this.router; }
