@@ -71,7 +71,7 @@ export class TournamentRegistrationRepository implements ITournamentRegistration
     const offset = Math.max(0, Math.floor((page - 1) * limit));
     const lim    = Math.max(1, Math.floor(limit));
     try {
-      const [rows] = await res.conn.execute<RowDataPacket[]>(
+      const [rows] = await res.conn.query<RowDataPacket[]>(
         `SELECT * 
         FROM tournament_registrations 
         WHERE tournament_id = ? 
@@ -104,11 +104,11 @@ export class TournamentRegistrationRepository implements ITournamentRegistration
     if (!res) return new TournamentRegistration();
     try {
       const [result] = await res.conn.execute<ResultSetHeader>(
-        `INSERT INTO tournament_registrations (team_id,tournament_id,seed) VALUES (?,?)`,
-        [tr.teamId,tr.tournamentId]
+        `INSERT INTO tournament_registrations (team_id,tournament_id,seed) VALUES (?,?,?)`,
+        [tr.teamId,tr.tournamentId,tr.seed]
       );
       if (result.insertId === 0) return new TournamentRegistration();
-      return new TournamentRegistration(result.insertId, tr.teamId, tr.tournamentId);
+      return new TournamentRegistration(tr.teamId, tr.tournamentId, tr.seed);
     } catch (err) {
       this.logger.error("TournamentRegistrationRepository", "create failed", err);
       return new TournamentRegistration();

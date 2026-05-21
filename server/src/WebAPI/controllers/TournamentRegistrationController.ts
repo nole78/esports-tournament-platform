@@ -12,7 +12,7 @@ export class TournamentRegistrationController{
 
     public constructor(private readonly tournamentRegistrationService: ITournamentRegistrationService){
         this.router.get("/tournaments/:id/registered", authenticate, this.getByTournamentId.bind(this));
-        this.router.post("/tournaments/:id/register", authenticate, this.register.bind(this));
+        this.router.post("/tournaments/:id/register",  this.register.bind(this));
         this.router.delete("/tournaments/:id/register/:teamId", authenticate, this.delete.bind(this));
         this.router.patch("/tournament/:id/registrations/:teamId", authenticate, authorize(UserRole.ADMIN), this.update.bind(this));
     }
@@ -20,7 +20,7 @@ export class TournamentRegistrationController{
     private async getByTournamentId(req: Request, res: Response): Promise<void>{
         const page  = parseInt(req.query.page  as string ?? "1",  10);
         const limit = Math.min(parseInt(String(req.query.limit ?? "12"), 10), 100);
-        const id = parseInt(req.query.id  as string,  10);
+        const id = parseInt(req.params.id  as string,  10);
         const result = await this.tournamentRegistrationService.getByTournamentId(id, page, limit);
         res.status(200).json({ success: true, data: result });
     }
