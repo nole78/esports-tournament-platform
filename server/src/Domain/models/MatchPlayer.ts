@@ -5,6 +5,6 @@ export class MatchPlayer{
         public userId : number = 0,
         public teamId : number = 0,
         public matchId : number = 0,
-        public preformaceNotes : string = "",
+        public performaceNotes : string = "",
     ){}
 }
