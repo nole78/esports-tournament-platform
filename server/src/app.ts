@@ -7,14 +7,12 @@ import { DateTimeConverter } from "./Services/datetime/DateTimeConverter";
 import { DbManager } from "./Database/connection/DbConnectionPool";
 
 import { UserRepository }   from "./Database/repositories/users/UserRepository";
-import { EntityRepository } from "./Database/repositories/entity/EntityRepository";
 import { GameRepository } from './Database/repositories/games/GameRepository';
 import { TournamentRepository } from "./Database/repositories/tournament/TournamentRepository";
 import { AuditRepository } from "./Database/repositories/audit/AuditRepository";
 
 import { AuthService }   from "./Services/auth/AuthService";
 import { UserService }   from "./Services/users/UserService";
-import { EntityService } from "./Services/entity/EntityService";
 import { GameService } from './Services/games/GameService';
 import { TournamentService } from "./Services/tournaments/TournamentService";
 import { AuditService } from "./Services/audit/AuditService";
@@ -40,7 +38,6 @@ const dateTimeConverter = new DateTimeConverter();
 
 // Repositories
 const userRepo   = new UserRepository(db, logger);
-const entityRepo = new EntityRepository(db, logger);
 const gameRepo = new GameRepository(db, logger);
 const tournamentRepo = new TournamentRepository(db, logger);
 const auditRepo = new AuditRepository(db, logger);
@@ -49,7 +46,6 @@ const teamMemberRepo = new TeamMemberRepository(db, logger);
 
 // Services
 const userService   = new UserService(userRepo);
-const entityService = new EntityService(entityRepo);
 const gameService   = new GameService(gameRepo);
 const tournamentService = new TournamentService(tournamentRepo, gameRepo, logger, dateTimeConverter);
 const auditService = new AuditService(auditRepo, userRepo);
@@ -64,7 +60,6 @@ app.use(express.json({ limit: "10mb"}));
 
 app.use("/api/v1", new AuthController(authService).getRouter());
 app.use("/api/v1", new UserController(userService).getRouter());
-app.use("/api/v1", new EntityController(entityService).getRouter());
 app.use("/api/v1", new GameController(gameService).getRouter());
 app.use("/api/v1", new TournamentController(tournamentService).getRouter());
 app.use("/api/v1", new AuditController(auditService).getRouter());
