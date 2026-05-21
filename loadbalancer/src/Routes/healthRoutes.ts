@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { HealthCheckService } from '../services/healthCheckService';
-import { authenticate } from '../middleware/authMiddleware';
+import { HealthCheckService } from '../Services/healthCheckService';
+import { authenticate } from '../Middlewares/authMiddleware';
 import { UserRole } from '../Domain/enums/UserRole';
-import { authorize } from '../middleware/authorizeMiddleware';
+import { authorize } from '../Middlewares/authorizeMiddleware';
 
 export function createHealthRouter(healthCheck: HealthCheckService) {
     const router = Router();
