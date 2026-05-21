@@ -61,7 +61,6 @@ CREATE TABLE tournaments(
 );
 
 CREATE TABLE matches(
-  /*TODO: Add date perhaps*/
   match_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   tournament_id INT UNSIGNED NOT NULL,
   blue_team_id INT UNSIGNED NOT NULL,
