@@ -5,6 +5,7 @@ import { authorize } from "../../Middlewares/authorization/AuthorizeMiddleware";
 import { UserRole } from "../../Domain/enums/UserRole";
 import { handleResult } from "../mappers/ResultMapper";
 import { MatchResultDto } from '../../Domain/DTOs/matches/MatchResultDto';
+import { AddPlayersDto } from "../../Domain/DTOs/match_players/AddPlayersDto";
 
 export class MatchController {
     private readonly router = Router();
@@ -12,8 +13,8 @@ export class MatchController {
         this.router.get("/matches/tournament/:tournamendId", this.getAllForTournament.bind(this));
         this.router.get("/matches/:id", this.getDetails.bind(this));
         this.router.patch("/matches/:id/result", authenticate, authorize(UserRole.ADMIN), this.setResult.bind(this));
-        this.router.post("/matches/:id/players", authenticate, this.getAllPlayers.bind(this));
-        this.router.put("/matches/:id/players/:userId", authenticate, this.addPlayer.bind(this));
+        this.router.post("/matches/:id/players", authenticate, this.addPlayers.bind(this));
+        this.router.put("/matches/:id/players/:userId", authenticate, this.changePerformanceNotes.bind(this));
         this.router.delete("/matches/:id/players/:userId", authenticate, this.removePlayer.bind(this));
     }
 
@@ -45,22 +46,28 @@ export class MatchController {
         handleResult(result,res);
     }
 
-    private async getAllPlayers(req: Request, res: Response) : Promise<void> {
-        const id = parseInt(req.params.id as string, 10);
-        if(isNaN(id)) {res.status(400).json({ success: false, message: "Invalid id"}); return;}
-
-        const result = await this.matchService.getAllPlayers(id);
-        handleResult(result, res);
-    }
-
-    private async addPlayer(req: Request, res: Response) : Promise<void> {
+    private async changePerformanceNotes(req: Request, res: Response) : Promise<void> {
         const id = parseInt(req.params.id as string, 10);
         if(isNaN(id)) {res.status(400).json({ success: false, message: "Invalid id"}); return;}
         
         const userId = parseInt(req.params.userId as string, 10);
         if(isNaN(userId)) {res.status(400).json({ success: false, message: "Invalid id"}); return;}
+
+        const {notes} = req.body as {notes?: string};
+        if(!notes) {res.status(400).json({ success: false, message: "No notes to add"}); return;}
+
+        const result = await this.matchService.setPerformanceNotes(id, userId, notes ?? "");
+        handleResult(result, res);
+    }
+
+    private async addPlayers(req: Request, res: Response) : Promise<void> {
+        const id = parseInt(req.params.id as string, 10);
+        if(isNaN(id)) {res.status(400).json({ success: false, message: "Invalid id"}); return;}
         
-        const result = await this.matchService.addPlayerToMatch(id,userId);
+        const {userIds} = req.body as {userIds?:number[]};
+        if(!userIds || userIds.length === 0) {res.status(400).json({ success: false, message: "No user to add"}); return;} 
+
+        const result = await this.matchService.addPlayersToMatch(id,new AddPlayersDto(userIds));
         handleResult(result, res);
     }
 
