@@ -64,10 +64,11 @@ export class MatchController {
         const id = parseInt(req.params.id as string, 10);
         if(isNaN(id)) {res.status(400).json({ success: false, message: "Invalid id"}); return;}
         
-        const {userIds} = req.body as {userIds?:number[]};
+        const {teamId, userIds} = req.body as {teamId?:number,userIds?:number[]};
         if(!userIds || userIds.length === 0) {res.status(400).json({ success: false, message: "No user to add"}); return;} 
+        if(!teamId || teamId <= 0) {res.status(400).json({ success: false, message: "Team Id required and has to be grater than 0"}); return;} 
 
-        const result = await this.matchService.addPlayersToMatch(id,new AddPlayersDto(userIds));
+        const result = await this.matchService.addPlayersToMatch(id,new AddPlayersDto(teamId, userIds));
         handleResult(result, res);
     }
 
