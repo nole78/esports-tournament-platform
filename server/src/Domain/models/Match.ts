@@ -1,4 +1,4 @@
-import { MatchRound } from "../enums/MatchRound";
+import { MatchSlot } from "../enums/MatchSlot";
 import { MatchStatus } from "../enums/MatchStatus";
 
 export class Match{
@@ -7,8 +7,14 @@ export class Match{
         public tournamentId: number = 0,
         public blueTeamId : number = 0,
         public redTeamId : number = 0,
-        public matchResult : string = "",
+        public winnerTeamId : number  = 0,
         public status : MatchStatus = MatchStatus.SCHEDULED,
-        public matchRound : MatchRound = MatchRound.ROUND_OF_16,
+        public roundNumber : number = 0,
+        public blueTeamScore : number = 0,
+        public redTeamScore : number = 0,
+        public WinnerToMatchId : number = 0,
+        public WinnerToSlot : MatchSlot = MatchSlot.BLUE,
+        public LoserToMatchId : number = 0,
+        public LoserToSlot : MatchSlot = MatchSlot.BLUE,
     ){}
 }

@@ -65,22 +65,33 @@ CREATE TABLE matches(
   tournament_id INT UNSIGNED NOT NULL,
   blue_team_id INT UNSIGNED NULL,
   red_team_id INT UNSIGNED NULL,
-  match_result VARCHAR(4),
-  status ENUM('scheduled','ongoing','completed'),
-  match_round ENUM('round_of_16','quarterfinal','semifinal','final'),
-  FOREIGN KEY (tournament_id) REFERENCES tournament(tournament_id)
-  ON DELETE CASCADE,
-  FOREIGN KEY (blue_team_id) REFERENCES teams(team_id),
-  FOREIGN KEY (red_team_id) REFERENCES teams(team_id),
-  CONSTRAINT match_score_format CHECK (
-    match_result REGEXP '^[0-9]:[0-9]$'
-  ),
-  CONSTRAINT at_least_one_team CHECK (
-  blue_team_id IS NOT NULL OR red_team_id IS NOT NULL
-  ),
-  CONSTRAINT different_teams CHECK (
-  blue_team_id IS NULL OR red_team_id IS NULL OR blue_team_id != red_team_id
-  )
+  winner_team_id INT UNSIGNED NULL,
+  status ENUM('scheduled','ongoing','completed') DEFAULT 'scheduled',
+  round_number INT UNSIGNED NOT NULL,
+  bracket_type ENUM('winner','loser','grand_final') NULL,
+
+  blue_team_score TINYINT UNSIGNED NULL,
+  red_team_score TINYINT UNSIGNED NULL,
+
+  winner_to_match_id INT UNSIGNED NULL,
+  winner_to_slot ENUM('blue','red') NULL,
+
+  loser_to_match_id INT UNSIGNED NULL,
+  loser_to_slot ENUM('blue','red') NULL,
+
+  FOREIGN KEY (tournament_id)
+    REFERENCES tournaments(tournament_id)
+    ON DELETE CASCADE,
+  FOREIGN KEY (blue_team_id)
+    REFERENCES teams(team_id),
+  FOREIGN KEY (red_team_id)
+    REFERENCES teams(team_id),
+  FOREIGN KEY (winner_team_id)
+    REFERENCES teams(team_id),
+  FOREIGN KEY (winner_to_match_id)
+    REFERENCES matches(match_id),
+  FOREIGN KEY (loser_to_match_id)
+    REFERENCES matches(match_id)
 );
 
 CREATE TABLE team_members(
