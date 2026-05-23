@@ -63,8 +63,8 @@ CREATE TABLE tournaments(
 CREATE TABLE matches(
   match_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   tournament_id INT UNSIGNED NOT NULL,
-  blue_team_id INT UNSIGNED NOT NULL,
-  red_team_id INT UNSIGNED NOT NULL,
+  blue_team_id INT UNSIGNED NULL,
+  red_team_id INT UNSIGNED NULL,
   match_result VARCHAR(4),
   status ENUM('scheduled','ongoing','completed'),
   match_round ENUM('round_of_16','quarterfinal','semifinal','final'),
@@ -74,6 +74,12 @@ CREATE TABLE matches(
   FOREIGN KEY (red_team_id) REFERENCES teams(team_id),
   CONSTRAINT match_score_format CHECK (
     match_result REGEXP '^[0-9]:[0-9]$'
+  ),
+  CONSTRAINT at_least_one_team CHECK (
+  blue_team_id IS NOT NULL OR red_team_id IS NOT NULL
+  ),
+  CONSTRAINT different_teams CHECK (
+  blue_team_id IS NULL OR red_team_id IS NULL OR blue_team_id != red_team_id
   )
 );
 
