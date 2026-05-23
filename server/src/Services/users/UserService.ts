@@ -30,4 +30,12 @@ export class UserService implements IUserService {
     var res = await this.userRepo.update(id,{role: role});
     return res? Result.Success():Result.Failure("Couldn't deactivate user",ErrorType.Internal);
   }
+
+  async logout(id: number): Promise<Result<void>>{
+    var user = await this.userRepo.findById(id);
+    if(user.id === 0) return Result.Failure(`User with id ${id} doesn't exist`,ErrorType.NotFound);
+
+    var res = await this.userRepo.logOut(user.id);
+    return res? Result.Success():Result.Failure("Couldn't log out user",ErrorType.Internal);
+  }
 }

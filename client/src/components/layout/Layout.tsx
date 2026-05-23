@@ -94,7 +94,10 @@ export function Layout() {
 
             <button
               onClick={() => {
-                if (user) logout();
+                if (user) {
+                  logout();
+                  usersApi.logout(user.id);
+                }
                 else navigate("/login");
               }}
               className="text-sm text-secondary bg-bgsecondary p-2 rounded-lg font-semibold cursor-pointer hover:text-white/70 hover:bg-bgsecondary/70 transition-colors"
