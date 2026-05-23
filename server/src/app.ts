@@ -76,7 +76,7 @@ app.use("/api/v1", new AuthController(authService).getRouter());
 app.use("/api/v1", new UserController(userService).getRouter());
 app.use("/api/v1", new EntityController(entityService).getRouter());
 app.use("/api/v1", new GameController(gameService).getRouter());
-app.use("/api/v1", new TournamentController(tournamentService).getRouter());
+app.use("/api/v1", new TournamentController(tournamentService, watchlistService).getRouter());
 app.use("/api/v1", new AuditController(auditService).getRouter());
 app.use("/api/v1", new HealthController(healthService).getRouter());
 app.use("/api/v1", new TeamController(teamService).getRouter());

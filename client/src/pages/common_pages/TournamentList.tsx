@@ -21,8 +21,10 @@ export default function TournamentList(){
     const [formatFilter, setFormatFilter] = useState<string>("");
     const [page, setPage] = useState(1);
     const [total, setTotal] = useState(0);
+    const [watchListMap, setWatchListMap] = useState<Record<number, boolean>>({});
     const navigate = useNavigate();
     const limit = 12;
+    const userId = user?.id ?? 0;
 
     const loadPage = (p : number) =>{
         tournamentApi.getAll(p, limit)
@@ -53,6 +55,22 @@ export default function TournamentList(){
         .catch(() => setError("Failed to load games!"));
     }
 
+    const checkWatchList = async (userId: number, tournamentId: number) => {
+    try {
+        const res = await tournamentApi.findWatchListItem({
+            userId,
+            tournamentId
+        });
+
+        setWatchListMap(prev => ({
+            ...prev,
+            [tournamentId]: res.success ? (res.data ?? false) : false
+        }));
+    } catch {
+        setError("Failed to check if the item is in watchlist!");
+        }
+    };
+
     useEffect(() =>{
         loadPage(page);
 
@@ -76,6 +94,14 @@ export default function TournamentList(){
         })
         .catch(() => setError("Failed to load tournaments!"))
     }, [gameNameFilter, statusFilter, formatFilter, page]);
+
+    useEffect(() => {
+    if (!userId || tournaments.length === 0) return;
+
+    tournaments.forEach(t => {
+        checkWatchList(userId, t.tournamentId);
+    });
+    }, [userId,tournaments]);
 
     return(
         <div>
@@ -135,6 +161,7 @@ export default function TournamentList(){
                         const days = daysUntilDeadline(t.tournamentApplicationDeadline);
                         const status = getDeadlineStatus(t.tournamentApplicationDeadline);
                         const color = getDeadlineColor(status);
+                        const isInWatchList = watchListMap[t.tournamentId] ?? false;
                         
                         return (
                             <div className="border-2 border-bgsecondary bg-bgprimary/30 p-4 rounded-xl hover:border-secondary/60 transition-all duration-200 hover:shadow-lg hover:shadow-secondary/20 cursor-pointer">
@@ -160,6 +187,55 @@ export default function TournamentList(){
                                     </div>
                                     <p className="text-bgsecondary">{t.tournamentStatus}</p>
                                 </a>
+                                {user?.role === "admin" || user?.role === "player" ? 
+                                <div>
+                                <br></br>
+                                    <button
+                                        onClick={async (e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+
+                                            try {
+                                                if (isInWatchList) {
+                                                    const res = await tournamentApi.removeFromWatchList(
+                                                        t.tournamentId,
+                                                        userId
+                                                    );
+
+                                                    if (res.success) {
+                                                        setWatchListMap(prev => ({
+                                                            ...prev,
+                                                            [t.tournamentId]: false
+                                                        }));
+                                                    }
+                                                } else {
+                                                    const res = await tournamentApi.addToWatchList(
+                                                        t.tournamentId,
+                                                        userId
+                                                    );
+
+                                                    if (res.success) {
+                                                        setWatchListMap(prev => ({
+                                                            ...prev,
+                                                            [t.tournamentId]: true
+                                                        }));
+                                                    }
+                                                }
+                                            } catch {
+                                                setError("Failed to update watchlist!");
+                                            }
+                                        }}
+                                        className={`cursor-pointer w-full min-w-3 rounded-xl p-1 text-sm transition-colors justify-self-center
+                                        ${
+                                            isInWatchList
+                                                ? "bg-red-400/40 border-2 border-red-500 hover:bg-bgsecondary/30 hover:border-bgsecondary text-red-500 font-semibold"
+                                                : "bg-green-400/40 border-2 border-green-500 hover:bg-bgsecondary/30 hover:border-bgsecondary text-green-500 font-semibold"
+                                        }`}
+                                        >
+                                        {isInWatchList
+                                            ? "Remove from watchlist"
+                                            : "Add to watchlist"}
+                                    </button></div> : <button></button>}  
                             </div>
                         );
                     })}

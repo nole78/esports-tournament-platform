@@ -89,9 +89,10 @@ export default function UserWatchlist() {
                                             </p>
                                         </div>
 
-                                        <div className="lg:col-start-3 flex justify-end">
+                                        <div className="relative group flex lg:justify-center sm:justify-end lg:col-start-3">
                                             <button
                                                 className="cursor-pointer w-1/3 min-w-30 bg-red-400/40 border-2 border-red-500 hover:bg-bgsecondary/30 hover:border-bgsecondary text-red-500 font-semibold rounded-xl p-1 text-sm transition-colors"
+                                                
                                                 onClick={() => {
                                                     setDeleted(false);
                                                     userWatchlistApi.delete(w.userId, w.tournamentId)
@@ -116,8 +117,11 @@ export default function UserWatchlist() {
                                                         );
                                                 }}
                                             >
-                                                Remove from watchlist
+                                                Remove
                                             </button>
+                                            <div className="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 rounded-md bg-bgsecondary/30 px-2 py-1 text-xs text-bgsecondary opacity-0 transition-opacity duration-200 group-hover:opacity-100 whitespace-nowrap">
+                                                Remove item from watchlist
+                                            </div>
                                         </div>
 
                                     </div>
