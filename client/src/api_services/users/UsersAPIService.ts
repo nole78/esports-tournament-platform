@@ -29,7 +29,7 @@ export const usersApi: IUsersAPIService = {
       .then(r => r.data).catch(e => err(e, "Failed to deactivate user"));
   },
   async logout(id) {
-    return axios.put<ApiResponse<void>>(`${BASE}/${id}/logout`, { headers: authHeader() })
+    return axios.post<ApiResponse<void>>(`${BASE}/${id}/logout`, { headers: authHeader() })
       .then(r => r.data).catch(e => err(e, "Failed to regulate activity of user"));
   }
 };

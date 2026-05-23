@@ -14,7 +14,7 @@ export class UserController {
     this.router.get("/users",          authenticate, authorize(UserRole.ADMIN), this.getAll.bind(this));
     this.router.get("/users/:id",       this.getById.bind(this));
     this.router.put("/users/:id/role", authenticate, authorize(UserRole.ADMIN), this.changeRole.bind(this));
-    this.router.put("/users/:id/logout", this.logout.bind(this))
+    this.router.post("/users/:id/logout", this.logout.bind(this))
   }
 
   private async getAll(req: Request, res: Response): Promise<void> {
