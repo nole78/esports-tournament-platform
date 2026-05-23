@@ -1,7 +1,6 @@
 import { Result } from "../../Domain/common/Result";
 import { IMatchService } from "../../Domain/services/matches/IMatchService";
 import { ErrorType } from '../../Domain/common/ErrorType';
-import { CreateMatchDto } from "../../Domain/DTOs/matches/CreateMatchDto";
 import { MatchDto } from "../../Domain/DTOs/matches/MatchDto";
 import { PaginatedListDto } from "../../Domain/DTOs/PaginatedListDto";
 import { Match } from '../../Domain/models/Match';
@@ -15,6 +14,9 @@ import { IUserRepository } from "../../Domain/repositories/users/IUserRepository
 import { ITeamMemberRepository } from "../../Domain/repositories/team_members/ITeamMemberRepository";
 import { MatchPlayer } from "../../Domain/models/MatchPlayer";
 import { AddPlayersDto } from "../../Domain/DTOs/match_players/AddPlayersDto";
+import { AddPlayersResponseDto } from "../../Domain/DTOs/match_players/AddPlayersResponseDto";
+import { MatchPlayerDto } from "../../Domain/DTOs/match_players/MatchPlayerDto";
+import { AddPlayerErrorDto } from "../../Domain/DTOs/match_players/AddPlayerErrorDto";
 
 export class MatchService implements IMatchService{
     constructor(
@@ -27,7 +29,19 @@ export class MatchService implements IMatchService{
     ){}
 
     private toMatchDto(match: Match): MatchDto{
-        return  new MatchDto(match.matchId, match.tournamentId, match.blueTeamId, match.redTeamId, match.matchResult, match.status, match.matchRound);
+        return  new MatchDto(match.matchId, 
+            match.tournamentId, 
+            match.blueTeamId,
+            match.redTeamId,
+            match.winnerTeamId,
+            match.status,
+            match.roundNumber,
+            match.blueTeamScore,
+            match.redTeamScore,
+            match.WinnerToMatchId,
+            match.WinnerToSlot,
+            match.LoserToMatchId,
+            match.LoserToSlot);
     }
     
     public async getAll(page?: number, limit?: number): Promise<Result<PaginatedListDto<MatchDto>>> {
@@ -67,7 +81,7 @@ export class MatchService implements IMatchService{
             return Result.Failure(`Tournament doesn't exist`,ErrorType.NotFound);
 
         const result = await this.matchRepo.findByTournamentId(tournamentId);
-        return  Result.Success(result);
+        return  Result.Success(result.map(match => this.toMatchDto(match)));
     }
 
     public async getByTeamId(teamId: number): Promise<Result<MatchDto[]>> {
@@ -76,36 +90,20 @@ export class MatchService implements IMatchService{
             return Result.Failure(`Team doesn't exist`,ErrorType.NotFound);
 
         const result = await this.matchRepo.findByTeamId(teamId);
-        return Result.Success(result.map(m => this.toMatchDto(m)));
+        return Result.Success(result.map(match => this.toMatchDto(match)));
     }
 
-    public async create(dto: CreateMatchDto): Promise<Result<MatchDto>> {
-        const tournament = await this.tournmaentRepo.findById(dto.tournamentId);
-        if(tournament.tournamentId === 0)
-            return Result.Failure("Tournament for which you want to create match for does not exist",ErrorType.NotFound);
-
-        const teamBlue = await this.teamRepo.findById(dto.blueTeamId);
-        if(teamBlue.teamId === 0)
-            return Result.Failure("Team blue doesn't exist", ErrorType.NotFound);
-
-        const teamRed = await this.teamRepo.findById(dto.redTeamId);
-        if(teamRed.teamId === 0)
-            return Result.Failure("Team red doesn't exist", ErrorType.NotFound);
-
-        const result = await this.matchRepo.create(new Match(0,dto.tournamentId,dto.blueTeamId,dto.redTeamId,dto.matchResult,dto.status,dto.matchRound));
-        if(result.matchId === 0)
-            return Result.Failure("Couldn't create match",ErrorType.Internal);
-        return Result.Success(this.toMatchDto(result));
-    }
-
-    public async setResult(id: number, result: MatchResultDto) : Promise<Result<void>> {
+    public async setResult(id: number, dto: MatchResultDto) : Promise<Result<void>> {
         const match = await this.matchRepo.findById(id);
         if(match.matchId === 0)
             return Result.Failure(`Match doesn't exist`,ErrorType.NotFound);
 
-        const matchResult = `${result.teamBlueScore}:${result.teamRedScore}`;
-        const ok = await this.matchRepo.update(id,{matchResult});
-        return ok? Result.Success() : Result.Failure("Couldn't set match result",ErrorType.Internal);
+        const blueTeamScore = dto.blueTeamScore;
+        const redTeamScore = dto.redTeamScore;
+        const ok = await this.matchRepo.update(id,{blueTeamScore,redTeamScore});
+        if(!ok) return Result.Failure("Couldn't set match result",ErrorType.Internal);
+
+        return Result.Success();
     }
 
     public async setPerformanceNotes(id: number, userId: number, notes: string) : Promise<Result<void>>{
@@ -127,7 +125,7 @@ export class MatchService implements IMatchService{
     }
 
 
-    public async addPlayersToMatch(id: number, dto: AddPlayersDto) :Promise<Result<void>> {
+    public async addPlayersToMatch(id: number, dto: AddPlayersDto) :Promise<Result<AddPlayersResponseDto>> {
         const match = await this.matchRepo.findById(id);
         if(match.matchId === 0)
             return Result.Failure(`Match doesn't exist`, ErrorType.NotFound);
@@ -140,21 +138,49 @@ export class MatchService implements IMatchService{
             return Result.Failure("Team is not in this match", ErrorType.Conflict);
         
         const members = await this.teamMemberRepo.findByTeamId(team.teamId);
-        for(const playerId of dto.userIds)
+        const players = await this.matchPlayerRepo.findByMatchId(match.matchId);
+
+        const addedPlayers : MatchPlayerDto[] = [];
+        const failedPlayers : AddPlayerErrorDto[] = [];
+        const validPlayers : number[] = [];
+        const uniquePlayerIds = [...new Set(dto.userIds)];
+        const memberIds = new Set(members.map(m => m.userId));
+        const playerIdsInMatch = new Set(players.map(p => p.userId));
+        
+        for(const playerId of uniquePlayerIds)
         {
-            if(members.find(m => m.userId === playerId))
-                return Result.Failure("Not all players are member of team", ErrorType.NotFound);
             const user = await this.userRepo.findById(playerId);
-            if(user.id === 0)
-                return Result.Failure("Not all players exist", ErrorType.NotFound);
+            if(user.id === 0){
+                failedPlayers.push(new AddPlayerErrorDto(playerId,"Player doesn't exist"));
+                continue;
+            }
+
+            if(!memberIds.has(playerId)){
+                failedPlayers.push(new AddPlayerErrorDto(playerId,"Player is not a member of a team"));
+                continue;
+            }
+
+            if(playerIdsInMatch.has(playerId)){
+                failedPlayers.push(new AddPlayerErrorDto(playerId,"Player is already in this match"));
+                continue;
+            }
+
+            validPlayers.push(playerId);
         }
 
-        for(const playerId of dto.userIds)
+        for(const playerId of validPlayers)
         {
-            await this.matchPlayerRepo.create(new MatchPlayer(playerId, team.teamId, id));
+            const result = await this.matchPlayerRepo.create(new MatchPlayer(playerId, team.teamId, id));
+            if(!result)
+                failedPlayers.push(new AddPlayerErrorDto(playerId, "Failed to add player to match"));
+            else
+                addedPlayers.push(new MatchPlayerDto(result.userId, result.teamId, result. matchId, result.performaceNotes));
         }
 
-        return Result.Success();
+        if(addedPlayers.length === 0)
+            return Result.Failure("No players were added",ErrorType.Validation);
+
+        return Result.Success(new AddPlayersResponseDto(addedPlayers,failedPlayers));
     }
 
     public async removePlayerFromMatch(id: number, userId: number) : Promise<Result<void>> {
@@ -176,14 +202,5 @@ export class MatchService implements IMatchService{
   
         const result = await this.matchPlayerRepo.delete(player.userId, player.teamId, player.matchId);
         return result? Result.Success() : Result.Failure("Couldn't remove player from match", ErrorType.Internal);
-    }
-    
-    public async delete(id: number): Promise<Result<void>> {
-        const match = await this.matchRepo.findById(id);
-        if(match.matchId === 0)
-            return Result.Failure(`Match with id ${id} doesn't exist`,ErrorType.NotFound);
-
-        const result = await this.matchRepo.delete(id);
-        return result? Result.Success(): Result.Failure("Couldn't delete match",ErrorType.Internal);
     }
 }

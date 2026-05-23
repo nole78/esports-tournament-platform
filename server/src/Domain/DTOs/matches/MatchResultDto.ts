@@ -1,7 +1,7 @@
 
 export class MatchResultDto{
     constructor(
-        public teamRedScore: number = 0,
-        public teamBlueScore: number = 0
+        public redTeamScore: number = 0,
+        public blueTeamScore: number = 0
     ){}
 }
