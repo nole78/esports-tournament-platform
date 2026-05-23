@@ -137,28 +137,30 @@ export default function TournamentList(){
                         const color = getDeadlineColor(status);
                         
                         return (
-                        <div className="border-2 border-bgsecondary bg-bgprimary/30 p-4 rounded-xl">
-                            <h2 className="text-bgsecondary text-2xl font-bold">{t.tournamentName}</h2>
-                            <p className="text-bgsecondary mb-3">{t.tournamentGame}</p>
-                            <div className="space-y-2">
-                                <p className="text-sm text-gray-400 mb-0.5">Format:</p>
-                                <p className="text-bgsecondary font-semibold mb-2">{t.tournamentFormat == "single_elimination" ? "SINGLE ELIMINATION" : t.tournamentFormat =="double_elimination" ? "DOUBLE ELIMINATION" : "ROUND ROBIN" }</p>
+                            <div className="border-2 border-bgsecondary bg-bgprimary/30 p-4 rounded-xl hover:border-secondary/60 transition-all duration-200 hover:shadow-lg hover:shadow-secondary/20 cursor-pointer">
+                                <a onClick={() => user?.role == "admin" ? navigate(`/admin/tournament_registration/${t.tournamentId}`) : navigate(`/tournament_registration/${t.tournamentId}`)}>
+                                    <h2 className="text-bgsecondary text-2xl font-bold">{t.tournamentName}</h2>
+                                    <p className="text-bgsecondary mb-3">{t.tournamentGame}</p>
+                                    <div className="space-y-2">
+                                        <p className="text-sm text-gray-400 mb-0.5">Format:</p>
+                                        <p className="text-bgsecondary font-semibold mb-2">{t.tournamentFormat == "single_elimination" ? "SINGLE ELIMINATION" : t.tournamentFormat =="double_elimination" ? "DOUBLE ELIMINATION" : "ROUND ROBIN" }</p>
+                                    </div>
+                                    <div className="space-y-2 mb-3">
+                                        <p className="text-sm text-gray-400 mb-0.5">Application deadline:</p>
+                                        <div className="flex justify-between items-center">
+                                            <p className="text-bgsecondary font-semibold">{formatDeadline(t.tournamentApplicationDeadline)}</p>
+                                            <p className={`text-sm font-bold ${color}`}>
+                                                {days < 0 ? "Expired" : days === 0 ? "Today!" : days === 1 ? "Tomorrow" : days <= 7 ? `${days} days` : `${days} days`}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-between items-center mb-3">
+                                        <p className="text-bgsecondary">{t.tournamentMaxTeams} teams</p>
+                                        <p className="text-bgsecondary">Prize: {t.tournamentPrizeFund}$</p>
+                                    </div>
+                                    <p className="text-bgsecondary">{t.tournamentStatus}</p>
+                                </a>
                             </div>
-                            <div className="space-y-2 mb-3">
-                                <p className="text-sm text-gray-400 mb-0.5">Application deadline:</p>
-                                <div className="flex justify-between items-center">
-                                    <p className="text-bgsecondary font-semibold">{formatDeadline(t.tournamentApplicationDeadline)}</p>
-                                    <p className={`text-sm font-bold ${color}`}>
-                                        {days < 0 ? "Expired" : days === 0 ? "Today!" : days === 1 ? "Tomorrow" : days <= 7 ? `${days} days` : `${days} days`}
-                                    </p>
-                                </div>
-                            </div>
-                            <div className="flex justify-between items-center mb-3">
-                                <p className="text-bgsecondary">{t.tournamentMaxTeams} teams</p>
-                                <p className="text-bgsecondary">Prize: {t.tournamentPrizeFund}$</p>
-                            </div>
-                            <p className="text-bgsecondary">{t.tournamentStatus}</p>
-                        </div>
                         );
                     })}
                 </section>

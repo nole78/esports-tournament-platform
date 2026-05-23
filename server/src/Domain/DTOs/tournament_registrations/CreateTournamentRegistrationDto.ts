@@ -1,5 +1,8 @@
-// TODO: implement class for TournamentRegistration DTO creation 
+import { TournamentRegistrationStatus } from "../../enums/TournamentRegistrationStatus";
 
 export class  CreateTournamentRegistrationDto{
-    
+    constructor(
+        public teamId: number = 0,
+        public tournamentId: number = 0,
+    ){}
 }

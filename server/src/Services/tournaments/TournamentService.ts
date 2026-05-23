@@ -40,6 +40,7 @@ export class TournamentService implements ITournamentService {
     
     const items = tournaments.map(t => 
       new TournamentDto(
+        t.tournamentId,
         t.tournamentName,
         gameMap.get(t.tournamentGameId) || "Unknown",
         t.tournamentFormat,
@@ -79,6 +80,7 @@ export class TournamentService implements ITournamentService {
 
     const items = tournaments.map(t => 
       new TournamentDto(
+        t.tournamentId,
         t.tournamentName,
         gameMap.get(t.tournamentGameId) || "Unknown",
         t.tournamentFormat,
@@ -105,6 +107,7 @@ export class TournamentService implements ITournamentService {
     }
 
     return new TournamentDto(
+      tournament.tournamentId,
       tournament.tournamentName,
       game.gameName,
       tournament.tournamentFormat,
@@ -115,7 +118,7 @@ export class TournamentService implements ITournamentService {
     );
   }
 
-  async create(t: CreateTournamentDto): Promise<Tournament | null> {
+  async create(t: CreateTournamentDto): Promise<TournamentDto | null> {
     // find game by name
     const game = await this.gameRepo.findByName(t.tournamentGame);
     if (!game) {
@@ -139,8 +142,11 @@ export class TournamentService implements ITournamentService {
       t.tournamentStatus,
     );
 
-    const created = await this.tournamentRepo.create(newTournament);
-    return created.tournamentId !== 0 ? created : null;
+    const created:Tournament = await this.tournamentRepo.create(newTournament);
+
+    const newTournamentDto:TournamentDto = new TournamentDto(created.tournamentId, created.tournamentName, game.gameName, created.tournamentFormat, created.tournamentMaxTeams, created.tournamentApplicationDeadline, created.tournamentPrizeFund, created.tournamentStatus);
+
+    return created.tournamentId !== 0 ? newTournamentDto : null;
   }
 
   async update(id: number, fields: Partial<Tournament>): Promise<boolean> {

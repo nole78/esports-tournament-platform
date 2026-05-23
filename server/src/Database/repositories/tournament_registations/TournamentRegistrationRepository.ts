@@ -1,9 +1,7 @@
-/*import { ResultSetHeader, RowDataPacket } from "mysql2";
+import { ResultSetHeader, RowDataPacket } from "mysql2";
 import { ITournamentRegistrationRepository } from "../../../Domain/repositories/tournament_registrations/ITournamentRegistrationRepository";
 import { ILoggerService } from "../../../Domain/services/logger/ILoggerService";
 import { DbManager } from "../../connection/DbConnectionPool";
-import { TournamentRegistrationDto } from "../../../Domain/DTOs/tournament_registrations/TournamentRegistrationDto";
-import { CreateTournamentRegistrationDto } from '../../../Domain/DTOs/tournament_registrations/CreateTournamentRegistrationDto';
 import { TournamentRegistration } from '../../../Domain/models/TournamentRegistration';
 
 export class TournamentRegistrationRepository implements ITournamentRegistrationRepository {
@@ -12,17 +10,53 @@ export class TournamentRegistrationRepository implements ITournamentRegistration
     private readonly logger: ILoggerService,
   ) {}
 
-  private map(r: RowDataPacket): TournamentRegistrationDto {
-    // TODO: implement
-    return new TournamentRegistrationDto();
+  private map(r: RowDataPacket): TournamentRegistration {
+    return new TournamentRegistration(r.team_id, r.tournament_id, r.seed, r.status, r.registered_at);
   }
 
-  async findByTeamId(teamId: number): Promise<TournamentRegistrationDto[]> {
+  async findTotalByTeamId(teamId: number): Promise<number>{
+    const res = await this.db.getReadConnection();
+    if(!res) return 0;
+    try{
+      const [cnt] = await res.conn.execute<RowDataPacket[]>(
+        `SELECT COUNT(*) as total FROM tournament_registrations 
+        WHERE team_id = ?`,[teamId]
+      );
+
+      return cnt[0]?.total ?? 0;
+    } catch (err) {
+      this.logger.error("TournamentRegistrationRepository", "findTotalByTeamId failed", err);
+      return 0;
+    } finally { res.conn.release(); }
+  }
+
+  async findTotalByTournamentId(tournamentId: number): Promise<number>{
+    const res = await this.db.getReadConnection();
+    if(!res) return 0;
+    try{
+      const [cnt] = await res.conn.execute<RowDataPacket[]>(
+        `SELECT COUNT(*) as total FROM tournament_registrations 
+        WHERE tournament_id = ?`,[tournamentId]
+      );
+
+      return cnt[0]?.total ?? 0;
+    } catch (err) {
+      this.logger.error("TournamentRegistrationRepository", "findTotalByTournamentId failed", err);
+      return 0;
+    } finally { res.conn.release(); }
+  }
+
+  async findByTeamId(teamId: number, page:number, limit:number): Promise<TournamentRegistration[]> {
     const res = await this.db.getReadConnection();
     if (!res) return [];
+    const offset = Math.max(0, Math.floor((page - 1) * limit));
+    const lim    = Math.max(1, Math.floor(limit));
     try {
       const [rows] = await res.conn.execute<RowDataPacket[]>(
-        `SELECT * FROM tournament_registrations WHERE team_id = ? ORDER BY tournament_id DESC`, [teamId]
+        `SELECT * 
+        FROM tournament_registrations 
+        WHERE team_id = ? 
+        ORDER BY tournament_id DESC LIMIT ? OFFSET ?`, [teamId, lim, offset]
       );
       return rows.map((r) => this.map(r));
     } catch (err) {
@@ -31,12 +65,17 @@ export class TournamentRegistrationRepository implements ITournamentRegistration
     } finally { res.conn.release(); }
   }
 
-  async findByTournamentId(tournamentId: number): Promise<TournamentRegistrationDto[]> {
+  async findByTournamentId(tournamentId: number, page:number, limit:number): Promise<TournamentRegistration[]> {
     const res = await this.db.getReadConnection();
     if (!res) return [];
+    const offset = Math.max(0, Math.floor((page - 1) * limit));
+    const lim    = Math.max(1, Math.floor(limit));
     try {
-      const [rows] = await res.conn.execute<RowDataPacket[]>(
-        `SELECT * FROM tournament_registrations WHERE tournament_id = ? ORDER BY team_id DESC`, [tournamentId]
+      const [rows] = await res.conn.query<RowDataPacket[]>(
+        `SELECT * 
+        FROM tournament_registrations 
+        WHERE tournament_id = ? 
+        ORDER BY team_id DESC LIMIT ? OFFSET ?`, [tournamentId, lim, offset]
       );
       return rows.map((r) => this.map(r));
     } catch (err) {
@@ -45,7 +84,7 @@ export class TournamentRegistrationRepository implements ITournamentRegistration
     } finally { res.conn.release(); }
   }
 
-  async findAll(page = 1, limit = 20): Promise<TournamentRegistrationDto[]> {
+  async findAll(page:number, limit:number): Promise<TournamentRegistration[]> {
     const res = await this.db.getReadConnection();
     if (!res) return [];
     const offset = (page - 1) * limit;
@@ -60,16 +99,16 @@ export class TournamentRegistrationRepository implements ITournamentRegistration
     } finally { res.conn.release(); }
   }
 
-  async create(dto: CreateTournamentRegistrationDto): Promise<TournamentRegistration> {
+  async create(tr: TournamentRegistration): Promise<TournamentRegistration> {
     const res = await this.db.getWriteConnection();
     if (!res) return new TournamentRegistration();
     try {
       const [result] = await res.conn.execute<ResultSetHeader>(
-        `INSERT INTO tournament_registrations (team_id,tournament_id,seed) VALUES (?,?)`,
-        [dto.teamId,dto.tournamentId]
+        `INSERT INTO tournament_registrations (team_id,tournament_id,seed) VALUES (?,?,?)`,
+        [tr.teamId,tr.tournamentId,tr.seed]
       );
       if (result.insertId === 0) return new TournamentRegistration();
-      return new TournamentRegistration(result.insertId, dto.teamId, dto.tournamentId);
+      return new TournamentRegistration(tr.teamId, tr.tournamentId, tr.seed);
     } catch (err) {
       this.logger.error("TournamentRegistrationRepository", "create failed", err);
       return new TournamentRegistration();
@@ -107,4 +146,4 @@ export class TournamentRegistrationRepository implements ITournamentRegistration
       return false;
     } finally { res.conn.release(); }
   }
-}*/
+}
