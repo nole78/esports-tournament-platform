@@ -1,4 +1,5 @@
 // Should be allright, need to check
+import { BracketType } from "../../enums/BracketType";
 import { MatchSlot } from "../../enums/MatchSlot";
 import { MatchStatus } from "../../enums/MatchStatus";
 
@@ -11,11 +12,12 @@ export class MatchDto{
         public winnerTeamId : number  = 0,
         public status : MatchStatus = MatchStatus.SCHEDULED,
         public roundNumber : number = 0,
+        public bracketType : BracketType = BracketType.WINNER, 
         public blueTeamScore : number = 0,
         public redTeamScore : number = 0,
-        public WinnerToMatchId : number = 0,
-        public WinnerToSlot : MatchSlot = MatchSlot.BLUE,
-        public LoserToMatchId : number = 0,
-        public LoserToSlot : MatchSlot = MatchSlot.BLUE,
+        public winnerToMatchId : number = 0,
+        public winnerToSlot : MatchSlot = MatchSlot.BLUE,
+        public loserToMatchId : number = 0,
+        public loserToSlot : MatchSlot = MatchSlot.BLUE,
     ){}
 }
