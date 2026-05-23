@@ -11,7 +11,19 @@ export class MatchRepository implements IMatchRepository {
   ) {}
 
   private map(r: RowDataPacket): Match {
-    return new Match(r.match_id, r.tournament_id, r.blue_team_id, r.red_team_id, r.match_result, r.status, r.match_result);
+    return new Match(r.match_id, 
+      r.tournament_id, 
+      r.blue_team_id, 
+      r.red_team_id, 
+      r.winner_team_id, 
+      r.status, 
+      r.bracket_type,
+      r.blue_team_score,
+      r.red_team_score,
+      r.winner_to_match_id,
+      r.winner_to_slot,
+      r.loser_to_match_id,
+      r.loser_to_slot);
   }
 
   async findById(id: number): Promise<Match> {
@@ -69,17 +81,43 @@ export class MatchRepository implements IMatchRepository {
     } finally { res.conn.release(); }
   }
 
-  async create(dto: Match): Promise<Match> {
+  async create(match: Match): Promise<Match> {
     const res = await this.db.getWriteConnection();
     if (!res) return new Match;
     try {
       const [result] = await res.conn.execute<ResultSetHeader>(
-        `INSERT INTO matches (blue_team_id, red_team_id, match_result, status, match_round) 
-        VALUES (?, ?, ?, ?, ?)`,
-        [dto.blueTeamId, dto.redTeamId, dto.matchResult, dto.status, dto.matchRound]
+        `INSERT INTO matches (tournament_id, blue_team_id, red_team_id, winner_team_id,
+        status, round_number, bracket_type, blue_team_score, red_team_score,
+        winner_to_match_id, winner_to_slot, loser_to_match_id, loser_to_slot) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [ match.tournamentId, 
+          match.blueTeamId, 
+          match.redTeamId, 
+          match.winnerTeamId, 
+          match.status,
+          match.roundNumber,
+          match.bracketType,
+          match.blueTeamScore,
+          match.redTeamScore,
+          match.winnerToMatchId,
+          match.winnerToSlot,
+          match.loserToMatchId,
+          match.loserToSlot ]
       );
       if (result.insertId === 0) return new Match;
-      return new Match(result.insertId, dto.tournamentId, dto.blueTeamId, dto.redTeamId, dto.matchResult, dto.status, dto.matchRound);
+      return new Match(result.insertId, match.tournamentId, 
+                                        match.blueTeamId, 
+                                        match.redTeamId, 
+                                        match.winnerTeamId, 
+                                        match.status,
+                                        match.roundNumber,
+                                        match.bracketType,
+                                        match.blueTeamScore,
+                                        match.redTeamScore,
+                                        match.winnerToMatchId,
+                                        match.winnerToSlot,
+                                        match.loserToMatchId,
+                                        match.loserToSlot );
     } catch (err) {
       this.logger.error("MatchRepository", "create failed", err);
       return new Match;
@@ -91,11 +129,19 @@ export class MatchRepository implements IMatchRepository {
     if (!res) return false;
 
     const  fieldMap: Record<string, string> = {
-      blueTeamId: "blue_team_id",
-      redTeamId: "red_team_id",
-      matchResult: "match_result",
+      tournamentId: "tournament_id", 
+      blueTeamId: "blue_team_id", 
+      redTeamId: "red_team_id", 
+      winnerTeamId: "winner_team_id", 
       status: "status",
-      matchRound: "match_round"
+      roundNumber: "round_number",
+      bracketType: "bracket_type",
+      blueTeamScore: "blue_team_score",
+      redTeamScore: "red_team_score",
+      winnerToMatchId: "winner_to_match_id",
+      winnerToSlot: "winner_to_slot",
+      loserToMatchId: "loser_to_match_id",
+      loserToSlot: "loser_to_slot" 
     }
 
     try {
