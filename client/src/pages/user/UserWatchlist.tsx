@@ -3,6 +3,7 @@ import { Empty, PageHeader, Pagination } from "../../components/ui/UI";
 import type { UserWatchlistDto } from "../../models/user_watchlist/UserWatchlistDto";
 import { userWatchlistApi } from '../../api_services/user_watchlist/UserWatchlistAPIService';
 import { useAuth } from "../../hooks/auth/useAuthHook";
+import { useNavigate } from "react-router-dom";
 
 export default function UserWatchlist() {
     const { user } = useAuth();
@@ -11,6 +12,7 @@ export default function UserWatchlist() {
     const [deleted, setDeleted] = useState<boolean>(false);
     const [page, setPage] = useState(1);
     const [total, setTotal] = useState(0);
+    const navigate = useNavigate();
     const limit = 20;
     const id = user?.id ?? 0;
 
@@ -39,7 +41,11 @@ export default function UserWatchlist() {
                     {watchlist.map(w => (
                         <div key={w.tournamentName} className="bg-white/2 border border-white/6 rounded-2xl p-4 sm:p-5 lg:p-6 relative">
                             <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
-                                <img src={w.gameLogotip} className="w-full sm:w-32 lg:w-40 aspect-square object-cover rounded-xl shrink-0 " />
+                                <div className="overflow-hidden rounded-xl shrink-0 w-full sm:w-32 lg:w-40">
+                                    <a onClick={() => user?.role == "admin" ? navigate(`/admin/tournament_registration/${w.tournamentId}`) : navigate(`/tournament_registration/${w.tournamentId}`)}>
+                                    <img src={w.gameLogotip} className="w-full aspect-square object-cover rounded-xl cursor-pointer transition-transform duration-300 hover:scale-110"/>
+                                    </a>
+                                </div>
                                 <div className="flex flex-col lg:gap-10 sm:gap-10 overflow-hidden">
                                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 sm:gap-10 lg:gap-25 text-xs font-mono">
 

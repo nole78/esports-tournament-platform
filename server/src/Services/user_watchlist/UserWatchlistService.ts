@@ -34,6 +34,12 @@ export class UserWatchlistService implements IUserWatchlistService {
         return Result.Success(new PaginatedListDto(list, total, page ?? 1, limit ?? 20));
     }
 
+    async findWatchListItem(userId: number, tournamentId: number): Promise<Result<boolean>>
+    {
+        const item = await this.watchlistRepo.findWatchlistItem(userId, tournamentId);
+        return Result.Success(item.userId !== 0);
+    }
+
     async add(dto: CreateUserWatchlistDto) : Promise<Result<UserWatchlistDto>>
     {
         const item = await this.watchlistRepo.findWatchlistItem(dto.userId, dto.tournamentId);
