@@ -6,5 +6,4 @@ export interface IUsersAPIService {
   getAll(): Promise<ApiResponse<UserDto[]>>;
   getById(id: number): Promise<ApiResponse<UserDto>>;
   changeRole(id: number,role: string): Promise<ApiResponse<void>>;
-  logout(id: number): Promise<ApiResponse<void>>;
 }

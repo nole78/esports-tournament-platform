@@ -14,7 +14,6 @@ export class UserController {
     this.router.get("/users",          authenticate, authorize(UserRole.ADMIN), this.getAll.bind(this));
     this.router.get("/users/:id",       this.getById.bind(this));
     this.router.put("/users/:id/role", authenticate, authorize(UserRole.ADMIN), this.changeRole.bind(this));
-    this.router.post("/users/:id/logout", this.logout.bind(this))
   }
 
   private async getAll(req: Request, res: Response): Promise<void> {
@@ -41,13 +40,6 @@ export class UserController {
     const parsedRole: UserRole = role as UserRole;
 
     const result = await this.userService.changeRole(id,parsedRole);  
-    handleResult(result, res);
-  }
-
-  private async logout(req: Request, res: Response): Promise<void> {
-    const id = parseInt(req.params.id as string, 10);
-    if (isNaN(id)) { res.status(400).json({ success: false, message: "Invalid id" }); return; }
-    const result = await this.userService.logout(id);
     handleResult(result, res);
   }
 

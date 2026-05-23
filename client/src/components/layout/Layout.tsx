@@ -4,6 +4,7 @@ import { useAuth } from "../../hooks/auth/useAuthHook";
 import logo from "../../assets/logo.png";
 import avatarPlaceholder from "../../assets/avatar_placeholder.jpg";
 import { usersApi } from "../../api_services/users/UsersAPIService";
+import { authApi } from "../../api_services/auth/AuthAPIService";
 
 // TODO: Update nav items to match your routes and roles
 const guestNav = [
@@ -96,7 +97,7 @@ export function Layout() {
               onClick={() => {
                 if (user) {
                   logout();
-                  usersApi.logout(user.id);
+                  authApi.logout(user.id);
                 }
                 else navigate("/login");
               }}

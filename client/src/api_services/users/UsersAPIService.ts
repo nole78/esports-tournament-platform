@@ -28,8 +28,4 @@ export const usersApi: IUsersAPIService = {
     return axios.patch<ApiResponse<void>>(`${BASE}/${id}/role`, role, { headers: authHeader() })
       .then(r => r.data).catch(e => err(e, "Failed to deactivate user"));
   },
-  async logout(id) {
-    return axios.post<ApiResponse<void>>(`${BASE}/${id}/logout`, { headers: authHeader() })
-      .then(r => r.data).catch(e => err(e, "Failed to regulate activity of user"));
-  }
 };
