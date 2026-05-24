@@ -84,6 +84,23 @@ export class TournamentRegistrationRepository implements ITournamentRegistration
     } finally { res.conn.release(); }
   }
 
+  async findByTournamentAndTeamId(tournamentId: number, teamId: number): Promise<TournamentRegistration>{
+    const res = await this.db.getReadConnection();
+    if (!res) return new TournamentRegistration();
+
+    try{
+      const [rows] = await res.conn.query<RowDataPacket[]>(
+        `SELECT *
+        FROM tournament_registrations
+        WHERE tournament_id = ? AND team_id = ?`, [tournamentId, teamId]
+      );
+      return rows.length > 0 ? this.map(rows[0]) : new TournamentRegistration();
+    }catch (err) {
+      this.logger.error("TournamentRepository", "findById failed", err);
+      return new TournamentRegistration();
+    } finally { res.conn.release(); }
+  } 
+
   async findAll(page:number, limit:number): Promise<TournamentRegistration[]> {
     const res = await this.db.getReadConnection();
     if (!res) return [];
