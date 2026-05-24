@@ -1,10 +1,10 @@
-import { ITournamentRepository } from "../../../Domain/repositories/tournaments/ITournamentRepository";
-import { Tournament } from '../../../Domain/models/Tournament';
-import { ResultSetHeader, RowDataPacket } from "mysql2";
-import { DbManager } from "../../connection/DbConnectionPool";
+import { RowDataPacket } from "mysql2";
+import { ITournamentRepositoryRead } from "../../../Domain/repositories/tournaments/ITournamentRepositoryRead";
 import { ILoggerService } from "../../../Domain/services/logger/ILoggerService";
+import { DbManager } from "../../connection/DbConnectionPool";
+import { Tournament } from "../../../Domain/models/Tournament";
 
-export class TournamentRepository implements ITournamentRepository {
+export class TournamentRepositoryRead implements ITournamentRepositoryRead {
   public constructor(
     private readonly db: DbManager,
     private readonly logger: ILoggerService,
@@ -25,7 +25,6 @@ export class TournamentRepository implements ITournamentRepository {
       return cnt[0]?.total ?? 0;
     } catch (err) {
       this.logger.error("TournamentRepository", "findTotal failed", err);
-      console.error("findAll error:", err);
       return 0;
     } finally { res.conn.release(); }
   }
@@ -54,7 +53,6 @@ export class TournamentRepository implements ITournamentRepository {
       return cnt[0]?.total ?? 0;
     } catch (err) {
       this.logger.error("TournamentRepository", "findTotalFiltered failed", err);
-      console.error("findAll error:", err);
       return 0;
     } finally { res.conn.release(); }
   }
@@ -64,9 +62,9 @@ export class TournamentRepository implements ITournamentRepository {
     if (!res) return new Tournament();
     try {
       const [rows] = await res.conn.execute<RowDataPacket[]>(
-        `SELECT t.tournament_name, t.tournament_game_id, t.tournament_format, t.tournament_max_teams, t.tournament_application_deadline, t.tournament_prize_fund, t.tournament_status
-         FROM tournaments t 
-         WHERE t.tournament_id = ?`, 
+        `SELECT tournament_id, tournament_name, tournament_game_id, tournament_format, tournament_max_teams, tournament_application_deadline, tournament_prize_fund, tournament_status
+         FROM tournaments
+         WHERE tournament_id = ?`, 
         [id]
       );
       return rows.length > 0 ? this.map(rows[0]) : new Tournament();
@@ -83,14 +81,10 @@ export class TournamentRepository implements ITournamentRepository {
     const lim    = Math.max(1, Math.floor(limit));
     try {
       const [rows] = await res.conn.query<RowDataPacket[]>(
-        `SELECT tournament_name, tournament_game_id, tournament_format, tournament_max_teams, tournament_application_deadline, tournament_prize_fund, tournament_status
+        `SELECT tournament_id, tournament_name, tournament_game_id, tournament_format, tournament_max_teams, tournament_application_deadline, tournament_prize_fund, tournament_status
          FROM tournaments
          ORDER BY tournament_id DESC LIMIT ? OFFSET ?`, 
         [lim, offset]
-      );
-
-      const [cnt] = await res.conn.execute<RowDataPacket[]>(
-        `SELECT COUNT(*) as total FROM tournaments`
       );
 
       const items = rows.map((r) => this.map(r))
@@ -98,36 +92,9 @@ export class TournamentRepository implements ITournamentRepository {
       return items;
     } catch (err) {
       this.logger.error("TournamentRepository", "findAll failed", err);
-      console.error("findAll error:", err);
       return [];
     } finally { res.conn.release(); }
   }
-
-  async create(t: Tournament): Promise<Tournament> {
-    const res = await this.db.getWriteConnection();
-    if (!res) return new Tournament();
-    try {
-      const [result] = await res.conn.execute<ResultSetHeader>(
-        `INSERT INTO tournaments (tournament_name, tournament_game_id, tournament_format, tournament_max_teams, tournament_application_deadline, tournament_prize_fund, tournament_status) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        [t.tournamentName, t.tournamentGameId, t.tournamentFormat, t.tournamentMaxTeams, t.tournamentApplicationDeadline, t.tournamentPrizeFund, t.tournamentStatus]
-      );
-      if (result.insertId === 0) return new Tournament();
-
-      return new Tournament(
-        result.insertId, 
-        t.tournamentName, 
-        t.tournamentGameId, 
-        t.tournamentFormat, 
-        t.tournamentMaxTeams, 
-        new Date(t.tournamentApplicationDeadline), 
-        t.tournamentPrizeFund, 
-        t.tournamentStatus
-      );
-    } catch (err) {
-      this.logger.error("TournamentRepository", "create failed", err);
-      return new Tournament();
-    } finally { res.conn.release(); }
-  }  
 
   async findFiltered(tournamentGameId:number, tournamentFormat:string, tournamentStatus:string, page:number, limit:number): Promise<Tournament[]>{
     const res = await this.db.getReadConnection();
@@ -165,51 +132,7 @@ export class TournamentRepository implements ITournamentRepository {
       return items;
     } catch (err) {
       this.logger.error("TournamentRepository", "findAll failed", err);
-      console.error("findAll error:", err);
       return [];
-    } finally { res.conn.release(); }
-  }
-
-  async update(id: number, fields: Partial<Tournament>): Promise<boolean> {
-    const res = await this.db.getWriteConnection();
-    if (!res) return false;
-
-    const fieldMap: Record<string, string> = {
-      tournamentName: "tournament_name",
-      tournamentGameId: "tournament_game_id",
-      tournamentFormat: "tournament_format",
-      tournamentMaxTeams: "tournament_max_teams",
-      tournamentApplicationDeadline: "tournament_application_deadline",
-      tournamentPrizeFund: "tournament_prize_fund",
-      tournamentStatus: "tournament_status"
-    }
-
-    try {
-      const entries = Object.entries(fields).filter(([, v]) => v !== undefined).map(([k,v]) => [fieldMap[k] ?? k, v]);
-      if (entries.length === 0) return false;
-      const setClause = entries.map(([k]) => `${k} = ?`).join(", ");
-      const values = entries.map(([, v]) => v);
-      const [result] = await res.conn.execute<ResultSetHeader>(
-        `UPDATE tournaments SET ${setClause} WHERE tournament_id = ?`, [...values, id]
-      );
-      return result.affectedRows > 0;
-    } catch (err) {
-      this.logger.error("TournamentRepository", "update failed", err);
-      return false;
-    } finally { res.conn.release(); }
-  }
-
-  async delete(id: number): Promise<boolean> {
-    const res = await this.db.getWriteConnection();
-    if (!res) return false;
-    try {
-      const [result] = await res.conn.execute<ResultSetHeader>(
-        `DELETE FROM tournaments WHERE tournament_id = ?`, [id]
-      );
-      return result.affectedRows > 0;
-    } catch (err) {
-      this.logger.error("TournamentRepository", "delete failed", err);
-      return false;
     } finally { res.conn.release(); }
   }
 }

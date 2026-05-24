@@ -9,28 +9,35 @@ import { DbManager } from "./Database/connection/DbConnectionPool";
 import { UserRepository }   from "./Database/repositories/users/UserRepository";
 import { EntityRepository } from "./Database/repositories/entity/EntityRepository";
 import { GameRepository } from './Database/repositories/games/GameRepository';
-import { TournamentRepository } from "./Database/repositories/tournament/TournamentRepository";
+import { TournamentRepositoryWrite } from "./Database/repositories/tournament/TournamentRepositoryWrite";
 import { AuditRepository } from "./Database/repositories/audit/AuditRepository";
+import { TournamentRegistrationRepositoryWrite } from './Database/repositories/tournament_registations/TournamentRegistrationRepositoryWrite';
 
 import { AuthService }   from "./Services/auth/AuthService";
 import { UserService }   from "./Services/users/UserService";
 import { EntityService } from "./Services/entity/EntityService";
 import { GameService } from './Services/games/GameService';
-import { TournamentService } from "./Services/tournaments/TournamentService";
+import { TournamentServiceWrite } from "./Services/tournaments/TournamentServiceWrite";
 import { AuditService } from "./Services/audit/AuditService";
 import { HealthService } from "./Services/health/HealthService";
+import { TournamentRegistrationServiceWrite } from "./Services/tournamentRegistration/TournamentRegistrationServiceWrite";
 
 import { AuthController }   from "./WebAPI/controllers/AuthController";
 import { UserController }   from "./WebAPI/controllers/UserController";
 import { EntityController } from "./WebAPI/controllers/EntityController";
 import { GameController } from "./WebAPI/controllers/GameController";
 import { TournamentController } from "./WebAPI/controllers/TournamentController";
+import { TournamentRegistrationController } from "./WebAPI/controllers/TournamentRegistrationController";
 import { HealthController } from "./WebAPI/controllers/HealthController";
 import { AuditController } from "./WebAPI/controllers/AuditController";
 import { TeamService } from './Services/teams/TeamService';
 import { TeamRepository } from "./Database/repositories/teams/TeamRepository";
 import { TeamMemberRepository } from "./Database/repositories/team_members/TeamMembersRepository";
 import { TeamController } from "./WebAPI/controllers/TeamController";
+import { TournamentRegistrationRepositoryRead } from "./Database/repositories/tournament_registations/TournamentRegistrationRepositoryRead";
+import { TournamentRegistrationServiceRead } from "./Services/tournamentRegistration/TournamentRegistrationServiceRead";
+import { TournamentRepositoryRead } from "./Database/repositories/tournament/TournamentRepositoryRead";
+import { TournamentServiceRead } from "./Services/tournaments/TournamentServiceRead";
 import { InviteRepository } from "./Database/repositories/invites/InviteRepository";
 
 export const logger = new ConsoleLoggerService();
@@ -43,22 +50,27 @@ const dateTimeConverter = new DateTimeConverter();
 const userRepo   = new UserRepository(db, logger);
 const entityRepo = new EntityRepository(db, logger);
 const gameRepo = new GameRepository(db, logger);
-const tournamentRepo = new TournamentRepository(db, logger);
+const tournamentRepoRead = new TournamentRepositoryRead(db, logger);
+const tournamentRepoWrite = new TournamentRepositoryWrite(db, logger);
 const auditRepo = new AuditRepository(db, logger);
 const teamRepo = new TeamRepository(db, logger);
 const teamMemberRepo = new TeamMemberRepository(db, logger);
+const tournamentRegistrationRepoRead = new TournamentRegistrationRepositoryRead(db, logger);
+const TournamentRegistrationRepoWrite = new TournamentRegistrationRepositoryWrite(db, logger);
 const inviteRepo = new InviteRepository(db, logger);
 
 // Services
 const userService   = new UserService(userRepo);
 const entityService = new EntityService(entityRepo);
 const gameService   = new GameService(gameRepo);
-const tournamentService = new TournamentService(tournamentRepo, gameRepo, logger, dateTimeConverter);
+const tournamentServiceRead = new TournamentServiceRead(tournamentRepoRead, gameRepo, logger);
+const tournamentServiceWrite = new TournamentServiceWrite(tournamentRepoRead, tournamentRepoWrite, gameRepo, logger, dateTimeConverter);
 const auditService = new AuditService(auditRepo, userRepo);
 const authService   = new AuthService(userRepo,auditService);
 const teamService = new TeamService(teamRepo, teamMemberRepo, userRepo, logger, inviteRepo);
-const healthService = new HealthService(gameRepo, tournamentRepo, userRepo, teamRepo, db);
-
+const healthService = new HealthService(gameRepo, tournamentRepoRead, userRepo, teamRepo, db);
+const tournamentRegistrationServiceRead = new TournamentRegistrationServiceRead(tournamentRegistrationRepoRead, teamRepo, tournamentRepoRead, logger);
+const tournamentRegistrationServiceWrite = new TournamentRegistrationServiceWrite(TournamentRegistrationRepoWrite, tournamentRegistrationRepoRead, teamRepo, teamMemberRepo, tournamentRepoRead, gameRepo, logger);
 // Express
 const app = express();
 app.use(cors({ origin: process.env.CLIENT_URL ?? "*" }));
@@ -68,10 +80,11 @@ app.use("/api/v1", new AuthController(authService, userService).getRouter());
 app.use("/api/v1", new UserController(userService).getRouter());
 app.use("/api/v1", new EntityController(entityService).getRouter());
 app.use("/api/v1", new GameController(gameService).getRouter());
-app.use("/api/v1", new TournamentController(tournamentService).getRouter());
+app.use("/api/v1", new TournamentController(tournamentServiceRead, tournamentServiceWrite).getRouter());
 app.use("/api/v1", new AuditController(auditService).getRouter());
 app.use("/api/v1", new HealthController(healthService).getRouter());
 app.use("/api/v1", new TeamController(teamService, logger).getRouter());
 app.use("/api/v1", new HealthController(healthService).getRouter());
+app.use("/api/v1", new TournamentRegistrationController(tournamentRegistrationServiceRead, tournamentRegistrationServiceWrite).getRouter());
 
 export default app;

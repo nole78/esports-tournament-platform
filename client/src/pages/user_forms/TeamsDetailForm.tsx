@@ -9,8 +9,9 @@ import type { UserForMembersDto } from "../../models/user/UserForMembers";
 import { ErrorBox } from "../../components/ui/UI";
 import { useAuth } from "../../hooks/auth/useAuthHook";
 import { usersApi } from "../../api_services/users/UsersAPIService";
-import useDebounce from "react-debounced";
-import FireIcon from "../../components/heroicons/FireIcon";
+import FireIcon from "../../components/HeroIcons/FireIcon";
+import useDebounce from 'react-debounced';
+
 
 
 
@@ -254,7 +255,7 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
                 </div>
                 <div className="flex gap-2">
                     
-                    <button type="button" onClick={() => navigate("/teams")}
+                    <button type="button" onClick={() => navigate(-1)}
                         className="py-3 bg-red-400/40  cursor-pointer border-red-500 hover:bg-red-400/30 hover:border-bgsecondary/70 text-red-500 font-semibold rounded-xl w-1/2 text-sm transition-colors">
                     Cancel</button>
                 </div>
