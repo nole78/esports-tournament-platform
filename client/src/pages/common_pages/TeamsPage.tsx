@@ -54,7 +54,7 @@ export default function TeamsPage(){
     }
     useEffect(() =>{
         loadPage(page);
-
+        
     }, [page]);
 
     return (
@@ -63,7 +63,9 @@ export default function TeamsPage(){
                 <button onClick={() => navigate("/teams/add")}
                         className="mb-2 w-1/6 bg-bgsecondary/40 border-2 border-bgsecondary hover:bg-bgsecondary/30 text-bgsecondary font-semibold rounded-xl py-3 text-sm transition-colors">
                 Add Team</button>
-
+                <button onClick={() => navigate("/teams/inbox")}
+                        className="mb-2 w-1/6 bg-bgsecondary/40 border-2 border-bgsecondary hover:bg-bgsecondary/30 text-bgsecondary font-semibold rounded-xl py-3 text-sm transition-colors">
+                Inbox</button>
                 {error && <ErrorBox message={error}/>}
 
                 {deleted && (
@@ -93,7 +95,9 @@ export default function TeamsPage(){
                             </div>
                             
                             <div className="absolute rounded-b-lg bottom-0 bg-primary/90 w-full p-2 origin-bottom scale-y-0 group-hover:scale-y-100 transition-transform duration-300">
-                                {(t.userRole === TeamRole.captain && <div className="top-0">
+                                <div className="top-0">
+                                {(t.userRole === TeamRole.captain &&
+                                    <>
                                     <button className="w-1/3 mb-2 bg-red-400/40 border-2 border-red-500 hover:bg-bgsecondary/30 hover:border-bgsecondary text-red-500 font-semibold rounded-xl p-1 text-sm transition-colors"
                                             onClick={() => {
                                                 setDeleted(false);
@@ -116,7 +120,15 @@ export default function TeamsPage(){
                                             >
                                         Edit
                                     </button>
-                                </div>)}
+                                    </>
+                                )}
+                                     <button className="w-1/3 mb-2 float-right bg-gray-400/40 border-2 border-gray-400 hover:bg-bgsecondary/30 hover:border-bgsecondary text-gray-400 font-semibold rounded-xl p-1 text-sm transition-colors"
+                                            onClick={() => navigate(`/teams/details/${t.teamId}`)}
+                                            >
+                                        Details
+                                    </button>
+
+                                </div>
                                 <span className="float-left font-semibold text-sm text-bgsecondary">{t.teamTag}</span>
                             </div>
                         </div>

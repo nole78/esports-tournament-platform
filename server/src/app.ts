@@ -38,6 +38,7 @@ import { TournamentRegistrationRepositoryRead } from "./Database/repositories/to
 import { TournamentRegistrationServiceRead } from "./Services/tournamentRegistration/TournamentRegistrationServiceRead";
 import { TournamentRepositoryRead } from "./Database/repositories/tournament/TournamentRepositoryRead";
 import { TournamentServiceRead } from "./Services/tournaments/TournamentServiceRead";
+import { InviteRepository } from "./Database/repositories/invites/InviteRepository";
 
 export const logger = new ConsoleLoggerService();
 export const db     = new DbManager(logger);
@@ -56,6 +57,7 @@ const teamRepo = new TeamRepository(db, logger);
 const teamMemberRepo = new TeamMemberRepository(db, logger);
 const tournamentRegistrationRepoRead = new TournamentRegistrationRepositoryRead(db, logger);
 const TournamentRegistrationRepoWrite = new TournamentRegistrationRepositoryWrite(db, logger);
+const inviteRepo = new InviteRepository(db, logger);
 
 // Services
 const userService   = new UserService(userRepo);
@@ -65,7 +67,7 @@ const tournamentServiceRead = new TournamentServiceRead(tournamentRepoRead, game
 const tournamentServiceWrite = new TournamentServiceWrite(tournamentRepoRead, tournamentRepoWrite, gameRepo, logger, dateTimeConverter);
 const auditService = new AuditService(auditRepo, userRepo);
 const authService   = new AuthService(userRepo,auditService);
-const teamService = new TeamService(teamRepo, teamMemberRepo, userRepo, logger);
+const teamService = new TeamService(teamRepo, teamMemberRepo, userRepo, logger, inviteRepo);
 const healthService = new HealthService(gameRepo, tournamentRepoRead, userRepo, teamRepo, db);
 const tournamentRegistrationServiceRead = new TournamentRegistrationServiceRead(tournamentRegistrationRepoRead, teamRepo, tournamentRepoRead, logger);
 const tournamentRegistrationServiceWrite = new TournamentRegistrationServiceWrite(TournamentRegistrationRepoWrite, tournamentRegistrationRepoRead, teamRepo, teamMemberRepo, tournamentRepoRead, gameRepo, logger);
@@ -81,7 +83,7 @@ app.use("/api/v1", new GameController(gameService).getRouter());
 app.use("/api/v1", new TournamentController(tournamentServiceRead, tournamentServiceWrite).getRouter());
 app.use("/api/v1", new AuditController(auditService).getRouter());
 app.use("/api/v1", new HealthController(healthService).getRouter());
-app.use("/api/v1", new TeamController(teamService).getRouter());
+app.use("/api/v1", new TeamController(teamService, logger).getRouter());
 app.use("/api/v1", new HealthController(healthService).getRouter());
 app.use("/api/v1", new TournamentRegistrationController(tournamentRegistrationServiceRead, tournamentRegistrationServiceWrite).getRouter());
 
