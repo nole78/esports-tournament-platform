@@ -28,11 +28,14 @@ import { TeamService } from './Services/teams/TeamService';
 import { TeamRepository } from "./Database/repositories/teams/TeamRepository";
 import { TeamMemberRepository } from "./Database/repositories/team_members/TeamMembersRepository";
 import { TeamController } from "./WebAPI/controllers/TeamController";
-import { MatchRepository } from "./Database/repositories/matches/MatchRepository";
 import { MatchService } from './Services/matches/MatchService';
 import { MatchPlayerService } from "./Services/match_players/MatchPlayerService";
-import { MatchPlayerRepository } from "./Database/repositories/match_players/MatchPlayerRepository";
 import { MatchController } from "./WebAPI/controllers/MatchController";
+import { MatchReadRepository } from "./Database/repositories/matches/MatchReadRepository";
+import { MatchWriteRepository } from "./Database/repositories/matches/MatchWriteRepository";
+import { MatchPlayerReadRepository } from "./Database/repositories/match_players/MatchPlayerReadRepository";
+import { MatchPlayerWriteRepository } from "./Database/repositories/match_players/MatchPlayerWriteRepository";
+import { match } from "node:assert";
 
 export const logger = new ConsoleLoggerService();
 export const db     = new DbManager(logger);
@@ -47,8 +50,10 @@ const tournamentRepo = new TournamentRepository(db, logger);
 const auditRepo = new AuditRepository(db, logger);
 const teamRepo = new TeamRepository(db, logger);
 const teamMemberRepo = new TeamMemberRepository(db, logger);
-const matchRepo = new MatchRepository(db, logger);
-const matchPlayerRepo = new MatchPlayerRepository(db, logger);
+const matchReadRepo = new MatchReadRepository(db, logger);
+const matchWriteRepo = new MatchWriteRepository(db, logger);
+const matchPlayerReadRepo = new MatchPlayerReadRepository(db, logger);
+const matchPlayerWriteRepo = new MatchPlayerWriteRepository(db, logger);
 
 // Services
 const userService   = new UserService(userRepo);
@@ -58,8 +63,8 @@ const auditService = new AuditService(auditRepo, userRepo);
 const authService   = new AuthService(userRepo,auditService);
 const teamService = new TeamService(teamRepo, teamMemberRepo, userRepo, logger);
 const healthService = new HealthService(gameRepo, tournamentRepo, userRepo, teamRepo, db);
-const matchService = new MatchService(matchRepo, teamRepo, tournamentRepo);
-const matchPlayerService = new MatchPlayerService(matchService, matchPlayerRepo, userRepo, teamRepo,teamMemberRepo);
+const matchService = new MatchService(matchReadRepo, matchWriteRepo, teamRepo, tournamentRepo);
+const matchPlayerService = new MatchPlayerService(matchService, matchPlayerReadRepo, matchPlayerWriteRepo, userRepo, teamRepo, teamMemberRepo);
 
 // Express
 const app = express();
