@@ -77,11 +77,11 @@ export class MatchPlayerRepository implements IMatchPlayerRepository {
     if (!res) return new MatchPlayer();
     try {
       const [result] = await res.conn.execute<ResultSetHeader>(
-        `INSERT INTO match_players (user_id,team_id,match_id) VALUES (?, ?, ?)`,
+        `INSERT INTO match_players (user_id, team_id, match_id) VALUES (?, ?, ?)`,
         [matchPlayer.userId, matchPlayer.teamId, matchPlayer.matchId]
       );
       if (result.insertId === 0) return new MatchPlayer();
-      return new MatchPlayer(result.insertId, matchPlayer.teamId, matchPlayer.matchId, matchPlayer.performaceNotes);
+      return new MatchPlayer(result.insertId, matchPlayer.teamId, matchPlayer.matchId, matchPlayer.performanceNotes);
     } catch (err) {
       this.logger.error("MatchPlayerRepository", "create failed", err);
       return new MatchPlayer();
@@ -96,7 +96,7 @@ export class MatchPlayerRepository implements IMatchPlayerRepository {
         matchId: "match_id",
         teamId: "team_id",
         userId: "user_id",
-        performaceNotes: "performance_notes"
+        performanceNotes: "performance_notes"
     }
 
     try {
@@ -112,7 +112,7 @@ export class MatchPlayerRepository implements IMatchPlayerRepository {
       );
       return result.affectedRows > 0;
     } catch (err) {
-      this.logger.error("MathcPlayerRepository", "update failed", err);
+      this.logger.error("MatchPlayerRepository", "update failed", err);
       return false;
     } finally { res.conn.release(); }
   }
@@ -126,7 +126,7 @@ export class MatchPlayerRepository implements IMatchPlayerRepository {
       );
       return result.affectedRows > 0;
     } catch (err) {
-      this.logger.error("MathcPlayerRepository", "delete failed", err);
+      this.logger.error("MatchPlayerRepository", "delete failed", err);
       return false;
     } finally { res.conn.release(); }
   }
