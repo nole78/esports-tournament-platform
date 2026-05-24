@@ -6,6 +6,8 @@ import { UserRole } from "../../Domain/enums/UserRole";
 import { ValidationResult } from "../../Domain/types/ValidationResult";
 import { CreateTournamentRegistrationDto } from "../../Domain/DTOs/tournament_registrations/CreateTournamentRegistrationDto";
 import { validateTournamentRegistration } from "../validators/tournamentRegistrations/validateTournamentRegistration";
+import { handleResult } from "../mappers/ResultMapper";
+import { Result } from '../../Domain/common/Result';
 
 export class TournamentRegistrationController{
     private readonly router = Router();
@@ -14,15 +16,16 @@ export class TournamentRegistrationController{
         this.router.get("/tournaments/:id/registered", authenticate, this.getByTournamentId.bind(this));
         this.router.post("/tournaments/:id/register",  this.register.bind(this));
         this.router.delete("/tournaments/:id/register/:teamId", authenticate, this.delete.bind(this));
-        this.router.patch("/tournament/:id/registrations/:teamId", authenticate, authorize(UserRole.ADMIN), this.update.bind(this));
+        this.router.patch("/tournaments/:id/registrations/:teamId", authenticate, authorize(UserRole.ADMIN), this.update.bind(this));
     }
 
     private async getByTournamentId(req: Request, res: Response): Promise<void>{
         const page  = parseInt(req.query.page  as string ?? "1",  10);
         const limit = Math.min(parseInt(String(req.query.limit ?? "12"), 10), 100);
         const id = parseInt(req.params.id  as string,  10);
+        if(isNaN(id)){res.status(400).json({ succes: false, message: "Invalid id"}); return; }
         const result = await this.tournamentRegistrationService.getByTournamentId(id, page, limit);
-        res.status(200).json({ success: true, data: result });
+        handleResult(result, res);
     }
 
     private async register(req: Request, res: Response) : Promise<void>{
@@ -31,24 +34,24 @@ export class TournamentRegistrationController{
         const v:ValidationResult = validateTournamentRegistration(teamId ?? 0, tournamentId ?? 0);
         if(!v.valid) {res.status(400).json({ success: false, message: v.message }); return;}
 
-        const created = await this.tournamentRegistrationService.create(new CreateTournamentRegistrationDto(teamId, tournamentId));
-        if (!created) { res.status(500).json({ success: false, message: "Failed to create" }); return; }
-        res.status(201).json({ success: true, data: created });
+        const result = await this.tournamentRegistrationService.create(new CreateTournamentRegistrationDto(teamId, tournamentId));
+        handleResult(result, res);
     }
      private async delete(req: Request, res: Response): Promise<void> {
         const tournamentId = parseInt(req.params.id as string, 10);
         const teamId = parseInt(req.params.teamId as string, 10);
         if (isNaN(tournamentId) || isNaN(teamId)) { res.status(400).json({ success: false, message: "Invalid id" }); return; }
-        const ok = await this.tournamentRegistrationService.delete(tournamentId, teamId);
-        res.status(ok ? 200 : 500).json({ success: ok });
+        const result = await this.tournamentRegistrationService.delete(tournamentId, teamId);
+        handleResult(result, res);
     }
 
     private async update(req: Request, res: Response): Promise<void> {
-        const tournamentId = parseInt(req.params.tournamentId as string, 10);
+        const tournamentId = parseInt(req.params.id as string, 10);
         const teamId = parseInt(req.params.teamId as string, 10);
+        console.log("tournamentId: "+tournamentId+" teamId: "+teamId);
         if (isNaN(tournamentId) || isNaN(teamId)) { res.status(400).json({ success: false, message: "Invalid id" }); return; }
-        const ok = await this.tournamentRegistrationService.update(tournamentId, teamId, req.body);
-        res.status(ok ? 200 : 500).json({ success: ok });
+        const result = await this.tournamentRegistrationService.update(tournamentId, teamId, req.body);
+        handleResult(result, res);
     }
 
     public getRouter(): Router { return this.router; }

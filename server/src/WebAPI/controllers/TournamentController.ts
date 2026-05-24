@@ -8,6 +8,8 @@ import { ValidationResult } from '../../Domain/types/ValidationResult';
 import { validateTournamentCreation } from "../validators/tournaments/validateTournamentCreation";
 import { TournamentFormat } from '../../Domain/enums/TournamentFormat';
 import { TournamentStatus } from '../../Domain/enums/TournamentStatus';
+import { handleResult } from "../mappers/ResultMapper";
+import { validateTournamentUpdate } from "../validators/tournaments/validateTournamentUpdate";
 export class TournamentController{
     private readonly router = Router();
 
@@ -34,15 +36,14 @@ export class TournamentController{
         const result = hasFilters 
             ? await this.tournamentService.getFiltered(filters, page, limit)
             : await this.tournamentService.getAll(page, limit);
-        res.status(200).json({ success: true, data: result });
-    }
+        handleResult(result, res);
+        }
 
     private async getById(req: Request, res: Response) : Promise<void>{
         const id = parseInt(req.params.id as string, 10);
         if(isNaN(id)) {res.status(400).json({ success: false, message: "Invalid id"}); return; }
-        const entity = await this.tournamentService.getById(id);
-        if(!entity) {res.status(404).json({ success: false, message: "Not found"}); return; }
-        res.status(200).json({ success: true, data: entity});
+        const result = await this.tournamentService.getById(id);
+        handleResult(result, res);
     }
 
     private async create(req: Request, res: Response) : Promise<void>{
@@ -51,23 +52,28 @@ export class TournamentController{
         const v:ValidationResult = validateTournamentCreation(tournamentName ?? "", tournamentGame ?? "", tournamentMaxTeams ?? 0, tournamentApplicationDeadline ?? new Date(), tournamentPrizeFund ?? 0, tournamentFormat, tournamentStatus);
         if(!v.valid) {res.status(400).json({ success: false, message: v.message }); return;}
 
-        const created = await this.tournamentService.create(new CreateTournamentDto( tournamentName, tournamentGame, tournamentFormat, tournamentMaxTeams, tournamentApplicationDeadline, tournamentPrizeFund, tournamentStatus));
-        if (!created) { res.status(500).json({ success: false, message: "Failed to create" }); return; }
-        res.status(201).json({ success: true, data: created });
+        const result = await this.tournamentService.create(new CreateTournamentDto( tournamentName, tournamentGame, tournamentFormat, tournamentMaxTeams, tournamentApplicationDeadline, tournamentPrizeFund, tournamentStatus));
+        handleResult(result, res);    
     }
 
     private async update(req: Request, res: Response): Promise<void> {
         const id = parseInt(req.params.id as string, 10);
         if (isNaN(id)) { res.status(400).json({ success: false, message: "Invalid id" }); return; }
-        const ok = await this.tournamentService.update(id, req.body);
-        res.status(ok ? 200 : 500).json({ success: ok });
+        
+        const {tournamentName, tournamentFormat, tournamentMaxTeams, tournamentApplicationDeadline, tournamentPrizeFund, tournamentStatus} 
+        = req.body as {tournamentName?:string, tournamentFormat?:TournamentFormat, tournamentMaxTeams?:number, tournamentApplicationDeadline?:Date, tournamentPrizeFund?:number, tournamentStatus?:TournamentStatus};
+        const v:ValidationResult = validateTournamentUpdate(tournamentName ?? "", tournamentMaxTeams ?? 0, tournamentApplicationDeadline ?? new Date(), tournamentPrizeFund ?? 0, tournamentFormat, tournamentStatus);
+        if(!v.valid) {res.status(400).json({ success: false, message: v.message }); return;}
+        
+        const result = await this.tournamentService.update(id, req.body);
+        handleResult(result, res);
     }
 
     private async delete(req: Request, res: Response): Promise<void> {
         const id = parseInt(req.params.id as string, 10);
         if (isNaN(id)) { res.status(400).json({ success: false, message: "Invalid id" }); return; }
-        const ok = await this.tournamentService.delete(id);
-        res.status(ok ? 200 : 500).json({ success: ok });
+        const result = await this.tournamentService.delete(id);
+        handleResult(result, res);
     }
 
     public getRouter(): Router { return this.router; }
