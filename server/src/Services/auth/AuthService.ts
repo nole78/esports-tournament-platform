@@ -15,7 +15,7 @@ export class AuthService implements IAuthService {
 
   async login(username: string, password: string): Promise<Result<AuthUserDto>> {
     const user = await this.userRepo.findByUsername(username);
-    if (user.id === 0 || user.isActive === 0) {
+    if (user.id === 0) {
       return Result.Failure("Wrong username or password", ErrorType.Unauthorized);
     }
 
@@ -40,7 +40,7 @@ export class AuthService implements IAuthService {
       entityId: user.id,
       //ipAddress: ip // TODO: get ip for login?
     });
-
+    await this.userRepo.logIn(user.id);
     return Result.Success(new AuthUserDto(user.id, user.gamerTag, user.role));
   }
 

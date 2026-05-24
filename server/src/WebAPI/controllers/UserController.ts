@@ -33,7 +33,8 @@ export class UserController {
     if (isNaN(id)) { res.status(400).json({ success: false, message: "Invalid id" }); return; }
     
     const role = req.body.role as string;
-    if (!Object.values(UserRole).includes(role as UserRole)) {
+    const roles = ["ADMIN", "PLAYER"];
+    if (!roles.includes(role)) {
         handleResult(Result.Failure("Invalid role",ErrorType.Validation),res);
         return;
     }

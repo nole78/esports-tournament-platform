@@ -1,6 +1,7 @@
 import { Request, Response, Router } from "express";
 import jwt from "jsonwebtoken";
 import { IAuthService } from "../../Domain/services/auth/IAuthService";
+import { IUserService } from "../../Domain/services/users/IUserService";
 import { ValidationResult } from "../../Domain/types/ValidationResult";
 import { validateLogin } from "../validators/auth/validateLogin";
 import { validateRegister } from "../validators/auth/validateRegister";
@@ -10,9 +11,10 @@ import { Result } from "../../Domain/common/Result";
 export class AuthController {
   private readonly router = Router();
 
-  public constructor(private readonly authService: IAuthService) {
+  public constructor(private readonly authService: IAuthService, private readonly userService: IUserService) {
     this.router.post("/auth/login", this.login.bind(this));
     this.router.post("/auth/register", this.register.bind(this));
+    this.router.post("/auth/logout", this.logout.bind(this));
   }
 
   private async login(req: Request, res: Response): Promise<void> {
@@ -45,6 +47,13 @@ export class AuthController {
       { expiresIn: "24h" }
     );
     handleResult(Result.Success(token),res);
+  }
+
+  private async logout(req: Request, res: Response): Promise<void> {
+    const id = parseInt(req.body.id as string, 10);
+    if (isNaN(id)) { res.status(400).json({ success: false, message: "Invalid id" }); return; }
+    const result = await this.userService.logout(id);
+    handleResult(result, res);
   }
 
   public getRouter(): Router { return this.router; }
