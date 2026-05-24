@@ -1,7 +1,7 @@
 
 export class AddPlayerErrorDto {
     constructor(
-        userId: number = 0,
-        reason: string = ""
+        public userId: number = 0,
+        public reason: string = ""
     ) {}
 }
