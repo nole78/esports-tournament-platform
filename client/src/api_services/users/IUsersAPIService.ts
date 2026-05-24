@@ -1,6 +1,5 @@
 import type { UserDto } from "../../models/user/UserTypes";
-
-export type ApiResponse<T> = { success: boolean; message: string; data?: T };
+import type { ApiResponse } from "../tournament_list/ITournamentAPIService";
 
 export interface IUsersAPIService {
   getAll(): Promise<ApiResponse<UserDto[]>>;

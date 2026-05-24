@@ -1,8 +1,7 @@
 import type { StatisticsDto } from "../../models/health/StatisticsDto";
 import type { HealthStatusDto } from "../../models/health/HealthStatusDto";
 import type { ApiStatusDto } from "../../models/health/ApiStatusDto";
-
-export type ApiResponse<T> = { success: boolean; message: string; data?: T };
+import type { ApiResponse } from "../users/IUsersAPIService";
 
 export interface IHealthAPIService {
   getDbStatus(): Promise<ApiResponse<HealthStatusDto>>;

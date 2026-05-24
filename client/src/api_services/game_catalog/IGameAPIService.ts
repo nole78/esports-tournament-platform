@@ -1,6 +1,5 @@
 import type { GameDto } from "../../models/game/GameDto";
-
-export type ApiResponse<T> = { success: boolean; message: string; data?: T };
+import type { ApiResponse } from "../users/IUsersAPIService";
 
 export interface IGameAPIService {
   getAll(page?: number, limit?: number): Promise<ApiResponse<{ items: GameDto[]; total: number }>>;

@@ -1,7 +1,8 @@
 import axios from "axios";
-import type { IUsersAPIService, ApiResponse } from "./IUsersAPIService";
+import type { IUsersAPIService } from "./IUsersAPIService";
 import type { UserDto } from "../../models/user/UserTypes";
 import { readItem } from "../../helpers/local_storage";
+import type { ApiResponse } from "../tournament_list/ITournamentAPIService";
 
 const BASE = import.meta.env.VITE_API_URL + "users";
 
