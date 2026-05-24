@@ -24,12 +24,18 @@ export class UserService implements IUserService {
     var user = await this.userRepo.findById(id);
     if(user.id === 0) return Result.Failure(`User with id ${id} doesn't exist`,ErrorType.NotFound);
     
-    if(!user.isActive) return Result.Failure("Can't change role of a deactivated user",ErrorType.Conflict);
-    
     if(user.role == UserRole.ADMIN) return Result.Failure("Can't change role of an admin",ErrorType.Unauthorized);
 
     var res = await this.userRepo.update(id,{role: role});
-    return res? Result.Success():Result.Failure("Couldn't deactivate user",ErrorType.Internal);
+    return res? Result.Success():Result.Failure("Couldn't change user role",ErrorType.Internal);
+  }
+
+  async logout(id: number): Promise<Result<void>>{
+    var user = await this.userRepo.findById(id);
+    if(user.id === 0) return Result.Failure(`User with id ${id} doesn't exist`,ErrorType.NotFound);
+
+    var res = await this.userRepo.logOut(user.id);
+    return res? Result.Success():Result.Failure("Couldn't log out user",ErrorType.Internal);
   }
 
   async getForSearch(username: string): Promise<Result<UserDto[]>> {

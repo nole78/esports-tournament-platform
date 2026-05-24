@@ -72,7 +72,7 @@ export class DbManager {
       info.node.status = ms > HEALTH_CHECK_TIMEOUT ? NodeStatus.DEGRADED : NodeStatus.HEALTHY;
     } catch (err) {
       info.node.status = NodeStatus.UNREACHABLE;
-      info.node.failedWrites++;
+      info.node.failedReads++;
       info.node.latency = -1;
       this.logger.warn("DB", `Node ${info.name} failed health check`);
     } finally {
@@ -119,11 +119,11 @@ export class DbManager {
       try {
         const conn = await info.pool.getConnection();
         this.slaveRrIndex = (idx + 1) % n;
-        info.node.successfulWrites++;
+        info.node.successfulReads++;
         return { conn, nodeName: info.name };
       } catch (err) {
         info.node.status = NodeStatus.UNREACHABLE;
-        info.node.failedWrites++;
+        info.node.failedReads++;
         this.logger.warn("DB", `Slave ${info.name} unreachable, trying next`);
       }
     }
@@ -135,10 +135,11 @@ export class DbManager {
     }
     try {
       const conn = await this.master.pool.getConnection();
-      this.master.node.successfulWrites++;
+      this.master.node.successfulReads++;
       return { conn, nodeName: this.master.name };
     } catch (err) {
       this.master.node.status = NodeStatus.UNREACHABLE;
+      this.master.node.failedReads++;
       this.logger.error("DB", "Failed to connect to master for fallback read", err);
       return null;
     }

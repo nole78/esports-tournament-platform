@@ -8,4 +8,5 @@ export interface IUserService {
   getById(id: number): Promise<Result<UserDto>>;
   changeRole(id: number,role: UserRole): Promise<Result<void>>;
   getForSearch(username: string) : Promise<Result<UserDto[]>>;
+  logout(id: number): Promise<Result<void>>;
 }

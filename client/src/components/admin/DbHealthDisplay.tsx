@@ -66,16 +66,24 @@ export default function DbHealthDisplay(){
                     </div>
                     <div className="grid grid-cols-3 gap-4 text-xs font-mono">
                     <div>
+                        <p className="text-white/20 uppercase tracking-wider text-[10px] mb-1.5">Successful reads</p>
+                        <p className="text-emerald-400">{n.successfulReads}</p>
+                    </div>
+                    <div>
+                        <p className="text-white/20 uppercase tracking-wider text-[10px] mb-1.5">Failed reads</p>
+                        <p className="text-red-400">{n.failedReads}</p>
+                    </div>
+                    <div>
+                        <p className="text-white/20 uppercase tracking-wider text-[10px] mb-1.5">Last check</p>
+                        <p className="text-white/40">{n.lastCheck ? new Date(n.lastCheck).toLocaleTimeString() : "—"}</p>
+                    </div>
+                    <div>
                         <p className="text-white/20 uppercase tracking-wider text-[10px] mb-1.5">Successful writes</p>
                         <p className="text-emerald-400">{n.successfulWrites}</p>
                     </div>
                     <div>
                         <p className="text-white/20 uppercase tracking-wider text-[10px] mb-1.5">Failed writes</p>
                         <p className="text-red-400">{n.failedWrites}</p>
-                    </div>
-                    <div>
-                        <p className="text-white/20 uppercase tracking-wider text-[10px] mb-1.5">Last check</p>
-                        <p className="text-white/40">{n.lastCheck ? new Date(n.lastCheck).toLocaleTimeString() : "—"}</p>
                     </div>
                     <div>
                         <p className="text-white/20 uppercase tracking-wider text-[10px] mb-1.5">Latency</p>
