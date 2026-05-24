@@ -7,7 +7,7 @@ import { Empty, ErrorBox, PageHeader, Pagination } from "../../components/ui/UI"
 import { formatDeadline, daysUntilDeadline, getDeadlineStatus, getDeadlineColor } from '../../helpers/date_formatter';
 import type { GameDto } from "../../models/game/GameDto";
 import { gameApi } from "../../api_services/game_catalog/GameAPIService";
-import { TournamentStatusValues, type TournamentStatus } from "../../types/tournament/TournamentStatus";
+import { TournamentStatus } from "../../types/tournament/TournamentStatus";
 import { TournamentFormatValues, type TournamentFormat } from "../../types/tournament/TournamentFormat";
 import type { TournamentFilterDto } from '../../models/tournament/TournamentFilterDto';
 
@@ -107,7 +107,7 @@ export default function TournamentList(){
                         <option value="" className='bg-lime-950'>
                             Any status
                         </option>
-                        {Object.entries(TournamentStatusValues).map(([key, value]) => (
+                        {Object.entries(TournamentStatus).map(([key, value]) => (
                             <option className='bg-lime-950' key={key} value={value}>
                                 {key}
                             </option>
