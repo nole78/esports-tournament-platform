@@ -168,7 +168,6 @@ export class TournamentRepository implements ITournamentRepository {
 
     const fieldMap: Record<string, string> = {
       tournamentName: "tournament_name",
-      tournamentGameId: "tournament_game_id",
       tournamentFormat: "tournament_format",
       tournamentMaxTeams: "tournament_max_teams",
       tournamentApplicationDeadline: "tournament_application_deadline",

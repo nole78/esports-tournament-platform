@@ -157,7 +157,6 @@ export class TournamentService implements ITournamentService {
       return Result.Failure("Tournament with id "+id+"does not exist!", ErrorType.NotFound);
     
     const updatedTournament:Partial<Tournament> = {
-      tournamentId: fields.tournamentId,
       tournamentName: fields.tournamentName,
       tournamentFormat: fields.tournamentFormat,
       tournamentMaxTeams: fields.tournamentMaxTeams,
