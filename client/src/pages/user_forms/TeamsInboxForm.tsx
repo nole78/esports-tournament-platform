@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { teamApi } from "../../api_services/teams/TeamAPIService";
 import type { IniviteDto } from '../../models/invite/InviteDto';
+import { Empty } from "../../components/ui/UI";
 
 
 export default function TeamsInboxForm(){
-    const navigate = useNavigate();
     // const [error, setError] = useState<string>("");
-    const load = 0;
     const [invites, setInvites] = useState<IniviteDto[]>([]);
+    const [teamNames, setTeamNames] = useState<Record<number, string>>({});
+    const [teamImages, setTeamImages] = useState<Record<number, string>>({});
 
     const answer = async (teamId: number, ans: string)=>{
         await teamApi.inviteRespond(teamId, ans).then(
@@ -23,55 +23,80 @@ export default function TeamsInboxForm(){
             }
         })
     }
-    useEffect(()=>{
-         teamApi.userInvites().then(
-            res => {
-                if (res.success){
-                    setInvites(res.data ?? []);
-                }
-            })
-        // ).catch(()=> setError("Failed to get invites"))
-    }, [load])
+
+    useEffect(() => {
+    const fetchData = async () => {
+        const inviteRes = await teamApi.userInvites();
+
+        if (inviteRes.success) {
+            const inviteData = inviteRes.data ?? [];
+            setInvites(inviteData);
+
+            const names: Record<number, string> = {};
+            const images: Record<number, string> = {};
+
+            for (const invite of inviteData) {
+                const teamRes = await teamApi.getById(invite.teamId);
+
+                names[invite.teamId] =
+                    teamRes.success
+                        ? teamRes.data?.teamName ?? "Unknown"
+                        : "Unknown";
+                images[invite.teamId] =
+                    teamRes.success
+                        ? teamRes.data?.teamLogotip ?? ""
+                        : ""
+            }
+            setTeamNames(names);
+            setTeamImages(images);
+        }
+    };
+    fetchData();
+}, []);
+
     return(
         <div>
-            <table className="min-w-full text-xs text-bgsecondary font-bold border-collapse">
-                                    <thead>
-                                    <tr className="border-b border-gray-200 text-left">
-                                        <th className=" pb-2 pr-4">Team Id</th>
-                                        <th className=" pb-2 pr-4">Invited at</th>
-                                        <th colSpan={2} className=" pb-2 pr-4">Status</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                        {invites.map(i => (
-                                        <tr key={i.teamId} className="border-b border-gray-400/30">
-                                            <td className="py-3 pr-4 font-normal text-left">{i.teamId}</td>
-                                            <td className="py-3 pr-4 font-normal text-left">{new Date(i.invitedAt).toLocaleString()}</td>
-                                            <td className="py-3 pr-4 font-normal text-left"> 
-                                                <button onClick={() => answer(i.teamId, "YES")} className="inline-flex items-center justify-center bg-green-400/40 border-2 border-gray-400 hover:bg-bgsecondary/30 hover:border-bgsecondary text-gray-400 font-semibold rounded-xl h-8 w-14 text-sm transition-colors mx-auto">
-                                                Accept
-                                        </button></td>
-                                        <td className="py-3 pr-4 font-normal text-left">
-                                             <button onClick={() => answer(i.teamId, "NO")} className="inline-flex items-center justify-center bg-red-400/40 border-2 border-gray-400 hover:bg-bgsecondary/30 hover:border-bgsecondary text-gray-400 font-semibold rounded-xl h-8 w-14 text-sm transition-colors mx-auto">
-                                                Reject
-                                        </button></td>
-                                        </tr>
-                                        ))
-                                        }
-                                    </tbody>
-                                </table>
-
-
-
-
-            {/* Need to get invites --> for this player */}
-             <div className="flex gap-2">
-                    
-                    <button type="button" onClick={() => navigate(-1)}
-                        className="py-3 bg-red-400/40  cursor-pointer border-red-500 hover:bg-red-400/30 hover:border-bgsecondary/70 text-red-500 font-semibold rounded-xl w-5/2 text-sm transition-colors">
-                    Cancel</button>
-                </div>
-
+            {invites.length == 0 ? <Empty message="You currently have no pending invites"/> : (
+                <section className="grid sm:grid-cols-1 lg:grid-cols-1">
+                {invites.map(i => { 
+                    return (
+                    <div key={i.teamId} className="bg-white/2 border border-white/6 p-4 relative">
+                        <div className="flex flex-col sm:flex-row gap-4">
+                            <div className="overflow-hidden rounded-xl shrink-0 w-16 h-16">
+                                <img src={teamImages[i.teamId]} className="w-full aspect-square object-cover rounded-xl cursor-pointer transition-transform duration-300 hover:scale-110"/>
+                            </div>
+                            <div className="flex flex-col overflow-hidden">
+                                <div className="grid grid-cols-1 text-xs font-mono">
+                                    <div className="min-w-0">
+                                        <p className="text-bgprimary tracking-wider text-[15px] mb-1.5">
+                                            You were invited to join the <span className="text-bgsecondary">{teamNames[i.teamId]}</span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flex flex-col overflow-hidden mt-2">
+                            <div className="grid grid-cols-2 text-xs font-mono">
+                                <div className="max-w-45">
+                                    <p className="text-bgprimary tracking-wider text-[15px] mb-1.5">
+                                        You were invited at <span className="text-bgsecondary/40">{new Date(i.invitedAt).toLocaleString()}</span>
+                                    </p>
+                                </div>
+                                <div className="grid grid-rows-2 text-xs font-mono">
+                                    <button onClick={() => answer(i.teamId, "YES")} className="cursor-pointer mb-2 bg-green-400/40 border-2 border-green-500 hover:bg-bgsecondary/30 hover:border-bgsecondary text-green-500 font-semibold rounded-xl p-1 text-sm transition-colors">
+                                        Accept
+                                    </button>
+                                    <button onClick={() => answer(i.teamId, "NO")} className="cursor-pointer mb-2 bg-red-400/40 border-2 border-red-500 hover:bg-bgsecondary/30 hover:border-bgsecondary text-red-500 font-semibold rounded-xl p-1 text-sm transition-colors">
+                                        Reject
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>)
+                    }
+                )}
+                </section>)}
         </div>
     );
 }
