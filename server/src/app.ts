@@ -60,7 +60,7 @@ const auditService = new AuditService(auditRepo, userRepo);
 const authService   = new AuthService(userRepo,auditService);
 const teamService = new TeamService(teamRepo, teamMemberRepo, userRepo, logger);
 const healthService = new HealthService(gameRepo, tournamentRepo, userRepo, teamRepo, db);
-const tournamentRegistrationService = new TournamentRegistrationService(tournamentRegistrationRepo, teamRepo, tournamentRepo, logger);
+const tournamentRegistrationService = new TournamentRegistrationService(tournamentRegistrationRepo, teamRepo, teamMemberRepo, tournamentRepo, gameRepo, logger);
 
 // Express
 const app = express();
