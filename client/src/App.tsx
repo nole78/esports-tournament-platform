@@ -23,6 +23,7 @@ import TeamsEditPage from "./pages/common_pages/TeamsEditPage";
 import { Layout } from "./components/layout/Layout";
 import UserOverview from "./pages/user/UserOverview";
 import HealthPage from "./pages/admin/HealthPage";
+import TestPage from "./pages/TestPage";
 
 export default function App() {
   return (
@@ -30,6 +31,7 @@ export default function App() {
       <Route path="/login"    element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
     <Route element={<Layout/>}>
+      <Route path="/test" element={<TestPage/>}/>
       <Route path="/home" element={<LandingPage/>}/>
       <Route path="/game_catalog" element={<GameCatalog/>} />
       <Route path="/tournament_list" element={<TournamentList />} />
