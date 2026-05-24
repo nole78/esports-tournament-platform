@@ -40,6 +40,12 @@ export default function RegisteredTeams() {
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [page]);
 
+    const Disqualify =async (tournamentId: number, teamId: number) =>{  
+      await tournamentRegistrationApi.update(tournamentId, teamId, {status: TournamentRegistrationStatus.DISQUALIFIED})
+      loadPage(page);
+    }
+
+
   const confirmedTeams = regTeams.filter(t => t.status === TournamentRegistrationStatus.CONFIRMED);
 
   return (
@@ -79,7 +85,7 @@ export default function RegisteredTeams() {
                       #{i + 1 + (page - 1) * limit}
                     </span>
                     {user?.role === "admin" && (
-                      <button className="px-3 py-1 text-xs bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded transition-colors duration-200">
+                      <button onClick={() => Disqualify(t.tournamentId, t.teamId)} className="px-3 py-1 text-xs bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded transition-colors duration-200">
                         Disqualify
                       </button>
                     )}
