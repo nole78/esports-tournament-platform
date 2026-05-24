@@ -6,10 +6,14 @@ import { UserRole } from "../../Domain/enums/UserRole";
 import { handleResult } from "../mappers/ResultMapper";
 import { MatchResultDto } from '../../Domain/DTOs/matches/MatchResultDto';
 import { AddPlayersDto } from "../../Domain/DTOs/match_players/AddPlayersDto";
+import { IMatchPlayerService } from "../../Domain/services/match_players/IMatchPlayerService";
 
 export class MatchController {
     private readonly router = Router();
-    public constructor(private readonly matchService: IMatchService){
+    public constructor(
+        private readonly matchService: IMatchService,
+        private readonly matchPlayerService: IMatchPlayerService
+    ){
         this.router.get("/matches/tournament/:tournamendId", this.getAllForTournament.bind(this));
         this.router.get("/matches/:id", this.getDetails.bind(this));
         this.router.patch("/matches/:id/result", authenticate, authorize(UserRole.ADMIN), this.setResult.bind(this));
@@ -56,7 +60,7 @@ export class MatchController {
         const {notes} = req.body as {notes?: string};
         if(!notes) {res.status(400).json({ success: false, message: "No notes to add"}); return;}
 
-        const result = await this.matchService.setPerformanceNotes(id, userId, notes ?? "");
+        const result = await this.matchPlayerService.setPerformanceNotes(id, userId, notes ?? "");
         handleResult(result, res);
     }
 
@@ -68,7 +72,7 @@ export class MatchController {
         if(!userIds || userIds.length === 0) {res.status(400).json({ success: false, message: "No user to add"}); return;} 
         if(!teamId || teamId <= 0) {res.status(400).json({ success: false, message: "Team Id required and has to be grater than 0"}); return;} 
 
-        const result = await this.matchService.addPlayersToMatch(id,new AddPlayersDto(teamId, userIds));
+        const result = await this.matchPlayerService.addPlayersToMatch(id,new AddPlayersDto(teamId, userIds));
         handleResult(result, res);
     }
 
@@ -79,7 +83,7 @@ export class MatchController {
         const userId = parseInt(req.params.userId as string, 10);
         if(isNaN(userId)) {res.status(400).json({ success: false, message: "Invalid id"}); return;}
         
-        const result = await this.matchService.removePlayerFromMatch(id,userId);
+        const result = await this.matchPlayerService.removePlayerFromMatch(id,userId);
         handleResult(result, res);
     }
 }
