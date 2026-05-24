@@ -11,6 +11,8 @@ import UserPlusIcon from "../../components/HeroIcons/UserPlusIcon";
 import WrenchScrewdriverIcon from "../../components/HeroIcons/WrenchScrewdriverIcon";
 import { useAuth } from "../../hooks/auth/useAuthHook";
 import { UserRole } from '../../../../server/src/Domain/enums/UserRole';
+import PendingTeams from "../../components/tournamentRegistration/PendingTeams";
+import Settings from '../../components/tournamentRegistration/Settings';
 
 export default function TournamentRegistrationPage() {
     const { user } = useAuth();
@@ -37,9 +39,9 @@ export default function TournamentRegistrationPage() {
         case 'register':
             return <RegisterTeam />;
         case 'pendingTeams':
-            return(<></>);
+            return <PendingTeams />;
         case 'settings':
-            return(<></>);
+            return <Settings />;
         default:
             return <TournamentOverview />;
         }
