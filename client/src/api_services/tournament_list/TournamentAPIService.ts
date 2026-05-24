@@ -37,7 +37,7 @@ export const tournamentApi : ITournamentAPIService = {
       .then(r => r.data).catch(e => err(e, "Failed to load items"));
   },
   async update(id, payload) {
-    return axios.patch<ApiResponse<void>>(`${BASE}/${id}`, payload, { headers: authHeader() })
+    return axios.put<ApiResponse<void>>(`${BASE}/${id}`, payload, { headers: authHeader() })
       .then(r => r.data).catch(e => err(e, "Failed to update"));
   },
   async delete(id) {
