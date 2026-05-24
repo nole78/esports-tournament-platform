@@ -8,15 +8,15 @@ import { UserDto } from "../../Domain/DTOs/users/UserDto";
 import { MatchStatus } from "../../Domain/enums/MatchStatus";
 import { MatchPlayer } from "../../Domain/models/MatchPlayer";
 import { IMatchPlayerRepository } from "../../Domain/repositories/match_players/IMatchPlayerRepository";
-import { IMatchRepository } from "../../Domain/repositories/matches/IMatchRepository";
 import { ITeamMemberRepository } from "../../Domain/repositories/team_members/ITeamMemberRepository";
 import { ITeamRepository } from "../../Domain/repositories/teams/ITeamRepository";
 import { IUserRepository } from "../../Domain/repositories/users/IUserRepository";
 import { IMatchPlayerService } from "../../Domain/services/match_players/IMatchPlayerService";
+import { IMatchService } from "../../Domain/services/matches/IMatchService";
 
 export class MatchPlayerService implements IMatchPlayerService{
     constructor(
-        private readonly matchRepo: IMatchRepository,
+        private readonly matchService: IMatchService,
         private readonly matchPlayerRepo: IMatchPlayerRepository,
         private readonly userRepo: IUserRepository,
         private readonly teamRepo: ITeamRepository,
@@ -24,11 +24,12 @@ export class MatchPlayerService implements IMatchPlayerService{
     ) {}
 
     public async getAllPlayers(id: number): Promise<Result<UserDto[]>> {
-        const match = await this.matchRepo.findById(id);
-        if(match.matchId === 0)
-            return Result.Failure(`Match doesn't exist`,ErrorType.NotFound);
-        const matchPlayers = await this.matchPlayerRepo.findByMatchId(match.matchId);
+        const res = await this.matchService.getById(id);
+        if(!res.isSuccess  || !res.value)
+            return Result.Failure(res.errorMessage ?? "Match not found",res.errorType ?? ErrorType.NotFound);
+        const match = res.value;
 
+        const matchPlayers = await this.matchPlayerRepo.findByMatchId(match.matchId);
         if(matchPlayers.length === 0)
             return Result.Success<UserDto[]>([]);
 
@@ -41,9 +42,10 @@ export class MatchPlayerService implements IMatchPlayerService{
 
     
     public async setPerformanceNotes(id: number, userId: number, notes: string) : Promise<Result<void>>{
-        const match = await this.matchRepo.findById(id);
-        if(match.matchId === 0)
-            return Result.Failure(`Match doesn't exist`,ErrorType.NotFound);
+        const res = await this.matchService.getById(id);
+        if(!res.isSuccess  || !res.value)
+            return Result.Failure(res.errorMessage ?? "Match not found",res.errorType ?? ErrorType.NotFound);
+        const match = res.value;
 
         if(match.status === MatchStatus.SCHEDULED)
             return Result.Failure("Match hasn't started, can't add performance notes now", ErrorType.Conflict);
@@ -62,9 +64,10 @@ export class MatchPlayerService implements IMatchPlayerService{
 
 
     public async addPlayersToMatch(id: number, dto: AddPlayersDto) :Promise<Result<AddPlayersResponseDto>> {
-        const match = await this.matchRepo.findById(id);
-        if(match.matchId === 0)
-            return Result.Failure(`Match doesn't exist`, ErrorType.NotFound);
+        const res = await this.matchService.getById(id);
+        if(!res.isSuccess  || !res.value)
+            return Result.Failure(res.errorMessage ?? "Match not found",res.errorType ?? ErrorType.NotFound);
+        const match = res.value;
 
         if(match.status === MatchStatus.COMPLETED)
             return Result.Failure("Match is completed, can't add players now", ErrorType.Conflict);
@@ -123,9 +126,10 @@ export class MatchPlayerService implements IMatchPlayerService{
     }
 
     public async removePlayerFromMatch(id: number, userId: number) : Promise<Result<void>> {
-        const match = await this.matchRepo.findById(id);
-        if(match.matchId === 0)
-            return Result.Failure("Match doesn't exist",ErrorType.NotFound);
+        const res = await this.matchService.getById(id);
+        if(!res.isSuccess  || !res.value)
+            return Result.Failure(res.errorMessage ?? "Match not found",res.errorType ?? ErrorType.NotFound);
+        const match = res.value;
 
         if(match.status === MatchStatus.COMPLETED)
             return Result.Failure("Match is completed, can't remove players now", ErrorType.Conflict);

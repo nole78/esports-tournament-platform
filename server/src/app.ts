@@ -29,6 +29,11 @@ import { TeamService } from './Services/teams/TeamService';
 import { TeamRepository } from "./Database/repositories/teams/TeamRepository";
 import { TeamMemberRepository } from "./Database/repositories/team_members/TeamMembersRepository";
 import { TeamController } from "./WebAPI/controllers/TeamController";
+import { MatchRepository } from "./Database/repositories/matches/MatchRepository";
+import { MatchService } from './Services/matches/MatchService';
+import { MatchPlayerService } from "./Services/match_players/MatchPlayerService";
+import { MatchPlayerRepository } from "./Database/repositories/match_players/MatchPlayerRepository";
+import { MatchController } from "./WebAPI/controllers/MatchController";
 
 export const logger = new ConsoleLoggerService();
 export const db     = new DbManager(logger);
@@ -43,6 +48,8 @@ const tournamentRepo = new TournamentRepository(db, logger);
 const auditRepo = new AuditRepository(db, logger);
 const teamRepo = new TeamRepository(db, logger);
 const teamMemberRepo = new TeamMemberRepository(db, logger);
+const matchRepo = new MatchRepository(db, logger);
+const matchPlayerRepo = new MatchPlayerRepository(db, logger);
 
 // Services
 const userService   = new UserService(userRepo);
@@ -52,6 +59,8 @@ const auditService = new AuditService(auditRepo, userRepo);
 const authService   = new AuthService(userRepo,auditService);
 const teamService = new TeamService(teamRepo, teamMemberRepo, userRepo, logger);
 const healthService = new HealthService(gameRepo, tournamentRepo, userRepo, teamRepo, db);
+const matchService = new MatchService(matchRepo, teamRepo, tournamentRepo);
+const matchPlayerService = new MatchPlayerService(matchService, matchPlayerRepo, userRepo, teamRepo,teamMemberRepo);
 
 // Express
 const app = express();
@@ -66,5 +75,6 @@ app.use("/api/v1", new AuditController(auditService).getRouter());
 app.use("/api/v1", new HealthController(healthService).getRouter());
 app.use("/api/v1", new TeamController(teamService).getRouter());
 app.use("/api/v1", new HealthController(healthService).getRouter());
+app.use("/api/v1", new MatchController(matchService, matchPlayerService).getRouter());
 
 export default app;

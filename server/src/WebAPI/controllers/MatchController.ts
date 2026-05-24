@@ -86,4 +86,6 @@ export class MatchController {
         const result = await this.matchPlayerService.removePlayerFromMatch(id,userId);
         handleResult(result, res);
     }
+
+    public getRouter(): Router { return this.router; }
 }
