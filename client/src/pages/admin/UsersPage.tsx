@@ -35,9 +35,9 @@ export default function UsersPage() {
                 <td className="px-5 py-3.5 text-bgsecondary/30 text-xs">
                   <div className="flex items-center">
                     <span
-                        className={`w-2.5 h-2.5 rounded-full mr-2 ${
+                        className={`w-2.5 h-2.5 rounded-full mr-2  ${
                             u?.isActive
-                                ? "bg-green-500 shadow-[0_0_8px_#22c55e]"
+                                ? "animate-pulse bg-green-500 shadow-[0_0_8px_#22c55e]"
                                 : "bg-bgsecondary/30"
                         }`}
                     />
