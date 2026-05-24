@@ -10,6 +10,8 @@ import { IDateTimeConverter } from "../../Domain/services/datetime/IDateTimeConv
 import { GameDto } from "../../Domain/DTOs/games/GameDto";
 import { TournamentFilterDto } from "../../Domain/DTOs/tournaments/TournamentFilterDto";
 import { Game } from "../../Domain/models/Game";
+import { Result } from "../../Domain/common/Result";
+import { ErrorType } from '../../Domain/common/ErrorType';
 
 export class TournamentService implements ITournamentService {
   public constructor(
@@ -19,10 +21,10 @@ export class TournamentService implements ITournamentService {
     private readonly dateTimeConverter: IDateTimeConverter,
   ) {}
 
-  async getAll(page?: number, limit?: number): Promise<PaginatedListDto<TournamentDto>> {
+  async getAll(page?: number, limit?: number): Promise<Result<PaginatedListDto<TournamentDto>>> {
     const tournaments = await this.tournamentRepo.findAll(page, limit);
     if (!tournaments) {
-      return new PaginatedListDto([], 0, page, limit);
+      return Result.Failure("There are no tournaments!", ErrorType.NotFound);
     }
 
     const gameIds = [...new Set(tournaments.map(t => t.tournamentGameId))];
@@ -53,10 +55,10 @@ export class TournamentService implements ITournamentService {
 
     const total = await this.tournamentRepo.findTotal();
 
-    return new PaginatedListDto(items, total, page, limit);
+    return Result.Success(new PaginatedListDto(items, total, page, limit));
   }
 
-  async getFiltered(fields: Partial<TournamentFilterDto>, page?: number, limit?: number): Promise<PaginatedListDto<TournamentDto>> {
+  async getFiltered(fields: Partial<TournamentFilterDto>, page?: number, limit?: number): Promise<Result<PaginatedListDto<TournamentDto>>> {
     
     let game:GameDto|null = new GameDto();
     if(fields.tournamentGame != null)
@@ -91,22 +93,22 @@ export class TournamentService implements ITournamentService {
       )
     );
     const total = await this.tournamentRepo.findTotalFiltered(game?.gameId == 0 ? undefined : game?.gameId, fields?.tournamentFormat, fields?.tournamentStatus);
-    return new PaginatedListDto(items, total, page, limit);
+    return Result.Success(new PaginatedListDto(items, total, page, limit));
   }
 
-  async getById(id: number): Promise<TournamentDto | null> {
+  async getById(id: number): Promise<Result<TournamentDto>> {
     const tournament = await this.tournamentRepo.findById(id);
     if (!tournament) {
-      return null;
+      return Result.Failure("Tournament with id "+id+" does not exist!", ErrorType.NotFound);
     }
 
     const game = await this.gameRepo.findById(tournament.tournamentGameId);
     if (!game) {
       this.logger.error("TournamentService", "getById failed", `Game with id "${tournament.tournamentGameId}" not found`);
-      return null;
+      return Result.Failure("Game with id " + tournament.tournamentGameId + " does not exist!", ErrorType.NotFound);
     }
 
-    return new TournamentDto(
+    return Result.Success(new TournamentDto(
       tournament.tournamentId,
       tournament.tournamentName,
       game.gameName,
@@ -115,15 +117,15 @@ export class TournamentService implements ITournamentService {
       tournament.tournamentApplicationDeadline,
       tournament.tournamentPrizeFund,
       tournament.tournamentStatus
-    );
+    ));
   }
 
-  async create(t: CreateTournamentDto): Promise<TournamentDto | null> {
+  async create(t: CreateTournamentDto): Promise<Result<TournamentDto>> {
     // find game by name
     const game = await this.gameRepo.findByName(t.tournamentGame);
     if (!game) {
       this.logger.error("TournamentService", "create failed", `Game with name "${t.tournamentGame}" not found`);
-      return null;
+      return Result.Failure("Game with name "+t.tournamentGame+" does not exist!", ErrorType.NotFound);
     }
 
     // Conver date to MySQL format
@@ -146,14 +148,32 @@ export class TournamentService implements ITournamentService {
 
     const newTournamentDto:TournamentDto = new TournamentDto(created.tournamentId, created.tournamentName, game.gameName, created.tournamentFormat, created.tournamentMaxTeams, created.tournamentApplicationDeadline, created.tournamentPrizeFund, created.tournamentStatus);
 
-    return created.tournamentId !== 0 ? newTournamentDto : null;
+    return created.tournamentId !== 0 ? Result.Success(newTournamentDto) : Result.Failure("Could not create new tournament!", ErrorType.Internal);
   }
 
-  async update(id: number, fields: Partial<Tournament>): Promise<boolean> {
-    return this.tournamentRepo.update(id, fields);
+  async update(id: number, fields: TournamentDto): Promise<Result<void>> {
+    const t = await this.tournamentRepo.findById(id);
+    if(t.tournamentId === 0)
+      return Result.Failure("Tournament with id "+id+"does not exist!", ErrorType.NotFound);
+    
+    const updatedTournament:Partial<Tournament> = {
+      tournamentId: fields.tournamentId,
+      tournamentName: fields.tournamentName,
+      tournamentFormat: fields.tournamentFormat,
+      tournamentMaxTeams: fields.tournamentMaxTeams,
+      tournamentApplicationDeadline: new Date(this.dateTimeConverter.toMySQLDateTime(fields.tournamentApplicationDeadline)),
+      tournamentPrizeFund: fields.tournamentPrizeFund,
+      tournamentStatus: fields.tournamentStatus
+    }
+    const res = await this.tournamentRepo.update(id, updatedTournament)
+    return res? Result.Success():Result.Failure("Could not update tournament!", ErrorType.Internal);
   }
 
-  async delete(id: number): Promise<boolean> {
-    return this.tournamentRepo.delete(id);
+  async delete(id: number): Promise<Result<void>> {
+    const t = await this.tournamentRepo.findById(id);
+    if(t.tournamentId === 0)
+      return Result.Failure("Tournament with id "+id+"does not exist!", ErrorType.NotFound);
+    const res = await this.tournamentRepo.delete(id);
+    return res? Result.Success(): Result.Failure("Could not delete tournament!", ErrorType.Internal);
   }
 }
