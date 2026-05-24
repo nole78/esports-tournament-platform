@@ -8,28 +8,28 @@ import { useParams } from "react-router-dom";
 
 export default function RegisteredTeams() {
   const { user } = useAuth();
-  const [regTeams, setRegTeams] = useState<TournamentRegistrationDto[]>([]);
+  //const [regTeams, setRegTeams] = useState<TournamentRegistrationDto[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const limit = 20;
   const {id} = useParams();
   const [error, setError] = useState<string>("");
-
+  const [confirmedTeams, setConfirmedTeams] = useState<TournamentRegistrationDto[]>([]);
 
   const loadPage = (pages: number) => {
       
     Promise.resolve().then(() => setLoading(true));
-    tournamentRegistrationApi.getByTournamentId(Number(id), pages, limit)
+    tournamentRegistrationApi.getByTournamentId(Number(id), TournamentRegistrationStatus.CONFIRMED, pages, limit)
     .then(res => {
       if (res.success && res.data) {
-        setRegTeams(res.data?.items);
+        setConfirmedTeams(res.data?.items);
         setTotal(res.data.total);
       }
       else
       {
         setError(res.message);
-        setRegTeams([]);
+        setConfirmedTeams([]);
       }
     })
     .finally(() => setLoading(false));
@@ -46,7 +46,7 @@ export default function RegisteredTeams() {
     }
 
 
-  const confirmedTeams = regTeams.filter(t => t.status === TournamentRegistrationStatus.CONFIRMED);
+  // const confirmedTeams = regTeams.filter(t => t.status === TournamentRegistrationStatus.CONFIRMED);
 
   return (
     <div>

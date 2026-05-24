@@ -16,8 +16,8 @@ const err = <T>(e: unknown, fallback: string): ApiResponse<T> => ({
 });
 
 export const tournamentRegistrationApi : ITournamentRegistrationAPIService = {
-    async getByTournamentId(id = 0, page = 1, limit = 20){
-        return axios.get(`${BASE}/${id}/registered?page=${page}&limit=${limit}`, { headers: authHeader() })
+    async getByTournamentId(id = 0, status, page = 1, limit = 9){
+        return axios.get(`${BASE}/${id}/registered?page=${page}&limit=${limit}${status !== undefined ? "&status="+status : undefined}`, { headers: authHeader() })
       .then(r => r.data).catch(e => err(e, "Failed to load items"));
     },
     async registerTournament(id, payload){

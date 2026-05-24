@@ -6,28 +6,27 @@ import type { TournamentRegistrationDto } from "../../models/tournamentRegistrat
 import { TournamentRegistrationStatus } from "../../types/tournament_registration/TournamentRegistrationStatus";
 
 export default function PendingTeams(){
-  const [regTeams, setRegTeams] = useState<TournamentRegistrationDto[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const limit = 20;
   const {id} = useParams();
   const [error, setError] = useState<string>("");
-
+  const [pendingTeams, setPendingTeams] = useState<TournamentRegistrationDto[]>([]); 
 
   const loadPage = (pages: number) => {
       
     Promise.resolve().then(() => setLoading(true));
-    tournamentRegistrationApi.getByTournamentId(Number(id), pages, limit)
+    tournamentRegistrationApi.getByTournamentId(Number(id), TournamentRegistrationStatus.PENDING, pages, limit)
     .then(res => {
       if (res.success && res.data) {
-        setRegTeams(res.data?.items);
+        setPendingTeams(res.data?.items);
         setTotal(res.data.total);
       }
       else
       {
         setError(res.message);
-        setRegTeams([]);
+        setPendingTeams([]);
       }
     })
     .finally(() => setLoading(false));
@@ -42,8 +41,10 @@ export default function PendingTeams(){
       await tournamentRegistrationApi.update(tournamentId, teamId, {status: TournamentRegistrationStatus.CONFIRMED})
       loadPage(page);
     }
-
-  const pendingTeams = regTeams.filter(t => t.status === TournamentRegistrationStatus.PENDING);
+    const Disqualify =async (tournamentId: number, teamId: number) =>{  
+      await tournamentRegistrationApi.update(tournamentId, teamId, {status: TournamentRegistrationStatus.DISQUALIFIED})
+      loadPage(page);
+    }
 
   return (
     <div>
@@ -81,8 +82,11 @@ export default function PendingTeams(){
                     <span className="text-xs text-white/40">
                       #{i + 1 + (page - 1) * limit}
                     </span>
-                      <button onClick={() => Add(t.tournamentId, t.teamId)} className="px-3 py-1 text-xs bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded transition-colors duration-200">
+                      <button onClick={() => Add(t.tournamentId, t.teamId)} className="px-3 py-1 text-xs bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded transition-colors duration-200">
                         Add
+                      </button>
+                      <button onClick={() => Disqualify(t.tournamentId, t.teamId)} className="px-3 py-1 text-xs bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded transition-colors duration-200">
+                        Disqualify
                       </button>
                   </div>
                 </div>
