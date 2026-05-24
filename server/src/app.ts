@@ -20,7 +20,6 @@ import { HealthService } from "./Services/health/HealthService";
 
 import { AuthController }   from "./WebAPI/controllers/AuthController";
 import { UserController }   from "./WebAPI/controllers/UserController";
-import { EntityController } from "./WebAPI/controllers/EntityController";
 import { GameController } from "./WebAPI/controllers/GameController";
 import { TournamentController } from "./WebAPI/controllers/TournamentController";
 import { HealthController } from "./WebAPI/controllers/HealthController";
