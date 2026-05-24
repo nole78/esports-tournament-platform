@@ -12,27 +12,27 @@ export class TeamRepository implements ITeamRepository {
     private readonly db: DbManager,
     private readonly logger: ILoggerService,
   ) {}
-  private map(r: RowDataPacket): TeamDto {
-    return new TeamDto(r.team_id, r.team_name, r.team_tag, r.team_logotip, r.team_description);
+  private map(r: RowDataPacket): Team {
+    return new Team(r.team_id, r.team_name, r.team_tag, r.team_logotip, r.team_description);
     }
 
-  async findById(id: number): Promise<TeamDto> {
+  async findById(id: number): Promise<Team> {
     const res = await this.db.getReadConnection();
-    if (!res) return new TeamDto();
+    if (!res) return new Team();
     try {
       const [rows] = await res.conn.execute<RowDataPacket[]>(
         `SELECT t.team_id, t.team_name, t.team_tag, t.team_logotip, t.team_description 
         FROM teams t WHERE t.team_id = ?`, [id]
       );
 
-      return rows.length > 0 ? this.map(rows[0]) : new TeamDto();
+      return rows.length > 0 ? this.map(rows[0]) : new Team();
     } catch (err) {
       this.logger.error("TeamRepository", "findById failed", err);
-      return new TeamDto();
+      return new Team();
     } finally { res.conn.release(); }
   }
 
-  async findAll(page = 1, limit = 20): Promise<TeamDto[]> {
+  async findAll(page = 1, limit = 20): Promise<Team[]> {
     const res = await this.db.getReadConnection();
     if (!res) return [];
     const offset = (page - 1) * limit;
@@ -110,17 +110,17 @@ export class TeamRepository implements ITeamRepository {
       return false;
     } finally { res.conn.release(); }
   }
-  async findByTeamTag(TeamTag: string): Promise<TeamDto> {
+  async findByTeamTag(TeamTag: string): Promise<Team> {
     const res = await this.db.getReadConnection();
-    if (!res) return new TeamDto;
+    if (!res) return new Team;
     try {
       const [rows] = await res.conn.query<RowDataPacket[]>(
         `SELECT * FROM teams WHERE team_tag = ? `, [TeamTag] 
       );
-      return rows.length > 0 ? this.map(rows[0]) : new TeamDto;
+      return rows.length > 0 ? this.map(rows[0]) : new Team;
     } catch (err) {
       this.logger.error("TeamRepository", "findByTeamTag failed", err);
-      return new TeamDto;
+      return new Team;
     } finally { res.conn.release(); }
   }
   async getTotal(): Promise<number>{

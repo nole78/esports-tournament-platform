@@ -28,4 +28,8 @@ export const usersApi: IUsersAPIService = {
     return axios.put<ApiResponse<void>>(`${BASE}/${id}/role`, {role : role.toUpperCase()}, { headers: authHeader() })
       .then(r => r.data).catch(e => err(e, "Failed to change user role"));
   },
+  async searchUsername(username){
+    return axios.get<ApiResponse<UserDto[]>>(`${BASE}/search/${username}`, {headers: authHeader()})
+      .then(r => r.data).catch(e=>err(e, "Failed to search users"))
+  }
 };
