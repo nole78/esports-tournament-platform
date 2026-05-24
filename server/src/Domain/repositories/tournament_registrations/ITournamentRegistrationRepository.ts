@@ -5,6 +5,7 @@ export interface ITournamentRegistrationRepository {
   findTotalByTournamentId(tournamentId: number): Promise<number>;
   findByTeamId(teamId: number, page?:number, limit?:number): Promise<TournamentRegistration[]>;
   findByTournamentId(tournamentId: number, page?:number, limit?:number): Promise<TournamentRegistration[]>;
+  findByTournamentAndTeamId(tournamentId: number, teamId: number): Promise<TournamentRegistration>;
   findAll(page?: number, limit?: number): Promise<TournamentRegistration[]>;
   create(tr: TournamentRegistration): Promise<TournamentRegistration>;
   update(tournamentId: number, teamId: number, fields: Partial<TournamentRegistration>): Promise<boolean>;
