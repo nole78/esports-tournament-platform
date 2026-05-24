@@ -60,10 +60,10 @@ export default function TeamsPage(){
     return (
             <div>
                 <PageHeader eyebrow="" title="Team Catalog"/>
-                <button onClick={() => navigate("/teams/add")}
+                <button onClick={() => user?.role == "admin" ? navigate(`/admin/teams/add`) : navigate(`/teams/add`)}
                         className="mb-2 w-1/6 bg-bgsecondary/40 border-2 border-bgsecondary hover:bg-bgsecondary/30 text-bgsecondary font-semibold rounded-xl py-3 text-sm transition-colors">
                 Add Team</button>
-                <button onClick={() => navigate("/teams/inbox")}
+                <button onClick={() => user?.role == "admin" ? navigate(`/admin/teams/inbox`) : navigate(`/teams/inbox}`)}
                         className="mb-2 w-1/6 bg-bgsecondary/40 border-2 border-bgsecondary hover:bg-bgsecondary/30 text-bgsecondary font-semibold rounded-xl py-3 text-sm transition-colors">
                 Inbox</button>
                 {error && <ErrorBox message={error}/>}
@@ -116,14 +116,14 @@ export default function TeamsPage(){
                                         Delete
                                     </button>
                                     <button className="w-1/3 mb-2 float-right bg-green-400/40 border-2 border-green-500 hover:bg-bgsecondary/30 hover:border-bgsecondary text-green-500 font-semibold rounded-xl p-1 text-sm transition-colors"
-                                            onClick={() => navigate(`/teams/edit/${t.teamId}`)}
+                                            onClick={() => user?.role == "admin" ? navigate(`/admin/teams/edit/${t.teamId}`) : navigate(`/teams/edit/${t.teamId}`)}
                                             >
                                         Edit
                                     </button>
                                     </>
                                 )}
                                      <button className="w-1/3 mb-2 float-right bg-gray-400/40 border-2 border-gray-400 hover:bg-bgsecondary/30 hover:border-bgsecondary text-gray-400 font-semibold rounded-xl p-1 text-sm transition-colors"
-                                            onClick={() => navigate(`/teams/details/${t.teamId}`)}
+                                            onClick={() => user?.role == "admin" ? navigate(`/admin/teams/details/${t.teamId}`) : navigate(`/teams/details/${t.teamId}`)}
                                             >
                                         Details
                                     </button>

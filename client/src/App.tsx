@@ -60,8 +60,11 @@ export default function App() {
       <Route path="/admin/tournament_list/add" element={<ProtectedRoute requiredRole="admin"><TournamentAddPage/></ProtectedRoute>} />
       <Route path="/admin/health" element={<ProtectedRoute requiredRole="admin"><HealthPage/></ProtectedRoute>}/>
       <Route path="/admin/tournament_registration/:id" element={<ProtectedRoute requiredRole="admin"><TournamentRegistrationPage /></ProtectedRoute>}/>
-      {/* <Route path="/admin/teams" element ={<ProtectedRoute requiredRole="admin"> <TeamsPage/></ProtectedRoute>} /> */}
-
+      <Route path="/admin/teams" element ={<ProtectedRoute requiredRole="admin"> <TeamsPage/></ProtectedRoute>} />
+      <Route path="/admin/teams/add" element ={<ProtectedRoute requiredRole="admin"> <TeamsAddPage/></ProtectedRoute>} />
+      <Route path="/admin/teams/edit/:id" element ={<ProtectedRoute requiredRole="admin"> <TeamsEditPage/></ProtectedRoute>} />
+      <Route path="/admin/teams/details/:id" element ={<ProtectedRoute requiredRole="admin"> <TeamsDetailPage/></ProtectedRoute>} />
+      <Route path="/admin/teams/inbox" element ={<ProtectedRoute requiredRole="admin"> <TeamsInboxPage/></ProtectedRoute>} />
 
       <Route path="/"    element={<Navigate to="/home" replace />} />
       <Route path="/404" element={<NotFoundPage />} />

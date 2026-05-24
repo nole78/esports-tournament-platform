@@ -67,7 +67,7 @@ export default function TeamsInboxForm(){
             {/* Need to get invites --> for this player */}
              <div className="flex gap-2">
                     
-                    <button type="button" onClick={() => navigate("/teams")}
+                    <button type="button" onClick={() => navigate(-1)}
                         className="py-3 bg-red-400/40  cursor-pointer border-red-500 hover:bg-red-400/30 hover:border-bgsecondary/70 text-red-500 font-semibold rounded-xl w-5/2 text-sm transition-colors">
                     Cancel</button>
                 </div>
