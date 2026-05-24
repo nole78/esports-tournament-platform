@@ -15,9 +15,5 @@ export class MatchDto{
         public bracketType : BracketType = BracketType.WINNER, 
         public blueTeamScore : number = 0,
         public redTeamScore : number = 0,
-        public winnerToMatchId : number = 0,
-        public winnerToSlot : MatchSlot = MatchSlot.BLUE,
-        public loserToMatchId : number = 0,
-        public loserToSlot : MatchSlot = MatchSlot.BLUE,
     ){}
 }

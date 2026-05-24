@@ -28,11 +28,7 @@ export class MatchService implements IMatchService{
             match.roundNumber,
             match.bracketType,
             match.blueTeamScore,
-            match.redTeamScore,
-            match.winnerToMatchId,
-            match.winnerToSlot,
-            match.loserToMatchId,
-            match.loserToSlot);
+            match.redTeamScore);
     }
     
     public async getAll(page?: number, limit?: number): Promise<Result<PaginatedListDto<MatchDto>>> {
