@@ -4,4 +4,5 @@ export type TeamDtoEdit = {
          teamTag : string,
          teamLogotip : string,
          teamDescription : string,
+         
     }

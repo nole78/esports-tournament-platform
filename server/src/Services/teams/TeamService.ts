@@ -17,6 +17,7 @@ import { InviteDto } from "../../Domain/DTOs/invite/InviteDto";
 import { IInvitesRepository } from "../../Domain/repositories/invites/IInvitesRepository";
 import { Invite } from '../../Domain/models/TeamInvite';
 import { TeamInviteStatus } from "../../Domain/enums/TeamInviteStatus";
+import { UserDto } from "../../Domain/DTOs/users/UserDto";
 
 
 export class TeamService implements ITeamService {
@@ -36,13 +37,24 @@ export class TeamService implements ITeamService {
         const total = await this.teamRepo.getTotal();
         return Result.Success(new PaginatedListDto(list, total, page, limit));
     }
-    async getById(id: number): Promise<Result<TeamDto>> {
+    async getById(id: number, gamerTag: string): Promise<Result<TeamDto>> {
         const team = await this.teamRepo.findById(id);
         if(team.teamId === 0){
             return Result.Failure(`Team with id ${id} doesn't exist`, ErrorType.NotFound);
         }
-        const teamDto = new TeamDto(team.teamId, team.teamName, team.teamTag, team.teamLogotip, team.teamDescription);
+        const user = await this.userRepo.findByUsername(gamerTag);
+        if (user.id===0){
+            return Result.Failure(`User with ${gamerTag} username doesn't exist`, ErrorType.NotFound);
+        }
+        const members = await this.teamMemberRepo.findByTeamId(team.teamId);
+        const isCaptain = members.some(m=>m.userId === user.id && m.role === TeamRole.CAPTAIN);
+        if (isCaptain){
+        const teamDto = new TeamDto(team.teamId, team.teamName, team.teamTag, team.teamLogotip, team.teamDescription, TeamRole.CAPTAIN);
         return Result.Success(teamDto);
+        }else{
+            const teamDto = new TeamDto(team.teamId, team.teamName, team.teamTag, team.teamLogotip, team.teamDescription);
+        return Result.Success(teamDto);
+        }
     }
     async getByGamerTag(tag: string, limit: number, page: number) : Promise<Result<PaginatedListDto<TeamDto>>>{
 
@@ -162,12 +174,12 @@ export class TeamService implements ITeamService {
         if (inTeam){
              return Result.Failure(`User is allready in this team`, ErrorType.Conflict);
         }
-
+        this.logger.info("Invite",gamerTag_invite);
         const result = await this.inviteRepo.create(new Invite(userForInvite.id as number, team.teamId as number));
         if (result.teamId===0 || result.userId===0){
              return Result.Failure(`Can't create invite`, ErrorType.Internal);
         }
-        return Result.Success(new InviteDto(result.userId, result.teamId, result.inivtedAt, result.status));
+        return Result.Success(new InviteDto(result.userId, result.teamId, result.invitedAt, result.status));
     }
 
 
@@ -297,5 +309,42 @@ export class TeamService implements ITeamService {
             return Result.Failure(`Couldn't delete from members`, ErrorType.Internal);
         }
        return Result.Success();
+    }
+
+    async getTeamMembers(teamId: number): Promise<Result<UserDto[]>> {
+    
+        const allUsers = await this.userRepo.findAll();
+        const team = await this.teamRepo.findById(teamId);
+        if (team.teamId === 0){
+            return Result.Failure(`Team with ${teamId} doesn't exist`, ErrorType.NotFound);
+        }
+
+        const members = await this.teamMemberRepo.findByTeamId(team.teamId);
+        
+        const usersReturn = allUsers.filter(user => members.some(m => m.userId === user.id));
+
+        return Result.Success(usersReturn.map((u) => new UserDto(u.id, u.gamerTag, u.email, u.role, u.profilePicture, u.isActive)))
+    }
+    async getInvites(gamerTag: string): Promise<Result<InviteDto[]>> {
+        const currentUser = await this.userRepo.findByUsername(gamerTag);
+        if (currentUser.id === 0) return Result.Failure(`User with ${gamerTag} username doesn't exist`, ErrorType.NotFound);;
+        
+        const invites = await this.inviteRepo.findByUserId(currentUser.id);
+        const ret = invites.filter(x => x.status === TeamInviteStatus.PENDING);
+        return Result.Success(ret.map(i => new InviteDto(i.userId, i.teamId, i.invitedAt, i.status)));
+    }
+    async getAllMyTeams(gamerTag: string): Promise<Result<TeamDto[]>> {
+        const currentUser = await this.userRepo.findByUsername(gamerTag);
+        if (currentUser.id === 0) return Result.Failure(`User with ${gamerTag} username doesn't exist`, ErrorType.NotFound);;
+        
+        const members = await this.teamMemberRepo.findByUserId(currentUser.id);
+        //Gets all the member data that you are the captain of
+        const membersCaptain = members.filter(m => m.role === TeamRole.CAPTAIN && m.userId === currentUser.id);
+
+        const teams = await Promise.all(
+            membersCaptain.map(m => this.teamRepo.findById(m.teamId))
+        );
+
+        return Result.Success(teams.map(t => new TeamDto(t.teamId, t.teamName, t.teamTag, t.teamLogotip, t.teamDescription, TeamRole.CAPTAIN)));
     }
 }

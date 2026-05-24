@@ -23,6 +23,8 @@ import TeamsEditPage from "./pages/common_pages/TeamsEditPage";
 import { Layout } from "./components/layout/Layout";
 import UserOverview from "./pages/user/UserOverview";
 import HealthPage from "./pages/admin/HealthPage";
+import TeamsDetailPage from "./pages/common_pages/TeamsDetailPage";
+import TeamsInboxPage from "./pages/common_pages/TeamsInboxPage";
 
 export default function App() {
   return (
@@ -33,12 +35,17 @@ export default function App() {
       <Route path="/home" element={<LandingPage/>}/>
       <Route path="/game_catalog" element={<GameCatalog/>} />
       <Route path="/tournament_list" element={<TournamentList />} />
-      <Route path="/teams" element = {<TeamsPage/>}/>
-      {<Route path="/teams/add" element = {<TeamsAddPage/>}/>}
-      {<Route path="/teams/edit/:id" element = {<TeamsEditPage/>}/>}
+      {/* <Route path="/teams" element = {<TeamsPage/>}/> */}
+      {/* {<Route path="/teams/add" element = {<TeamsAddPage/>}/>}
+      {<Route path="/teams/edit/:id" element = {<TeamsEditPage/>}/>} */}
       {/* User routes */}
       <Route path="/dashboard" element={<ProtectedRoute requiredRole="player"><UserDashboard /></ProtectedRoute>} />
       <Route path="/user_info" element={<ProtectedRoute requiredRole="player"><UserOverview/></ProtectedRoute>}/>
+      <Route path="/teams" element ={<ProtectedRoute requiredRole="player"> <TeamsPage/></ProtectedRoute>} />
+      <Route path="/teams/add" element ={<ProtectedRoute requiredRole="player"> <TeamsAddPage/></ProtectedRoute>} />
+      <Route path="/teams/edit/:id" element ={<ProtectedRoute requiredRole="player"> <TeamsEditPage/></ProtectedRoute>} />
+      <Route path="/teams/details/:id" element ={<ProtectedRoute requiredRole="player"> <TeamsDetailPage/></ProtectedRoute>} />
+      <Route path="/teams/inbox" element ={<ProtectedRoute requiredRole="player"> <TeamsInboxPage/></ProtectedRoute>} />
 
       {/* Admin routes */}
       <Route path="/admin_info" element={<ProtectedRoute requiredRole="admin"><UserOverview/></ProtectedRoute>}/>

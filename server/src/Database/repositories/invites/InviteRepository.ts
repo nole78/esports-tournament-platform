@@ -14,7 +14,7 @@ export class InviteRepository implements IInvitesRepository{
     ){}
 
     private map(r: RowDataPacket) : Invite{
-        return new Invite(r.userId, r.teamId, r.invited_at, r.status);
+        return new Invite(r.user_id, r.team_id, r.invited_at, r.status);
     }
 
     async findByTeamId(teamId: number): Promise<Invite[]> {
@@ -39,7 +39,7 @@ export class InviteRepository implements IInvitesRepository{
 
         try{
             const [rows] = await res.conn.execute<RowDataPacket[]>(
-                `SELECT * FROM team_invites WHERE userId = ?`, [userId]
+                `SELECT * FROM team_invites WHERE user_id = ?`, [userId]
             );
 
             return rows.map((r) => this.map(r));
@@ -55,12 +55,12 @@ export class InviteRepository implements IInvitesRepository{
         if (!res) return new Invite;
         try{
         const [result] = await res.conn.execute<ResultSetHeader>(
-            `INSERT INTO team_invites (userId, teamId, status) VALUES (?, ?, ?)`, [invite.userId, invite.teamId, invite.status]
+            `INSERT INTO team_invites (user_id, team_id, status) VALUES (?, ?, ?)`, [invite.userId, invite.teamId, invite.status]
         );
         if (result.affectedRows === 0) return new Invite;
 
         const [row] = await res.conn.execute<RowDataPacket[]>(
-            `SELECT * FROM team_invites WHERE teamId=? AND userId=?`, [invite.teamId, invite.userId]
+            `SELECT * FROM team_invites WHERE team_id=? AND user_id=?`, [invite.teamId, invite.userId]
         );
         return this.map(row[0]);
         }catch (err){
@@ -74,7 +74,7 @@ export class InviteRepository implements IInvitesRepository{
         if (!res) return false;
         try{
             const [result] = await res.conn.execute<ResultSetHeader>(
-                `DELETE FROM team_invites WHERE userId = ? AND teamId = ?`, [userId, teamId]
+                `DELETE FROM team_invites WHERE user_id = ? AND team_id = ?`, [userId, teamId]
             );
             return result.affectedRows > 0;
 
@@ -90,7 +90,7 @@ export class InviteRepository implements IInvitesRepository{
 
         try{
             const [row] = await res.conn.execute<ResultSetHeader>(
-                `UPDATE team_invites SET status = ? WHERE teamId = ? AND userId = ?`, [status, teamId, userId]
+                `UPDATE team_invites SET status = ? WHERE team_id = ? AND user_id = ?`, [status, teamId, userId]
             );
             return row.affectedRows>0;
         }catch(err){
@@ -104,7 +104,7 @@ export class InviteRepository implements IInvitesRepository{
 
         try{
             const [rows] = await res.conn.execute<RowDataPacket[]>(
-                `SELECT * FROM team_invites WHERE teamId = ? AND userId = ?`, [teamId,userId]
+                `SELECT * FROM team_invites WHERE team_id = ? AND user_id = ?`, [teamId,userId]
             );
 
             return rows.length > 0 ? this.map(rows[0]) : new Invite;
