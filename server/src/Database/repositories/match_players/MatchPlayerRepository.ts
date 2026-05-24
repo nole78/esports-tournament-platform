@@ -13,6 +13,20 @@ export class MatchPlayerRepository implements IMatchPlayerRepository {
   private map(r: RowDataPacket): MatchPlayer {
     return new MatchPlayer(r.user_id, r.team_id, r.match_id, r.performance_notes);
   }
+  
+  async findOne(userId: number, matchId: number): Promise<MatchPlayer> {
+    const res = await this.db.getReadConnection();
+    if (!res) return new MatchPlayer;
+    try {
+      const [rows] = await res.conn.execute<RowDataPacket[]>(
+        `SELECT * FROM match_players WHERE user_id = ? AND match_id = ? LIMIT 1`, [userId, matchId]
+      );
+      return rows.length > 0 ? this.map(rows[0]) : new MatchPlayer;
+    } catch (err) {
+      this.logger.error("MatchPlayerRepository", "findOne failed", err);
+      return new MatchPlayer;
+    } finally { res.conn.release(); }
+  }
 
   async findByUserId(userId: number): Promise<MatchPlayer[]> {
     const res = await this.db.getReadConnection();
@@ -81,7 +95,7 @@ export class MatchPlayerRepository implements IMatchPlayerRepository {
         [matchPlayer.userId, matchPlayer.teamId, matchPlayer.matchId]
       );
       if (result.insertId === 0) return new MatchPlayer();
-      return new MatchPlayer(result.insertId, matchPlayer.teamId, matchPlayer.matchId, matchPlayer.performanceNotes);
+      return matchPlayer;
     } catch (err) {
       this.logger.error("MatchPlayerRepository", "create failed", err);
       return new MatchPlayer();
@@ -108,7 +122,7 @@ export class MatchPlayerRepository implements IMatchPlayerRepository {
       const setClause = entries.map(([k]) => `${k} = ?`).join(", ");
       const values = entries.map(([, v]) => v);
       const [result] = await res.conn.execute<ResultSetHeader>(
-        `UPDATE match_players SET ${setClause} WHERE user_id = ? AND team_id = ? AND match_id = =`, [...values, userId, teamId, matchId]
+        `UPDATE match_players SET ${setClause} WHERE user_id = ? AND team_id = ? AND match_id = ?`, [...values, userId, teamId, matchId]
       );
       return result.affectedRows > 0;
     } catch (err) {
