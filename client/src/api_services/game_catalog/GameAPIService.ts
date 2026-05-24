@@ -2,7 +2,7 @@ import axios from "axios";
 import type { IGameAPIService } from "./IGameAPIService";
 import type { GameDto } from "../../models/game/GameDto";
 import { readItem } from "../../helpers/local_storage";
-import type { ApiResponse } from "../users/IUsersAPIService";
+import type { ApiResponse } from "../tournament_list/ITournamentAPIService";
 
 const BASE = import.meta.env.VITE_API_URL + "games";
 

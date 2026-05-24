@@ -1,5 +1,5 @@
 import type { GameDto } from "../../models/game/GameDto";
-import type { ApiResponse } from "../users/IUsersAPIService";
+import type { ApiResponse } from "../tournament_list/ITournamentAPIService";
 
 export interface IGameAPIService {
   getAll(page?: number, limit?: number): Promise<ApiResponse<{ items: GameDto[]; total: number }>>;

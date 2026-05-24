@@ -4,7 +4,7 @@ import type { StatisticsDto } from "../../models/health/StatisticsDto";
 import type { HealthStatusDto } from "../../models/health/HealthStatusDto";
 import type { ApiStatusDto } from "../../models/health/ApiStatusDto";
 import { readItem } from "../../helpers/local_storage";
-import type { ApiResponse } from "../users/IUsersAPIService";
+import type { ApiResponse } from "../tournament_list/ITournamentAPIService";
 
 const BASE = import.meta.env.VITE_API_URL;
 const err = <T>(e: unknown): ApiResponse<T> => ({ success: false, message: "Error: " + e });
