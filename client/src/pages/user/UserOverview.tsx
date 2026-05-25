@@ -9,6 +9,8 @@ export default function UserOverview() {
   const {user} = useAuth();
   const [error,setError] = useState("");
   const [userInfo,setUserInfo] = useState<UserDto>();
+  const [open, setOpen] = useState<boolean>(false);
+  const [image, setImage] = useState<string>("");
 
   useEffect(() => {
     usersApi.getById(user?.id ?? 0)
@@ -33,7 +35,7 @@ export default function UserOverview() {
         {userInfo && (
         <div className="grid lg:grid-cols-2 sm:grid-cols-1 items-center lg:gap-10 sm:gap-1">
           <div className="relative w-40 h-40 justify-self-center">
-            <img draggable={false} alt="Profile" className="w-40 h-40 object-cover rounded-full image-rendering-auto justify-self-center" src = {userInfo.profilePicture ? userInfo.profilePicture : avatarPlaceholder}/>
+            <img draggable={false} alt="Profile" className="w-40 h-40 object-cover rounded-full image-rendering-auto justify-self-center cursor-pointer" onClick={() => {setOpen(true); setImage(userInfo.profilePicture ? userInfo.profilePicture : avatarPlaceholder);} } src = {userInfo.profilePicture ? userInfo.profilePicture : avatarPlaceholder}/>
             <div className="absolute bottom-2 right-2 w-8 h-8 rounded-full bg-primary flex items-center justify-center">
               <div className={`w-6 h-6 rounded-full ${
                             userInfo.isActive
@@ -65,6 +67,15 @@ export default function UserOverview() {
         </div>
         </div>
         )}
+    {open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm backdrop-grayscale-50" onClick={() => setOpen(false)}/>
+          <div className="absolute top-4 right-4 bg-red-400/40 border-2 border-red-500 hover:bg-bgsecondary/30 hover:border-bgsecondary text-red-500 hover:text-bgsecondary text-2xl font-bold cursor-pointer px-4 py-2 rounded-full" onClick={() => setOpen(false)}>X</div>
+            <div className=" relative w-85 rounded-3xl p-6">
+              <img draggable={false} alt="Profile" className="w-64 h-64 object-cover image-rendering-auto justify-self-center cursor-pointer" onClick={() => setOpen(true)} src = {image}/>
+            </div>
+          </div>
+      )}
     </div>
   );
 }
