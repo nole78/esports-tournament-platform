@@ -1,72 +1,94 @@
 import { useEffect, useState } from "react";
 import { usersApi } from "../../api_services/users/UsersAPIService";
+import { ErrorBox } from "../../components/ui/UI";
 import { useAuth } from "../../hooks/auth/useAuthHook";
-import { ErrorBox } from '../../components/ui/UI';
 import type { UserDto } from "../../models/user/UserTypes";
 
-export default function UserOverview() {
-  const {user} = useAuth();
-  const [error,setError] = useState("");
-  const [userInfo,setUserInfo] = useState<UserDto>();
+type UserOverviewState =
+    | { status: "loading" }
+    | { status: "error"; error: string }
+    | { status: "success"; user: UserDto };
 
-  useEffect(() => {
-    usersApi.getById(user?.id ?? 0)
-    .then(res => {
-      setUserInfo({
-        id: res.data?.id ?? 0,
-        gamerTag: res.data?.gamerTag ?? "",
-        fullName: res.data?.fullName ?? "",
-        email: res.data?.email ?? "",
-        isActive: res.data?.isActive ?? 1,
-        profilePicture: res.data?.profilePicture ?? "",
-        role: res.data?.role ?? "player",
-      })
-    })
-    .catch(err => err? setError(err):setError("Couldn't load user info"))
-  },[user])
+export default function UserOverview({ userId }: { userId?: number }) {
+    const { user: authUser } = useAuth();
+    const [state, setState] = useState<UserOverviewState>({ status: "loading" });
 
-  return (
-<div className="w-1/2 flex mx-auto justify-center items-center py-10 bg-bgprimary/60 rounded-xl">
-      <div className="flex flex-col items-center gap-4">
+    useEffect(() => {
+        let cancelled = false;
+        const resolvedUserId = userId ?? authUser?.id ?? 0;
 
-        {error && <ErrorBox message={error} />}
+        async function load() {
+            setState({ status: "loading" });
+            const res = await usersApi.getById(resolvedUserId);
 
-        {userInfo?.profilePicture && (
-          <img
-            src={userInfo.profilePicture}
-            draggable={false}
-            alt="Profile"
-            className="rounded-xl w-40 h-40 object-cover"
-          />
-        )}
+            if (cancelled) {
+                return;
+            }
 
-        <div className="flex flex-col items-center gap-2">
-          <div>
-            <strong className="text-bgsecondary">ID:</strong> 
-            {userInfo?.id && <span className="ml-2 text-primary">{userInfo.id}</span>}
-          </div>
-          <div>
-            <strong className="text-bgsecondary">Gamer Tag:</strong> 
-            {userInfo?.gamerTag && <span className="ml-2 text-primary">{userInfo.gamerTag}</span>}
-          </div>
-          <div>
-            <strong className="text-bgsecondary">Full Name:</strong> 
-            {userInfo?.fullName && <span className="ml-2 text-primary">{userInfo.fullName}</span>}
-          </div>
-          <div>
-            <strong className="text-bgsecondary">Email:</strong> 
-            {userInfo?.email && <span className="ml-2 text-primary">{userInfo.email}</span>}
-          </div>
-          <div>
-            <strong className="text-bgsecondary">Role:</strong> 
-            {userInfo?.role && <span className="ml-2 text-primary">{userInfo.role}</span>}
-          </div>
-          <div>
-            <strong className="text-bgsecondary">Status:</strong>{" "}
-            <span className="ml-2 text-primary">{userInfo?.isActive ? "Active" : "Inactive"}</span>
-          </div>
+            if (!res.success || !res.data) {
+                setState({ status: "error", error: res.message || "Couldn't load user info" });
+                return;
+            }
+
+            setState({ status: "success", user: res.data });
+        }
+
+        load();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [authUser, userId]);
+
+    if (state.status === "loading") {
+        return <div className="rounded-xl bg-bgprimary/60 px-6 py-10 text-center text-bgsecondary">Loading player info...</div>;
+    }
+
+    if (state.status === "error") {
+        return <ErrorBox message={state.error} />;
+    }
+
+    const userData = state.user;
+
+    return (
+        <div className="mx-auto flex w-full max-w-2xl items-center justify-center rounded-xl bg-bgprimary/60 py-10">
+            <div className="flex flex-col items-center gap-4">
+                {userData.profilePicture && (
+                    <img
+                        src={userData.profilePicture}
+                        draggable={false}
+                        alt="Profile"
+                        className="h-40 w-40 rounded-xl object-cover"
+                    />
+                )}
+
+                <div className="flex flex-col items-center gap-2 text-center">
+                    <div>
+                        <strong className="text-bgsecondary">ID:</strong>
+                        <span className="ml-2 text-primary">{userData.id}</span>
+                    </div>
+                    <div>
+                        <strong className="text-bgsecondary">Gamer Tag:</strong>
+                        <span className="ml-2 text-primary">{userData.gamerTag}</span>
+                    </div>
+                    <div>
+                        <strong className="text-bgsecondary">Full Name:</strong>
+                        <span className="ml-2 text-primary">{userData.fullName}</span>
+                    </div>
+                    <div>
+                        <strong className="text-bgsecondary">Email:</strong>
+                        <span className="ml-2 text-primary">{userData.email}</span>
+                    </div>
+                    <div>
+                        <strong className="text-bgsecondary">Role:</strong>
+                        <span className="ml-2 text-primary">{userData.role}</span>
+                    </div>
+                    <div>
+                        <strong className="text-bgsecondary">Status:</strong>{" "}
+                        <span className="ml-2 text-primary">{userData.isActive ? "Active" : "Inactive"}</span>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 }
