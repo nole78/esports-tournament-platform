@@ -5,10 +5,11 @@ import { TournamentRegistrationStatus } from "../../types/tournament_registratio
 import { useAuth } from "../../hooks/auth/useAuthHook";
 import { tournamentRegistrationApi } from "../../api_services/tournament_registration/TournamentRegistrationAPIService";
 import { useParams } from "react-router-dom";
+import { tournamentApi } from "../../api_services/tournament_list/TournamentAPIService";
+import type { TournamentDto } from "../../models/tournament/TournamentDto";
 
 export default function RegisteredTeams() {
   const { user } = useAuth();
-  //const [regTeams, setRegTeams] = useState<TournamentRegistrationDto[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -16,7 +17,7 @@ export default function RegisteredTeams() {
   const {id} = useParams();
   const [error, setError] = useState<string>("");
   const [confirmedTeams, setConfirmedTeams] = useState<TournamentRegistrationDto[]>([]);
-
+  const [tournament, setTournament] = useState<TournamentDto>();
   const loadPage = (pages: number) => {
       
     Promise.resolve().then(() => setLoading(true));
@@ -32,6 +33,14 @@ export default function RegisteredTeams() {
         setConfirmedTeams([]);
       }
     })
+    tournamentApi.getById(Number(id))
+    .then(res =>{
+      if(res.success && res.data){
+        setTournament(res.data);
+      }
+      else
+        setError(res.message);
+    })
     .finally(() => setLoading(false));
   };
 
@@ -45,12 +54,10 @@ export default function RegisteredTeams() {
       loadPage(page);
     }
 
-
-  // const confirmedTeams = regTeams.filter(t => t.status === TournamentRegistrationStatus.CONFIRMED);
-
   return (
     <div>
       <PageHeader eyebrow="" title="Registered Teams" />
+      <p className="text-white">{confirmedTeams.length}/{tournament?.tournamentMaxTeams} teams registered</p>
       <div className="space-y-4">
         {loading ? (
           <div className="flex justify-center py-16">
