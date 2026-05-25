@@ -17,8 +17,6 @@ export const validateTournamentUpdate = (tname: string, tmaxteams:number, tappld
         return {valid:false, message:"Prize fund must be greater than 0"};
     if(!tformat)
         return {valid:false, message:"Invalid tournament format"};
-    if(!tstatus)
-        return {valid:false, message:"Invalid tournament status"};
     if(!tappldeadline || (tstatus === TournamentStatus.UPCOMING && new Date(tappldeadline) <= new Date()))
         return {valid:false, message:"Application deadline must be in the future"};
     return {valid:true}

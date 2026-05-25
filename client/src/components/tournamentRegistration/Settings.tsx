@@ -19,7 +19,6 @@ export default function Settings() {
     const [maxTeams, setMaxTeams] = useState<string>("");
     const [applicationDeadline, setApplicationDeadline] = useState<string>("");
     const [prizeFund, setPrizeFund] = useState<string>("");
-    const [status, setStatus] = useState<string>("");
 
     const navigate = useNavigate();
 
@@ -37,7 +36,6 @@ export default function Settings() {
           const day = String(date.getDate()).padStart(2, '0');
           setApplicationDeadline(`${year}-${month}-${day}`);
           setPrizeFund(tournamentRes.data.tournamentPrizeFund.toString());
-          setStatus(tournamentRes.data.tournamentStatus);
         } else {
           setError("Failed to load tournament");
         }
@@ -68,8 +66,7 @@ export default function Settings() {
         tournamentFormat: format,
         tournamentMaxTeams: maxTeamsNum,
         tournamentApplicationDeadline: new Date(applicationDeadline),
-        tournamentPrizeFund: prizeFundNum,
-        tournamentStatus: status as TournamentStatus
+        tournamentPrizeFund: prizeFundNum
     };      
 
     const res = await tournamentApi.update(Number(id), payload);
@@ -180,28 +177,6 @@ export default function Settings() {
                     className="w-full bg-bgprimary/10 border border-secondary/50 rounded-xl px-4 py-3 text-bgsecondary text-sm focus:outline-none focus:border-white/30 transition-colors"
                     style={{ colorScheme: "dark" }}
                 />
-            </div>
-
-            <div>
-                <label className="block text-xs text-bgprimary mb-2 font-medium">Tournament status</label>
-                <div>
-        <div className="flex gap-2">
-            {[TournamentStatus.UPCOMING, TournamentStatus.ACTIVE, TournamentStatus.COMPLETED].map((s) => (
-                <button
-                    key={s}
-                    type="button"
-                    onClick={() => setStatus(s)}
-                    className={`flex-1 py-3 rounded-xl font-semibold text-sm transition-colors ${
-                    status === s
-                        ? 'bg-bgsecondary text-primary'
-                        : 'bg-bgprimary/10 border border-secondary/50 text-bgsecondary hover:bg-bgprimary/20'
-                    }`}
-                >
-                {s.charAt(0).toUpperCase() + s.slice(1)}
-            </button>
-            ))}
-        </div>
-        </div>
             </div>
 
             <div className="flex gap-2 mt-4">
