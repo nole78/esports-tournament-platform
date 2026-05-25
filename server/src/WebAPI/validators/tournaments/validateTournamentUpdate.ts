@@ -11,7 +11,7 @@ export const validateTournamentUpdate = (tname: string, tmaxteams:number, tappld
         return {valid:false, message:"Tournament name is mandatory"};
     if(tmaxteams < 4 || tmaxteams > 256)
         return {valid:false, message:"Maximum number of teams must be greater or equal to 4 and less or equal to 256"};
-    if(!isPowerOfTwo(tmaxteams))
+    if(!isPowerOfTwo(tmaxteams) && tformat !== TournamentFormat.ROUND_ROBIN)
         return {valid:false, message:"Maximum number of teams must be a power of 2 (2, 4, 8, 16, 32, 64, ...)"};
     if(tprizefund <= 0)
         return {valid:false, message:"Prize fund must be greater than 0"};

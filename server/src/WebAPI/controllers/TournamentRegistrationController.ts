@@ -50,7 +50,6 @@ export class TournamentRegistrationController{
     private async update(req: Request, res: Response): Promise<void> {
         const tournamentId = parseInt(req.params.id as string, 10);
         const teamId = parseInt(req.params.teamId as string, 10);
-        console.log("tournamentId: "+tournamentId+" teamId: "+teamId);
         if (isNaN(tournamentId) || isNaN(teamId)) { res.status(400).json({ success: false, message: "Invalid id" }); return; }
         const result = await this.tournamentRegistrationWriteService.update(tournamentId, teamId, req.body);
         handleResult(result, res);
