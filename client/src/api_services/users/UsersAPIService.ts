@@ -31,5 +31,5 @@ export const usersApi: IUsersAPIService = {
   async searchUsername(username){
     return axios.get<ApiResponse<UserDto[]>>(`${BASE}/search/${username}`, {headers: authHeader()})
       .then(r => r.data).catch(e=>err(e, "Failed to search users"))
-  },
+  }
 };
