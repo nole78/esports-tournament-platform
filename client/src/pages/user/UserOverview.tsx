@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { usersApi } from "../../api_services/users/UsersAPIService";
 import avatarPlaceholder from "../../assets/avatar_placeholder.jpg";
 import { useAuth } from "../../hooks/auth/useAuthHook";
-import { ErrorBox } from '../../components/ui/UI';
+import { ErrorBox, RoleBadge } from '../../components/ui/UI';
 import type { UserDto } from "../../models/user/UserTypes";
 
 export default function UserOverview() {
@@ -38,10 +38,12 @@ export default function UserOverview() {
             draggable={false}
             alt="Profile"
             className="w-40 h-40 object-cover rounded-2xl image-rendering-auto"/>
-            : <div><img src={avatarPlaceholder}
-            draggable={false}
-            alt="Profile"
-            className="w-40 h-40 object-cover rounded-2xl image-rendering-auto"/></div>
+            : <div>
+              <img src={avatarPlaceholder}
+              draggable={false}
+              alt="Profile"
+              className="w-40 h-40 object-cover rounded-2xl image-rendering-auto"/>
+            </div>
         }
 
         <div className="flex flex-col items-center gap-2">
@@ -63,7 +65,7 @@ export default function UserOverview() {
           </div>
           <div>
             <strong className="text-bgsecondary">Role:</strong> 
-            {userInfo?.role && <span className="ml-2 text-primary">{userInfo.role}</span>}
+            {userInfo?.role && <span className="ml-2 text-primary"><RoleBadge role = {userInfo.role}/> </span>}
           </div>
           <div>
             <strong className="text-bgsecondary">Status:</strong>{" "}
