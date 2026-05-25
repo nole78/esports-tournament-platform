@@ -51,6 +51,7 @@ import { match } from "node:assert";
 import { UserWatchlistRepository } from "./Database/repositories/user_watchlist/UserWatchlistRepository";
 import { UserWatchlistService } from "./Services/user_watchlist/UserWatchlistService";
 import { UserWatchlistController } from "./WebAPI/controllers/UserWatchlistController";
+import { BracketAdvancementService } from "./Services/bracket/BracketAdvancmentService";
 
 export const logger = new ConsoleLoggerService();
 export const db     = new DbManager(logger);
@@ -91,7 +92,8 @@ const healthService = new HealthService(gameRepo, tournamentReadRepo, userRepo, 
 const watchlistService = new UserWatchlistService(userWatchlistRepo, tournamentReadRepo, gameRepo);
 const tournamentRegistrationReadService = new TournamentRegistrationReadService(tournamentRegistrationReadRepo, teamRepoRead, tournamentReadRepo, logger);
 const tournamentRegistrationWriteService = new TournamentRegistrationWriteService(tournamentRegistrationWriteRepo, tournamentRegistrationReadRepo, teamRepoRead, teamMemberRepoRead, tournamentReadRepo, gameRepo, logger);
-const matchService = new MatchService(matchReadRepo, matchWriteRepo, teamRepoRead, tournamentReadRepo, gameRepo);
+const bracketAdvancementService = new BracketAdvancementService(matchReadRepo,matchWriteRepo);
+const matchService = new MatchService(matchReadRepo, matchWriteRepo, teamRepoRead, tournamentReadRepo, gameRepo,bracketAdvancementService);
 const matchPlayerService = new MatchPlayerService(matchReadRepo, matchPlayerReadRepo, matchPlayerWriteRepo, userRepo, teamRepoRead, teamMemberRepoRead);
 
 // Express
