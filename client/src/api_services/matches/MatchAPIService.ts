@@ -28,8 +28,8 @@ export const matchApi: IMatchAPIService = {
             return axios.patch(`${BASE}/${id}/result`, payload, {headers: authHeader()})
                 .then(r => r.data).catch(e => err(e,"Failed to set result"));
         },
-        async getPlayers(id) {
-            return axios.get(`${BASE}/${id}/players`, { headers: authHeader() })
+        async getPlayers(id, teamId) {
+            return axios.get(`${BASE}/${id}/players/${teamId}`, { headers: authHeader() })
                 .then(r => r.data).catch(e => err(e, "Failed to load players"));
         },
         async addPlayers(id, payload) {
