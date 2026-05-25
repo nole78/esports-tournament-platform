@@ -6,7 +6,7 @@ export class NodeStatusDto {
     public host: string = "",
     public port: number = 3306,
     public status: NodeStatus = NodeStatus.HEALTHY,
-    public lastCheck: Date | null = null,
+    public lastCheck: Date = new Date(),
     public successfulReads: number = 0,
     public failedReads: number = 0,
     public successfulWrites: number = 0,

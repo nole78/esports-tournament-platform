@@ -2,9 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { teamApi } from "../../api_services/teams/TeamAPIService";
 import type { TeamDtoEdit } from "../../models/team/TeamDtoEdit";
+import { useAuth } from "../../hooks/auth/useAuthHook";
 
 export const TeamsEditForm: React.FC<{id: string}> = ({id}) =>{
 
+    const {user} = useAuth();
     const emptyTeam : TeamDtoEdit = {teamName:"", teamLogotip:"", teamDescription:"", teamTag:""};
     const [team, setTeam] = useState<TeamDtoEdit>(emptyTeam);
     
@@ -27,7 +29,10 @@ export const TeamsEditForm: React.FC<{id: string}> = ({id}) =>{
 
         
         setTeam(emptyTeam);
-        navigate("/teams", {state: {edited : true} });
+        if(user?.role == "admin")
+            navigate("/admin/teams", {state: {edited : true} });
+        else
+            navigate("/teams", {state: {edited : true} });
     }
 
     useEffect(() =>{
@@ -102,7 +107,7 @@ export const TeamsEditForm: React.FC<{id: string}> = ({id}) =>{
                         className="w-1/2 cursor-pointer bg-bgprimary hover:bg-bgprimary/80 disabled:opacity-50 text-primary font-semibold rounded-xl py-3 text-sm transition-colors">
                         {editing ? "Editing…" : "Edit"}
                     </button>
-                    <button type="button" onClick={() => navigate("/teams")}
+                    <button type="button" onClick={() => navigate(-1)}
                         className="py-3 bg-red-400/40  cursor-pointer border-red-500 hover:bg-red-400/30 hover:border-bgsecondary/70 text-red-500 font-semibold rounded-xl w-1/2 text-sm transition-colors">
                     Cancel</button>
                 </div>

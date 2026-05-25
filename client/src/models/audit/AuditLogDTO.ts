@@ -1,11 +1,11 @@
 export interface AuditLogDto {
   id: number;
-  userId: number | null;
-  gamer_tag: string | null;
+  userId: number;
+  gamer_tag: string;
   action: string;
-  entity: string | null;
-  entityId: number | null;
-  meta: Record<string, unknown> | null;
-  ipAddress: string | null;
+  entity: string;
+  entityId: number;
+  meta: Record<string, unknown>;
+  ipAddress: string;
   createdAt: string;
 };

@@ -5,6 +5,7 @@ import { DbManager } from "../../connection/DbConnectionPool";
 import { TeamMemberDto } from "../../../Domain/DTOs/team_members/TeamMemberDto";
 import { CreateTeamMemberDto } from "../../../Domain/DTOs/team_members/CreateTeamMemberDto";
 import { TeamMember } from "../../../Domain/models/TeamMember";
+import { TeamRole } from "../../../Domain/enums/TeamRole";
 
 export class TeamMemberRepository implements ITeamMemberRepository {
   public constructor(
@@ -12,11 +13,11 @@ export class TeamMemberRepository implements ITeamMemberRepository {
     private readonly logger: ILoggerService,
   ) {}
 
-  private map(r: RowDataPacket): TeamMemberDto {
-    return new TeamMemberDto(r.team_id, r.user_id, r.role);
+  private map(r: RowDataPacket): TeamMember {
+    return new TeamMember(r.team_id, r.user_id, r.role, r.joined_at);
   }
 
-  async findAll(page = 1, limit = 20): Promise<TeamMemberDto[]> {
+  async findAll(page = 1, limit = 20): Promise<TeamMember[]> {
     const res = await this.db.getReadConnection();
     if (!res) return [];
     const offset = (page - 1) * limit;
@@ -31,7 +32,7 @@ export class TeamMemberRepository implements ITeamMemberRepository {
     } finally { res.conn.release(); }
   }
 
-  async findByUserId(userId: number): Promise<TeamMemberDto[]> {
+  async findByUserId(userId: number): Promise<TeamMember[]> {
     const res = await this.db.getReadConnection();
     if (!res) return [];
     try {
@@ -45,7 +46,7 @@ export class TeamMemberRepository implements ITeamMemberRepository {
     } finally { res.conn.release(); }
   }
 
-   async findByTeamId(teamId: number): Promise<TeamMemberDto[]> {
+   async findByTeamId(teamId: number): Promise<TeamMember[]> {
     const res = await this.db.getReadConnection();
     if (!res) return [];
     try {
@@ -59,7 +60,7 @@ export class TeamMemberRepository implements ITeamMemberRepository {
     } finally { res.conn.release(); }
   }
 
-  async create(dto: TeamMemberDto): Promise<TeamMember> {
+  async create(dto: TeamMember): Promise<TeamMember> {
     const res = await this.db.getWriteConnection();
     if (!res) return new TeamMember();
     try {
@@ -76,16 +77,16 @@ export class TeamMemberRepository implements ITeamMemberRepository {
     } finally { res.conn.release(); }
   }
 
-  async update(teamId: number, userId: number, fields: Partial<TeamMember>): Promise<boolean> {
+  async update(teamId: number, userId: number, role: TeamRole): Promise<boolean> {
     const res = await this.db.getWriteConnection();
     if (!res) return false;
     try {
-      const entries = Object.entries(fields).filter(([, v]) => v !== undefined);
-      if (entries.length === 0) return false;
-      const setClause = entries.map(([k]) => `${k} = ?`).join(", ");
-      const values = entries.map(([, v]) => v);
+      // const entries = Object.entries(fields).filter(([, v]) => v !== undefined);
+      // if (entries.length === 0) return false;
+      // const setClause = entries.map(([k]) => `${k} = ?`).join(", ");
+      // const values = entries.map(([, v]) => v);
       const [result] = await res.conn.execute<ResultSetHeader>(
-        `UPDATE team_members SET ${setClause} WHERE team_id = ? AND user_id = ?`, [...values, teamId, userId]
+        `UPDATE team_members SET role = ? WHERE team_id = ? AND user_id = ?`, [role, teamId, userId]
       );
       return result.affectedRows > 0;
     } catch (err) {

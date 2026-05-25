@@ -2,10 +2,12 @@ import { useRef, useState } from 'react';
 import type { TeamDto } from '../../models/team/TeamDto';
 import type { ITeamAPIService } from '../../api_services/teams/ITeamAPIService';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../hooks/auth/useAuthHook';
 
 const DEFAULT_TEAM_ROLE: TeamDto['userRole'] = 'member' as TeamDto['userRole'];
 
 export default function TeamsAddForm({teamApi} : {teamApi:ITeamAPIService}){
+    const {user} = useAuth();
     const emptyTeam : TeamDto = {teamId: 0, teamName:"", teamLogotip:"", teamDescription:"", teamTag:"", userRole: DEFAULT_TEAM_ROLE};
     const [team, setTeam] = useState<TeamDto>(emptyTeam);
     
@@ -29,7 +31,10 @@ export default function TeamsAddForm({teamApi} : {teamApi:ITeamAPIService}){
         if (!res.success || !res.data){setError(res.message ?? "Invalid values"); return;}
 
         
-        navigate("/teams", {state: {added : true} });
+        if(user?.role == "admin")
+            navigate("/admin/teams", {state: {added : true} });
+        else
+            navigate("/teams", {state: {added : true} });
     }
 
     return(
@@ -95,7 +100,7 @@ export default function TeamsAddForm({teamApi} : {teamApi:ITeamAPIService}){
                         className="w-1/2 cursor-pointer bg-bgprimary hover:bg-bgprimary/80 disabled:opacity-50 text-primary font-semibold rounded-xl py-3 text-sm transition-colors">
                         {creating ? "Creating…" : "Create"}
                     </button>
-                    <button type="button" onClick={() => navigate("/teams")}
+                    <button type="button" onClick={() => navigate(-1)}
                         className="py-3 bg-red-400/40  cursor-pointer border-red-500 hover:bg-red-400/30 hover:border-bgsecondary/70 text-red-500 font-semibold rounded-xl w-1/2 text-sm transition-colors">
                     Cancel</button>
                 </div>
