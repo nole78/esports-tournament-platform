@@ -36,8 +36,7 @@ export default function UserOverview() {
             src={userInfo.profilePicture}
             draggable={false}
             alt="Profile"
-            className="rounded-xl w-40 h-40 object-cover"
-          />
+            className="w-40 h-40 object-cover rounded-2xl image-rendering-auto"/>
         )}
 
         <div className="flex flex-col items-center gap-2">
