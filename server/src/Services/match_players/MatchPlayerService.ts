@@ -42,6 +42,19 @@ export class MatchPlayerService implements IMatchPlayerService{
         return Result.Success(users.map(u => new UserDto(u.id)))
     }
 
+    public async getMatchPlayers(id: number): Promise<Result<MatchPlayerDto[]>> {
+        const res = await this.matchService.getById(id);
+        if (!res.isSuccess || !res.value)
+            return Result.Failure(res.errorMessage ?? "Match not found", res.errorType ?? ErrorType.NotFound);
+
+        const matchPlayers = await this.matchPlayerReadRepo.findByMatchId(res.value.matchId);
+        return Result.Success(
+            matchPlayers.map(
+                (mp) => new MatchPlayerDto(mp.userId, mp.teamId, mp.matchId, mp.performanceNotes),
+            ),
+        );
+    }
+
     
     public async setPerformanceNotes(id: number, userId: number, notes: string) : Promise<Result<void>>{
         const res = await this.matchService.getById(id);

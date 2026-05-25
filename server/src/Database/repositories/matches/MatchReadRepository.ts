@@ -17,6 +17,7 @@ export class MatchReadRepository implements IMatchReadRepository {
       r.red_team_id, 
       r.winner_team_id, 
       r.status, 
+      r.round_number,
       r.bracket_type,
       r.blue_team_score,
       r.red_team_score,
