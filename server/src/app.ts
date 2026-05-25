@@ -73,7 +73,7 @@ const auditService = new AuditService(auditRepo, userRepo);
 const authService   = new AuthService(userRepo,auditService);
 const teamService = new TeamService(teamRepo, teamMemberRepo, userRepo, logger, inviteRepo);
 const healthService = new HealthService(gameRepo, tournamentRepoRead, userRepo, teamRepo, db);
-const watchlistService = new UserWatchlistService(userWatchlistRepo, tournamentRepo, gameRepo);
+const watchlistService = new UserWatchlistService(userWatchlistRepo, tournamentRepoRead, gameRepo);
 const tournamentRegistrationServiceRead = new TournamentRegistrationServiceRead(tournamentRegistrationRepoRead, teamRepo, tournamentRepoRead, logger);
 const tournamentRegistrationServiceWrite = new TournamentRegistrationServiceWrite(TournamentRegistrationRepoWrite, tournamentRegistrationRepoRead, teamRepo, teamMemberRepo, tournamentRepoRead, gameRepo, logger);
 // Express

@@ -6,14 +6,14 @@ import { UserWatchlist } from '../../Domain/models/UserWatchlist';
 import { PaginatedListDto } from '../../Domain/DTOs/PaginatedListDto';
 import { IUserWatchlistRepository } from '../../Domain/repositories/user_watchlist/IUserWatchlistRepository';
 import { IUserWatchlistService } from '../../Domain/services/user_watchlist/IUserWatchlistService';
-import { ITournamentRepository } from '../../Domain/repositories/tournaments/ITournamentRepository';
 import { IGameRepository } from '../../Domain/repositories/games/IGameRepository';
+import { ITournamentRepositoryRead } from '../../Domain/repositories/tournaments/ITournamentRepositoryRead';
 
 export class UserWatchlistService implements IUserWatchlistService {
-    public constructor(private readonly watchlistRepo : IUserWatchlistRepository, private readonly tournamentRepo : ITournamentRepository, private readonly gameRepo : IGameRepository){}
+    public constructor(private readonly watchlistRepo : IUserWatchlistRepository, private readonly tournamentRepoRead : ITournamentRepositoryRead, private readonly gameRepo : IGameRepository){}
 
     private async toUserWatchlistDto(watchlist: UserWatchlist) : Promise<UserWatchlistDto>{
-        const tournament = await this.tournamentRepo.findById(watchlist.tournamentId);
+        const tournament = await this.tournamentRepoRead.findById(watchlist.tournamentId);
         const game = await this.gameRepo.findById(tournament.tournamentGameId);
         return new UserWatchlistDto(
             watchlist.userId,

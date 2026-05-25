@@ -12,7 +12,7 @@ import { UserRole } from '../../../../server/src/Domain/enums/UserRole';
 import PendingTeams from "../../components/tournamentRegistration/PendingTeams";
 import Settings from '../../components/tournamentRegistration/Settings';
 import { SidebarMenu } from "../../components/SideBar/SidebarMenu";
-import PencilSquareIcon from "../../components/heroicons/pencilSquareIcon";
+import PencilSquareIcon from "../../components/heroicons/PencilSquareIcon";
 
 export default function TournamentRegistrationPage() {
     const { user } = useAuth();
