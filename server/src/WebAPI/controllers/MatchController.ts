@@ -16,6 +16,7 @@ export class MatchController {
     ){
         this.router.get("/matches/tournament/:tournamendId", this.getAllForTournament.bind(this));
         this.router.get("/matches/:id", this.getDetails.bind(this));
+        this.router.get("/matches/:id/players/:teamId", authenticate, this.getPlayers.bind(this));
         this.router.patch("/matches/:id/result", authenticate, authorize(UserRole.ADMIN), this.setResult.bind(this));
         this.router.post("/matches/:id/players", authenticate, this.addPlayers.bind(this));
         this.router.put("/matches/:id/players/:userId", authenticate, this.changePerformanceNotes.bind(this));
@@ -26,7 +27,7 @@ export class MatchController {
         const tournamentId = parseInt(req.params.tournamentId as string, 10);
         if(isNaN(tournamentId)) {res.status(400).json({ success: false, message: "Invalid tournament id"}); return;}
 
-        const result = await this.matchService.getByTournamentId(2);
+        const result = await this.matchService.getByTournamentId(tournamentId);
         handleResult(result, res);
     }
 
@@ -34,7 +35,7 @@ export class MatchController {
         const id = parseInt(req.params.id as string, 10)
         if(isNaN(id)) {res.status(400).json({ success: false, message: "Invalid id"}); return; }
 
-        const result = await this.matchService.getById(1);
+        const result = await this.matchService.getById(id);
         handleResult(result, res);
     }
 
@@ -61,6 +62,17 @@ export class MatchController {
         if(!notes) {res.status(400).json({ success: false, message: "No notes to add"}); return;}
 
         const result = await this.matchPlayerService.setPerformanceNotes(id, userId, notes ?? "");
+        handleResult(result, res);
+    }
+
+    private async getPlayers(req: Request, res: Response): Promise<void> {
+        const id = parseInt(req.params.id as string, 10);
+        if (isNaN(id)) { res.status(400).json({ success: false, message: "Invalid match id" }); return; }
+
+        const teamId = parseInt(req.params.teamId as string, 10);
+        if (isNaN(teamId)) { res.status(400).json({ success: false, message: "Invalid team id" }); return; }
+
+        const result = await this.matchPlayerService.getMatchPlayers(id, teamId);
         handleResult(result, res);
     }
 

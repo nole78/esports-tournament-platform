@@ -1,6 +1,6 @@
 import { ErrorType } from "../../Domain/common/ErrorType";
 
-export function mapErrorTypeToStatus(errorType: ErrorType | null): number {
+export function mapErrorTypeToStatus(errorType: ErrorType | void): number {
 
     switch (errorType) {
 

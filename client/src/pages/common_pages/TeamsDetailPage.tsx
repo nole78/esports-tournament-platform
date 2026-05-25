@@ -6,7 +6,7 @@ export default function TeamsDetailPage(){
     const {id} = useParams();
     return (
         <main className="min-h-screen bg-primary flex items-center justify-center px-4">
-                            <TeamsDetailForm id={id ?? ""}/>
-                </main>
+            <TeamsDetailForm id={id ?? ""}/>
+        </main>
     );
 }

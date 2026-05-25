@@ -1,4 +1,4 @@
 export type MatchResultDto = {
-    redTeamScore: number,
-    blueTeamScore: number
+    teamRedScore: number,
+    teamBlueScore: number
 }

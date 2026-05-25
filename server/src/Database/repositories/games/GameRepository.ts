@@ -12,7 +12,7 @@ export class GameRepository implements IGameRepository{
     ){}
 
       private map(r: RowDataPacket): Game {
-        return new Game(r.game_id, r.game_name, r.game_logotip, r.game_genre, r.game_players);
+        return new Game(r.game_id, r.game_name, r.game_logotip, r.game_genre, r.players_per_team);
       }
 
     async findById(id: number): Promise<Game> {

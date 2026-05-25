@@ -5,10 +5,11 @@ export type AddPlayerErrorDto = {
 }
 
 export type MatchPlayerDto = {
-    userId : number,
-    teamId : number,
-    matchId : number,
-    performanceNotes : string
+    gamerTag: string,
+    userId: number,
+    teamId: number,
+    matchId: number,
+    performanceNotes: string,
 }
 
 export type AddPlayersResponseDto = {

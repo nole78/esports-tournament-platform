@@ -2,11 +2,11 @@ import { ErrorType } from './ErrorType';
 
 export class Result<T = void>{
     public isSuccess: boolean = false;
-    public errorMessage: string | null = null;
-    public errorType: ErrorType | null = null;
-    public value: T | null = null;
+    public errorMessage: string = "";
+    public errorType: ErrorType | void;
+    public value: T | void;
 
-    protected constructor(isSuccess: boolean, value: T | null, errorMessage: string | null, errorType: ErrorType | null)
+    protected constructor(isSuccess: boolean, value: T | void, errorMessage: string, errorType: ErrorType | void)
     {
         this.isSuccess = isSuccess;
         this.value = value;
@@ -17,10 +17,10 @@ export class Result<T = void>{
     public static Success(): Result<void>;
     public static Success<T>(value: T): Result<T>;
     public static Success<T>(value?: T) : Result<T | void>{
-        return new Result<T | void>(true,value ?? null,null,null)
+        return new Result<T | void>(true,value,"",void 0)
     }
 
     public static Failure<T>(errorMessage: string, errorType: ErrorType) : Result<T>{
-        return new Result<T>(false,null,errorMessage,errorType);
+        return new Result<T>(false,void 0,errorMessage,errorType);
     }
 }
