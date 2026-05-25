@@ -85,8 +85,9 @@ const teamService = new TeamService(teamRepoWrite, teamRepoRead, teamMemberRepoW
 const teamMemberService = new TeamMemberService(teamRepoRead, teamMemberRepoWrite, teamMemberRepoRead, userRepo, inviteRepoWrite, inviteRepoRead);
 const healthService = new HealthService(gameRepo, tournamentRepoRead, userRepo, teamRepoRead, db);
 const tournamentRegistrationServiceRead = new TournamentRegistrationServiceRead(tournamentRegistrationRepoRead, teamRepoRead, tournamentRepoRead, logger);
-const tournamentRegistrationServiceWrite = new TournamentRegistrationServiceWrite(TournamentRegistrationRepoWrite, tournamentRegistrationRepoRead, teamRepoRead, teamMemberRepoRead, tournamentRepoRead, gameRepo, logger);const matchService = new MatchService(matchReadRepo, matchWriteRepo, teamRepo, tournamentRepo, gameRepo);
-const matchPlayerService = new MatchPlayerService(matchReadRepo, matchPlayerReadRepo, matchPlayerWriteRepo, userRepo, teamRepo, teamMemberRepo);
+const tournamentRegistrationServiceWrite = new TournamentRegistrationServiceWrite(TournamentRegistrationRepoWrite, tournamentRegistrationRepoRead, teamRepoRead, teamMemberRepoRead, tournamentRepoRead, gameRepo, logger);
+const matchService = new MatchService(matchReadRepo, matchWriteRepo, teamRepoRead, tournamentRepoRead, gameRepo);
+const matchPlayerService = new MatchPlayerService(matchReadRepo, matchPlayerReadRepo, matchPlayerWriteRepo, userRepo, teamRepoRead, teamMemberRepoRead);
 
 // Express
 const app = express();
