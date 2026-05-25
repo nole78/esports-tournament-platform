@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import TeamsInboxForm from "../../pages/user_forms/TeamsInboxForm";
-import { EnvelopeOpen, EnvelopeClosed } from "../heroIcons/EnvelopeIcons";
+import { EnvelopeOpen, EnvelopeClosed } from "../../components/heroIcons/EnvelopeIcons";
 
 export default function NotificationDropdown() {
   const [open, setOpen] = useState(false);

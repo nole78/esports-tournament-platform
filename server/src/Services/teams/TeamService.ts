@@ -323,7 +323,7 @@ export class TeamService implements ITeamService {
         
         const usersReturn = allUsers.filter(user => members.some(m => m.userId === user.id));
 
-        return Result.Success(usersReturn.map((u) => new UserDto(u.id, u.gamerTag, u.email, u.role, u.profilePicture, u.isActive)))
+        return Result.Success(usersReturn.map((u) => new UserDto(u.id, u.gamerTag, u.fullName, u.email, u.role, u.profilePicture, u.isActive)))
     }
     async getInvites(gamerTag: string): Promise<Result<InviteDto[]>> {
         const currentUser = await this.userRepo.findByUsername(gamerTag);

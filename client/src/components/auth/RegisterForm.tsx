@@ -55,20 +55,58 @@ export function RegisterForm({ authApi }: { authApi: IAuthAPIService }) {
                       className="w-1/3 bg-bgprimary hover:bg-bgprimary/80 disabled:opacity-50 text-primary font-semibold rounded-xl py-3 text-sm transition-colors"
             >Choose Picture</button>
           <input className="hidden" ref={ref} accept="image/*" type="file" onChange={e => {
-                        const file = e.target.files?.[0];
-                        if(!file) { setPicture("");setPreview(""); return;}
+              const file = e.target.files?.[0];
 
-                        const reader = new FileReader();
+              if (!file) {
+                setPicture("");
+                setPreview("");
+                return;
+              }
 
-                        reader.onloadend = () => {
-                            const base64String = reader.result as string;
-                            setPicture(base64String);
-                            setPreview(base64String);
-                        }
+              const reader = new FileReader();
 
-                        reader.readAsDataURL(file);
-          }}></input>
-          {preview && <img src={preview} className="mt-5 rounded-xl w-1/2 h-1/2 aspect-square"/>}
+              reader.onload = event => {
+                const img = new Image();
+
+                img.onload = () => {
+                  const canvas = document.createElement("canvas");
+                  const ctx = canvas.getContext("2d");
+
+                  const SIZE = 200;
+
+                  canvas.width = SIZE;
+                  canvas.height = SIZE;
+
+                  const size = Math.min(img.width, img.height);
+
+                  const sx = (img.width - size) / 2;
+                  const sy = (img.height - size) / 2;
+
+                  ctx?.drawImage(
+                      img,
+                      sx,
+                      sy,
+                      size,
+                      size,
+                      0,
+                      0,
+                      200,
+                      200
+                  );
+
+                  const resizedBase64 = canvas.toDataURL("image/jpeg", 0.5);
+
+                  setPicture(resizedBase64);
+                  setPreview(resizedBase64);
+                };
+
+                img.src = event.target?.result as string;
+              };
+
+              reader.readAsDataURL(file);
+            }}
+          />
+          {preview && <img src={preview} className="mt-5 rounded-xl w-24 h-24 object-cover object-center aspect-square"/>}
         </div>
         <button type="submit" disabled={loading}
           className="mt-2 bg-bgprimary hover:bg-bgprimary/80 disabled:opacity-50 text-primary font-semibold rounded-xl py-3 text-sm transition-colors">
