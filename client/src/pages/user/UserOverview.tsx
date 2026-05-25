@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { usersApi } from "../../api_services/users/UsersAPIService";
+import avatarPlaceholder from "../../assets/avatar_placeholder.jpg";
 import { useAuth } from "../../hooks/auth/useAuthHook";
 import { ErrorBox } from '../../components/ui/UI';
 import type { UserDto } from "../../models/user/UserTypes";
@@ -31,13 +32,17 @@ export default function UserOverview() {
 
         {error && <ErrorBox message={error} />}
 
-        {userInfo?.profilePicture && (
+        {userInfo?.profilePicture ?
           <img
             src={userInfo.profilePicture}
             draggable={false}
             alt="Profile"
             className="w-40 h-40 object-cover rounded-2xl image-rendering-auto"/>
-        )}
+            : <div><img src={avatarPlaceholder}
+            draggable={false}
+            alt="Profile"
+            className="w-40 h-40 object-cover rounded-2xl image-rendering-auto"/></div>
+        }
 
         <div className="flex flex-col items-center gap-2">
           <div>
