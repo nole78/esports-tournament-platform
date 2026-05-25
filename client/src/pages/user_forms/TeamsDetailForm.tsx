@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 
 import { teamApi } from "../../api_services/teams/TeamAPIService";
 import { useNavigate } from "react-router-dom";
-import type { TeamDto } from "../../models/team/TeamDto";
-import { TeamRole } from '../../../../server/src/Domain/enums/TeamRole';
+import type { TeamDto } from "../../models/team/TeamDto"; 
 
 import type { UserForMembersDto } from "../../models/user/UserForMembers";
 import { ErrorBox } from "../../components/ui/UI";
@@ -42,7 +41,7 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
                             teamLogotip:res.data?.teamLogotip as string,
                             teamDescription:res.data?.teamDescription as string,
                             teamTag:res.data?.teamTag as string,
-                            userRole:res.data?.userRole as TeamRole};
+                            userRole:res.data?.userRole as string};
                             setTeam(teamHelp);
                     }).catch(() => setError("Failed to load the team"))
 
@@ -71,7 +70,7 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
                             teamLogotip:res.data?.teamLogotip as string,
                             teamDescription:res.data?.teamDescription as string,
                             teamTag:res.data?.teamTag as string,
-                            userRole:res.data?.userRole as TeamRole};
+                            userRole:res.data?.userRole as string};
                             setTeam(teamHelp);
                     }).catch(() => setError("Failed to load the team"))
 
@@ -111,7 +110,7 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
                 teamLogotip:res.data?.teamLogotip as string,
                 teamDescription:res.data?.teamDescription as string,
                 teamTag:res.data?.teamTag as string,
-                userRole:res.data?.userRole as TeamRole};
+                userRole:res.data?.userRole as string};
                 setTeam(teamHelp);
         }).catch(() => setError("Failed to load the team"))
     }, [id])
@@ -170,13 +169,13 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
                         <tr className="border-b border-gray-200 text-left">
                             <th className=" pb-2 pr-4">Gamer Tag</th>
                             <th className=" pb-2 pr-4">ID</th>
-                            { team.userRole === TeamRole.CAPTAIN && (
+                            { team.userRole === "captain" && (
                             <>
                                
                             </>
                             )
                             }
-                            { team.userRole === TeamRole.MEMBER && (
+                            { team.userRole === "member" && (
                             <>
                                 
                             </>
@@ -187,12 +186,12 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
                         <tbody>
                             {members.map(m => (
                             <tr key={m.id} className="border-b border-gray-400/30">
-                                { team.userRole === TeamRole.CAPTAIN && user?.id === m.id as number && <td className="flex flex-row items-center gap-1 py-3 pr-4 font-normal text-left">{m.gamerTag} <FireIcon/> </td>}
-                                { team.userRole === TeamRole.MEMBER && user?.id === m.id as number && <td className="flex flex-row items-center gap-1 py-3 pr-4 font-normal text-left">{m.gamerTag} </td>}
+                                { team.userRole === "captain" && user?.id === m.id as number && <td className="flex flex-row items-center gap-1 py-3 pr-4 font-normal text-left">{m.gamerTag} <FireIcon/> </td>}
+                                { team.userRole === "member" && user?.id === m.id as number && <td className="flex flex-row items-center gap-1 py-3 pr-4 font-normal text-left">{m.gamerTag} </td>}
                                 {  user?.id !== m.id && <td className="py-3 pr-4 font-normal text-left">{m.gamerTag}  </td>}
                                 <td className="py-3 pr-4 font-normal text-left">{m.id} </td>
 
-                                { team.userRole === TeamRole.CAPTAIN && user?.id !== m.id as number &&(
+                                { team.userRole === "captain" && user?.id !== m.id as number &&(
                                 <>
                                 <td className="py-2 font-normal text-center">
                                     <button type="button" onClick={() => giveCaptainShip(m.id)} className="inline-flex items-center justify-center bg-gray-400/40 border-2 border-gray-400 hover:bg-bgsecondary/30 hover:border-bgsecondary text-gray-400 font-semibold rounded-xl h-8 w-16 text-sm transition-colors mx-auto">
@@ -207,7 +206,7 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
                                 </>
                                 )
                                  }
-                                 { team.userRole === TeamRole.MEMBER && user?.id === m.id as number &&(
+                                 { team.userRole === "member" && user?.id === m.id as number &&(
                                 <>
                                 <td className="py-2 font-normal text-center">
                                     <button type="button" onClick={() => deleteMember(team.teamId, user.id)} className="inline-flex items-center justify-center bg-gray-400/40 border-2 border-gray-400 hover:bg-bgsecondary/30 hover:border-bgsecondary text-gray-400 font-semibold rounded-xl h-8 w-10 text-sm transition-colors mx-auto">
@@ -224,7 +223,7 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
                     </table>
                 
                 
-                {team.userRole === TeamRole.CAPTAIN && <div>
+                {team.userRole === "captain" && <div>
                     <label className="block text-xs text-bgprimary mb-2 font-bold">Invite member</label>
                     <input type="text" className=" font-bold" placeholder="Search by username" onChange={(e)=>(setSearch(e.target.value))}></input>
                     {search && userSearch.length > 0 && (

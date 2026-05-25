@@ -4,7 +4,6 @@ import TournamentOverview from "../../components/tournamentRegistration/Tourname
 import type { SideMenuItem } from "../../models/SideMenu/SideMenuItem";
 import RegisterTeam from "../../components/tournamentRegistration/RegisterTeam";
 import { useAuth } from "../../hooks/auth/useAuthHook";
-import { UserRole } from '../../../../server/src/Domain/enums/UserRole';
 import PendingTeams from "../../components/tournamentRegistration/PendingTeams";
 import Settings from '../../components/tournamentRegistration/Settings';
 import { SidebarMenu } from "../../components/SideBar/SidebarMenu";
@@ -50,7 +49,7 @@ export default function TournamentRegistrationPage() {
   return (
     <div className="flex gap-0 bg-primary min-h-screen">
       {/* Sidebar */}
-      <SidebarMenu menuItems={user?.role == UserRole.ADMIN ? menuItemsAdmin : menuItems} activeItem={activeItem} onItemSelect={setActiveItem}/>
+      <SidebarMenu menuItems={user?.role == "admin" ? menuItemsAdmin : menuItems} activeItem={activeItem} onItemSelect={setActiveItem}/>
 
       {/* Content Area */}
       <div className="flex-1">

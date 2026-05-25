@@ -3,7 +3,6 @@ import type { TeamDto } from '../../models/team/TeamDto';
 import type { ITeamAPIService } from '../../api_services/teams/ITeamAPIService';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/auth/useAuthHook';
-import { UserRole } from '../../../../server/src/Domain/enums/UserRole';
 
 const DEFAULT_TEAM_ROLE: TeamDto['userRole'] = 'member' as TeamDto['userRole'];
 
@@ -32,7 +31,7 @@ export default function TeamsAddForm({teamApi} : {teamApi:ITeamAPIService}){
         if (!res.success || !res.data){setError(res.message ?? "Invalid values"); return;}
 
         
-        if(user?.role == UserRole.ADMIN)
+        if(user?.role == "admin")
             navigate("/admin/teams", {state: {added : true} });
         else
             navigate("/teams", {state: {added : true} });
