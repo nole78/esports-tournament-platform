@@ -76,7 +76,7 @@ export function MatchDetails({ id }: { id: number }) {
     const match = state.match;
 
     return (
-        <div className="mx-auto max-w-3xl overflow-hidden rounded-xl border border-white/10 bg-bgprimary/30">
+        <div className="mx-auto max-w-3xl overflow-hidden rounded-xl border border-white/10 bg-bgprimary/60">
             <div className="flex flex-col gap-6 bg-primary/90 p-5">
                 <div className="flex items-start justify-between">
                     <div className="text-sm font-semibold text-bgprimary">#{match.matchId}</div>
@@ -115,8 +115,8 @@ export function MatchDetails({ id }: { id: number }) {
                         draggable={false}
                         className="mx-auto mb-2 h-16 w-16 rounded-xl"
                     />
-                    <p className="font-bold text-blue-400">{match.blueTeamName}</p>
-                    <p className="text-sm text-bgsecondary/80">{match.blueTeamTag}</p>
+                    <p className="text-xl font-bold text-blue-400">{match.blueTeamName}</p>
+                    <p className="text-sm font-semibold text-bgsecondary/80">{match.blueTeamTag}</p>
                 </div>
 
                 <div className="flex-1 p-5 text-center">
@@ -126,8 +126,8 @@ export function MatchDetails({ id }: { id: number }) {
                         draggable={false}
                         className="mx-auto mb-2 h-16 w-16 rounded-xl"
                     />
-                    <p className="font-bold text-red-400">{match.redTeamName}</p>
-                    <p className="text-sm text-bgsecondary/80">{match.redTeamTag}</p>
+                    <p className="text-xl font-bold text-red-400">{match.redTeamName}</p>
+                    <p className="text-sm font-semibold text-bgsecondary/80">{match.redTeamTag}</p>
                 </div>
             </div>
         </div>

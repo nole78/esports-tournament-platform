@@ -136,6 +136,7 @@ export class MatchService implements IMatchService{
             const match = await this.matchReadRepo.findById(id);
             if(match.matchId === 0)
                 return Result.Failure(`Match doesn't exist`, ErrorType.NotFound);
+            console.log(match);
 
             if(match.blueTeamId === 0 || match.redTeamId === 0)
                 return Result.Failure("There is no team in this match", ErrorType.Conflict);
@@ -149,12 +150,12 @@ export class MatchService implements IMatchService{
             const loserTeamId = match.blueTeamId === winnerTeamId ? match.redTeamId : match.blueTeamId;
 
             // PRE VALIDATION
-            if(match.winnerToMatchId !== 0) {
+            if(match.winnerToMatchId) {
                 const validation = await this.validateAdvance(match.winnerToMatchId, match.winnerToSlot, winnerTeamId);
                 if(!validation.isSuccess)
                     return validation;
             }
-            if(match.loserToMatchId !== 0) {
+            if(match.loserToMatchId) {
                 const validation = await this.validateAdvance(match.loserToMatchId, match.loserToSlot, loserTeamId);
                 if(!validation.isSuccess)
                     return validation;
@@ -163,13 +164,13 @@ export class MatchService implements IMatchService{
             const ok = await this.matchWriteRepo.update(id,{blueTeamScore, redTeamScore, winnerTeamId, status: MatchStatus.COMPLETED});
             if(!ok) return Result.Failure("Couldn't set match result",ErrorType.Internal);
             // ADVANCE WINNER
-            if(match.winnerToMatchId !== 0) {
+            if(match.winnerToMatchId) {
                 const result = await this.advanceTeam(match.winnerToMatchId, match.winnerToSlot, winnerTeamId);
                 if(!result.isSuccess)
                     return result;
             }
             // ADVANCE LOSER
-            if(match.loserToMatchId !== 0) {
+            if(match.loserToMatchId) {
                 const result = await this.advanceTeam(match.loserToMatchId, match.loserToSlot, loserTeamId);
                 if(!result.isSuccess)
                     return result;

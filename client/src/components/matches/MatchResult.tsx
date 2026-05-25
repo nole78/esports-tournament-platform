@@ -38,9 +38,29 @@ export function MatchResult({
         setError("");
         setSuccess("");
 
+        const teamRedScore = Number(redScore);
+        const teamBlueScore = Number(blueScore);
+
+        if(!teamRedScore || !teamBlueScore){
+            setError("You must enter score for both teams!");
+            setLoading(false);
+            return;
+        }
+        if(teamRedScore < 0 && teamBlueScore < 0){
+            setError("Scores must be grater than 0!");
+            setLoading(false);
+            return;
+        }
+        if(teamRedScore == teamBlueScore)
+        {
+            setError("Draws are not supported!");
+            setLoading(false);
+            return;
+        }
+
         const payload = {
-            teamRedScore: Number(redScore),
-            teamBlueScore: Number(blueScore),
+            teamRedScore,
+            teamBlueScore
         };
 
         const res = await matchApi.setResult(matchId, payload);
@@ -62,7 +82,7 @@ export function MatchResult({
                     <button
                         type="button"
                         onClick={onClose}
-                        className="absolute right-3 top-3 text-xl text-white/40 transition-colors hover:text-white/80"
+                        className="cursor-pointer bg-secondary absolute rounded-xl w-1/6 right-3 top-3 text-xl text-primary transition-colors hover:bg-secondary/60"
                     >
                         ×
                     </button>
@@ -90,13 +110,13 @@ export function MatchResult({
                         <button
                             type="submit"
                             disabled={loading}
-                            className="ml-4 rounded-lg bg-primary px-4 py-2 font-semibold text-white transition-colors hover:bg-primary/80"
+                            className="cursor-pointer ml-4 rounded-lg bg-primary px-4 py-2 font-semibold text-white transition-colors hover:bg-primary/80"
                         >
                             {loading ? <Spinner size={18} /> : "Confirm"}
                         </button>
                     </form>
                     {success && <div className="mb-2 text-green-400">{success}</div>}
-                    {error && <div className="mb-2 text-red-400">{error}</div>}
+                    {error && <div className="mb-2 text-xl text-red-600">{error}</div>}
                 </div>
             </div>
         </ProtectedRoute>

@@ -29,7 +29,7 @@ type PlayerOverlayState =
 export default function MatchInfo() {
     const {id} = useParams();
     const matchId = Number(id);
-    
+
     const { user } = useAuth();
     const [matchState, setMatchState] = useState<MatchState>({ status: "loading" });
     const [players, setPlayers] = useState<PlayersState>({ left: [], right: [] });
@@ -37,6 +37,7 @@ export default function MatchInfo() {
     const [refreshKey, setRefreshKey] = useState(0);
     const [showResult, setShowResult] = useState(false);
     const [showLineup, setShowLineup] = useState(false);
+    const [lineupReloadKey, setLineupReloadKey] = useState(0);
     const [selectedPlayer, setSelectedPlayer] = useState<PlayerOverlayState>({ status: "closed" });
     const [isBlueCaptain, setIsBlueCaptain] = useState(false);
     const [isRedCaptain, setIsRedCaptain] = useState(false);
@@ -152,12 +153,30 @@ export default function MatchInfo() {
         return () => {
             cancelled = true;
         };
-    }, [matchId, matchState]);
+    }, [matchId, matchState, lineupReloadKey]);
 
     const handleResultSuccess = () => {
         setShowResult(false);
         setRefreshKey((value) => value + 1);
     };
+
+    const closeLineup = () => {
+        setShowLineup(false);
+        setLineupReloadKey((value) => value + 1);
+    };
+
+    useEffect(() => {
+        if (!showLineup) {
+            document.body.style.overflow = "";
+            return;
+        }
+
+        document.body.style.overflow = "hidden";
+
+        return () => {
+            document.body.style.overflow = "";
+        };
+    }, [showLineup]);
 
     const canEditLineup = isBlueCaptain || isRedCaptain;
     const lineupTeamId =
@@ -170,25 +189,25 @@ export default function MatchInfo() {
     return (
         <div className="min-h-screen py-8">
             <div className="max-w-3xl mx-auto relative">
-                <MatchDetails id={matchId} key={refreshKey} />
-
-                {user && user.role === "admin" && matchState.status === "loaded" && matchState.match.status === "ongoing" && (
-                    <div className="absolute right-4 top-4 z-10 flex gap-3">
+                {user && user.role === "admin" && matchState.status === "loaded" && matchState.match.status !== "completed" && (
+                    <div className="mb-2 w-full right-4 top-4 z-10 flex gap-3">
                         <button
                             type="button"
-                            className="cursor-pointer rounded-lg bg-primary px-4 py-2 font-semibold text-white transition-colors hover:bg-primary/80"
+                            className="cursor-pointer w-1/4 rounded-lg bg-bgsecondary/30 px-4 py-2 font-semibold border-bgsecondary border-2 text-bgsecondary transition-colors hover:bg-bgsecondary/20"
                             onClick={() => setShowResult(true)}
                         >
                             Set Result
                         </button>
                     </div>
                 )}
+                <MatchDetails id={matchId} key={refreshKey} />
+
 
                 {showResult && matchState.status === "loaded" && (
                     <MatchResult
                         matchId={matchState.match.matchId}
-                        initialBlue={matchState.match.blueTeamScore}
-                        initialRed={matchState.match.redTeamScore}
+                        initialBlue={matchState.match.blueTeamScore ?? 0}
+                        initialRed={matchState.match.redTeamScore ?? 0}
                         onClose={() => setShowResult(false)}
                         onSuccess={handleResultSuccess}
                     />
@@ -201,7 +220,7 @@ export default function MatchInfo() {
                     {canEditLineup && (
                         <button
                             type="button"
-                            className="cursor-pointer rounded-lg bg-white/10 px-4 py-2 font-semibold text-white transition-colors hover:bg-white/20"
+                            className="cursor-pointer rounded-lg bg-bgprimary px-4 py-2 font-semibold text-primary transition-colors hover:bg-bgprimary/80"
                             onClick={() => setShowLineup(true)}
                         >
                             Edit Lineup
@@ -224,14 +243,20 @@ export default function MatchInfo() {
             </div>
 
             {showLineup && matchState.status === "loaded" && canEditLineup && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
-                    <div className="w-full max-w-5xl rounded-2xl border border-white/10 bg-bgprimary/95 p-4 shadow-2xl">
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
+                    onClick={closeLineup}
+                >
+                    <div
+                        className="w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-2xl border border-white/10 bg-secondary/90 p-4 shadow-2xl"
+                        onClick={(event) => event.stopPropagation()}
+                    >
                         <div className="mb-4 flex items-center justify-between">
                             <h2 className="text-lg font-bold text-bgsecondary">Match Lineup</h2>
                             <button
                                 type="button"
-                                className="rounded-lg bg-white/10 px-3 py-1 text-sm text-white transition-colors hover:bg-white/20"
-                                onClick={() => setShowLineup(false)}
+                                className="cursor-pointer rounded-lg bg-bgprimary px-3 py-1 text-sm text-primary transition-colors hover:bg-bgprimary/60"
+                                onClick={closeLineup}
                             >
                                 Close
                             </button>
@@ -252,14 +277,14 @@ export default function MatchInfo() {
                     onClick={() => setSelectedPlayer({ status: "closed" })}
                 >
                     <div
-                        className="relative w-full max-w-2xl rounded-2xl border border-white/10 bg-bgprimary/95 p-4 shadow-2xl"
+                        className="relative w-full max-w-2xl rounded-2xl border bg-secondary/90 p-4 shadow-2xl"
                         onClick={(event) => event.stopPropagation()}
                     >
                         <div className="mb-4 flex items-center justify-between">
                             <h2 className="text-lg font-bold text-bgsecondary">Player Overview</h2>
                             <button
                                 type="button"
-                                className="rounded-lg bg-white/10 px-3 py-1 text-sm text-white transition-colors hover:bg-white/20"
+                                className="cursor-pointer rounded-lg bg-bgprimary px-3 py-1 text-sm text-primary transition-colors hover:bg-bgprimary/60"
                                 onClick={() => setSelectedPlayer({ status: "closed" })}
                             >
                                 Close
