@@ -3,16 +3,16 @@ import RegisteredTeams from "../../components/tournamentRegistration/RegisteredT
 import TournamentOverview from "../../components/tournamentRegistration/TournamentOverview";
 import type { SideMenuItem } from "../../models/SideMenu/SideMenuItem";
 import RegisterTeam from "../../components/tournamentRegistration/RegisterTeam";
-import EyeIcon from "../../components/heroicons/EyeIcon";
-import UserGroupIcon from "../../components/heroicons/UserGroupIcon";
-import UserPlusIcon from "../../components/heroicons/UserPlusIcon";
-import WrenchScrewdriverIcon from "../../components/heroicons/WrenchScrewdriverIcon";
 import { useAuth } from "../../hooks/auth/useAuthHook";
 import { UserRole } from '../../../../server/src/Domain/enums/UserRole';
 import PendingTeams from "../../components/tournamentRegistration/PendingTeams";
 import Settings from '../../components/tournamentRegistration/Settings';
 import { SidebarMenu } from "../../components/SideBar/SidebarMenu";
-import PencilSquareIcon from "../../components/heroicons/PencilSquareIcon";
+import EyeIcon from "../../components/HeroIcons/EyeIcon";
+import PencilSquareIcon from "../../components/HeroIcons/PencilSquareIcon";
+import UserGroupIcon from "../../components/HeroIcons/UserGroupIcon";
+import UserPlusIcon from "../../components/HeroIcons/UserPlusIcon";
+import WrenchScrewdriverIcon from "../../components/HeroIcons/WrenchScrewdriverIcon";
 
 export default function TournamentRegistrationPage() {
     const { user } = useAuth();

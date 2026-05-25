@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import BurgerIcon from '../heroicons/BurgerIcon';
 import type { SidebarProps } from '../../models/SideMenu/SidebarProps';
+import BurgerIcon from '../HeroIcons/BurgerIcon';
 
 
 export function SidebarMenu({ menuItems, activeItem, onItemSelect }: SidebarProps) {
@@ -12,7 +12,7 @@ export function SidebarMenu({ menuItems, activeItem, onItemSelect }: SidebarProp
     }`}>
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="w-12 h-12 rounded-xl bg-linear-to-br from-[#f7d494] to-[#d2aa60] flex items-center justify-center mb-4 hover:shadow-lg hover:shadow-white/20 transition-all cursor-pointer hover:scale-105 active:scale-95"
+        className="w-12 h-12 rounded-xl bg-linear-to-br from-[#f7d494] to-[#d2aa60] flex items-center justify-center mb-4 hover:shadow-lg hover:shadow-bgsecondary/30 transition-all cursor-pointer hover:scale-105 active:scale-95"
         title={isCollapsed ? "Expand menu" : "Collapse menu"}>
         <span className={`text-xl font-bold text-secondary transition-transform duration-300 ${isCollapsed ? 'rotate-180' : ''}`}>
           <BurgerIcon />
@@ -27,7 +27,7 @@ export function SidebarMenu({ menuItems, activeItem, onItemSelect }: SidebarProp
             onClick={() => onItemSelect(item.id)}
             className={`relative group w-full h-12 rounded-xl flex items-center justify-center transition-all duration-200 text-5xl
               ${activeItem === item.id 
-                ? 'bg-linear-to-br  from-[#f7d494] to-[#d2aa60] text-[#41542b] shadow-lg shadow-blue-400/30' 
+                ? 'bg-linear-to-br  from-[#f7d494] to-[#d2aa60] text-[#41542b] shadow-lg shadow-bgsecondary/30' 
                 : 'text-secondary hover:bg-white/10'
               }
             `}
