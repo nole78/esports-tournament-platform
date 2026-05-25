@@ -4,7 +4,7 @@ import { MatchDetails } from "../../components/matches/MatchDetails";
 import { MatchPlayersTable } from "../../components/matches/MatchPlayersTable";
 import { MatchResult } from "../../components/matches/MatchResult";
 import { matchApi } from "../../api_services/matches/MatchAPIService";
-import UserOverview from "../user/UserOverview";
+import UserOverview from "../../components/account/UserOverview";
 import type { MatchDetailsDto } from "../../models/match/MatchDetailsDto";
 import type { MatchPlayerDto } from "../../models/match_player/AddPlayerResponseDto";
 import { useParams } from "react-router-dom";
