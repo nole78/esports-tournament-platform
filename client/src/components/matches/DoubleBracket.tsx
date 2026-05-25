@@ -19,9 +19,8 @@ type PositionedMatch = {
     y: number;
 };
 
-function positionRounds(
-    rounds: { round: number; matches: MatchDto[] }[]
-): { positioned: PositionedMatch[]; canvasWidth: number; canvasHeight: number } {
+function positionRounds(rounds: { round: number; matches: MatchDto[] }[])
+: { positioned: PositionedMatch[]; canvasWidth: number; canvasHeight: number } {
     if (rounds.length === 0) {
         return { positioned: [], canvasWidth: 400, canvasHeight: 300 };
     }
@@ -53,19 +52,14 @@ function positionRounds(
     return { positioned, canvasWidth, canvasHeight };
 }
 
-function BracketCanvas({
-    rounds,
-    label,
-    labelColor,
-    lineColor,
-}: {
+function BracketCanvas({rounds, label, labelColor, lineColor,}: {
     rounds: { round: number; matches: MatchDto[] }[];
     label: string;
     labelColor: string;
     lineColor: string;
 }) {
     const [scale, setScale] = useState(1);
-    const containerRef = useRef<HTMLDivElement>(null);
+    const containerRef = useRef<HTMLDivElement>(document.createElement("div"));
     const isDragging = useRef(false);
     const dragStart = useRef({ x: 0, y: 0, scrollLeft: 0, scrollTop: 0 });
     const [dragging, setDragging] = useState(false);
@@ -191,9 +185,9 @@ function BracketCanvas({
                     >
                         {positioned.map((current) => {
                             const targetId = current.match.winnerToMatchId;
-                            if (!targetId) return null;
+                            if (!targetId) return <></>;
                             const target = getPos(targetId);
-                            if (!target) return null;
+                            if (!target) return <></>;
 
                             const startX = current.x + MATCH_WIDTH;
                             const startY = current.y + MATCH_HEIGHT / 2;

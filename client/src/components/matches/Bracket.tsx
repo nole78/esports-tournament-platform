@@ -16,8 +16,8 @@ const MIN_SCALE = 0.35;
 const MAX_SCALE = 1.2;
 
 export default function Bracket({ matches , title}: BracketProps) {
-    const containerRef = useRef<HTMLDivElement>(null);
-    const canvasRef = useRef<HTMLDivElement>(null);
+    const containerRef = useRef(document.createElement("div"));
+    const canvasRef = useRef(document.createElement("div"));
     const isDragging = useRef(false);
     const [dragging, setDragging] = useState(false);
     const dragStart = useRef({ x: 0, y: 0, scrollLeft: 0, scrollTop: 0 });
@@ -182,12 +182,12 @@ export default function Bracket({ matches , title}: BracketProps) {
                         height={canvasHeight}
                     >
                         {positionedMatches.map((current) => {
-                            if (!current.match.winnerToMatchId) return null;
+                            if (!current.match.winnerToMatchId) return <></>;
 
                             const target = getMatchPosition(
                                 current.match.winnerToMatchId
                             );
-                            if (!target) return null;
+                            if (!target) return <></>;
 
                             const startX = current.x + MATCH_WIDTH;
                             const startY = current.y + MATCH_HEIGHT / 2;
