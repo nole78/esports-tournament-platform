@@ -10,13 +10,13 @@ export class UserService implements IUserService {
 
   async getAll(): Promise<Result<UserDto[]>> {
     const users = await this.userRepo.findAll();
-    return Result.Success(users.map((u) => new UserDto(u.id, u.gamerTag, u.email, u.role, u.profilePicture, u.isActive)));
+    return Result.Success(users.map((u) => new UserDto(u.id, u.gamerTag, u.fullName, u.email, u.role, u.profilePicture, u.isActive)));
   }
 
   async getById(id: number): Promise<Result<UserDto>> {
     const u = await this.userRepo.findById(id);
     if (u.id === 0) return Result.Failure(`User with id ${id} doesn't exist`,ErrorType.NotFound);
-    return Result.Success(new UserDto(u.id, u.gamerTag, u.email, u.role, u.profilePicture, u.isActive));
+    return Result.Success(new UserDto(u.id, u.gamerTag, u.fullName, u.email, u.role, u.profilePicture, u.isActive));
   }
 
   async changeRole(id: number,role:UserRole): Promise<Result<void>> {
