@@ -3,13 +3,14 @@ import { useAuth } from "../../hooks/auth/useAuthHook";
 import type { TeamDto } from "../../models/team/TeamDto";
 import { useLocation, useNavigate } from 'react-router-dom';
 import { teamApi } from "../../api_services/teams/TeamAPIService";
-import { Empty, ErrorBox, PageHeader} from "../../components/ui/UI";
+import { Empty, ErrorBox, PageHeader, Pagination} from "../../components/ui/UI";
 import { TeamRole } from "../../types/teamMembers/teamMemberRole";
 
 
 
 export default function TeamsPage(){
     const {user} = useAuth();
+    const [total, setTotal] = useState<number>(0);
     const [teams, setTeams] = useState<TeamDto[]>([]);
     const [error, setError] = useState<string>("");
     const [deleted, setDeleted] = useState<boolean>(false);
@@ -50,6 +51,7 @@ export default function TeamsPage(){
         .then((res) => {
             if (res.success){
                 setTeams(res.data?.items ?? []);
+                setTotal(res.data?.total ?? 0);
             }else{
                 setError(res.message);
             }
@@ -141,25 +143,7 @@ export default function TeamsPage(){
                 )}
                 
                 <div className="flex items-center justify-center gap-4 mt-6">
-                <button
-                    type="button"
-                    onClick={() => setPage(p => p - 1)}
-                    disabled={page === 1}
-                    className="px-4 py-2 text-sm font-semibold rounded-xl border-2 border-gray-400 text-gray-400 bg-gray-400/10 hover:bg-gray-400/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                >
-                    Previous
-                </button>
-
-                <span className="text-sm text-bgsecondary font-bold">Page {page}</span>
-
-                <button
-                    type="button"
-                    onClick={() => setPage(p => p + 1)}
-                    disabled={teams.length < limit}
-                    className="px-4 py-2 text-sm font-semibold rounded-xl border-2 border-gray-400 text-gray-400 bg-gray-400/10 hover:bg-gray-400/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                >
-                    Next
-                </button>
+               <Pagination page={page} total={total} pageSize={limit} onChange={setPage}/>
             </div>
         </div>
     );
