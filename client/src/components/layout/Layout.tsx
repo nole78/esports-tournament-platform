@@ -16,6 +16,7 @@ const userNav = [
   { to: "/game_catalog", label: "Game Catalog"},
   { to: "/teams", label: "Teams List"},
   { to: "/tournament_list", label: "Tournaments"},
+  { to: "/watchlist", label: "My Watchlist"},
   // add more user routes here
 ];
 const adminNav = [
@@ -25,6 +26,7 @@ const adminNav = [
   { to: "/admin/teams", label: "Teams List"},
   { to: "/tournament_list", label: "Tournaments"},
   { to: "/admin/health", label: "Health"},
+  { to: "/admin/watchlist", label: "My Watchlist"},
   // add more admin routes here
 ];
 

@@ -5,7 +5,7 @@ import { ErrorBox, NodeBadge, PageHeader, Spinner, SuccessBox } from "../ui/UI";
 
 
 export default function DbHealthDisplay(){
-    const [status, setStatus] = useState<HealthStatusDto | null>(null);
+    const [status, setStatus] = useState<HealthStatusDto>();
     const [success, setSuccess] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(true);

@@ -17,7 +17,7 @@ export default function AuditLogPage() {
     
     Promise.resolve().then(() => setLoading(true));
 
-    auditLogApi.getLogs(token, p, limit)
+    auditLogApi.getLogs(p, limit)
       .then((res) => {
         if (res.success && res.data) {
           setLogs(res.data.items);

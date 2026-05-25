@@ -3,20 +3,25 @@ import { authenticate } from "../../Middlewares/authentification/AuthMiddleware"
 import { authorize } from "../../Middlewares/authorization/AuthorizeMiddleware";
 import { UserRole } from "../../Domain/enums/UserRole";
 import { ITournamentServiceWrite } from "../../Domain/services/tournaments/ITournamentServiceWrite";
+import { IUserWatchlistService } from "../../Domain/services/user_watchlist/IUserWatchlistService";
 import { CreateTournamentDto } from "../../Domain/DTOs/tournaments/CreateTournamentDto";
 import { ValidationResult } from '../../Domain/types/ValidationResult';
 import { validateTournamentCreation } from "../validators/tournaments/validateTournamentCreation";
 import { TournamentFormat } from '../../Domain/enums/TournamentFormat';
 import { TournamentStatus } from '../../Domain/enums/TournamentStatus';
-import { handleResult } from "../mappers/ResultMapper";
 import { validateTournamentUpdate } from "../validators/tournaments/validateTournamentUpdate";
 import { ITournamentServiceRead } from "../../Domain/services/tournaments/ITournamentServiceRead";
+import { handleResult } from "../mappers/ResultMapper";
+import { CreateUserWatchlistDto } from "../../Domain/DTOs/user_watchlists/CreateUserWatchlistDto";
 export class TournamentController{
     private readonly router = Router();
 
-    public constructor(private readonly tournamentServiceRead: ITournamentServiceRead, private readonly tournamentServiceWrite: ITournamentServiceWrite){
+    public constructor(private readonly tournamentServiceRead: ITournamentServiceRead, private readonly tournamentServiceWrite: ITournamentServiceWrite, private readonly watchlistService: IUserWatchlistService){
         this.router.get("/tournaments", this.getAll.bind(this));
         this.router.get("/tournaments/:id", this.getById.bind(this));
+        this.router.post("/tournaments/watch/check", this.findWatchListItem.bind(this));
+        this.router.post("/tournaments/:id/watch", authenticate, authorize(UserRole.PLAYER, UserRole.ADMIN), this.addToWatchList.bind(this));
+        this.router.delete("/tournaments/:id/watch", authenticate, authorize(UserRole.PLAYER, UserRole.ADMIN), this.removeFromWatchList.bind(this));
         this.router.post("/tournaments", authenticate, authorize(UserRole.ADMIN), this.create.bind(this));
         this.router.put("/tournaments/:id", authenticate, authorize(UserRole.ADMIN), this.update.bind(this));
         this.router.delete("/tournaments/:id", authenticate, authorize(UserRole.ADMIN), this.delete.bind(this));
@@ -75,6 +80,32 @@ export class TournamentController{
         if (isNaN(id)) { res.status(400).json({ success: false, message: "Invalid id" }); return; }
         const result = await this.tournamentServiceWrite.delete(id);
         handleResult(result, res);
+    }
+
+    private async addToWatchList(req: Request, res: Response): Promise<void>{
+        const userId = parseInt(req.body.userId as string, 10);
+        const tournamentId = parseInt(req.params.id as string, 10);
+        if (isNaN(userId) || isNaN(tournamentId)) { res.status(400).json({ success: false, message: "Invalid id" }); return; }
+        const result = await this.watchlistService.add(new CreateUserWatchlistDto(userId, tournamentId));
+        handleResult(result,res);
+    }
+
+    private async removeFromWatchList(req: Request, res: Response): Promise<void>{
+        const userId = parseInt(req.body.userId as string, 10);
+        const tournamentId = parseInt(req.params.id as string, 10);
+        if (isNaN(userId) || isNaN(tournamentId)) { res.status(400).json({ success: false, message: "Invalid id" }); return; }
+        const result = await this.watchlistService.remove(userId, tournamentId);
+        handleResult(result,res);
+    }
+
+    private async findWatchListItem(req: Request, res: Response): Promise<void>
+    {
+        console.log(req.user);
+        const userId = parseInt(req.body.userId as string, 10);
+        const tournamentId = parseInt(req.body.tournamentId as string, 10);
+        if (isNaN(userId) || isNaN(tournamentId)) { res.status(400).json({ success: false, message: "Invalid id" }); return; }
+        const result = await this.watchlistService.findWatchListItem(userId, tournamentId);
+        handleResult(result,res);
     }
 
     public getRouter(): Router { return this.router; }

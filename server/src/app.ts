@@ -39,6 +39,9 @@ import { TournamentRegistrationServiceRead } from "./Services/tournamentRegistra
 import { TournamentRepositoryRead } from "./Database/repositories/tournament/TournamentRepositoryRead";
 import { TournamentServiceRead } from "./Services/tournaments/TournamentServiceRead";
 import { InviteRepository } from "./Database/repositories/invites/InviteRepository";
+import { UserWatchlistRepository } from "./Database/repositories/user_watchlist/UserWatchlistRepository";
+import { UserWatchlistService } from "./Services/user_watchlist/UserWatchlistService";
+import { UserWatchlistController } from "./WebAPI/controllers/UserWatchlistController";
 
 export const logger = new ConsoleLoggerService();
 export const db     = new DbManager(logger);
@@ -55,6 +58,7 @@ const tournamentRepoWrite = new TournamentRepositoryWrite(db, logger);
 const auditRepo = new AuditRepository(db, logger);
 const teamRepo = new TeamRepository(db, logger);
 const teamMemberRepo = new TeamMemberRepository(db, logger);
+const userWatchlistRepo = new UserWatchlistRepository(db, logger);
 const tournamentRegistrationRepoRead = new TournamentRegistrationRepositoryRead(db, logger);
 const TournamentRegistrationRepoWrite = new TournamentRegistrationRepositoryWrite(db, logger);
 const inviteRepo = new InviteRepository(db, logger);
@@ -69,6 +73,7 @@ const auditService = new AuditService(auditRepo, userRepo);
 const authService   = new AuthService(userRepo,auditService);
 const teamService = new TeamService(teamRepo, teamMemberRepo, userRepo, logger, inviteRepo);
 const healthService = new HealthService(gameRepo, tournamentRepoRead, userRepo, teamRepo, db);
+const watchlistService = new UserWatchlistService(userWatchlistRepo, tournamentRepo, gameRepo);
 const tournamentRegistrationServiceRead = new TournamentRegistrationServiceRead(tournamentRegistrationRepoRead, teamRepo, tournamentRepoRead, logger);
 const tournamentRegistrationServiceWrite = new TournamentRegistrationServiceWrite(TournamentRegistrationRepoWrite, tournamentRegistrationRepoRead, teamRepo, teamMemberRepo, tournamentRepoRead, gameRepo, logger);
 // Express
@@ -80,11 +85,12 @@ app.use("/api/v1", new AuthController(authService, userService).getRouter());
 app.use("/api/v1", new UserController(userService).getRouter());
 app.use("/api/v1", new EntityController(entityService).getRouter());
 app.use("/api/v1", new GameController(gameService).getRouter());
-app.use("/api/v1", new TournamentController(tournamentServiceRead, tournamentServiceWrite).getRouter());
+app.use("/api/v1", new TournamentController(tournamentServiceRead, tournamentServiceWrite, watchlistService).getRouter());
 app.use("/api/v1", new AuditController(auditService).getRouter());
 app.use("/api/v1", new HealthController(healthService).getRouter());
 app.use("/api/v1", new TeamController(teamService, logger).getRouter());
 app.use("/api/v1", new HealthController(healthService).getRouter());
+app.use("/api/v1", new UserWatchlistController(watchlistService).getRouter());
 app.use("/api/v1", new TournamentRegistrationController(tournamentRegistrationServiceRead, tournamentRegistrationServiceWrite).getRouter());
 
 export default app;
