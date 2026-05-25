@@ -25,4 +25,5 @@ export type MatchDetailsDto = {
          tournamentName: string,
 
          gameName: string,
+         playersPerTeam: number,
 }

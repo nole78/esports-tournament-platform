@@ -26,5 +26,6 @@ export class MatchDetailsDto{
         public tournamentName: string = "",
 
         public gameName: string = "",
+        public playersPerTeam: number = 0,
     ){}
 }
