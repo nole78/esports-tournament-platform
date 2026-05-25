@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { usersApi } from "../../api_services/users/UsersAPIService";
 import avatarPlaceholder from "../../assets/avatar_placeholder.jpg";
 import { useAuth } from "../../hooks/auth/useAuthHook";
-import { ErrorBox, RoleBadge } from "../../components/ui/UI";
+import { ErrorBox, RoleBadge } from "../ui/UI";
 import type { UserDto } from "../../models/user/UserTypes";
 
 type UserOverviewState =

@@ -63,7 +63,7 @@ export class GameRepository implements IGameRepository{
         if (!res) return new Game;
         try {
         const [result] = await res.conn.execute<ResultSetHeader>(
-            `INSERT INTO games (game_name, game_logotip, game_genre, game_players) VALUES (?, ?, ?, ?)`,
+            `INSERT INTO games (game_name, game_logotip, game_genre, players_per_team) VALUES (?, ?, ?, ?)`,
             [game.gameName, game.gameLogotip, game.gameGenre, game.gamePlayers]
         );
         if (result.insertId === 0) return new Game;
