@@ -5,7 +5,7 @@ import { Empty, ErrorBox } from "../../components/ui/UI";
 import type { TeamDtoGuest } from "../../models/team/TeamDtoGuest";
 import type { UserForMembersDto } from "../../models/user/UserForMembers";
 import type { UserDto } from "../../models/user/UserTypes";
-import FireIcon from "../../components/heroicons/FireIcon";
+import FireIcon from "../../components/heroIcons/FireIcon";
 
 
 

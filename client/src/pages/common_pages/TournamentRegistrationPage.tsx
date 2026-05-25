@@ -4,11 +4,11 @@ import RegisteredTeams from "../../components/tournamentRegistration/RegisteredT
 import TournamentOverview from "../../components/tournamentRegistration/TournamentOverview";
 import type { SideMenuItem } from "../../models/SideMenu/SideMenuItem";
 import RegisterTeam from "../../components/tournamentRegistration/RegisterTeam";
-import EyeIcon from "../../components/HeroIcons/EyeIcon";
-import UserGroupIcon from "../../components/HeroIcons/UserGroupIcon";
-import PlusCircleIcon from "../../components/HeroIcons/PlusCircleIcon";
-import UserPlusIcon from "../../components/HeroIcons/UserPlusIcon";
-import WrenchScrewdriverIcon from "../../components/HeroIcons/WrenchScrewdriverIcon";
+import EyeIcon from "../../components/heroIcons/EyeIcon";
+import UserGroupIcon from "../../components/heroIcons/UserGroupIcon";
+import PlusCircleIcon from "../../components/heroIcons/PlusCircleIcon";
+import UserPlusIcon from "../../components/heroIcons/UserPlusIcon";
+import WrenchScrewdriverIcon from "../../components/heroIcons/WrenchScrewdriverIcon";
 import { useAuth } from "../../hooks/auth/useAuthHook";
 import { UserRole } from '../../../../server/src/Domain/enums/UserRole';
 import PendingTeams from "../../components/tournamentRegistration/PendingTeams";
