@@ -11,15 +11,17 @@ import { Result } from '../../Domain/common/Result';
 import { User } from "../../Domain/models/User";
 import { logger } from '../../app';
 import { ILoggerService } from "../../Domain/services/logger/ILoggerService";
+import { ITeamMemberService } from "../../Domain/services/teamMember/ITeamMemberService";
 
 
 export class TeamController{
     private readonly  router = Router();
 
-    public constructor(private readonly teamService: ITeamService, private readonly logger: ILoggerService){
+    public constructor(private readonly teamService: ITeamService, private readonly teamMemberService: ITeamMemberService){
         this.router.get("/teams", authenticate, this.getByGamerTag.bind(this));
         this.router.post("/teams", authenticate, this.create.bind(this));
-        this.router.get("/teams/:id", authenticate,this.getTeamsById.bind(this));
+        this.router.get("/teams/user/:id", authenticate,this.getTeamsById.bind(this));
+        this.router.get("/teams/:id", this.getTeamsByIdGuest.bind(this));
         this.router.patch("/teams/:id", authenticate, this.update.bind(this));
         this.router.delete("/teams/:id", authenticate, this.delete.bind(this));
         
@@ -32,6 +34,7 @@ export class TeamController{
         this.router.get("/teams/invites/all", authenticate, this.allInvites.bind(this));
         this.router.get("/teams/members/:id", this.getMembers.bind(this));
         this.router.get("/teams/mine/all", authenticate, this.allMyTeams.bind(this));
+        this.router.get("/teams/guest/all", this.getAll.bind(this));
     }
 
     private async getAll(req: Request, res: Response) : Promise<void>{
@@ -103,7 +106,7 @@ export class TeamController{
 
         if (isNaN(id)) {res.status(400).json({success: false, message: "Invalid id"}); return;}
 
-        const result = await this.teamService.invite(gamerTag, id, safeGamerTagInvite);
+        const result = await this.teamMemberService.invite(gamerTag, id, safeGamerTagInvite);
         handleResult(result, res);
     }
 
@@ -115,7 +118,7 @@ export class TeamController{
         const safeAnswer = answer ?? "";
         if (isNaN(id)) {res.status(400).json({success: false, message: "Invalid id"}); return;}
 
-        const result = await this.teamService.inviteResponse(gamerTag, id, safeAnswer);
+        const result = await this.teamMemberService.inviteResponse(gamerTag, id, safeAnswer);
         handleResult(result, res);
     }
 
@@ -125,7 +128,7 @@ export class TeamController{
         const userId = parseInt(req.params.userId as string,10);
         if (isNaN(teamId) || isNaN(userId)) {res.status(400).json({success: false, message: "Invalid id"}); return;}
 
-        const result = await this.teamService.transferCaptainship(gamerTag, teamId, userId);
+        const result = await this.teamMemberService.transferCaptainship(gamerTag, teamId, userId);
         handleResult(result, res);
     }
 
@@ -135,25 +138,33 @@ export class TeamController{
         const userId = parseInt(req.params.userId as string,10);
         if (isNaN(teamId) || isNaN(userId)) {res.status(400).json({success: false, message: "Invalid id"}); return;}
 
-        const result = await this.teamService.leaveTeam(gamerTag, teamId, userId);
+        const result = await this.teamMemberService.leaveTeam(gamerTag, teamId, userId);
         handleResult(result, res);
     }
 
     private async getMembers(req: Request, res: Response) : Promise<void>{
         const id = parseInt(req.params.id as string, 10);
         if(isNaN(id)) {res.status(400).json({ success: false, message: "Invalid id"}); return; }
-        const result = await this.teamService.getTeamMembers(id);
+        const result = await this.teamMemberService.getTeamMembers(id);
         handleResult(result, res);
     }
 
     private async allInvites(req: Request, res: Response) : Promise<void>{
         const gamerTag = req.user?.username as string;
-        const result = await this.teamService.getInvites(gamerTag);
+        const result = await this.teamMemberService.getInvites(gamerTag);
         handleResult(result, res);
     }
+    
     private async allMyTeams(req: Request, res: Response) : Promise<void>{
         const gamerTag = req.user?.username as string;
         const result = await this.teamService.getAllMyTeams(gamerTag);
+        handleResult(result, res);
+    }
+
+    private async getTeamsByIdGuest(req: Request, res: Response) : Promise<void>{
+        const id = parseInt(req.params.id as string, 10);
+        if(isNaN(id)) {res.status(400).json({ success: false, message: "Invalid id"}); return; }
+        const result = await this.teamService.getByIdGuest(id);
         handleResult(result, res);
     }
     public getRouter(): Router { return this.router; }

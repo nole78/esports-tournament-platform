@@ -2,31 +2,31 @@ import { ITournamentRegistrationServiceWrite } from "../../Domain/services/tourn
 import { ITournamentRegistrationRepositoryWrite } from "../../Domain/repositories/tournament_registrations/ITournamentRegistrationRepositoryWrite";
 import { ILoggerService } from "../../Domain/services/logger/ILoggerService";
 import { TournamentRegistrationDto } from "../../Domain/DTOs/tournament_registrations/TournamentRegistrationDto";
-import { ITeamRepository } from "../../Domain/repositories/teams/ITeamRepository";
 import { CreateTournamentRegistrationDto } from "../../Domain/DTOs/tournament_registrations/CreateTournamentRegistrationDto";
 import { TournamentRegistration } from "../../Domain/models/TournamentRegistration";
 import { TournamentRegistrationStatus } from "../../Domain/enums/TournamentRegistrationStatus";
 import { Result } from '../../Domain/common/Result';
 import { ErrorType } from "../../Domain/common/ErrorType";
 import { IGameRepository } from "../../Domain/repositories/games/IGameRepository";
-import { ITeamMemberRepository } from "../../Domain/repositories/team_members/ITeamMemberRepository";
 import { TeamMemberDto } from "../../Domain/DTOs/team_members/TeamMemberDto";
 import { ITournamentRegistrationRepositoryRead } from '../../Domain/repositories/tournament_registrations/ITournamentRegistrationRepositoryRead';
 import { ITournamentRepositoryRead } from "../../Domain/repositories/tournaments/ITournamentRepositoryRead";
+import { ITeamRepositoryRead } from "../../Domain/repositories/teams/ITeamRepositoryRead";
+import { ITeamMemberRepositoryRead } from "../../Domain/repositories/team_members/ITeamMemberRepositoryRead";
 
 export class TournamentRegistrationServiceWrite implements ITournamentRegistrationServiceWrite{
     public constructor(
         private readonly tournamentRegistrationRepoWrite: ITournamentRegistrationRepositoryWrite,
         private readonly tournamentRegistrationRepoRead: ITournamentRegistrationRepositoryRead,
-        private readonly teamRepo: ITeamRepository,
-        private readonly teamMemberRepo: ITeamMemberRepository,
+        private readonly teamRepoRead: ITeamRepositoryRead,
+        private readonly teamMemberRepoRead: ITeamMemberRepositoryRead,
         private readonly tournamentRepoRead : ITournamentRepositoryRead,
         private readonly gameRepo: IGameRepository,
         private readonly logger: ILoggerService,
     ){}
 
     async create(tr: CreateTournamentRegistrationDto): Promise<Result<TournamentRegistrationDto>>{
-        const team = await this.teamRepo.findById(tr.teamId);
+        const team = await this.teamRepoRead.findById(tr.teamId);
         if (team.teamId === 0) {
             this.logger.error("TournamentRegistrationService", "create failed", `Team with teamId "${tr.teamId}" not found`);
             return Result.Failure("Could not find team with id "+tr.teamId, ErrorType.NotFound);
@@ -45,7 +45,7 @@ export class TournamentRegistrationServiceWrite implements ITournamentRegistrati
         }
 
         const game = await this.gameRepo.findById(tournament.tournamentGameId);
-        const team_members:TeamMemberDto[] = await this.teamMemberRepo.findByTeamId(team.teamId);
+        const team_members:TeamMemberDto[] = await this.teamMemberRepoRead.findByTeamId(team.teamId);
         if(team_members.length < game.gamePlayers)
             return Result.Failure("Not enough players in team " + team.teamName, ErrorType.Validation);
 
@@ -70,7 +70,7 @@ export class TournamentRegistrationServiceWrite implements ITournamentRegistrati
         if(tournament.tournamentId === 0)
             return Result.Failure("Could not find tournament with id " + tournamentId, ErrorType.NotFound);
 
-        const team = await this.teamRepo.findById(teamId);
+        const team = await this.teamRepoRead.findById(teamId);
         if(team.teamId === 0)
             return Result.Failure("Could not find team with id "+teamId, ErrorType.NotFound);
 
@@ -100,7 +100,7 @@ export class TournamentRegistrationServiceWrite implements ITournamentRegistrati
         if(tournament.tournamentId === 0)
             return Result.Failure("Could not find tournament with id " + tournamentId, ErrorType.NotFound);
 
-        const team = await this.teamRepo.findById(teamId);
+        const team = await this.teamRepoRead.findById(teamId);
         if(team.teamId === 0)
             return Result.Failure("Could not find team with id "+teamId, ErrorType.NotFound);
 

@@ -63,7 +63,7 @@ export default function TeamsPage(){
                 <button onClick={() => user?.role == "admin" ? navigate(`/admin/teams/add`) : navigate(`/teams/add`)}
                         className="mb-2 w-1/6 bg-bgsecondary/40 border-2 border-bgsecondary hover:bg-bgsecondary/30 text-bgsecondary font-semibold rounded-xl py-3 text-sm transition-colors">
                 Add Team</button>
-                <button onClick={() => user?.role == "admin" ? navigate(`/admin/teams/inbox`) : navigate(`/teams/inbox}`)}
+                <button onClick={() => user?.role == "admin" ? navigate(`/admin/teams/inbox`) : navigate(`/teams/inbox`)}
                         className="mb-2 w-1/6 bg-bgsecondary/40 border-2 border-bgsecondary hover:bg-bgsecondary/30 text-bgsecondary font-semibold rounded-xl py-3 text-sm transition-colors">
                 Inbox</button>
                 {error && <ErrorBox message={error}/>}

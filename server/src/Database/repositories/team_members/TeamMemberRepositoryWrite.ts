@@ -1,63 +1,18 @@
-import { ResultSetHeader, RowDataPacket } from "mysql2";
-import { ITeamMemberRepository } from "../../../Domain/repositories/team_members/ITeamMemberRepository";
+import { RowDataPacket, ResultSetHeader } from "mysql2";
+import { TeamRole } from "../../../Domain/enums/TeamRole";
+import { TeamMember } from "../../../Domain/models/TeamMember";
+import { ITeamMemberRepositoryWrite } from "../../../Domain/repositories/team_members/ITeamMemberRepositoryWrite";
 import { ILoggerService } from "../../../Domain/services/logger/ILoggerService";
 import { DbManager } from "../../connection/DbConnectionPool";
-import { TeamMemberDto } from "../../../Domain/DTOs/team_members/TeamMemberDto";
-import { CreateTeamMemberDto } from "../../../Domain/DTOs/team_members/CreateTeamMemberDto";
-import { TeamMember } from "../../../Domain/models/TeamMember";
-import { TeamRole } from "../../../Domain/enums/TeamRole";
 
-export class TeamMemberRepository implements ITeamMemberRepository {
-  public constructor(
+export class TeamMemberRepositoryWrite implements ITeamMemberRepositoryWrite{
+    public constructor(
     private readonly db: DbManager,
     private readonly logger: ILoggerService,
   ) {}
 
   private map(r: RowDataPacket): TeamMember {
     return new TeamMember(r.team_id, r.user_id, r.role, r.joined_at);
-  }
-
-  async findAll(page = 1, limit = 20): Promise<TeamMember[]> {
-    const res = await this.db.getReadConnection();
-    if (!res) return [];
-    const offset = (page - 1) * limit;
-    try {
-      const [rows] = await res.conn.execute<RowDataPacket[]>(
-        `SELECT * FROM team_members LIMIT ? OFFSET ?`, [limit, offset]
-      );
-      return rows.map((r) => this.map(r));
-    } catch (err) {
-      this.logger.error("TeamMemberRepository", "findAll failed", err);
-      return [];
-    } finally { res.conn.release(); }
-  }
-
-  async findByUserId(userId: number): Promise<TeamMember[]> {
-    const res = await this.db.getReadConnection();
-    if (!res) return [];
-    try {
-      const [rows] = await res.conn.execute<RowDataPacket[]>(
-        `SELECT * FROM team_members WHERE user_id = ? ORDER BY user_id DESC`, [userId]
-      );
-      return rows.map((r) => this.map(r));
-    } catch (err) {
-      this.logger.error("TeamMemberRepository", "findByUserId failed", err);
-      return [];
-    } finally { res.conn.release(); }
-  }
-
-   async findByTeamId(teamId: number): Promise<TeamMember[]> {
-    const res = await this.db.getReadConnection();
-    if (!res) return [];
-    try {
-      const [rows] = await res.conn.execute<RowDataPacket[]>(
-        `SELECT * FROM team_members WHERE team_id = ? ORDER BY team_id DESC`, [teamId]
-      );
-      return rows.map((r) => this.map(r));
-    } catch (err) {
-      this.logger.error("TeamMemberRepository", "findByTeamId failed", err);
-      return [];
-    } finally { res.conn.release(); }
   }
 
   async create(dto: TeamMember): Promise<TeamMember> {

@@ -8,7 +8,8 @@ import { usersApi } from "../../api_services/users/UsersAPIService";
 // TODO: Update nav items to match your routes and roles
 const guestNav = [
   {to: "/game_catalog", label: "Game Catalog"},
-  {to: "/tournament_list", label: "Tournaments"}
+  {to: "/tournament_list", label: "Tournaments"},
+  {to: "/guest/teams", label: "Teams List"}
 ]
 
 const userNav = [

@@ -1,5 +1,6 @@
 import type { IniviteDto } from "../../models/invite/InviteDto";
 import type { TeamDto } from "../../models/team/TeamDto";
+import type { TeamDtoGuest } from "../../models/team/TeamDtoGuest";
 import type { UserForMembersDto } from "../../models/user/UserForMembers";
 
 //import { ApiResponse } from '../tournament_list/ITournamentAPIService';
@@ -9,6 +10,7 @@ import type { UserForMembersDto } from "../../models/user/UserForMembers";
 export type ApiResponse<T> = {success: boolean; message: string; data?: T};
 
 export interface ITeamAPIService {
+    getAll(page: number, limit: number): Promise<ApiResponse<{items: TeamDto[], total: number}>>;
     getByGamerTag(page: number, limit: number): Promise<ApiResponse<{items: TeamDto[], total: number}>>;
     create(payload: Record<string, unknown>): Promise<ApiResponse<TeamDto>>;
     delete(id: number): Promise<ApiResponse<void>>;
@@ -21,4 +23,5 @@ export interface ITeamAPIService {
     inviteRespond(teamId: number, answer : string): Promise<ApiResponse<void>>;
     leaveTeam(teamId: number, userId: number): Promise<ApiResponse<void>>;
     getMyTeams():Promise<ApiResponse<TeamDto>>;
+    getTeamGuest(teamId: number): Promise<ApiResponse<TeamDtoGuest>>;
 }

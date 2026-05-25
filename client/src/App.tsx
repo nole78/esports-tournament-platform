@@ -26,6 +26,8 @@ import UserOverview from "./pages/user/UserOverview";
 import HealthPage from "./pages/admin/HealthPage";
 import TeamsDetailPage from "./pages/common_pages/TeamsDetailPage";
 import TeamsInboxPage from "./pages/common_pages/TeamsInboxPage";
+import TeamsGuestPage from "./pages/common_pages/TeamsGuestPage";
+import TeamsGuestDetailsPage from "./pages/common_pages/TeamsGuestDetailsPage";
 
 export default function App() {
   return (
@@ -36,9 +38,9 @@ export default function App() {
       <Route path="/home" element={<LandingPage/>}/>
       <Route path="/game_catalog" element={<GameCatalog/>} />
       <Route path="/tournament_list" element={<TournamentList />} />
-      {/* <Route path="/teams" element = {<TeamsPage/>}/> */}
-      {/* {<Route path="/teams/add" element = {<TeamsAddPage/>}/>}
-      {<Route path="/teams/edit/:id" element = {<TeamsEditPage/>}/>} */}
+      <Route path="/guest/teams" element = {<TeamsGuestPage/>}/>
+      <Route path="/guest/teams/:id" element = {<TeamsGuestDetailsPage/>}/>
+      
       {/* User routes */}
       <Route path="/dashboard" element={<ProtectedRoute requiredRole="player"><UserDashboard /></ProtectedRoute>} />
       <Route path="/user_info" element={<ProtectedRoute requiredRole="player"><UserOverview/></ProtectedRoute>}/>
