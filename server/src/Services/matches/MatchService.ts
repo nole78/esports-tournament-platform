@@ -11,6 +11,8 @@ import { MatchSlot } from "../../Domain/enums/MatchSlot";
 import { MatchStatus } from "../../Domain/enums/MatchStatus";
 import { IMatchReadRepository } from "../../Domain/repositories/matches/IMatchReadRepository";
 import { IMatchWriteRepository } from "../../Domain/repositories/matches/IMatchWriteRepository";
+import { MatchDetailsDto } from "../../Domain/DTOs/matches/MatchDetailsDto";
+import { IGameRepository } from "../../Domain/repositories/games/IGameRepository";
 
 // TODO: fix N+1 problem for geting team names
 export class MatchService implements IMatchService{
@@ -18,7 +20,8 @@ export class MatchService implements IMatchService{
         private readonly matchReadRepo: IMatchReadRepository,
         private readonly matchWriteRepo: IMatchWriteRepository,
         private readonly teamRepo: ITeamRepository,
-        private readonly tournamentRepo: ITournamentRepository
+        private readonly tournamentRepo: ITournamentRepository,
+        private readonly gameRepo: IGameRepository
     ){}
 
     private toMatchDto(match: Match,redTeamName: string, blueTeamName: string): MatchDto{
@@ -36,19 +39,28 @@ export class MatchService implements IMatchService{
             match.redTeamScore);
     }
 
-    private async getTeamName(match: Match) : Promise<{redTeamName: string, blueTeamName: string}> {
+    private async getTeamName(match: Match) : Promise<{redTeamName: string, redTeamTag: string, redLogo: string,
+                                                        blueTeamName: string, blueTeamTag: string, blueLogo: string}> {
         let redTeamName = "";
+        let redTeamTag = "";
+        let redLogo = "";
         let blueTeamName = "";
+        let blueTeamTag = "";
+        let blueLogo = "";
         if(match.redTeamId !== 0) {
             const redTeam = await this.teamRepo.findById(match.redTeamId);
             redTeamName = redTeam.teamName;
+            redTeamTag = redTeam.teamTag;
+            redLogo = redTeam.teamLogotip;
         }
         if(match.blueTeamId !== 0){
             const blueTeam = await this.teamRepo.findById(match.blueTeamId);
             blueTeamName = blueTeam.teamName;
+            blueTeamTag = blueTeam.teamTag;
+            blueLogo = "";
         }
         
-        return {redTeamName, blueTeamName};
+        return {redTeamName, redTeamTag, redLogo, blueTeamName, blueTeamTag, blueLogo};
     }
     
     public async getAll(page?: number, limit?: number): Promise<Result<PaginatedListDto<MatchDto>>> {
@@ -65,14 +77,21 @@ export class MatchService implements IMatchService{
         return Result.Success(new PaginatedListDto(dtos, cnt, page ?? 1,limit ?? 20))
     }
 
-    public async getById(id: number): Promise<Result<MatchDto>> {
+    public async getById(id: number): Promise<Result<MatchDetailsDto>> {
         const match = await this.matchReadRepo.findById(id);
         if(match.matchId === 0)
             return Result.Failure(`Match doesn't exist`,ErrorType.NotFound);
         
         const result = await this.getTeamName(match);
 
-        return Result.Success(this.toMatchDto(match, result.redTeamName, result.blueTeamName));
+        const tournament = await this.tournamentRepo.findById(match.tournamentId);
+        const game = await this.gameRepo.findById(tournament.tournamentGameId);
+
+        return Result.Success(new MatchDetailsDto(match.matchId,match.status,match.roundNumber,match.blueTeamId,
+            result.blueTeamName, result.blueTeamTag, result.blueLogo, match.redTeamId, result.redTeamName, result.redTeamTag,
+            result.redLogo, match.winnerTeamId, match.blueTeamScore, match.redTeamScore, match.tournamentId, 
+            tournament.tournamentName, game.gameName 
+        ));
     }
 
     public async getByTournamentId(tournamentId: number): Promise<Result<MatchDto[]>>{
