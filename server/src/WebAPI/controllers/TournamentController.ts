@@ -13,10 +13,11 @@ import { ITournamentReadService } from "../../Domain/services/tournaments/ITourn
 import { handleResult } from "../mappers/ResultMapper";
 import { CreateUserWatchlistDto } from "../../Domain/DTOs/user_watchlists/CreateUserWatchlistDto";
 import { ITournamentWriteService } from "../../Domain/services/tournaments/ITournamentWriteService";
+import { IAuditService } from "../../Domain/services/audit/IAuditService";
 export class TournamentController{
     private readonly router = Router();
 
-    public constructor(private readonly tournamentReadService: ITournamentReadService, private readonly tournamentWriteService: ITournamentWriteService, private readonly watchlistService: IUserWatchlistService){
+    public constructor(private readonly tournamentReadService: ITournamentReadService, private readonly tournamentWriteService: ITournamentWriteService, private readonly watchlistService: IUserWatchlistService, private readonly auditService: IAuditService){
         this.router.get("/tournaments", this.getAll.bind(this));
         this.router.get("/tournaments/:id", this.getById.bind(this));
         this.router.post("/tournaments/watch/check", this.findWatchListItem.bind(this));
@@ -59,6 +60,14 @@ export class TournamentController{
         if(!v.valid) {res.status(400).json({ success: false, message: v.message }); return;}
 
         const result = await this.tournamentWriteService.create(new CreateTournamentDto( tournamentName, tournamentGame, tournamentFormat, tournamentMaxTeams, tournamentApplicationDeadline, tournamentPrizeFund, tournamentStatus));
+        await this.auditService.log({
+            userId: req.user?.id,
+            action: "TOURNAMENT_CREATED",
+            entity: "Team",
+            entityId: result.value!.tournamentId,
+            meta: {},
+            ipAddress: req.ip
+          });
         handleResult(result, res);    
     }
 
@@ -72,6 +81,14 @@ export class TournamentController{
         if(!v.valid) {res.status(400).json({ success: false, message: v.message }); return;}
         
         const result = await this.tournamentWriteService.update(id, req.body);
+        await this.auditService.log({
+            userId: req.user?.id,
+            action: "TOURNAMENT_UPDATED",
+            entity: "Team",
+            entityId: id,
+            meta: {},
+            ipAddress: req.ip
+          });
         handleResult(result, res);
     }
 
@@ -79,6 +96,14 @@ export class TournamentController{
         const id = parseInt(req.params.id as string, 10);
         if (isNaN(id)) { res.status(400).json({ success: false, message: "Invalid id" }); return; }
         const result = await this.tournamentWriteService.delete(id);
+        await this.auditService.log({
+            userId: req.user?.id,
+            action: "TOURNAMENT_DELETED",
+            entity: "Team",
+            entityId: id,
+            meta: {},
+            ipAddress: req.ip
+          });
         handleResult(result, res);
     }
 
