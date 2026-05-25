@@ -64,7 +64,7 @@ const authService   = new AuthService(userRepo,auditService);
 const teamService = new TeamService(teamRepo, teamMemberRepo, userRepo, logger);
 const healthService = new HealthService(gameRepo, tournamentRepo, userRepo, teamRepo, db);
 const matchService = new MatchService(matchReadRepo, matchWriteRepo, teamRepo, tournamentRepo);
-const matchPlayerService = new MatchPlayerService(matchService, matchPlayerReadRepo, matchPlayerWriteRepo, userRepo, teamRepo, teamMemberRepo);
+const matchPlayerService = new MatchPlayerService(matchReadRepo, matchPlayerReadRepo, matchPlayerWriteRepo, userRepo, teamRepo, teamMemberRepo);
 
 // Express
 const app = express();
