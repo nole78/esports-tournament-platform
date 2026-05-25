@@ -90,7 +90,7 @@ export class MatchService implements IMatchService{
         return Result.Success(new MatchDetailsDto(match.matchId,match.status,match.roundNumber,match.blueTeamId,
             result.blueTeamName, result.blueTeamTag, result.blueLogo, match.redTeamId, result.redTeamName, result.redTeamTag,
             result.redLogo, match.winnerTeamId, match.blueTeamScore, match.redTeamScore, match.tournamentId, 
-            tournament.tournamentName, game.gameName 
+            tournament.tournamentName, game.gameName, game.gamePlayers
         ));
     }
 
