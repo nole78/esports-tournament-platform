@@ -1,6 +1,6 @@
 import { IHealthService } from "../../Domain/services/health/IHealthService";
 import { IGameRepository } from "../../Domain/repositories/games/IGameRepository";
-import { ITournamentRepositoryRead } from "../../Domain/repositories/tournaments/ITournamentRepositoryRead";
+import { ITournamentReadRepository } from "../../Domain/repositories/tournaments/ITournamentReadRepository";
 import { IUserRepository } from "../../Domain/repositories/users/IUserRepository";
 import { ITeamRepository } from "../../Domain/repositories/teams/ITeamRepository";
 import { StatisticsDto } from "../../Domain/DTOs/statistics/StatisticsDto";
@@ -14,7 +14,7 @@ import { Result } from "../../Domain/common/Result";
 export class HealthService implements IHealthService {
   public constructor(
     private readonly gameRepo: IGameRepository,
-    private readonly tournamentRepoRead: ITournamentRepositoryRead,
+    private readonly tournamentReadRepo: ITournamentReadRepository,
     private readonly userRepo: IUserRepository,
     private readonly teamRepo: ITeamRepository,
     private readonly db: DbManager
@@ -30,7 +30,7 @@ export class HealthService implements IHealthService {
   // Change later when other repos are implemented
   async getStatistics(): Promise<Result<StatisticsDto>> {
     const games = await this.gameRepo.getTotal();
-    const tournaments = await this.tournamentRepoRead.findAll(); //Change later for getTotal
+    const tournaments = await this.tournamentReadRepo.findAll(); //Change later for getTotal
     const users = await this.userRepo.findAll();
     const teams = await this.teamRepo.findAll();
     const matches = 0;

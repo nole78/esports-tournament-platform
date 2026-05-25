@@ -1,10 +1,10 @@
 import { RowDataPacket } from "mysql2";
-import { ITournamentRepositoryRead } from "../../../Domain/repositories/tournaments/ITournamentRepositoryRead";
+import { ITournamentReadRepository } from "../../../Domain/repositories/tournaments/ITournamentReadRepository";
 import { ILoggerService } from "../../../Domain/services/logger/ILoggerService";
 import { DbManager } from "../../connection/DbConnectionPool";
 import { Tournament } from "../../../Domain/models/Tournament";
 
-export class TournamentRepositoryRead implements ITournamentRepositoryRead {
+export class TournamentReadRepository implements ITournamentReadRepository {
   public constructor(
     private readonly db: DbManager,
     private readonly logger: ILoggerService,

@@ -7,13 +7,13 @@ import { PaginatedListDto } from '../../Domain/DTOs/PaginatedListDto';
 import { IUserWatchlistRepository } from '../../Domain/repositories/user_watchlist/IUserWatchlistRepository';
 import { IUserWatchlistService } from '../../Domain/services/user_watchlist/IUserWatchlistService';
 import { IGameRepository } from '../../Domain/repositories/games/IGameRepository';
-import { ITournamentRepositoryRead } from '../../Domain/repositories/tournaments/ITournamentRepositoryRead';
+import { ITournamentReadRepository } from '../../Domain/repositories/tournaments/ITournamentReadRepository';
 
 export class UserWatchlistService implements IUserWatchlistService {
-    public constructor(private readonly watchlistRepo : IUserWatchlistRepository, private readonly tournamentRepoRead : ITournamentRepositoryRead, private readonly gameRepo : IGameRepository){}
+    public constructor(private readonly watchlistRepo : IUserWatchlistRepository, private readonly tournamentReadRepo : ITournamentReadRepository, private readonly gameRepo : IGameRepository){}
 
     private async toUserWatchlistDto(watchlist: UserWatchlist) : Promise<UserWatchlistDto>{
-        const tournament = await this.tournamentRepoRead.findById(watchlist.tournamentId);
+        const tournament = await this.tournamentReadRepo.findById(watchlist.tournamentId);
         const game = await this.gameRepo.findById(tournament.tournamentGameId);
         return new UserWatchlistDto(
             watchlist.userId,

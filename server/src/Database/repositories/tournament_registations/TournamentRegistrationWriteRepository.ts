@@ -1,10 +1,10 @@
 import { ResultSetHeader, RowDataPacket } from "mysql2";
-import { ITournamentRegistrationRepositoryWrite } from "../../../Domain/repositories/tournament_registrations/ITournamentRegistrationRepositoryWrite";
+import { ITournamentRegistrationWriteRepository } from "../../../Domain/repositories/tournament_registrations/ITournamentRegistrationWriteRepository";
 import { ILoggerService } from "../../../Domain/services/logger/ILoggerService";
 import { DbManager } from "../../connection/DbConnectionPool";
 import { TournamentRegistration } from '../../../Domain/models/TournamentRegistration';
 
-export class TournamentRegistrationRepositoryWrite implements ITournamentRegistrationRepositoryWrite {
+export class TournamentRegistrationRepositoryWrite implements ITournamentRegistrationWriteRepository {
   public constructor(
     private readonly db: DbManager,
     private readonly logger: ILoggerService,
