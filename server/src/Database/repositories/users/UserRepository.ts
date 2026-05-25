@@ -124,7 +124,7 @@ export class UserRepository implements IUserRepository {
     } finally { res.conn.release(); }
   }
 
-  async deactivate(id: number): Promise<boolean> {
+  async logOut(id: number): Promise<boolean> {
     const res = await this.db.getWriteConnection();
     if (!res) return false;
     try {
@@ -133,7 +133,21 @@ export class UserRepository implements IUserRepository {
       );
       return result.affectedRows > 0;
     } catch (err) {
-      this.logger.error("UserRepository", "deactivate failed", err);
+      this.logger.error("UserRepository", "log out failed", err);
+      return false;
+    } finally { res.conn.release(); }
+  }
+
+  async logIn(id: number): Promise<boolean> {
+    const res = await this.db.getWriteConnection();
+    if (!res) return false;
+    try {
+      const [result] = await res.conn.execute<ResultSetHeader>(
+        `UPDATE users SET isActive = 1 WHERE id = ?`, [id]
+      );
+      return result.affectedRows > 0;
+    } catch (err) {
+      this.logger.error("UserRepository", "log in failed", err);
       return false;
     } finally { res.conn.release(); }
   }

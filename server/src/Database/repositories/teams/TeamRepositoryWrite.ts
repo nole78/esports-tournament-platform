@@ -1,53 +1,21 @@
 import { ResultSetHeader, RowDataPacket } from "mysql2";
-import { ITeamRepository } from "../../../Domain/repositories/teams/ITeamRepository";
 import { ILoggerService } from "../../../Domain/services/logger/ILoggerService";
 import { DbManager } from "../../connection/DbConnectionPool";
-import { TeamDto } from "../../../Domain/DTOs/teams/TeamDto";
 import { CreateTeamDto } from "../../../Domain/DTOs/teams/CreateTeamDto";
 import { Team } from "../../../Domain/models/Team";
+import { ITeamRepositoryWrite } from "../../../Domain/repositories/teams/ITeamRepositoryWrite";
 
 
-export class TeamRepository implements ITeamRepository {
+export class TeamRepositoryWrite implements ITeamRepositoryWrite {
   public constructor(
     private readonly db: DbManager,
     private readonly logger: ILoggerService,
   ) {}
-  private map(r: RowDataPacket): TeamDto {
-    return new TeamDto(r.team_id, r.team_name, r.team_tag, r.team_logotip, r.team_description);
+  private map(r: RowDataPacket): Team {
+    return new Team(r.team_id, r.team_name, r.team_tag, r.team_logotip, r.team_description);
     }
 
-  async findById(id: number): Promise<TeamDto> {
-    const res = await this.db.getReadConnection();
-    if (!res) return new TeamDto();
-    try {
-      const [rows] = await res.conn.execute<RowDataPacket[]>(
-        `SELECT t.team_id, t.team_name, t.team_tag, t.team_logotip, t.team_description 
-        FROM teams t WHERE t.team_id = ?`, [id]
-      );
-
-      return rows.length > 0 ? this.map(rows[0]) : new TeamDto();
-    } catch (err) {
-      this.logger.error("TeamRepository", "findById failed", err);
-      return new TeamDto();
-    } finally { res.conn.release(); }
-  }
-
-  async findAll(page = 1, limit = 20): Promise<TeamDto[]> {
-    const res = await this.db.getReadConnection();
-    if (!res) return [];
-    const offset = (page - 1) * limit;
-    try {
-      const [rows] = await res.conn.query<RowDataPacket[]>(
-        `SELECT t.team_id, t.team_name, t.team_tag, t.team_logotip, t.team_description 
-        FROM teams t ORDER BY t.team_id
-         LIMIT ? OFFSET ?`, [limit, offset]
-      );
-      return rows.map((r) => this.map(r));
-    } catch (err) {
-      this.logger.error("TeamRepository", "findAll failed", err);
-      return [];
-    } finally { res.conn.release(); }
-  }
+  
 
   async create(dto: CreateTeamDto): Promise<Team> {
     const res = await this.db.getWriteConnection();
@@ -110,30 +78,5 @@ export class TeamRepository implements ITeamRepository {
       return false;
     } finally { res.conn.release(); }
   }
-  async findByTeamTag(TeamTag: string): Promise<TeamDto> {
-    const res = await this.db.getReadConnection();
-    if (!res) return new TeamDto;
-    try {
-      const [rows] = await res.conn.query<RowDataPacket[]>(
-        `SELECT * FROM teams WHERE team_tag = ? `, [TeamTag] 
-      );
-      return rows.length > 0 ? this.map(rows[0]) : new TeamDto;
-    } catch (err) {
-      this.logger.error("TeamRepository", "findByTeamTag failed", err);
-      return new TeamDto;
-    } finally { res.conn.release(); }
-  }
-  async getTotal(): Promise<number>{
-    const res = await this.db.getReadConnection();
-    if (!res) return 0;
-
-    try{
-      const [cnt] = await res.conn.execute<RowDataPacket[]>(`SELECT COUNT(*) as total FROM teams`);
-      return cnt[0]?.total ?? 0;
-    }
-    catch (err){
-      this.logger.error("TeamRepository", "get total failed", err);
-      return 0;
-    } finally {res.conn.release();}
-  }
+  
 }

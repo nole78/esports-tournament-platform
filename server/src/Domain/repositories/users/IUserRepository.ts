@@ -8,5 +8,6 @@ export interface IUserRepository {
   findAll(): Promise<User[]>;
   create(user: User): Promise<User>;
   update(id:number ,fields: Partial<User>): Promise<boolean>;
-  deactivate(id: number): Promise<boolean>;
+  logOut(id: number): Promise<boolean>;
+  logIn(id: number): Promise<boolean>;
 }

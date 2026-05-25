@@ -3,8 +3,10 @@ import { NodeStatus } from "../enums/NodeStatus";
 export class DbNode {
   public status: NodeStatus    = NodeStatus.UNREACHABLE;
   public lastCheck: Date       = new Date();
+  public successfulReads: number = 0;
+  public failedReads: number  = 0;
   public successfulWrites: number = 0;
-  public failedWrites: number  = 0;
+  public failedWrites: number = 0;
   public latency: number = 0;
 
   constructor(

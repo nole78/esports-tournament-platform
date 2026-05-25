@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
 import type { ITournamentAPIService } from '../../api_services/tournament_list/ITournamentAPIService';
 import { TournamentFormatValues, type TournamentFormat } from '../../types/tournament/TournamentFormat';
-import { TournamentStatusValues, type TournamentStatus } from '../../types/tournament/TournamentStatus';
+import { TournamentStatus } from '../../types/tournament/TournamentStatus';
 import type { IGameAPIService } from '../../api_services/game_catalog/IGameAPIService';
 import type { GameDto } from '../../models/game/GameDto';
 import { useNavigate } from 'react-router-dom';
-
 
 export default function TournamentAddForm({tournamentApi, gameApi} : {tournamentApi:ITournamentAPIService, gameApi:IGameAPIService}){
     const [tournamentName,setTournamentName] = useState<string>("");
@@ -14,7 +13,6 @@ export default function TournamentAddForm({tournamentApi, gameApi} : {tournament
     const [maxTeams, setMaxTeams] = useState<string>("");
     const [applicationDeadline, setApplicationDeadline] = useState<Date>(new Date());
     const [prizeFund, setPrizeFund] = useState<string>("");
-    const [status, setStatus] = useState<TournamentStatus>('upcoming');
     const [games, setGames] = useState<GameDto[]>([]);
 
     const [error, setError] = useState<string>("");
@@ -33,7 +31,6 @@ export default function TournamentAddForm({tournamentApi, gameApi} : {tournament
                     setGameName(loadedGames[0].gameName);
                 }
                 setFormat("single_elimination");
-                setStatus("upcoming");
                 setError("");
             } else {
                 setError(res.message ?? "Failed to load games");
@@ -59,7 +56,7 @@ export default function TournamentAddForm({tournamentApi, gameApi} : {tournament
         tournamentMaxTeams: maxTeamsNum, 
         tournamentApplicationDeadline: applicationDeadline, 
         tournamentPrizeFund: prizeFundNum, 
-        tournamentStatus: status
+        tournamentStatus: TournamentStatus.UPCOMING
     };
     
     const res = await tournamentApi.create(payload);
@@ -74,7 +71,6 @@ export default function TournamentAddForm({tournamentApi, gameApi} : {tournament
     setMaxTeams("");
     setApplicationDeadline(new Date());
     setPrizeFund("");
-    setStatus('upcoming');
       };
         return(
             <div className="w-full max-w-sm">
@@ -121,20 +117,6 @@ export default function TournamentAddForm({tournamentApi, gameApi} : {tournament
                                 {Object.entries(TournamentFormatValues).map(([key, value]) => (
                                     <option className='bg-lime-950' key={key} value={value}>
                                         {key.replace(/_/g, ' ')}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className="flex-1.5">
-                            <label className="block text-xs text-bgprimary mb-2 font-medium">Status</label>
-                            <select 
-                                value={status} 
-                                onChange={e => setStatus(e.target.value as TournamentStatus)}
-                                className="w-full bg-bgprimary/10 border border-secondary/50 rounded-xl px-4 py-3 text-bgsecondary text-sm focus:outline-none focus:border-white/30 transition-colors"
-                            >
-                                {Object.entries(TournamentStatusValues).map(([key, value]) => (
-                                    <option className='bg-lime-950' key={key} value={value}>
-                                        {key}
                                     </option>
                                 ))}
                             </select>

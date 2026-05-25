@@ -14,6 +14,7 @@ export class UserController {
     this.router.get("/users",          authenticate, authorize(UserRole.ADMIN), this.getAll.bind(this));
     this.router.get("/users/:id",       this.getById.bind(this));
     this.router.put("/users/:id/role", authenticate, authorize(UserRole.ADMIN), this.changeRole.bind(this));
+    this.router.get("/users/search/:username", this.getUsersSearch.bind(this));
   }
 
   private async getAll(req: Request, res: Response): Promise<void> {
@@ -33,13 +34,21 @@ export class UserController {
     if (isNaN(id)) { res.status(400).json({ success: false, message: "Invalid id" }); return; }
     
     const role = req.body.role as string;
-    if (!Object.values(UserRole).includes(role as UserRole)) {
+    const roles = ["ADMIN", "PLAYER"];
+    if (!roles.includes(role)) {
         handleResult(Result.Failure("Invalid role",ErrorType.Validation),res);
         return;
     }
     const parsedRole: UserRole = role as UserRole;
 
     const result = await this.userService.changeRole(id,parsedRole);  
+    handleResult(result, res);
+  }
+
+  private async getUsersSearch(req: Request, res: Response): Promise<void>{
+    const username = req.params.username as string ?? "";
+
+    const result = await this.userService.getForSearch(username);
     handleResult(result, res);
   }
 
