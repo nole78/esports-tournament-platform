@@ -9,7 +9,7 @@ import type { UserForMembersDto } from "../../models/user/UserForMembers";
 import { ErrorBox } from "../../components/ui/UI";
 import { useAuth } from "../../hooks/auth/useAuthHook";
 import { usersApi } from "../../api_services/users/UsersAPIService";
-import FireIcon from "../../components/HeroIcons/FireIcon";
+import FireIcon from "../../components/heroicons/FireIcon";
 import useDebounce from 'react-debounced';
 
 

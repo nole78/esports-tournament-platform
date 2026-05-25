@@ -41,7 +41,7 @@ export class TournamentRegistrationServiceWrite implements ITournamentRegistrati
         if(tournamentReg.tournamentId !== 0 && tournamentReg.teamId !== 0)
         {
             this.logger.error("TournamentRegistrationService", "create failed", `Tournament registration already exists!`);
-            return Result.Failure("Tournament registration with touranment id " + tr.tournamentId + " and team id " + tr.teamId + " already exists!", ErrorType.Conflict);
+            return Result.Failure("Team is already registered into this tournament!", ErrorType.Conflict);
         }
 
         const game = await this.gameRepo.findById(tournament.tournamentGameId);

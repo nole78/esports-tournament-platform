@@ -8,7 +8,7 @@ import { formatDeadline, daysUntilDeadline, getDeadlineStatus, getDeadlineColor 
 import type { GameDto } from "../../models/game/GameDto";
 import { gameApi } from "../../api_services/game_catalog/GameAPIService";
 import { TournamentStatus } from "../../types/tournament/TournamentStatus";
-import { TournamentFormatValues, type TournamentFormat } from "../../types/tournament/TournamentFormat";
+import { TournamentFormatValues } from "../../types/tournament/TournamentFormat";
 import type { TournamentFilterDto } from '../../models/tournament/TournamentFilterDto';
 
 export default function TournamentList(){
@@ -60,9 +60,9 @@ export default function TournamentList(){
 
     useEffect(() => {
         const filter: TournamentFilterDto = {
-            tournamentGame: gameNameFilter === "" ? undefined : gameNameFilter,
-            tournamentFormat: formatFilter === "" ? undefined : (formatFilter as TournamentFormat),
-            tournamentStatus: statusFilter === "" ? undefined : (statusFilter as TournamentStatus)
+            tournamentGame: gameNameFilter === "" ? "" : gameNameFilter,
+            tournamentFormat: formatFilter === "" ? "" : formatFilter,
+            tournamentStatus: statusFilter === "" ? "" : statusFilter
         };
         tournamentApi.getFiltered(filter, page, limit)
         .then(res => {

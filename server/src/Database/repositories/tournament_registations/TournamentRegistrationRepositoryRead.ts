@@ -34,11 +34,11 @@ export class TournamentRegistrationRepositoryRead implements ITournamentRegistra
   async findTotalByTournamentId(tournamentId: number, status:TournamentRegistrationStatus): Promise<number>{
     const res = await this.db.getReadConnection();
     if(!res) return 0;
-    const statusClause = status !== undefined ? "AND status = ?" : "";
+    const statusClause = status ? "AND status = ?" : "";
     try{
       const [cnt] = await res.conn.execute<RowDataPacket[]>(
         `SELECT COUNT(*) as total FROM tournament_registrations 
-        WHERE tournament_id = ? ${statusClause}`,[tournamentId, ...(status !== undefined ? [status] : [])]
+        WHERE tournament_id = ? ${statusClause}`,[tournamentId, ...(status ? [status] : [])]
       );
 
       return cnt[0]?.total ?? 0;
@@ -72,14 +72,14 @@ export class TournamentRegistrationRepositoryRead implements ITournamentRegistra
     if (!res) return [];
     const offset = Math.max(0, Math.floor((page - 1) * limit));
     const lim    = Math.max(1, Math.floor(limit));
-    const statusClause = status !== undefined ? "AND status = ?" : "";
+    const statusClause = status ? "AND status = ?" : "";
     console.log(statusClause);
     try {
       const [rows] = await res.conn.query<RowDataPacket[]>(
         `SELECT * 
         FROM tournament_registrations 
         WHERE tournament_id = ? ${statusClause}
-        ORDER BY team_id DESC LIMIT ? OFFSET ?`, [tournamentId, ...(status !== undefined ? [status] : []), lim, offset]
+        ORDER BY team_id DESC LIMIT ? OFFSET ?`, [tournamentId, ...(status ? [status] : []), lim, offset]
       );
       return rows.map((r) => this.map(r));
     } catch (err) {

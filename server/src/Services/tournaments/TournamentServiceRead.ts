@@ -29,7 +29,7 @@ export class TournamentServiceRead implements ITournamentServiceRead {
     for(let i:number = 0; i < gameIds.length; i++)
     {
       const game = await this.gameRepo.findById(gameIds[i]);
-      if(game != null)
+      if(game)
         games.push(game);
     }
 
@@ -56,13 +56,13 @@ export class TournamentServiceRead implements ITournamentServiceRead {
 
   async getFiltered(fields: Partial<TournamentFilterDto>, page?: number, limit?: number): Promise<Result<PaginatedListDto<TournamentDto>>> {
     
-    let game:GameDto|null = new GameDto();
-    if(fields.tournamentGame != null)
+    let game:GameDto = new GameDto();
+    if(fields.tournamentGame)
     {
       game = await this.gameRepo.findByName(fields.tournamentGame);
     }
     
-    const tournaments = await this.tournamentRepoRead.findFiltered(game?.gameId == 0 ? undefined : game?.gameId, fields?.tournamentFormat, fields?.tournamentStatus, page, limit);
+    const tournaments = await this.tournamentRepoRead.findFiltered(game?.gameId == 0 ? 0 : game?.gameId, fields?.tournamentFormat, fields?.tournamentStatus, page, limit);
 
     const gameIds = [...new Set(tournaments.map(t => t.tournamentGameId))];
     const games:GameDto[] = [];
@@ -70,7 +70,7 @@ export class TournamentServiceRead implements ITournamentServiceRead {
     for(let i:number = 0; i < gameIds.length; i++)
     {
       const game = await this.gameRepo.findById(gameIds[i]);
-      if(game != null)
+      if(game)
         games.push(game);
     }
 
@@ -88,7 +88,7 @@ export class TournamentServiceRead implements ITournamentServiceRead {
         t.tournamentStatus
       )
     );
-    const total = await this.tournamentRepoRead.findTotalFiltered(game?.gameId == 0 ? undefined : game?.gameId, fields?.tournamentFormat, fields?.tournamentStatus);
+    const total = await this.tournamentRepoRead.findTotalFiltered(game?.gameId == 0 ? 0 : game?.gameId, fields?.tournamentFormat, fields?.tournamentStatus);
     return Result.Success(new PaginatedListDto(items, total, page, limit));
   }
 

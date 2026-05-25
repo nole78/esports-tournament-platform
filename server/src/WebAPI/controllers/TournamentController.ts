@@ -32,7 +32,7 @@ export class TournamentController{
         tournamentStatus: req.query.tournamentStatus as TournamentStatus
         };
     
-        const hasFilters = Object.values(filters).some(v => v !== undefined);
+        const hasFilters = Object.values(filters).some(v => v);
     
         const result = hasFilters 
             ? await this.tournamentServiceRead.getFiltered(filters, page, limit)

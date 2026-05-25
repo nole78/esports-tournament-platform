@@ -71,7 +71,7 @@ export const teamApi: ITeamAPIService ={
         .then(r => r.data).catch(e => err(e, "Failed to delete member"))
     },
     async getMyTeams() {
-        return axios.get<ApiResponse<TeamDto>>(`${BASE}/mine/all`, {headers: authHeader()})
+        return axios.get<ApiResponse<TeamDto[]>>(`${BASE}/mine/all`, {headers: authHeader()})
         .then(r => r.data).catch(e => err(e, "Failed to get your teams"))
     },
 };

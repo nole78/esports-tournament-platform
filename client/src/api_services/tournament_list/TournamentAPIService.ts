@@ -31,9 +31,9 @@ export const tournamentApi : ITournamentAPIService = {
   async getFiltered(payload, page = 1, limit = 20)
   {
     return axios.get(`${BASE}?page=${page}&limit=${limit}
-      ${payload.tournamentGame != null ? "&tournamentGame=" + payload.tournamentGame : ""}
-      ${payload.tournamentFormat != null ? "&tournamentFormat=" + payload.tournamentFormat : ""}
-      ${payload.tournamentStatus != null ? "&tournamentStatus=" + payload.tournamentStatus : ""}`, { headers: authHeader() })
+      ${payload.tournamentGame != "" ? "&tournamentGame=" + payload.tournamentGame : ""}
+      ${payload.tournamentFormat != "" ? "&tournamentFormat=" + payload.tournamentFormat : ""}
+      ${payload.tournamentStatus != "" ? "&tournamentStatus=" + payload.tournamentStatus : ""}`, { headers: authHeader() })
       .then(r => r.data).catch(e => err(e, "Failed to load items"));
   },
   async update(id, payload) {

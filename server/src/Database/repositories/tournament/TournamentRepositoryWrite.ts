@@ -54,7 +54,7 @@ export class TournamentRepositoryWrite implements ITournamentRepositoryWrite {
     }
 
     try {
-      const entries = Object.entries(fields).filter(([, v]) => v !== undefined).map(([k,v]) => [fieldMap[k] ?? k, v]);
+      const entries = Object.entries(fields).filter(([, v]) => v).map(([k,v]) => [fieldMap[k] ?? k, v]);
       if (entries.length === 0) return false;
       const setClause = entries.map(([k]) => `${k} = ?`).join(", ");
       const values = entries.map(([, v]) => v);

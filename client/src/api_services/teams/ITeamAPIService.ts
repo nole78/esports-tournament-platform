@@ -20,5 +20,5 @@ export interface ITeamAPIService {
     userInvites():Promise<ApiResponse<IniviteDto[]>>;
     inviteRespond(teamId: number, answer : string): Promise<ApiResponse<void>>;
     leaveTeam(teamId: number, userId: number): Promise<ApiResponse<void>>;
-    getMyTeams():Promise<ApiResponse<TeamDto>>;
+    getMyTeams():Promise<ApiResponse<TeamDto[]>>;
 }

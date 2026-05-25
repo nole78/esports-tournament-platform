@@ -30,7 +30,7 @@ export class TournamentRegistrationRepositoryWrite implements ITournamentRegistr
     const res = await this.db.getWriteConnection();
     if (!res) return false;
     try {
-      const entries = Object.entries(fields).filter(([, v]) => v !== undefined);
+      const entries = Object.entries(fields).filter(([, v]) => v);
       if (entries.length === 0) return false;
       const setClause = entries.map(([k]) => `${k} = ?`).join(", ");
       const values = entries.map(([, v]) => v);

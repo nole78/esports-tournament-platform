@@ -141,7 +141,7 @@ export default function TournamentAddForm({tournamentApi, gameApi} : {tournament
                             className="w-1/2 cursor-pointer bg-bgprimary hover:bg-bgprimary/80 disabled:opacity-50 text-primary font-semibold rounded-xl py-3 text-sm transition-colors">
                             {creating ? "Creating…" : "Create"}
                         </button>
-                        <button type="button" onClick={() => navigate("/admin/tournament_list")}
+                        <button type="button" onClick={() => navigate(-1)}
                         className="py-3 bg-red-400/40  cursor-pointer border-red-500 hover:bg-red-400/30 hover:border-bgsecondary/70 text-red-500 font-semibold rounded-xl w-1/2 text-sm transition-colors">
                             Cancel
                         </button>

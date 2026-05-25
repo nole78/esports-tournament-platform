@@ -1,10 +1,9 @@
 import { useState } from 'react';
-import BurgerIcon from '../HeroIcons/BurgerIcon';
+import BurgerIcon from '../heroicons/BurgerIcon';
 import type { SidebarProps } from '../../models/SideMenu/SidebarProps';
 
 
-export function TournamentSidebar({ menuItems, activeItem, onItemSelect }: SidebarProps) {
-  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+export function SidebarMenu({ menuItems, activeItem, onItemSelect }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(true);
 
   return (
@@ -26,8 +25,6 @@ export function TournamentSidebar({ menuItems, activeItem, onItemSelect }: Sideb
           <button
             key={item.id}
             onClick={() => onItemSelect(item.id)}
-            onMouseEnter={() => setHoveredItem(item.id)}
-            onMouseLeave={() => setHoveredItem(null)}
             className={`relative group w-full h-12 rounded-xl flex items-center justify-center transition-all duration-200 text-5xl
               ${activeItem === item.id 
                 ? 'bg-linear-to-br  from-[#f7d494] to-[#d2aa60] text-[#41542b] shadow-lg shadow-blue-400/30' 
@@ -45,13 +42,6 @@ export function TournamentSidebar({ menuItems, activeItem, onItemSelect }: Sideb
                 {item.label}
               </span>
             </div>
-            
-            {/* Tooltip - Show only when collapsed and hovering */}
-            {isCollapsed && hoveredItem === item.id && (
-              <div className="absolute left-16 bg-secondary/95 text-white/90 text-xs px-3 py-1 rounded-lg whitespace-nowrap pointer-events-none z-50">
-                {item.label}
-              </div>
-            )}
           </button>
         ))}
       </div>
