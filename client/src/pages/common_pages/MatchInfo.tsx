@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "../hooks/auth/useAuthHook";
-import { MatchDetails } from "../components/matches/MatchDetails";
-import { MatchPlayersTable } from "../components/matches/MatchPlayersTable";
-import { MatchResult } from "../components/matches/MatchResult";
-import MatchLineup from "../components/matches/MatchLineup";
-import { matchApi } from "../api_services/matches/MatchAPIService";
-import { Spinner } from "../components/ui/UI";
-import UserOverview from "./user/UserOverview";
-import type { MatchDetailsDto } from "../models/match/MatchDetailsDto";
-import type { MatchPlayerDto } from "../models/match_player/AddPlayerResponseDto";
+import { useAuth } from "../../hooks/auth/useAuthHook";
+import { MatchDetails } from "../../components/matches/MatchDetails";
+import { MatchPlayersTable } from "../../components/matches/MatchPlayersTable";
+import { MatchResult } from "../../components/matches/MatchResult";
+import { matchApi } from "../../api_services/matches/MatchAPIService";
+import UserOverview from "../user/UserOverview";
+import type { MatchDetailsDto } from "../../models/match/MatchDetailsDto";
+import type { MatchPlayerDto } from "../../models/match_player/AddPlayerResponseDto";
+import { useParams } from "react-router-dom";
+import MatchLineup from '../../components/matches/MatchLineup';
+import { teamApi } from "../../api_services/teams/TeamAPIService";
+import { Spinner } from '../../components/ui/UI';
 
 type MatchState =
     | { status: "loading" }
@@ -25,7 +27,7 @@ type PlayerOverlayState =
     | { status: "open"; userId: number };
 
 export default function TestPage() {
-    const matchId = 1;
+    const matchId = Number(useParams());
     const { user } = useAuth();
     const [matchState, setMatchState] = useState<MatchState>({ status: "loading" });
     const [players, setPlayers] = useState<PlayersState>({ left: [], right: [] });
@@ -34,6 +36,48 @@ export default function TestPage() {
     const [showResult, setShowResult] = useState(false);
     const [showLineup, setShowLineup] = useState(false);
     const [selectedPlayer, setSelectedPlayer] = useState<PlayerOverlayState>({ status: "closed" });
+    const [isBlueCaptain, setIsBlueCaptain] = useState(false);
+    const [isRedCaptain, setIsRedCaptain] = useState(false);
+
+    useEffect(() => {
+        let cancelled = false;
+
+        async function checkCaptain() {
+            if (matchState.status !== "loaded" || !user) {
+                setIsBlueCaptain(false);
+                setIsRedCaptain(false);
+                return;
+            }
+
+            setIsBlueCaptain(false);
+            setIsRedCaptain(false);
+
+            try {
+                const [blueRes, redRes] = await Promise.all([
+                    teamApi.getCaptain(matchState.match.blueTeamId),
+                    teamApi.getCaptain(matchState.match.redTeamId),
+                ]);
+
+                if (cancelled) {
+                    return;
+                }
+
+                setIsBlueCaptain(Boolean(blueRes.success && blueRes.data && blueRes.data.id === user.id));
+                setIsRedCaptain(Boolean(redRes.success && redRes.data && redRes.data.id === user.id));
+            } catch {
+                if (!cancelled) {
+                    setIsBlueCaptain(false);
+                    setIsRedCaptain(false);
+                }
+            }
+        }
+
+        checkCaptain();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [matchState, user]);
 
     useEffect(() => {
         let cancelled = false;
@@ -114,6 +158,14 @@ export default function TestPage() {
         setRefreshKey((value) => value + 1);
     };
 
+    const canEditLineup = isBlueCaptain || isRedCaptain;
+    const lineupTeamId =
+        matchState.status === "loaded"
+            ? isRedCaptain
+                ? matchState.match.redTeamId
+                : matchState.match.blueTeamId
+            : 0;
+
     return (
         <div className="min-h-screen py-8">
             <div className="max-w-3xl mx-auto relative">
@@ -145,13 +197,15 @@ export default function TestPage() {
 
             <div className="mx-auto mt-8 max-w-3xl">
                 <div>
-                    <button
-                        type="button"
-                        className="cursor-pointer rounded-lg bg-white/10 px-4 py-2 font-semibold text-white transition-colors hover:bg-white/20"
-                        onClick={() => setShowLineup(true)}
-                    >
-                        Edit Lineup
-                    </button>
+                    {canEditLineup && (
+                        <button
+                            type="button"
+                            className="cursor-pointer rounded-lg bg-white/10 px-4 py-2 font-semibold text-white transition-colors hover:bg-white/20"
+                            onClick={() => setShowLineup(true)}
+                        >
+                            Edit Lineup
+                        </button>
+                    )}
                 </div>
                 {loadingPlayers ? (
                     <div className="flex justify-center py-8">
@@ -168,7 +222,7 @@ export default function TestPage() {
                 )}
             </div>
 
-            {showLineup && matchState.status === "loaded" && (
+            {showLineup && matchState.status === "loaded" && canEditLineup && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
                     <div className="w-full max-w-5xl rounded-2xl border border-white/10 bg-bgprimary/95 p-4 shadow-2xl">
                         <div className="mb-4 flex items-center justify-between">
@@ -183,7 +237,7 @@ export default function TestPage() {
                         </div>
                         <MatchLineup
                             matchId={matchState.match.matchId}
-                            teamId={matchState.match.blueTeamId}
+                            teamId={lineupTeamId}
                             playersPerTeam={matchState.match.playersPerTeam}
                             disabled={false}
                         />

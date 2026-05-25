@@ -28,7 +28,7 @@ import TeamsDetailPage from "./pages/common_pages/TeamsDetailPage";
 import TeamsInboxPage from "./pages/common_pages/TeamsInboxPage";
 import TeamsGuestPage from "./pages/common_pages/TeamsGuestPage";
 import TeamsGuestDetailsPage from "./pages/common_pages/TeamsGuestDetailsPage";
-import TestPage from "./pages/TestPage";
+import MatchInfo from "./pages/common_pages/MatchInfo";
 
 export default function App() {
   return (
@@ -36,7 +36,7 @@ export default function App() {
       <Route path="/login"    element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
     <Route element={<Layout/>}>
-      <Route path="/test" element={<TestPage/>}/>
+      <Route path="/match/:id" element={<MatchInfo/>}/>
       <Route path="/home" element={<LandingPage/>}/>
       <Route path="/game_catalog" element={<GameCatalog/>} />
       <Route path="/tournament_list" element={<TournamentList />} />
