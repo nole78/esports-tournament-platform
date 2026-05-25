@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import BurgerIcon from '../HeroIcons/BurgerIcon';
+import BurgerIcon from '../heroIcons/BurgerIcon';
 import type { SidebarProps } from '../../models/SideMenu/SidebarProps';
 
 
