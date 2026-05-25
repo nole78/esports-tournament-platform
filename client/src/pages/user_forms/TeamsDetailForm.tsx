@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+/*import { useEffect, useState } from "react";
 
 import { teamApi } from "../../api_services/teams/TeamAPIService";
 import { useNavigate } from "react-router-dom";
@@ -161,7 +161,6 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
                     <label className="block text-xs text-bgprimary mb-2 font-bold">Team Description</label>
                     <label className="block text-xs text-bgsecondary mb-2 font-bold"> {team.teamDescription} </label>
                 </div>
-                {/*List out team members + do the captainship transfer + kick out*/}
                 <label className="block text-xs text-bgprimary mb-2 font-bold">Member Description</label>
                 <div className="w-full overflow-x-auto">
                     
@@ -261,5 +260,11 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
                 </div>
             </form>
         </div>
+    );
+}*/
+
+export function TeamsDetailForm(){
+    return(
+        <></>
     );
 }
