@@ -23,8 +23,6 @@ const userNav = [
 const adminNav = [
   { to: "/admin/dashboard", label: "Admin Dashboard"},
   { to: "/game_catalog", label: "Game Catalog"},
-  { to: "/teams", label: "Teams List"},
-  { to: "/tournament_list", label: "Tournaments"},
   { to: "/admin/teams", label: "Teams List"},
   { to: "/tournament_list", label: "Tournaments"},
   { to: "/admin/watchlist", label: "My Watchlist"},

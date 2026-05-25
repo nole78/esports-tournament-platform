@@ -41,7 +41,7 @@ export class UserService implements IUserService {
   async getForSearch(username: string): Promise<Result<UserDto[]>> {
     const users = await this.userRepo.findAll();
     const retUsers = users.filter(user => user.gamerTag.includes(username))
-    return Result.Success(retUsers.map((u) => new UserDto(u.id, u.gamerTag, u.email, u.role, u.profilePicture, u.isActive)));
+    return Result.Success(retUsers.map((u) => new UserDto(u.id, u.gamerTag, u.fullName, u.email, u.role, u.profilePicture, u.isActive)));
  
   }
 }
