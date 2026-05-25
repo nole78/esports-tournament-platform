@@ -9,20 +9,24 @@ export default function TeamsInboxForm(){
     const [invites, setInvites] = useState<IniviteDto[]>([]);
     const [teamNames, setTeamNames] = useState<Record<number, string>>({});
     const [teamImages, setTeamImages] = useState<Record<number, string>>({});
+    const [inviteStatus, setInviteStatus] = useState<Record<number, "accepted" | "rejected" | null>>({});
 
-    const answer = async (teamId: number, ans: string)=>{
-        await teamApi.inviteRespond(teamId, ans).then(
-            res=>{
-            if (res.success){
-                teamApi.userInvites().then(
-            res => {
-                if (res.success){
-                    setInvites(res.data ?? []);
-                }
-            })
-            }
-        })
+    const answer = async (teamId: number, ans: string) => {
+    setInviteStatus(prev => ({
+        ...prev,
+        [teamId]: ans === "YES" ? "accepted" : "rejected"
+    }));
+
+    const res = await teamApi.inviteRespond(teamId, ans);
+
+    if (res.success) {
+        setTimeout(() => {
+            setInvites(prev =>
+                prev.filter(i => i.teamId !== teamId)
+            );
+        }, 800);
     }
+};
 
     useEffect(() => {
     const fetchData = async () => {
@@ -60,7 +64,32 @@ export default function TeamsInboxForm(){
                 <section className="grid sm:grid-cols-1 lg:grid-cols-1">
                 {invites.map(i => { 
                     return (
-                    <div key={i.teamId} className="bg-white/2 border border-white/6 p-4 relative">
+                    <div key={i.teamId} className={`bg-white/2 border border-white/6 p-4 relative rounded-2xl overflow-hidden transition-all duration-1000
+                        ${
+                            inviteStatus[i.teamId] == "accepted"
+                                ? "border-green-500"
+                                : inviteStatus[i.teamId] == "rejected"
+                                ? "border-red-500 opacity-70"
+                                : ""
+                        }
+                    `}>
+                    {inviteStatus[i.teamId] && (
+                    <div
+                        className={`absolute inset-0 z-20 flex items-center justify-center rounded-xl animate-pulse transition-all duration-1000
+                            ${
+                                inviteStatus[i.teamId] == "accepted"
+                                    ? "bg-green-400/60"
+                                    : "bg-red-400/60"
+                            }
+                        `}>
+                        <p className="text-2xl font-bold tracking-widest animate-pulse">
+                            {inviteStatus[i.teamId] == "accepted"
+                                ? <span className="text-green-500">INVITE ACCEPTED</span>
+                                : <span className="text-red-500">INVITE REJECTED</span>}
+                        </p>
+                    </div>
+                    )}
+
                         <div className="flex flex-col sm:flex-row gap-4">
                             <div className="overflow-hidden rounded-xl shrink-0 w-16 h-16">
                                 <img src={teamImages[i.teamId]} className="w-full aspect-square object-cover rounded-xl cursor-pointer transition-transform duration-300 hover:scale-110"/>
