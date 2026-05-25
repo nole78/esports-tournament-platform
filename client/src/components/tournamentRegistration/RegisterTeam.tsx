@@ -2,16 +2,22 @@ import { useEffect, useState } from "react";
 import { ErrorBox, PageHeader, Spinner } from "../ui/UI";
 import { teamApi } from "../../api_services/teams/TeamAPIService";
 import { tournamentRegistrationApi } from "../../api_services/tournament_registration/TournamentRegistrationAPIService";
+import { tournamentApi } from "../../api_services/tournament_list/TournamentAPIService";
 import { useParams } from "react-router-dom";
 import type { TeamDto } from "../../models/team/TeamDto";
+import type { TournamentDto } from "../../models/tournament/TournamentDto";
+import { TournamentStatus } from "../../types/tournament/TournamentStatus";
 
 export default function RegisterTeam() {
   const { id } = useParams();
   const [teams, setTeams] = useState<TeamDto[]>([]);
+  const [tournament, setTournament] = useState<TournamentDto | null>(null);
   const [error, setError] = useState<string>("");
+  const [success, setSuccess] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedTeamId, setSelectedTeamId] = useState<string>("");
   const [submitting, setSubmitting] = useState<boolean>(false);
+  const [unregistering, setUnregistering] = useState<boolean>(false);
   
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -22,11 +28,14 @@ export default function RegisterTeam() {
     
     setSubmitting(true);
     setError("");
+    setSuccess("");
     
     try {
       const res = await tournamentRegistrationApi.registerTournament(Number(id), { teamId: Number(selectedTeamId), tournamentId: Number(id) });
       if (res.success) {
+        setSuccess("Team successfully registered for the tournament!");
         setSelectedTeamId("");
+        setTimeout(() => setSuccess(""), 3000);
       } else {
         setError(res.message ?? "Failed to register team");
       }
@@ -34,6 +43,32 @@ export default function RegisterTeam() {
       setError("Failed to register team: " + err);
     } finally {
       setSubmitting(false);
+    }
+  }
+
+  const unregister = async () => {
+    if (!selectedTeamId) {
+      setError("Please select a team");
+      return;
+    }
+
+    setUnregistering(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      const res = await tournamentRegistrationApi.delete(Number(id), Number(selectedTeamId));
+      if (res.success) {
+        setSuccess("Team registration successfully removed!");
+        setSelectedTeamId("");
+        setTimeout(() => setSuccess(""), 3000);
+      } else {
+        setError(res.message ?? "Failed to unregister team");
+      }
+    } catch (err) {
+      setError("Failed to unregister team: " + err);
+    } finally {
+      setUnregistering(false);
     }
   }
   
@@ -48,8 +83,13 @@ export default function RegisterTeam() {
         } else {
           setError("Failed to load teams");
         }
+
+        const tournamentData = await tournamentApi.getById(Number(id));
+        if (tournamentData.success && tournamentData.data) {
+          setTournament(tournamentData.data);
+        }
       } catch (err) {
-        setError("Failed to load teams! " + err);
+        setError("Failed to load data! " + err);
       } finally {
         setLoading(false);
       }
@@ -62,6 +102,11 @@ export default function RegisterTeam() {
     <div>
       <PageHeader eyebrow="" title="Register/Remove your team" />
       {error && <ErrorBox message={error} />}
+      {success && (
+        <div className="bg-green-600/20 border border-green-500/50 rounded-lg p-4 mb-4">
+          <p className="text-green-400 font-medium">{success}</p>
+        </div>
+      )}
       {loading ? (
         <div className="max-w-2xl text-center py-12">
           <p className="text-white/60">Loading teams...</p>
@@ -129,13 +174,30 @@ export default function RegisterTeam() {
                 })()}
               </div>
             )}
+            {selectedTeamId && tournament && tournament.tournamentStatus !== TournamentStatus.ACTIVE && tournament.tournamentStatus !== TournamentStatus.COMPLETED && (
+              <>
+                <button 
+                  type="submit"
+                  disabled={submitting || !selectedTeamId}
+                  className="w-full bg-linear-to-r from-[#f7d494] to-[#d2aa60] text-[#41542b] font-medium py-2 rounded-lg hover:shadow-lg hover:shadow-blue-400/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                  {submitting ? "Registering..." : "Register team"}
+                </button>
+              
+                <button 
+                  type="button"
+                  onClick={unregister}
+                  disabled={unregistering || !selectedTeamId}
+                  className="w-full bg-red-600/80 hover:bg-red-600 text-white font-medium py-2 rounded-lg hover:shadow-lg hover:shadow-red-400/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                  {unregistering ? "Removing..." : "Remove registration"}
+                </button>
+              </>
+            )}
 
-            <button 
-              type="submit"
-              disabled={submitting || !selectedTeamId}
-              className="w-full bg-linear-to-r from-[#f7d494] to-[#d2aa60] text-[#41542b] font-medium py-2 rounded-lg hover:shadow-lg hover:shadow-blue-400/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-              {submitting ? "Registering..." : "Register team"}
-            </button>
+            {selectedTeamId && tournament && (tournament.tournamentStatus === TournamentStatus.ACTIVE || tournament.tournamentStatus === TournamentStatus.COMPLETED) && (
+              <div className="bg-red-600/20 border border-red-500/50 rounded-lg p-4 text-center">
+                <p className="text-red-400 font-medium">Can't register or remove teams if tournament already started!</p>
+              </div>
+            )}
           </form>
         </div>
       )}
