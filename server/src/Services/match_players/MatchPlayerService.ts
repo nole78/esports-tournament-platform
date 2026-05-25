@@ -24,22 +24,37 @@ export class MatchPlayerService implements IMatchPlayerService{
         private readonly teamMemberRepo: ITeamMemberRepositoryRead
     ) {}
 
-    public async getMatchPlayers(id: number): Promise<Result<MatchPlayerDto[]>> {
+    public async getMatchPlayers(id: number, teamId: number): Promise<Result<MatchPlayerDto[]>> {
         const match = await this.matchReadRepository.findById(id);
         if(match.matchId === 0)
             return Result.Failure("Match doesn't exist",ErrorType.NotFound);
 
+        const team = await this.teamRepo.findById(teamId);
+        if(team.teamId === 0)
+            return Result.Failure("Team doesn't exist", ErrorType.NotFound);
+
+        if(match.blueTeamId !== team.teamId && match.redTeamId !== team.teamId)
+            return Result.Failure("Team is not in this match", ErrorType.Conflict);
+
         const matchPlayers = await this.matchPlayerReadRepo.findByMatchId(match.matchId);
-        if(matchPlayers.length === 0)
+        const teamPlayers = matchPlayers.filter((mp) => mp.teamId === teamId);
+        if(teamPlayers.length === 0)
             return Result.Success([]);
-        // REMOVE DUPLICATES
-        const userIds = [...new Set(matchPlayers.map(mp => mp.userId))];
 
+        const userIds = [...new Set(teamPlayers.map((mp) => mp.userId))];
         const users = await this.userRepo.findByIds(userIds);
-        const userMap = new Map(users.map(u => [u.id, u.gamerTag]));
+        const userMap = new Map(users.map((u) => [u.id, u.gamerTag]));
 
-        return Result.Success(matchPlayers.map((mp) => 
-                new MatchPlayerDto(userMap.get(mp.userId) ?? "player", mp.userId, mp.teamId, mp.matchId, mp.performanceNotes),
+        return Result.Success(
+            teamPlayers.map(
+                (mp) =>
+                    new MatchPlayerDto(
+                        userMap.get(mp.userId) ?? "player",
+                        mp.userId,
+                        mp.teamId,
+                        mp.matchId,
+                        mp.performanceNotes,
+                    ),
             ),
         );
     }
