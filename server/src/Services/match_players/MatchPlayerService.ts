@@ -4,7 +4,6 @@ import { AddPlayerErrorDto } from "../../Domain/DTOs/match_players/AddPlayerErro
 import { AddPlayersDto } from "../../Domain/DTOs/match_players/AddPlayersDto";
 import { AddPlayersResponseDto } from "../../Domain/DTOs/match_players/AddPlayersResponseDto";
 import { MatchPlayerDto } from "../../Domain/DTOs/match_players/MatchPlayerDto";
-import { UserDto } from "../../Domain/DTOs/users/UserDto";
 import { MatchStatus } from "../../Domain/enums/MatchStatus";
 import { MatchPlayer } from "../../Domain/models/MatchPlayer";
 import { IMatchPlayerReadRepository } from "../../Domain/repositories/match_players/IMatchPlayerReadRepository";
@@ -13,11 +12,11 @@ import { ITeamMemberRepository } from "../../Domain/repositories/team_members/IT
 import { ITeamRepository } from "../../Domain/repositories/teams/ITeamRepository";
 import { IUserRepository } from "../../Domain/repositories/users/IUserRepository";
 import { IMatchPlayerService } from "../../Domain/services/match_players/IMatchPlayerService";
-import { IMatchService } from "../../Domain/services/matches/IMatchService";
+import { IMatchReadRepository } from "../../Domain/repositories/matches/IMatchReadRepository";
 
 export class MatchPlayerService implements IMatchPlayerService{
     constructor(
-        private readonly matchService: IMatchService,
+        private readonly matchReadRepository: IMatchReadRepository,
         private readonly matchPlayerReadRepo: IMatchPlayerReadRepository,
         private readonly matchPlayerWriteRepo: IMatchPlayerWriteRepository,
         private readonly userRepo: IUserRepository,
@@ -25,42 +24,31 @@ export class MatchPlayerService implements IMatchPlayerService{
         private readonly teamMemberRepo: ITeamMemberRepository
     ) {}
 
-    public async getAllPlayers(id: number): Promise<Result<UserDto[]>> {
-        const res = await this.matchService.getById(id);
-        if(!res.isSuccess  || !res.value)
-            return Result.Failure(res.errorMessage ?? "Match not found",res.errorType ?? ErrorType.NotFound);
-        const match = res.value;
+    public async getMatchPlayers(id: number): Promise<Result<MatchPlayerDto[]>> {
+        const match = await this.matchReadRepository.findById(id);
+        if(match.matchId === 0)
+            return Result.Failure("Match doesn't exist",ErrorType.NotFound);
 
         const matchPlayers = await this.matchPlayerReadRepo.findByMatchId(match.matchId);
         if(matchPlayers.length === 0)
-            return Result.Success<UserDto[]>([]);
-
+            return Result.Success([]);
         // REMOVE DUPLICATES
         const userIds = [...new Set(matchPlayers.map(mp => mp.userId))];
 
         const users = await this.userRepo.findByIds(userIds);
-        return Result.Success(users.map(u => new UserDto(u.id)))
-    }
+        const userMap = new Map(users.map(u => [u.id, u.gamerTag]));
 
-    public async getMatchPlayers(id: number): Promise<Result<MatchPlayerDto[]>> {
-        const res = await this.matchService.getById(id);
-        if (!res.isSuccess || !res.value)
-            return Result.Failure(res.errorMessage ?? "Match not found", res.errorType ?? ErrorType.NotFound);
-
-        const matchPlayers = await this.matchPlayerReadRepo.findByMatchId(res.value.matchId);
-        return Result.Success(
-            matchPlayers.map(
-                (mp) => new MatchPlayerDto(mp.userId, mp.teamId, mp.matchId, mp.performanceNotes),
+        return Result.Success(matchPlayers.map((mp) => 
+                new MatchPlayerDto(userMap.get(mp.userId) ?? "player", mp.userId, mp.teamId, mp.matchId, mp.performanceNotes),
             ),
         );
     }
 
     
     public async setPerformanceNotes(id: number, userId: number, notes: string) : Promise<Result<void>>{
-        const res = await this.matchService.getById(id);
-        if(!res.isSuccess  || !res.value)
-            return Result.Failure(res.errorMessage ?? "Match not found",res.errorType ?? ErrorType.NotFound);
-        const match = res.value;
+        const match = await this.matchReadRepository.findById(id);
+        if(match.matchId === 0)
+            return Result.Failure("Match doesn't exist",ErrorType.NotFound);
 
         if(match.status === MatchStatus.SCHEDULED)
             return Result.Failure("Match hasn't started, can't add performance notes now", ErrorType.Conflict);
@@ -79,10 +67,9 @@ export class MatchPlayerService implements IMatchPlayerService{
 
 
     public async addPlayersToMatch(id: number, dto: AddPlayersDto) :Promise<Result<AddPlayersResponseDto>> {
-        const res = await this.matchService.getById(id);
-        if(!res.isSuccess  || !res.value)
-            return Result.Failure(res.errorMessage ?? "Match not found",res.errorType ?? ErrorType.NotFound);
-        const match = res.value;
+        const match = await this.matchReadRepository.findById(id);
+        if(match.matchId === 0)
+            return Result.Failure("Match doesn't exist",ErrorType.NotFound);
 
         if(match.status === MatchStatus.COMPLETED)
             return Result.Failure("Match is completed, can't add players now", ErrorType.Conflict);
@@ -103,11 +90,13 @@ export class MatchPlayerService implements IMatchPlayerService{
         const uniquePlayerIds = [...new Set(dto.userIds)];
         const memberIds = new Set(members.map(m => m.userId));
         const playerIdsInMatch = new Set(players.map(p => p.userId));
+        const users = await this.userRepo.findByIds(uniquePlayerIds);
+        const usersMap = new Map(users.map(u => [u.id, u.gamerTag]));
         
         for(const playerId of uniquePlayerIds)
         {
-            const user = await this.userRepo.findById(playerId);
-            if(user.id === 0){
+            const user = usersMap.get(playerId);
+            if(!user){
                 failedPlayers.push(new AddPlayerErrorDto(playerId,"Player doesn't exist"));
                 continue;
             }
@@ -131,7 +120,7 @@ export class MatchPlayerService implements IMatchPlayerService{
             if(!result)
                 failedPlayers.push(new AddPlayerErrorDto(playerId, "Failed to add player to match"));
             else
-                addedPlayers.push(new MatchPlayerDto(result.userId, result.teamId, result. matchId, result.performanceNotes));
+                addedPlayers.push(new MatchPlayerDto(usersMap.get(playerId) ?? "Player", result.userId, result.teamId, result. matchId, result.performanceNotes));
         }
 
         if(addedPlayers.length === 0)
@@ -141,10 +130,9 @@ export class MatchPlayerService implements IMatchPlayerService{
     }
 
     public async removePlayerFromMatch(id: number, userId: number) : Promise<Result<void>> {
-        const res = await this.matchService.getById(id);
-        if(!res.isSuccess  || !res.value)
-            return Result.Failure(res.errorMessage ?? "Match not found",res.errorType ?? ErrorType.NotFound);
-        const match = res.value;
+        const match = await this.matchReadRepository.findById(id);
+        if(match.matchId === 0)
+            return Result.Failure("Match doesn't exist",ErrorType.NotFound);
 
         if(match.status === MatchStatus.COMPLETED)
             return Result.Failure("Match is completed, can't remove players now", ErrorType.Conflict);
