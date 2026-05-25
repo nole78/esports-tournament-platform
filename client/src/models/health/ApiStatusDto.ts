@@ -4,6 +4,6 @@ export type ApiStatusDto = {
     name: string;
     url: string;
     status: ApiStatus;
-    lastCheck: string | null;
+    lastCheck: string;
     latency: number
 }
