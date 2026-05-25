@@ -18,6 +18,7 @@ export default function TeamsPage(){
     const location = useLocation();
     const [added, setAdded] = useState<boolean>(location.state?.added ?? false);
     const [edited, setEdited] = useState<boolean>(location.state?.edited ?? false);
+     const [left, setLeft] = useState<boolean>(location.state?.left ?? false);
     const [page, setPage] = useState(1);
     const limit = 20;
     const navigate = useNavigate();
@@ -34,7 +35,12 @@ export default function TeamsPage(){
     },[added]);
 
     useEffect(()=>{
-        if (location.state?.edited || location.state?.added){
+        if(!left) return;
+        setTimeout(()=> {setLeft(false)}, 3000);
+    },[left]);
+
+    useEffect(()=>{
+        if (location.state?.edited || location.state?.added || location.state?.left){
             navigate(location.pathname, {replace: true, state: {}})
         }
     }, [location.state, location.pathname, navigate]);
@@ -63,14 +69,17 @@ export default function TeamsPage(){
                 <button onClick={() => user?.role == "admin" ? navigate(`/admin/teams/add`) : navigate(`/teams/add`)}
                         className="mb-2 w-1/6 bg-bgsecondary/40 border-2 border-bgsecondary hover:bg-bgsecondary/30 text-bgsecondary font-semibold rounded-xl py-3 text-sm transition-colors">
                 Add Team</button>
-                <button onClick={() => user?.role == "admin" ? navigate(`/admin/teams/inbox`) : navigate(`/teams/inbox`)}
-                        className="mb-2 w-1/6 bg-bgsecondary/40 border-2 border-bgsecondary hover:bg-bgsecondary/30 text-bgsecondary font-semibold rounded-xl py-3 text-sm transition-colors">
-                Inbox</button>
+                
                 {error && <ErrorBox message={error}/>}
 
                 {deleted && (
                 <div className="mb-5 bg-green-500/10 border border-green-500/20 text-green-300 text-sm px-4 py-3 rounded-xl">
                     Succesfully deleted team
+                </div>)}
+
+                {left && (
+                <div className="mb-5 bg-green-500/10 border border-green-500/20 text-green-300 text-sm px-4 py-3 rounded-xl">
+                    Succesfully left team
                 </div>)}
 
                 {edited && (
@@ -136,6 +145,7 @@ export default function TeamsPage(){
                     }
                 </section>
                 )}
+                
                 <Pagination page={page} total={limit} pageSize={limit} onChange={setPage} />
             </div>
     );

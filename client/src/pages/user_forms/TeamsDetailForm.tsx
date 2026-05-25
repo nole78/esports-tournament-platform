@@ -11,6 +11,9 @@ import { useAuth } from "../../hooks/auth/useAuthHook";
 import { usersApi } from "../../api_services/users/UsersAPIService";
 import FireIcon from "../../components/heroicons/FireIcon";
 import useDebounce from 'react-debounced';
+import { UserRole } from "../../../../server/src/Domain/enums/UserRole";
+import type { IniviteDto } from "../../models/invite/InviteDto";
+import type { UserDto } from "../../models/user/UserTypes";
 
 
 
@@ -20,9 +23,13 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
     const emptyTeam : TeamDto = {teamId:0 ,teamName:"", teamLogotip:"", teamDescription:"", teamTag:"", userRole: "member"};
     const [team, setTeam] = useState<TeamDto>(emptyTeam);
     const [members, setMember] = useState<UserForMembersDto[]>([]);
+    const [captain, setCaptain] = useState<UserDto>();
     const [userSearch, setUserSearch] = useState<UserForMembersDto[]>([]);
+    const [invitedMembers, setInvitedMembers] = useState<IniviteDto[]>([]);
     const [error, setError] = useState<string>("");
+    const [kicked, setKicked] = useState<boolean>(false);
     const [transfer, setTransfer] = useState<boolean>(false);
+    const [invite, setInvite] = useState<boolean>(false);
     const { user } = useAuth();
     const [search, setSearch] = useState<string>("");
     const navigate = useNavigate();
@@ -50,6 +57,13 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
                     .then(res =>{
                         setMember(res.data ?? []);
                     }).catch(()=> setError("Failed to load team members"))
+
+                    teamApi.getInvitesByTeamId(Number(id))
+                    .then(
+                        res => {
+                            setInvitedMembers(res.data ?? []);
+                        }
+                    ).catch(()=> setError("Failed to load invites"))
                     return;
                 }else setError(res.message);
             }
@@ -61,8 +75,8 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
         await teamApi.inviteMember(team.teamId, username).then(
             res => {
                 if (res.success){
-                    setTransfer(true);
-                    setTimeout(() => {setTransfer(false)}, 3000);
+                    setInvite(true);
+                    setTimeout(() => {setInvite(false)}, 3000);
                     teamApi.getById(Number(id))
                     .then(res => {
                         const teamHelp : TeamDto = {
@@ -79,6 +93,14 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
                     .then(res =>{
                         setMember(res.data ?? []);
                     }).catch(()=> setError("Failed to load team members"))
+
+                    
+                   teamApi.getInvitesByTeamId(Number(id))
+                    .then(
+                        res => {
+                            setInvitedMembers(res.data ?? []);
+                        }
+                    ).catch(()=> setError("Failed to load invites"))
 
                     setSearch("");
                     return;
@@ -100,6 +122,14 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
                 }
             }
         ).catch(() => setError("Failed to delete member"));
+        if (user?.id === userId){
+            if(user?.role == UserRole.ADMIN)
+                        navigate("/admin/teams", {state: {left : true} });
+                    else
+                        navigate("/teams", {state: {left : true} });
+        }else{
+            setTimeout(()=> {setKicked(false)}, 3000);
+        }
     }
 
     useEffect(() =>{
@@ -114,6 +144,13 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
                 userRole:res.data?.userRole as TeamRole};
                 setTeam(teamHelp);
         }).catch(() => setError("Failed to load the team"))
+
+        teamApi.getInvitesByTeamId(Number(id))
+                    .then(
+                        res => {
+                            setInvitedMembers(res.data ?? []);
+                        }
+                    ).catch(()=> setError("Failed to load invites"))
     }, [id])
 
     useEffect(()=>{
@@ -121,6 +158,12 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
         .then(res =>{
             setMember(res.data ?? []);
         }).catch(()=> setError("Failed to load team members"))
+        teamApi.getCaptain(Number(id))
+        .then(res =>{
+                if (res.success){
+                    setCaptain(res.data);
+                }
+        }).catch(()=> setError("Failed to load team captain"))
     }, [id])
     
     useEffect(()=>{
@@ -134,6 +177,14 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
 
     return(
         <div className='w-full max-w-sm'>
+            {kicked && (
+                <div className="mb-5 bg-green-500/10 border border-green-500/20 text-green-300 text-sm px-4 py-3 rounded-xl">
+                    Succesfully kicked out member
+                </div>)}
+            {invite && (
+                <div className="mb-5 bg-green-500/10 border border-green-500/20 text-green-300 text-sm px-4 py-3 rounded-xl">
+                    Succesfully invited member
+                </div>)}
             {error && <ErrorBox message={error}/>}
             {transfer && (
                 <div className="mb-5 bg-green-500/10 border border-green-500/20 text-green-300 text-sm px-4 py-3 rounded-xl">
@@ -186,9 +237,9 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
                         <tbody>
                             {members.map(m => (
                             <tr key={m.id} className="border-b border-gray-400/30">
-                                { team.userRole === TeamRole.CAPTAIN && user?.id === m.id as number && <td className="flex flex-row items-center gap-1 py-3 pr-4 font-normal text-left">{m.gamerTag} <FireIcon/> </td>}
-                                { team.userRole === TeamRole.MEMBER && user?.id === m.id as number && <td className="flex flex-row items-center gap-1 py-3 pr-4 font-normal text-left">{m.gamerTag} </td>}
-                                {  user?.id !== m.id && <td className="py-3 pr-4 font-normal text-left">{m.gamerTag}  </td>}
+                                { <td className="flex flex-row items-center gap-1 py-3 pr-4 font-normal text-left">{m.gamerTag} {captain?.id === m.id && <FireIcon/>} </td>}
+                                {/* { team.userRole === TeamRole.MEMBER && user?.id === m.id as number && <td className="flex flex-row items-center gap-1 py-3 pr-4 font-normal text-left">{m.gamerTag} </td>} */}
+                                {/* {  user?.id !== m.id && <td className="py-3 pr-4 font-normal text-left">{m.gamerTag}  </td>} */}
                                 <td className="py-3 pr-4 font-normal text-left">{m.id} </td>
 
                                 { team.userRole === TeamRole.CAPTAIN && user?.id !== m.id as number &&(
@@ -228,8 +279,11 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
                     <input type="text" className=" font-bold" placeholder="Search by username" onChange={(e)=>(setSearch(e.target.value))}></input>
                     {search && userSearch.length > 0 && (
                         <div className="gap-1">
-                            {userSearch.map(u => ( 
-                                u.id !== user?.id && !members.some(m => m.id === u.id) &&
+                            {userSearch.filter(u => u.id !== user?.id &&
+                             !members.some(m => m.id === u.id) && 
+                             !invitedMembers.some(i => i.userId === u.id)
+                                ).map( u => (
+                               
                                 <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-400/10 border border-gray-400/20 hover:bg-gray-400/20 transition-colors">
                                     <span className="text-xs text-bgsecondary font-normal">{u.gamerTag}</span>
                                     <button
@@ -239,11 +293,13 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
                                         Invite
                                     </button>
                                 </div>
-                                 
-                            ))}
+                                ))
+                            
+                            
+                        }
                         </div>
                     )}
-                    {}
+                    
                 </div>  
                 }
                 {search && userSearch.length === 0 &&(

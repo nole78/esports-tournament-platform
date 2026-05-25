@@ -1,29 +1,22 @@
 import { useEffect, useState } from "react";
-
 import { teamApi } from "../../api_services/teams/TeamAPIService";
 import { useNavigate } from "react-router-dom";
-
 import { Empty, ErrorBox } from "../../components/ui/UI";
 import type { TeamDtoGuest } from "../../models/team/TeamDtoGuest";
 import type { UserForMembersDto } from "../../models/user/UserForMembers";
-// import type { UserForMembersDto } from "../../models/user/UserForMembers";
-// import { useAuth } from "../../hooks/auth/useAuthHook";
-// import { usersApi } from "../../api_services/users/UsersAPIService";
-// import FireIcon from "../../components/HeroIcons/FireIcon";
-// import useDebounce from 'react-debounced';
+import type { UserDto } from "../../models/user/UserTypes";
+import FireIcon from "../../components/heroicons/FireIcon";
+
 
 
 
 
 export const TeamsGuestDetailsForm: React.FC<{id: string}> = ({id}) =>{
-    
+    const [captain, setCaptain] = useState<UserDto>();
     const emptyTeam : TeamDtoGuest = {teamId:0 ,teamName:"", teamLogotip:"", teamDescription:"", teamTag:""};
     const [team, setTeam] = useState<TeamDtoGuest>(emptyTeam);
-     const [members, setMember] = useState<UserForMembersDto[]>([]);
-    // const [userSearch, setUserSearch] = useState<UserForMembersDto[]>([]);
+    const [members, setMember] = useState<UserForMembersDto[]>([]);
     const [error, setError] = useState<string>("");
-    // const { user } = useAuth();
-    // const [search, setSearch] = useState<string>("");
     const navigate = useNavigate();
 
 
@@ -43,6 +36,14 @@ export const TeamsGuestDetailsForm: React.FC<{id: string}> = ({id}) =>{
                     .then(res =>{
                         setMember(res.data ?? []);
                     }).catch(()=> setError("Failed to load team members"))
+       
+        teamApi.getCaptain(Number(id))
+        .then(res =>{
+                if (res.success){
+                    setCaptain(res.data);
+                }
+        }).catch(()=> setError("Failed to load team captain"))
+               
         return;
     }, [id])
 
@@ -74,7 +75,7 @@ export const TeamsGuestDetailsForm: React.FC<{id: string}> = ({id}) =>{
                     <label className="block text-xs text-bgprimary mb-2 font-bold">Team Description</label>
                     <label className="block text-xs text-bgsecondary mb-2 font-bold"> {team.teamDescription} </label>
                 </div>
-                {/*List out team members + do the captainship transfer + kick out*/}
+
                 <label className="block text-xs text-bgprimary mb-2 font-bold">Member Description</label>
                 <div className="w-full overflow-x-auto">
                     
@@ -89,7 +90,7 @@ export const TeamsGuestDetailsForm: React.FC<{id: string}> = ({id}) =>{
                             {members.map(m => (
                             <tr key={m.id} className="border-b border-gray-400/30">
                                 
-                                <td className="flex flex-row items-center gap-1 py-3 pr-4 font-normal text-left">{m.gamerTag} </td>
+                                <td className="flex flex-row items-center gap-1 py-3 pr-4 font-normal text-left">{m.gamerTag} {captain?.id === m.id && <FireIcon/>} </td>
                             
                                 <td className="py-3 pr-4 font-normal text-left">{m.id} </td>
 

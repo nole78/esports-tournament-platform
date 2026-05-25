@@ -2,8 +2,10 @@ import type { IniviteDto } from "../../models/invite/InviteDto";
 import type { TeamDto } from "../../models/team/TeamDto";
 import type { TeamDtoGuest } from "../../models/team/TeamDtoGuest";
 import type { UserForMembersDto } from "../../models/user/UserForMembers";
+import type { UserDto } from "../../models/user/UserTypes";
 
 //import { ApiResponse } from '../tournament_list/ITournamentAPIService';
+
 
 
 
@@ -24,4 +26,6 @@ export interface ITeamAPIService {
     leaveTeam(teamId: number, userId: number): Promise<ApiResponse<void>>;
     getMyTeams():Promise<ApiResponse<TeamDto>>;
     getTeamGuest(teamId: number): Promise<ApiResponse<TeamDtoGuest>>;
-}
+    getInvitesByTeamId(teamId: number) : Promise<ApiResponse<IniviteDto[]>>;
+    getCaptain(teamId: number) : Promise<ApiResponse<UserDto>>
+} 

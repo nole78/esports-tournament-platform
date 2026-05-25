@@ -19,7 +19,7 @@ export class InvitesRepositoryRead implements IInvitesRepositoryRead{
 
         try{
             const [rows] = await res.conn.execute<RowDataPacket[]>(
-                `SELECT * FROM team_invites WHERE teamId = ?`, [teamId]
+                `SELECT * FROM team_invites WHERE team_id = ?`, [teamId]
             );
             return rows.map((r) => this.map(r));
         } catch (err){

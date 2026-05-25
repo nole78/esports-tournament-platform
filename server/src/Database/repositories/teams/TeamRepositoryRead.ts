@@ -73,4 +73,19 @@ export class TeamRepositoryRead implements ITeamRepositoryRead {
       return 0;
     } finally {res.conn.release();}
   }
+  async findByIds(ids: number[]): Promise<Team[]> {
+    const res = await this.db.getReadConnection();
+     if (!res) return [];
+     try {
+      const setClause = ids.map(() => "?").join(",");
+
+      const [rows] = await res.conn.execute<RowDataPacket[]>(
+        `SELECT * FROM teams WHERE team_id IN (${setClause})`, ids);
+      return rows.map(r => this.map(r));
+    } catch (err) {
+      this.logger.error("TeamRepositoryRead", "findByIds failed", err);
+      return [];
+    } finally { res.conn.release(); }
+  }
+  
 }
