@@ -6,16 +6,16 @@ import { TournamentRegistrationStatus } from "../../Domain/enums/TournamentRegis
 import { Team } from "../../Domain/models/Team";
 import { Tournament } from "../../Domain/models/Tournament";
 import { ITeamRepositoryRead } from "../../Domain/repositories/teams/ITeamRepositoryRead";
-import { ITournamentRegistrationRepositoryRead } from "../../Domain/repositories/tournament_registrations/ITournamentRegistrationRepositoryRead";
-import { ITournamentRepositoryRead } from "../../Domain/repositories/tournaments/ITournamentRepositoryRead";
+import { ITournamentRegistrationReadRepository } from "../../Domain/repositories/tournament_registrations/ITournamentRegistrationReadRepository";
+import { ITournamentReadRepository } from "../../Domain/repositories/tournaments/ITournamentReadRepository";
 import { ILoggerService } from "../../Domain/services/logger/ILoggerService";
 import { ITournamentRegistrationReadService } from "../../Domain/services/tournamentRegistration/ITournamentRegistrationReadService";
 
 export class TournamentRegistrationReadService implements ITournamentRegistrationReadService{
     public constructor(
-        private readonly tournamentRegistrationRepoRead: ITournamentRegistrationRepositoryRead,
+        private readonly tournamentRegistrationReadRepo: ITournamentRegistrationReadRepository,
         private readonly teamRepoRead: ITeamRepositoryRead,
-        private readonly tournamentRepoRead : ITournamentRepositoryRead,
+        private readonly tournamentReadRepo : ITournamentReadRepository,
         private readonly logger: ILoggerService,
     ){}
 

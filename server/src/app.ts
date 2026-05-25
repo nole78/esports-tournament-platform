@@ -68,14 +68,15 @@ const teamRepoRead = new TeamRepositoryRead(db, logger);
 const teamRepoWrite = new TeamRepositoryWrite(db, logger);
 const teamMemberRepoRead = new TeamMemberRepositoryRead(db, logger);
 const teamMemberRepoWrite = new TeamMemberRepositoryWrite(db, logger);
-const tournamentRegistrationRepoRead = new TournamentRegistrationRepositoryRead(db, logger);
-const TournamentRegistrationRepoWrite = new TournamentRegistrationRepositoryWrite(db, logger);
+const tournamentRegistrationReadRepo = new TournamentRegistrationReadRepository(db, logger);
+const tournamentRegistrationWriteRepo = new TournamentRegistrationRepositoryWrite(db, logger);
 const inviteRepoRead = new InvitesRepositoryRead(db, logger);
 const inviteRepoWrite = new InvitesRepositoryWrite(db, logger);
 const matchReadRepo = new MatchReadRepository(db, logger);
 const matchWriteRepo = new MatchWriteRepository(db, logger);
 const matchPlayerReadRepo = new MatchPlayerReadRepository(db, logger);
 const matchPlayerWriteRepo = new MatchPlayerWriteRepository(db, logger);
+const userWatchlistRepo = new UserWatchlistRepository(db, logger);
 
 // Services
 const userService   = new UserService(userRepo);
@@ -89,8 +90,8 @@ const teamMemberService = new TeamMemberService(teamRepoRead, teamMemberRepoWrit
 const healthService = new HealthService(gameRepo, tournamentReadRepo, userRepo, teamRepoRead, db);
 const watchlistService = new UserWatchlistService(userWatchlistRepo, tournamentReadRepo, gameRepo);
 const tournamentRegistrationReadService = new TournamentRegistrationReadService(tournamentRegistrationReadRepo, teamRepoRead, tournamentReadRepo, logger);
-const tournamentRegistrationWriteService = new TournamentRegistrationWriteService(TournamentRegistrationWriteRepo, tournamentRegistrationReadRepo, teamRepoRead, teamMemberRepoRead, tournamentReadRepo, gameRepo, logger);
-const matchService = new MatchService(matchReadRepo, matchWriteRepo, teamRepoRead, tournamentRepoRead, gameRepo);
+const tournamentRegistrationWriteService = new TournamentRegistrationWriteService(tournamentRegistrationWriteRepo, tournamentRegistrationReadRepo, teamRepoRead, teamMemberRepoRead, tournamentReadRepo, gameRepo, logger);
+const matchService = new MatchService(matchReadRepo, matchWriteRepo, teamRepoRead, tournamentReadRepo, gameRepo);
 const matchPlayerService = new MatchPlayerService(matchReadRepo, matchPlayerReadRepo, matchPlayerWriteRepo, userRepo, teamRepoRead, teamMemberRepoRead);
 
 // Express

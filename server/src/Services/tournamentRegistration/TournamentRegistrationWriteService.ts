@@ -9,18 +9,18 @@ import { Result } from '../../Domain/common/Result';
 import { ErrorType } from "../../Domain/common/ErrorType";
 import { IGameRepository } from "../../Domain/repositories/games/IGameRepository";
 import { TeamMemberDto } from "../../Domain/DTOs/team_members/TeamMemberDto";
-import { ITournamentRegistrationRepositoryRead } from '../../Domain/repositories/tournament_registrations/ITournamentRegistrationRepositoryRead';
-import { ITournamentRepositoryRead } from "../../Domain/repositories/tournaments/ITournamentRepositoryRead";
-import { ITeamRepositoryRead } from "../../Domain/repositories/teams/ITeamRepositoryRead";
 import { ITeamMemberRepositoryRead } from "../../Domain/repositories/team_members/ITeamMemberRepositoryRead";
+import { ITournamentReadRepository } from "../../Domain/repositories/tournaments/ITournamentReadRepository";
+import { ITournamentRegistrationReadRepository } from '../../Domain/repositories/tournament_registrations/ITournamentRegistrationReadRepository';
+import { ITeamRepositoryRead } from "../../Domain/repositories/teams/ITeamRepositoryRead";
 
 export class TournamentRegistrationWriteService implements ITournamentRegistrationWriteService{
     public constructor(
-        private readonly tournamentRegistrationRepoWrite: ITournamentRegistrationRepositoryWrite,
-        private readonly tournamentRegistrationRepoRead: ITournamentRegistrationRepositoryRead,
+        private readonly tournamentRegistrationWriteRepo: ITournamentRegistrationWriteRepository,
+        private readonly tournamentRegistrationReadRepo: ITournamentRegistrationReadRepository,
         private readonly teamRepoRead: ITeamRepositoryRead,
         private readonly teamMemberRepoRead: ITeamMemberRepositoryRead,
-        private readonly tournamentRepoRead : ITournamentRepositoryRead,
+        private readonly tournamentReadRepo : ITournamentReadRepository,
         private readonly gameRepo: IGameRepository,
         private readonly logger: ILoggerService,
     ){}

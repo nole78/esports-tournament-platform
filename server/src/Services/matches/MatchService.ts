@@ -12,7 +12,7 @@ import { IMatchWriteRepository } from "../../Domain/repositories/matches/IMatchW
 import { MatchDetailsDto } from "../../Domain/DTOs/matches/MatchDetailsDto";
 import { IGameRepository } from "../../Domain/repositories/games/IGameRepository";
 import { ITeamRepositoryRead } from "../../Domain/repositories/teams/ITeamRepositoryRead";
-import { ITournamentRepositoryRead } from "../../Domain/repositories/tournaments/ITournamentRepositoryRead";
+import { ITournamentReadRepository } from "../../Domain/repositories/tournaments/ITournamentReadRepository";
 
 // TODO: fix N+1 problem for geting team names
 export class MatchService implements IMatchService{
@@ -20,7 +20,7 @@ export class MatchService implements IMatchService{
         private readonly matchReadRepo: IMatchReadRepository,
         private readonly matchWriteRepo: IMatchWriteRepository,
         private readonly teamRepo: ITeamRepositoryRead,
-        private readonly tournamentRepo: ITournamentRepositoryRead,
+        private readonly tournamentRepo: ITournamentReadRepository,
         private readonly gameRepo: IGameRepository
     ){}
 

@@ -217,7 +217,7 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
                             <th className=" pb-2 pr-4">ID</th>
                             { team.userRole === "captain" && (
                             <>
-                               
+                               {captain}
                             </>
                             )
                             }
@@ -269,7 +269,7 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
                     </table>
                 
                 
-                {team.userRole === "captain" && <div>
+                { team.userRole === "captain" && <div>
                     <label className="block text-xs text-bgprimary mb-2 font-bold">Invite member</label>
                     <input type="text" className=" font-bold" placeholder="Search by username" onChange={(e)=>(setSearch(e.target.value))}></input>
                     {search && userSearch.length > 0 && (
@@ -296,7 +296,7 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
                     )}
                     
                 </div>  
-                )}
+                }
                 {search && userSearch.length === 0 &&(
                     <p className="mt-2 text-xs text-gray-400">No users found</p>
                 )}
