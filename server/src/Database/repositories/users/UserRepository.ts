@@ -94,7 +94,7 @@ export class UserRepository implements IUserRepository {
 
     try {
       const entries = Object.entries(fields)
-                .filter(([, v]) => v !== "")
+                .filter(([, v]) => v)
                 .map(([k,v]) => [fieldMap[k] ?? k, v]);  
 
       if (entries.length === 0) return false;
