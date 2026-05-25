@@ -1,12 +1,12 @@
 import { useState } from "react";
-import UserGroupIcon from "../../components/HeroIcons/UserGroupIcon";
+import UserGroupIcon from "../../components/heroIcons/UserGroupIcon";
 import { SidebarMenu } from "../../components/SideBar/SidebarMenu";
 import type { SideMenuItem } from "../../models/SideMenu/SideMenuItem";
 import AuditLogPage from "./AuditLog";
 import HealthPage from "./HealthPage";
 import UsersPage from "./UsersPage";
-import BulletListIcon from "../../components/HeroIcons/BulletListIcon";
-import ShieldCheckIcon from "../../components/HeroIcons/ShieldCheckIcon";
+import BulletListIcon from "../../components/heroIcons/BulletListIcon";
+import ShieldCheckIcon from "../../components/heroIcons/ShieldCheckIcon";
 
 export default function AdminDashboard() {
   const [activeItem, setActiveItem] = useState<string>('users');

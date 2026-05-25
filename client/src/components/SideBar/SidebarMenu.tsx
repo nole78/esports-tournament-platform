@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { SidebarProps } from '../../models/SideMenu/SidebarProps';
-import BurgerIcon from '../HeroIcons/BurgerIcon';
+import BurgerIcon from '../heroIcons/BurgerIcon';
 
 
 export function SidebarMenu({ menuItems, activeItem, onItemSelect }: SidebarProps) {
