@@ -27,7 +27,7 @@ export class MatchController {
         const tournamentId = parseInt(req.params.tournamentId as string, 10);
         if(isNaN(tournamentId)) {res.status(400).json({ success: false, message: "Invalid tournament id"}); return;}
 
-        const result = await this.matchService.getByTournamentId(2);
+        const result = await this.matchService.getByTournamentId(tournamentId);
         handleResult(result, res);
     }
 
@@ -35,7 +35,7 @@ export class MatchController {
         const id = parseInt(req.params.id as string, 10)
         if(isNaN(id)) {res.status(400).json({ success: false, message: "Invalid id"}); return; }
 
-        const result = await this.matchService.getById(1);
+        const result = await this.matchService.getById(id);
         handleResult(result, res);
     }
 
