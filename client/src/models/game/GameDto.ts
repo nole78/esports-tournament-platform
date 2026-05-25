@@ -1,7 +1,7 @@
 export type GameDto = {
     gameId: number,
     gameName: string,
-    gameLogotip: string, // Change to actually be logo
+    gameLogotip: string, 
     gameGenre: string,
     gamePlayers: number
 }

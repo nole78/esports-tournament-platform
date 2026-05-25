@@ -1,6 +1,6 @@
 import { ValidationResult } from '../../../Domain/types/ValidationResult';
 
-export const validateGameCreation = (n: string, g:String, p:number) : ValidationResult => {
+export const validateGameCreation = (n: string, g:string, p:number) : ValidationResult => {
     if(!n)
         return {valid:false, message:"Game name is mandatory"};
     if(!g)

@@ -1,15 +1,22 @@
-//TODO: implement entity match
-
-import { MatchRound } from "../enums/MatchRound";
+import { BracketType } from "../enums/BracketType";
+import { MatchSlot } from "../enums/MatchSlot";
 import { MatchStatus } from "../enums/MatchStatus";
 
 export class Match{
     constructor(
         public matchId : number = 0,
+        public tournamentId: number = 0,
         public blueTeamId : number = 0,
         public redTeamId : number = 0,
-        public matchResult : string = "",
-        public status : MatchStatus.SCHEDULED,
-        public matchRound : MatchRound = MatchRound.ROUND_OF_16,
+        public winnerTeamId : number  = 0,
+        public status : MatchStatus = MatchStatus.SCHEDULED,
+        public roundNumber : number = 0,
+        public bracketType : BracketType = BracketType.WINNER, 
+        public blueTeamScore : number = 0,
+        public redTeamScore : number = 0,
+        public winnerToMatchId : number = 0,
+        public winnerToSlot : MatchSlot = MatchSlot.BLUE,
+        public loserToMatchId : number = 0,
+        public loserToSlot : MatchSlot = MatchSlot.BLUE,
     ){}
 }

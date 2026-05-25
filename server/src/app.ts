@@ -7,7 +7,6 @@ import { DateTimeConverter } from "./Services/datetime/DateTimeConverter";
 import { DbManager } from "./Database/connection/DbConnectionPool";
 
 import { UserRepository }   from "./Database/repositories/users/UserRepository";
-import { EntityRepository } from "./Database/repositories/entity/EntityRepository";
 import { GameRepository } from './Database/repositories/games/GameRepository';
 import { TournamentWriteRepository } from "./Database/repositories/tournament/TournamentWriteRepository";
 import { AuditRepository } from "./Database/repositories/audit/AuditRepository";
@@ -15,7 +14,6 @@ import { TournamentRegistrationRepositoryWrite } from './Database/repositories/t
 
 import { AuthService }   from "./Services/auth/AuthService";
 import { UserService }   from "./Services/users/UserService";
-import { EntityService } from "./Services/entity/EntityService";
 import { GameService } from './Services/games/GameService';
 import { TournamentServiceWrite } from "./Services/tournaments/TournamentWriteService";
 import { AuditService } from "./Services/audit/AuditService";
@@ -24,7 +22,6 @@ import { TournamentRegistrationWriteService } from "./Services/tournamentRegistr
 
 import { AuthController }   from "./WebAPI/controllers/AuthController";
 import { UserController }   from "./WebAPI/controllers/UserController";
-import { EntityController } from "./WebAPI/controllers/EntityController";
 import { GameController } from "./WebAPI/controllers/GameController";
 import { TournamentController } from "./WebAPI/controllers/TournamentController";
 import { TournamentRegistrationController } from "./WebAPI/controllers/TournamentRegistrationController";
@@ -42,6 +39,11 @@ import { InviteRepository } from "./Database/repositories/invites/InviteReposito
 import { UserWatchlistRepository } from "./Database/repositories/user_watchlist/UserWatchlistRepository";
 import { UserWatchlistService } from "./Services/user_watchlist/UserWatchlistService";
 import { UserWatchlistController } from "./WebAPI/controllers/UserWatchlistController";
+import { MatchRepository } from "./Database/repositories/matches/MatchRepository";
+import { MatchService } from './Services/matches/MatchService';
+import { MatchPlayerService } from "./Services/match_players/MatchPlayerService";
+import { MatchPlayerRepository } from "./Database/repositories/match_players/MatchPlayerRepository";
+import { MatchController } from "./WebAPI/controllers/MatchController";
 
 export const logger = new ConsoleLoggerService();
 export const db     = new DbManager(logger);
@@ -51,7 +53,6 @@ const dateTimeConverter = new DateTimeConverter();
 
 // Repositories
 const userRepo   = new UserRepository(db, logger);
-const entityRepo = new EntityRepository(db, logger);
 const gameRepo = new GameRepository(db, logger);
 const tournamentReadRepo = new TournamentReadRepository(db, logger);
 const tournamentWriteRepo = new TournamentWriteRepository(db, logger);
@@ -62,10 +63,11 @@ const userWatchlistRepo = new UserWatchlistRepository(db, logger);
 const tournamentRegistrationReadRepo = new TournamentRegistrationReadRepository(db, logger);
 const TournamentRegistrationWriteRepo = new TournamentRegistrationRepositoryWrite(db, logger);
 const inviteRepo = new InviteRepository(db, logger);
+const matchRepo = new MatchRepository(db, logger);
+const matchPlayerRepo = new MatchPlayerRepository(db, logger);
 
 // Services
 const userService   = new UserService(userRepo);
-const entityService = new EntityService(entityRepo);
 const gameService   = new GameService(gameRepo);
 const tournamentReadService = new TournamentReadService(tournamentReadRepo, gameRepo, logger);
 const tournamentWriteService = new TournamentServiceWrite(tournamentReadRepo, tournamentWriteRepo, gameRepo, logger, dateTimeConverter);
@@ -75,7 +77,9 @@ const teamService = new TeamService(teamRepo, teamMemberRepo, userRepo, logger, 
 const healthService = new HealthService(gameRepo, tournamentReadRepo, userRepo, teamRepo, db);
 const watchlistService = new UserWatchlistService(userWatchlistRepo, tournamentReadRepo, gameRepo);
 const tournamentRegistrationReadService = new TournamentRegistrationReadService(tournamentRegistrationReadRepo, teamRepo, tournamentReadRepo, logger);
-const tournamentRegistrationWriteService = new TournamentRegistrationWriteService(TournamentRegistrationWriteRepo, tournamentRegistrationReadRepo, teamRepo, teamMemberRepo, tournamentReadRepo, gameRepo, logger);
+const tournamentRegistrationWriteService = new TournamentRegistrationWriteService(TournamentRegistrationWriteRepo, tournamentRegistrationReadRepo, teamRepo, teamMemberRepo, tournamentReadRepo, gameRepo, logger);const matchService = new MatchService(matchRepo, teamRepo, tournamentRepo);
+const matchPlayerService = new MatchPlayerService(matchService, matchPlayerRepo, userRepo, teamRepo,teamMemberRepo);
+
 // Express
 const app = express();
 app.use(cors({ origin: process.env.CLIENT_URL ?? "*" }));
@@ -83,7 +87,6 @@ app.use(express.json({ limit: "10mb"}));
 
 app.use("/api/v1", new AuthController(authService, userService).getRouter());
 app.use("/api/v1", new UserController(userService).getRouter());
-app.use("/api/v1", new EntityController(entityService).getRouter());
 app.use("/api/v1", new GameController(gameService).getRouter());
 app.use("/api/v1", new TournamentController(tournamentReadService, tournamentWriteService, watchlistService).getRouter());
 app.use("/api/v1", new AuditController(auditService).getRouter());
@@ -92,5 +95,6 @@ app.use("/api/v1", new TeamController(teamService, logger).getRouter());
 app.use("/api/v1", new HealthController(healthService).getRouter());
 app.use("/api/v1", new UserWatchlistController(watchlistService).getRouter());
 app.use("/api/v1", new TournamentRegistrationController(tournamentRegistrationReadService, tournamentRegistrationWriteService).getRouter());
+app.use("/api/v1", new MatchController(matchService, matchPlayerService).getRouter());
 
 export default app;

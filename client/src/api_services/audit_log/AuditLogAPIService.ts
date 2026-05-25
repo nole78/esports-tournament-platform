@@ -1,6 +1,6 @@
 import axios from "axios";
 import type { AuditLogDto } from "../../models/audit/AuditLogDTO";
-import type { ApiResponse } from "../../types/audit/AuditApiResponse";
+import type { ApiResponse } from "../../types/api/ApiResponse";
 import type { PaginatedList } from "../../models/audit/AuditList";
 import type { IAuditLogAPIService } from "./IAuditLogAPIService";
 import { readItem } from "../../helpers/local_storage";
