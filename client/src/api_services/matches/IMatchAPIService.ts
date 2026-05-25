@@ -1,3 +1,4 @@
+import type { MatchDetailsDto } from "../../models/match/MatchDetailsDto";
 import type { MatchDto } from "../../models/match/MatchDto";
 import type { MatchResultDto } from "../../models/match/MatchResultDto";
 import type { AddPlayersDto } from "../../models/match_player/AddPlayerDto";
@@ -6,7 +7,7 @@ import type { ApiResponse } from "../../types/api/ApiResponse";
 
 export interface IMatchAPIService {
     getAllForTorunament(tournamentId: number) : Promise<ApiResponse<MatchDto[]>>;
-    getDetails(id: number) : Promise<ApiResponse<MatchDto>>;
+    getDetails(id: number) : Promise<ApiResponse<MatchDetailsDto>>;
     setResult(id: number, payload: MatchResultDto) : Promise<ApiResponse<void>>;
     getPlayers(id: number): Promise<ApiResponse<MatchPlayerDto[]>>;
     addPlayers(id: number, payload: AddPlayersDto) : Promise<ApiResponse<AddPlayersResponseDto>>;
