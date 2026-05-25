@@ -80,14 +80,4 @@ export class TournamentWriteService implements ITournamentWriteService {
     const res = await this.tournamentWriteRepo.delete(id);
     return res? Result.Success(): Result.Failure("Could not delete tournament!", ErrorType.Internal);
   }
-
-  async generateBracket(id: number): Promise<Result<void>>{
-    const tournament = await this.tournamentReadRepo.findById(id);
-    if(tournament.tournamentId === 0)
-    {
-      this.logger.error("TournamentService", "generateBracket failed", `Tournament with tournamentId "${id}" not found`);
-      return Result.Failure("Tournament with id "+id+"does not exist!", ErrorType.NotFound);
-    }
-    return Result.Failure("", ErrorType.Conflict);
-  }
 }
