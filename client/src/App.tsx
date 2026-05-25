@@ -7,13 +7,11 @@ import NotFoundPage from "./pages/not_found/NotFoundPage";
 
 import UserDashboard from "./pages/user/UserDashboard";
 import AdminDashboard from "./pages/admin/AdminDashboard";
-import UsersPage from "./pages/admin/UsersPage";
 import GameCatalog from "./pages/common_pages/GameCatalog";
 import GameAddPage from "./pages/admin/GameAddPage";
 import GameEditPage from "./pages/admin/GameEditPage";
 import TournamentList from "./pages/common_pages/TournamentList";
 import TournamentAddPage from "./pages/admin/TournamentAddPage";
-import AuditLogPage from "./pages/admin/AuditLog";
 import LandingPage from "./pages/common_pages/LandingPage";
 import TeamsPage from "./pages/common_pages/TeamsPage";
 import TeamsAddPage from "./pages/common_pages/TeamsAddPage";
@@ -22,7 +20,6 @@ import TeamsEditPage from "./pages/common_pages/TeamsEditPage";
 
 import { Layout } from "./components/layout/Layout";
 import UserOverview from "./pages/user/UserOverview";
-import HealthPage from "./pages/admin/HealthPage";
 
 export default function App() {
   return (
@@ -43,13 +40,11 @@ export default function App() {
       {/* Admin routes */}
       <Route path="/admin_info" element={<ProtectedRoute requiredRole="admin"><UserOverview/></ProtectedRoute>}/>
       <Route path="/admin"       element={<ProtectedRoute requiredRole="admin"><AdminDashboard /></ProtectedRoute>} />
-      <Route path="/admin/users" element={<ProtectedRoute requiredRole="admin"><UsersPage /></ProtectedRoute>} />
       <Route path="/game_catalog/add" element={<ProtectedRoute requiredRole="admin"><GameAddPage/></ProtectedRoute>} />
       <Route path="/game_catalog/edit/:id" element={<ProtectedRoute requiredRole="admin"><GameEditPage/></ProtectedRoute>}/>
-      <Route path="/admin/audit_log" element={<ProtectedRoute requiredRole="admin"><AuditLogPage/></ProtectedRoute>}/>
       <Route path="/admin/tournament_list" element={<ProtectedRoute requiredRole="admin"><TournamentList/></ProtectedRoute>} />
       <Route path="/admin/tournament_list/add" element={<ProtectedRoute requiredRole="admin"><TournamentAddPage/></ProtectedRoute>} />
-      <Route path="/admin/health" element={<ProtectedRoute requiredRole="admin"><HealthPage/></ProtectedRoute>}/>
+      <Route path="/admin/dashboard" element={<ProtectedRoute requiredRole="admin"><AdminDashboard/></ProtectedRoute>}/>
       {/* <Route path="/admin/teams" element ={<ProtectedRoute requiredRole="admin"> <TeamsPage/></ProtectedRoute>} /> */}
 
 
