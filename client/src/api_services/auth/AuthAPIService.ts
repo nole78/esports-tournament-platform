@@ -17,4 +17,8 @@ export const authApi: IAuthAPIService = {
     return axios.post<AuthResponse>(`${BASE}/register`, { username, email, password, fullName, profilePicture, role })
       .then(r => r.data).catch(e => err(e, "Registration failed"));
   },
+  async logout(id) {
+    return axios.post<AuthResponse>(`${BASE}/logout`, { id })
+      .then(r => r.data).catch(e => err(e, "Failed to regulate activity of user"));
+  }
 };

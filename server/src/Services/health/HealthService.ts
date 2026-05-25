@@ -22,7 +22,7 @@ export class HealthService implements IHealthService {
 
   getDbStatus(): Result<HealthStatusDto> {
     const nodes = this.db.getNodes().map((n) =>
-        new NodeStatusDto(n.name, n.host, n.port, n.status, n.lastCheck, n.successfulWrites, n.failedWrites, n.latency)
+        new NodeStatusDto(n.name, n.host, n.port, n.status, n.lastCheck, n.successfulReads, n.failedReads, n.successfulWrites, n.failedWrites, n.latency)
     );
     return Result.Success(new HealthStatusDto(nodes, this.db.getSlaveRrIndex()));
   }

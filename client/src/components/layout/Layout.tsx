@@ -4,6 +4,8 @@ import { useAuth } from "../../hooks/auth/useAuthHook";
 import logo from "../../assets/logo.png";
 import avatarPlaceholder from "../../assets/avatar_placeholder.jpg";
 import { usersApi } from "../../api_services/users/UsersAPIService";
+import { authApi } from "../../api_services/auth/AuthAPIService";
+import NotificationDropdown from "../account/NotificationDropDown";
 
 // TODO: Update nav items to match your routes and roles
 const guestNav = [
@@ -86,6 +88,9 @@ export function Layout() {
           <div className="flex items-center gap-4">
             {user && (
               <div className="flex items-center gap-2">
+                <div className="w-10 mr-2">
+                  <NotificationDropdown />
+                </div>
                 <button onClick={() => navigate(user.role == "admin"?"/admin_info":"user_info")}
                   className="cursor-pointer w-8 h-8 rounded-full bg-white/10 border border-primary/50 flex items-center justify-center">
                   <img src={avatar? avatar : avatarPlaceholder} className="rounded-full"/>
@@ -95,7 +100,10 @@ export function Layout() {
 
             <button
               onClick={() => {
-                if (user) logout();
+                if (user) {
+                  logout();
+                  authApi.logout(user.id);
+                }
                 else navigate("/login");
               }}
               className="text-sm text-secondary bg-bgsecondary p-2 rounded-lg font-semibold cursor-pointer hover:text-white/70 hover:bg-bgsecondary/70 transition-colors"
