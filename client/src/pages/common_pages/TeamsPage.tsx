@@ -4,11 +4,9 @@ import type { TeamDto } from "../../models/team/TeamDto";
 import { useLocation, useNavigate } from 'react-router-dom';
 import { teamApi } from "../../api_services/teams/TeamAPIService";
 import { Empty, ErrorBox, PageHeader, Pagination } from "../../components/ui/UI";
+import { TeamRole } from "../../types/teamMembers/teamMemberRole";
 
 
-const TeamRole: Record<string, string> = new Proxy({}, {
-    get: (_target, prop) => String(prop),
-});
 
 export default function TeamsPage(){
     const {user} = useAuth();
@@ -105,7 +103,7 @@ export default function TeamsPage(){
                             
                             <div className="absolute rounded-b-lg bottom-0 bg-primary/90 w-full p-2 origin-bottom scale-y-0 group-hover:scale-y-100 transition-transform duration-300">
                                 <div className="top-0">
-                                {(t.userRole === TeamRole.captain &&
+                                {(t.userRole === TeamRole.CAPTAIN &&
                                     <>
                                     <button className="w-1/3 mb-2 bg-red-400/40 border-2 border-red-500 hover:bg-bgsecondary/30 hover:border-bgsecondary text-red-500 font-semibold rounded-xl p-1 text-sm transition-colors"
                                             onClick={() => {

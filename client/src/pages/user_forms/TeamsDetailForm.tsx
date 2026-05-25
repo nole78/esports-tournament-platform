@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { teamApi } from "../../api_services/teams/TeamAPIService";
 import { useNavigate } from "react-router-dom";
 import type { TeamDto } from "../../models/team/TeamDto";
-import { TeamRole } from '../../../../server/src/Domain/enums/TeamRole';
 
 import type { UserForMembersDto } from "../../models/user/UserForMembers";
 import { ErrorBox } from "../../components/ui/UI";
@@ -11,16 +10,17 @@ import { useAuth } from "../../hooks/auth/useAuthHook";
 import { usersApi } from "../../api_services/users/UsersAPIService";
 import FireIcon from "../../components/heroicons/FireIcon";
 import useDebounce from 'react-debounced';
-import { UserRole } from "../../../../server/src/Domain/enums/UserRole";
 import type { IniviteDto } from "../../models/invite/InviteDto";
 import type { UserDto } from "../../models/user/UserTypes";
+import { TeamRole } from "../../types/teamMembers/teamMemberRole";
+import { UserRole } from "../../types/user/userRole";
 
 
 
 
 export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
     
-    const emptyTeam : TeamDto = {teamId:0 ,teamName:"", teamLogotip:"", teamDescription:"", teamTag:"", userRole: "member"};
+    const emptyTeam : TeamDto = {teamId:0 ,teamName:"", teamLogotip:"", teamDescription:"", teamTag:"", userRole: TeamRole.MEMBER};
     const [team, setTeam] = useState<TeamDto>(emptyTeam);
     const [members, setMember] = useState<UserForMembersDto[]>([]);
     const [captain, setCaptain] = useState<UserDto>();
@@ -123,7 +123,7 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
             }
         ).catch(() => setError("Failed to delete member"));
         if (user?.id === userId){
-            if(user?.role == UserRole.ADMIN)
+            if(user?.role === UserRole.ADMIN)
                         navigate("/admin/teams", {state: {left : true} });
                     else
                         navigate("/teams", {state: {left : true} });
@@ -212,7 +212,7 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
                     <label className="block text-xs text-bgprimary mb-2 font-bold">Team Description</label>
                     <label className="block text-xs text-bgsecondary mb-2 font-bold"> {team.teamDescription} </label>
                 </div>
-                {/*List out team members + do the captainship transfer + kick out*/}
+                
                 <label className="block text-xs text-bgprimary mb-2 font-bold">Member Description</label>
                 <div className="w-full overflow-x-auto">
                     
@@ -239,8 +239,6 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
                             {members.map(m => (
                             <tr key={m.id} className="border-b border-gray-400/30">
                                 { <td className="flex flex-row items-center gap-1 py-3 pr-4 font-normal text-left">{m.gamerTag} {captain?.id === m.id && <FireIcon/>} </td>}
-                                {/* { team.userRole === TeamRole.MEMBER && user?.id === m.id as number && <td className="flex flex-row items-center gap-1 py-3 pr-4 font-normal text-left">{m.gamerTag} </td>} */}
-                                {/* {  user?.id !== m.id && <td className="py-3 pr-4 font-normal text-left">{m.gamerTag}  </td>} */}
                                 <td className="py-3 pr-4 font-normal text-left">{m.id} </td>
 
                                 { team.userRole === TeamRole.CAPTAIN && user?.id !== m.id as number &&(

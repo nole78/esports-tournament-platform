@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { teamApi } from "../../api_services/teams/TeamAPIService";
 import type { TeamDtoEdit } from "../../models/team/TeamDtoEdit";
 import { useAuth } from "../../hooks/auth/useAuthHook";
-import { UserRole } from '../../../../server/src/Domain/enums/UserRole';
+import { UserRole } from "../../types/user/userRole";
+
 
 export const TeamsEditForm: React.FC<{id: string}> = ({id}) =>{
 
@@ -30,7 +31,7 @@ export const TeamsEditForm: React.FC<{id: string}> = ({id}) =>{
 
         
         setTeam(emptyTeam);
-        if(user?.role == UserRole.ADMIN)
+        if(user?.role === UserRole.ADMIN)
             navigate("/admin/teams", {state: {edited : true} });
         else
             navigate("/teams", {state: {edited : true} });
