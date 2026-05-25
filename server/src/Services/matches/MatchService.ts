@@ -6,7 +6,7 @@ import { PaginatedListDto } from "../../Domain/DTOs/PaginatedListDto";
 import { Match } from '../../Domain/models/Match';
 import { IMatchRepository } from '../../Domain/repositories/matches/IMatchRepository';
 import { ITeamRepository } from "../../Domain/repositories/teams/ITeamRepository";
-import { ITournamentRepository } from "../../Domain/repositories/tournaments/ITournamentRepository";
+import { ITournamentReadRepository } from "../../Domain/repositories/tournaments/ITournamentReadRepository";
 import { MatchResultDto } from "../../Domain/DTOs/matches/MatchResultDto";
 import { MatchSlot } from "../../Domain/enums/MatchSlot";
 import { MatchStatus } from "../../Domain/enums/MatchStatus";
@@ -15,7 +15,7 @@ export class MatchService implements IMatchService{
     constructor(
         private readonly matchRepo: IMatchRepository,
         private readonly teamRepo: ITeamRepository,
-        private readonly tournamentRepo: ITournamentRepository
+        private readonly tournamentReadRepo: ITournamentReadRepository
     ){}
 
     private toMatchDto(match: Match): MatchDto{
@@ -49,7 +49,7 @@ export class MatchService implements IMatchService{
     }
 
     public async getByTournamentId(tournamentId: number): Promise<Result<MatchDto[]>>{
-        const tournament = await this.tournamentRepo.findById(tournamentId);
+        const tournament = await this.tournamentReadRepo.findById(tournamentId);
         if(tournament.tournamentId === 0)
             return Result.Failure(`Tournament doesn't exist`,ErrorType.NotFound);
 

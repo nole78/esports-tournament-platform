@@ -73,7 +73,6 @@ export class TournamentRegistrationReadRepository implements ITournamentRegistra
     const offset = Math.max(0, Math.floor((page - 1) * limit));
     const lim    = Math.max(1, Math.floor(limit));
     const statusClause = status ? "AND status = ?" : "";
-    console.log(statusClause);
     try {
       const [rows] = await res.conn.query<RowDataPacket[]>(
         `SELECT * 

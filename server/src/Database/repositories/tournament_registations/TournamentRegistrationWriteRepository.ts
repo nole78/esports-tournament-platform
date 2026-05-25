@@ -18,7 +18,6 @@ export class TournamentRegistrationRepositoryWrite implements ITournamentRegistr
         `INSERT INTO tournament_registrations (team_id,tournament_id,seed) VALUES (?,?,?)`,
         [tr.teamId,tr.tournamentId,tr.seed]
       );
-      if (result.insertId === 0) return new TournamentRegistration();
       return new TournamentRegistration(tr.teamId, tr.tournamentId, tr.seed);
     } catch (err) {
       this.logger.error("TournamentRegistrationRepository", "create failed", err);

@@ -13,6 +13,7 @@ import { ITeamMemberRepository } from "../../Domain/repositories/team_members/IT
 import { TeamMemberDto } from "../../Domain/DTOs/team_members/TeamMemberDto";
 import { ITournamentRegistrationReadRepository } from '../../Domain/repositories/tournament_registrations/ITournamentRegistrationReadRepository';
 import { ITournamentReadRepository } from "../../Domain/repositories/tournaments/ITournamentReadRepository";
+import { TournamentStatus } from '../../Domain/enums/TournamentStatus';
 
 export class TournamentRegistrationWriteService implements ITournamentRegistrationWriteService{
     public constructor(
@@ -38,10 +39,17 @@ export class TournamentRegistrationWriteService implements ITournamentRegistrati
         }
 
         const tournamentReg = await this.tournamentRegistrationReadRepo.findByTournamentAndTeamId(tr.tournamentId, tr.teamId);
+        
         if(tournamentReg.tournamentId !== 0 && tournamentReg.teamId !== 0)
         {
             this.logger.error("TournamentRegistrationService", "create failed", `Tournament registration already exists!`);
             return Result.Failure("Team is already registered into this tournament!", ErrorType.Conflict);
+        }
+
+        if(tournament.tournamentStatus === TournamentStatus.ACTIVE || tournament.tournamentStatus === TournamentStatus.COMPLETED)
+        {
+            this.logger.error("TournamentRegistrationService", "create failed", `Tournament already started!`);
+            return Result.Failure("You can't register to ongoing tournament!", ErrorType.Conflict);
         }
 
         const game = await this.gameRepo.findById(tournament.tournamentGameId);
@@ -108,7 +116,13 @@ export class TournamentRegistrationWriteService implements ITournamentRegistrati
         if(tournamentReg.tournamentId === 0 && tournamentReg.teamId === 0)
         {
             this.logger.error("TournamentRegistrationService", "delete failed", `Tournament registration does not exist!`);
-            return Result.Failure("Tournament registration with touranment id " + tournamentId + " and team id " + teamId + " does not exist!", ErrorType.NotFound);
+            return Result.Failure("Team is not registered on tournament!", ErrorType.NotFound);
+        }
+
+        if(tournament.tournamentStatus === TournamentStatus.ACTIVE || tournament.tournamentStatus === TournamentStatus.COMPLETED)
+        {
+            this.logger.error("TournamentRegistrationService", "delete failed", `Tournament is active or started!`);
+            return Result.Failure("You can't remove tournament registration of tournament that has already started!", ErrorType.NotFound);
         }
 
         const res = await this.tournamentRegistrationWriteRepo.delete(tournamentId, teamId);
