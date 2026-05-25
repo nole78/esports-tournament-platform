@@ -1,6 +1,6 @@
 import { ValidationResult } from "../../../Domain/types/ValidationResult"
 
-export const validateTeamsCreation = (teamName: string, teamTag: string, teamLogotip: string, teamDescription: string) : ValidationResult =>{
+export const validateTeams = (teamName: string, teamTag: string, teamLogotip: string, teamDescription: string) : ValidationResult =>{
     if (!teamName || teamName.trim().length === 0){
         return {valid:false, message:"Team name is required!"};
     }

@@ -43,7 +43,7 @@ export const teamApi: ITeamAPIService ={
         .then(r => r.data).catch(e => err(e, "Failed to find by id"))
     },
     async update(id, payload){
-        return axios.patch<ApiResponse<void>>(`${BASE}/${id}`, payload, {headers: authHeader()})
+        return axios.put<ApiResponse<void>>(`${BASE}/${id}`, payload, {headers: authHeader()})
         .then(r => r.data).catch(e => err(e, "Failed to update"))
     },
     async getMembers(id){

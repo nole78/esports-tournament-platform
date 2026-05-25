@@ -4,7 +4,7 @@ import { authenticate } from "../../Middlewares/authentification/AuthMiddleware"
 import { authorize } from "../../Middlewares/authorization/AuthorizeMiddleware";
 import { UserRole } from "../../Domain/enums/UserRole";
 import { ValidationResult } from '../../Domain/types/ValidationResult';
-import { validateTeamsCreation } from "../validators/teams/validateTeamsCreation";
+import { validateTeams } from "../validators/teams/validateTeams";
 import { CreateTeamDto } from "../../Domain/DTOs/teams/CreateTeamDto";
 import { handleResult } from "../mappers/ResultMapper";
 import { Result } from '../../Domain/common/Result';
@@ -22,7 +22,7 @@ export class TeamController{
         this.router.post("/teams", authenticate, this.create.bind(this));
         this.router.get("/teams/user/:id", authenticate,this.getTeamsById.bind(this));
         this.router.get("/teams/:id", this.getTeamsByIdGuest.bind(this));
-        this.router.patch("/teams/:id", authenticate, this.update.bind(this));
+        this.router.put("/teams/:id", authenticate, this.update.bind(this));
         this.router.delete("/teams/:id", authenticate, this.delete.bind(this));
         
         this.router.post("/teams/:id/invite", authenticate, this.invite.bind(this));
@@ -69,7 +69,7 @@ export class TeamController{
         const safeTeamLogotip = teamLogotip ?? "";
         const safeTeamDescription = teamDescription ?? "";
         
-        const v:ValidationResult = validateTeamsCreation(safeTeamName, safeTeamTag, safeTeamLogotip, safeTeamDescription);
+        const v:ValidationResult = validateTeams(safeTeamName, safeTeamTag, safeTeamLogotip, safeTeamDescription);
         if (!v.valid){res.status(400).json({success:false, message: v.message}); return;}
         
         const result = await this.teamService.create(new CreateTeamDto(safeTeamName, safeTeamTag, safeTeamLogotip, safeTeamDescription), gamerTag);
@@ -82,6 +82,15 @@ export class TeamController{
         const gamerTag = req.user?.username as string;
         const id = parseInt(req.params.id as string, 10);
         if(isNaN(id)) {res.status(400).json({ success: false, message: "Invalid id"}); return; }
+
+        const {teamName, teamTag, teamLogotip, teamDescription} = (req.body ?? {}) as {teamName?:string, teamTag?:string, teamLogotip?:string, teamDescription?:string};
+        const safeTeamName = teamName ?? "";
+        const safeTeamTag = teamTag ?? "";
+        const safeTeamLogotip = teamLogotip ?? "";
+        const safeTeamDescription = teamDescription ?? "";
+
+        const v:ValidationResult = validateTeams(safeTeamName, safeTeamTag, safeTeamLogotip, safeTeamDescription);
+        if (!v.valid){res.status(400).json({success:false, message: v.message}); return;}
 
         const result = await this.teamService.update(gamerTag, req.body, id);
         handleResult(result, res);
