@@ -16,7 +16,7 @@ export class MatchController {
     ){
         this.router.get("/matches/tournament/:tournamendId", this.getAllForTournament.bind(this));
         this.router.get("/matches/:id", this.getDetails.bind(this));
-        this.router.get("/matches/:id/players", authenticate, this.getPlayers.bind(this));
+        this.router.get("/matches/:id/players/:teamId", authenticate, this.getPlayers.bind(this));
         this.router.patch("/matches/:id/result", authenticate, authorize(UserRole.ADMIN), this.setResult.bind(this));
         this.router.post("/matches/:id/players", authenticate, this.addPlayers.bind(this));
         this.router.put("/matches/:id/players/:userId", authenticate, this.changePerformanceNotes.bind(this));
@@ -67,9 +67,12 @@ export class MatchController {
 
     private async getPlayers(req: Request, res: Response): Promise<void> {
         const id = parseInt(req.params.id as string, 10);
-        if (isNaN(id)) { res.status(400).json({ success: false, message: "Invalid id" }); return; }
+        if (isNaN(id)) { res.status(400).json({ success: false, message: "Invalid match id" }); return; }
 
-        const result = await this.matchPlayerService.getMatchPlayers(id);
+        const teamId = parseInt(req.params.teamId as string, 10);
+        if (isNaN(teamId)) { res.status(400).json({ success: false, message: "Invalid team id" }); return; }
+
+        const result = await this.matchPlayerService.getMatchPlayers(id, teamId);
         handleResult(result, res);
     }
 
