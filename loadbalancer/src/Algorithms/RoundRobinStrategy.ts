@@ -6,7 +6,7 @@ import { ILoadBalancingStrategy } from '../Domain/interfaces/ILoadbalancingStrat
 export class RoundRobinStrategy implements ILoadBalancingStrategy{
     private currentIdx = 0;
     public getNextServer(servers: ServerInstance[]) {
-        if(servers.length === 0) return null;
+        if(servers.length === 0) return new ServerInstance;
         
         const n = servers.length;
 

@@ -1,6 +1,7 @@
 import { Result } from "../../Domain/common/Result";
 import { Response } from "express";
 import { mapErrorTypeToStatus } from "./HttpStatusMapper";
+import { ErrorType } from "../../Domain/common/ErrorType";
 
 export function handleResult<T>(result: Result<T>, res: Response): Response {
 

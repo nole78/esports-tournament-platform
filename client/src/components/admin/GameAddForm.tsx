@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import type { IGameAPIService } from "../../api_services/game_catalog/IGameAPIService";
 import { useNavigate } from "react-router-dom";
 
@@ -15,28 +15,37 @@ export default function GameAddForm({gameApi} : {gameApi:IGameAPIService}){
     const [succes,setSucces] = useState<boolean>(false);
     const [creating,setCreating] = useState<boolean>(false);
 
-    const fileRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
 
-  const submit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setError("");
-    setSucces(false);
-    setCreating(true);
-    const gamePlayers = Number(players);
+    const openFilePicker = () => {
+        const element = document.getElementById("game-logo-input");
 
-    const res = await gameApi.create({gameName,gameLogotip,gameGenre,gamePlayers});
-    
-    setCreating(false);
-    if(!res.success || !res.data) {setError(res.message ?? "Invalid values"); return;}
-    
-    setSucces(true);
-    setName("");
-    setGenre("");
-    setLogo("");
-    setPlayers("");
-    setPreview("");
-  };
+        if(!(element instanceof HTMLInputElement)) {
+            return;
+        }
+
+        element.click();
+    }
+
+    const submit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setError("");
+        setSucces(false);
+        setCreating(true);
+        const gamePlayers = Number(players);
+
+        const res = await gameApi.create({gameName,gameLogotip,gameGenre,gamePlayers});
+        
+        setCreating(false);
+        if(!res.success || !res.data) {setError(res.message ?? "Invalid values"); return;}
+        
+        setSucces(true);
+        setName("");
+        setGenre("");
+        setLogo("");
+        setPlayers("");
+        setPreview("");
+    };
     return(
         <div className="w-full max-w-sm">
             <div className="text-center mb-10">
@@ -63,9 +72,9 @@ export default function GameAddForm({gameApi} : {gameApi:IGameAPIService}){
                 <div>
                     <label className="mr-5 w-min text-xs text-bgprimary mb-2 font-bold">Logo</label>
                     <button type="button" className=" rounded-xl w-1/3 py-3 border-bgprimary bg-bgprimary text-primary font-semibold text-sm hover:bg-bgprimary/80 cursor-pointer"
-                        onClick={() => {if(fileRef.current) fileRef.current.click()}}
+                        onClick={openFilePicker}
                         >Choose Image</button>
-                    <input type="file" accept="image/*" ref={fileRef}
+                    <input type="file" accept="image/*" id="game-logo-input"
                     onChange={e => {
                         const file = e.target.files?.[0];
                         if(!file) { setLogo("");setPreview(""); return;}

@@ -24,7 +24,7 @@ export default function DbHealthDisplay(){
                 }, 3000);
             }
             else
-                setError(res?.message)
+                setError(res?.message ?? "Failed to load DB health status")
         }
         catch{
             setError("Couldn't load DB health status");

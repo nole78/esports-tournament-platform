@@ -4,5 +4,5 @@ export interface ILoadBalancingStrategy {
     getNextServer(
         servers: ServerInstance[],
         clientIp?: string
-    ): ServerInstance | null;
+    ): ServerInstance;
 }

@@ -2,8 +2,13 @@ import axios from "axios";
 import { readItem } from "../../helpers/local_storage";
 import type { ApiResponse, ITeamAPIService } from './ITeamAPIService';
 import type { TeamDto } from "../../models/team/TeamDto";
+// import { ApiResponse } from './ITeamAPIService';
+// import ApiHealthDisplay from '../../components/admin/ApiHealthDisplay';
+//import { InviteDto } from '../../../../server/src/Domain/DTOs/invite/InviteDto';
 import type { UserForMembersDto } from "../../models/user/UserForMembers";
 import type { IniviteDto } from "../../models/invite/InviteDto";
+import type { TeamDtoGuest } from "../../models/team/TeamDtoGuest";
+import type { UserDto } from "../../models/user/UserTypes";
 //import type { UserDto } from "../../models/user/UserTypes";
 //import { Team } from '../../../../server/src/Domain/models/Team';
 //import type { TeamDto } from "../../models/team/TeamDto";
@@ -22,6 +27,9 @@ const err = <T>(e: unknown, fallback: string): ApiResponse<T> => ({
 });
 
 export const teamApi: ITeamAPIService ={
+    async getAll(page, limit) {
+        return axios.get(`${BASE}/guest/all?page=${page}&limit=${limit}`).then(r => r.data).catch(e => err(e, "Failed to get all teams"))
+    },
     async getByGamerTag(page, limit){
         return axios.get(`${BASE}?page=${page}&limit=${limit}`, { headers: authHeader()})
         .then(r => r.data).catch(e => err(e, "Failed to load items"));
@@ -35,11 +43,11 @@ export const teamApi: ITeamAPIService ={
         .then(r => r.data).catch(e => err(e, "Failed to delete"))
     },
     async getById(id){
-        return axios.get<ApiResponse<TeamDto>>(`${BASE}/${id}`, {headers: authHeader()})
+        return axios.get<ApiResponse<TeamDto>>(`${BASE}/user/${id}`, {headers: authHeader()})
         .then(r => r.data).catch(e => err(e, "Failed to find by id"))
     },
     async update(id, payload){
-        return axios.patch<ApiResponse<void>>(`${BASE}/${id}`, payload, {headers: authHeader()})
+        return axios.put<ApiResponse<void>>(`${BASE}/${id}`, payload, {headers: authHeader()})
         .then(r => r.data).catch(e => err(e, "Failed to update"))
     },
     async getMembers(id){
@@ -73,5 +81,18 @@ export const teamApi: ITeamAPIService ={
     async getMyTeams() {
         return axios.get<ApiResponse<TeamDto[]>>(`${BASE}/mine/all`, {headers: authHeader()})
         .then(r => r.data).catch(e => err(e, "Failed to get your teams"))
+    },
+    async getTeamGuest(teamId) {
+        return axios.get<ApiResponse<TeamDtoGuest>>(`${BASE}/${teamId}`)
+        .then(r => r.data).catch(e => err(e, "Failed to get team for guest"))
+    },
+    
+    async getInvitesByTeamId(teamId) {
+         return axios.get<ApiResponse<IniviteDto[]>>(`${BASE}/invites/details/${teamId}`, {headers: authHeader()})
+        .then(r => r.data).catch(e => err(e, "Failed to get your invites"))
+    },
+    async getCaptain(teamId) {
+        return axios.get<ApiResponse<UserDto>>(`${BASE}/captain/${teamId}`)
+        .then(r => r.data).catch(e => err(e, "Failed to get your invites"))
     },
 };

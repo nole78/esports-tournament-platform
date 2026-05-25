@@ -3,8 +3,8 @@ import { ServerInstance } from "../Domain/models/ServerInstance";
 import crypto from 'crypto';
 
 export class IpHashStrategy implements ILoadBalancingStrategy{
-    public getNextServer(servers: ServerInstance[], clientIp?: string): ServerInstance | null {
-        if(!clientIp || servers.length === 0) return null;
+    public getNextServer(servers: ServerInstance[], clientIp?: string) {
+        if(!clientIp || servers.length === 0) return new ServerInstance;
         const hash = this.hashIp(clientIp);
         const index = hash % servers.length;
         

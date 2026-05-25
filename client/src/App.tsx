@@ -24,6 +24,9 @@ import { Layout } from "./components/layout/Layout";
 import UserOverview from "./pages/user/UserOverview";
 import TeamsDetailPage from "./pages/common_pages/TeamsDetailPage";
 import TeamsInboxPage from "./pages/common_pages/TeamsInboxPage";
+import TeamsGuestPage from "./pages/common_pages/TeamsGuestPage";
+import TeamsGuestDetailsPage from "./pages/common_pages/TeamsGuestDetailsPage";
+import MatchInfo from "./pages/common_pages/MatchInfo";
 
 export default function App() {
   return (
@@ -31,12 +34,13 @@ export default function App() {
       <Route path="/login"    element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
     <Route element={<Layout/>}>
+      <Route path="/match/:id" element={<MatchInfo/>}/>
       <Route path="/home" element={<LandingPage/>}/>
       <Route path="/game_catalog" element={<GameCatalog/>} />
       <Route path="/tournament_list" element={<TournamentList />} />
-      {/* <Route path="/teams" element = {<TeamsPage/>}/> */}
-      {/* {<Route path="/teams/add" element = {<TeamsAddPage/>}/>}
-      {<Route path="/teams/edit/:id" element = {<TeamsEditPage/>}/>} */}
+      <Route path="/guest/teams" element = {<TeamsGuestPage/>}/>
+      <Route path="/guest/teams/:id" element = {<TeamsGuestDetailsPage/>}/>
+      
       {/* User routes */}
       <Route path="/dashboard" element={<ProtectedRoute requiredRole="player"><UserDashboard /></ProtectedRoute>} />
       <Route path="/user_info" element={<ProtectedRoute requiredRole="player"><UserOverview/></ProtectedRoute>}/>
