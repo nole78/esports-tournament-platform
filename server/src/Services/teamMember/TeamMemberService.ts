@@ -213,4 +213,28 @@ export class TeamMemberService implements ITeamMemberService{
             const ret = invites.filter(x => x.status === TeamInviteStatus.PENDING);
             return Result.Success(ret.map(i => new InviteDto(i.userId, i.teamId, i.invitedAt, i.status)));
         }
+        async getInvitesByTeamId(teamId: number): Promise<Result<InviteDto[]>> {
+            const team = await this.teamRepoRead.findById(teamId);
+            if (team.teamId === 0){
+                return Result.Failure(`Team with ${teamId} doesn't exist`, ErrorType.NotFound);
+            }
+
+            const invites = await this.inviteRepoRead.findByTeamId(teamId);
+            return Result.Success(invites.map(i => new InviteDto(i.userId, i.teamId, i.invitedAt, i.status)));
+        }
+        async getCaptain(teamId: number): Promise<Result<UserDto>> {
+            const team = await this.teamRepoRead.findById(teamId);
+            if (team.teamId === 0){
+                return Result.Failure(`Team with ${teamId} doesn't exist`, ErrorType.NotFound);
+            }
+            const members = await this.teamMemberRepoRead.findByTeamId(teamId);
+            const membersCaptain = members.find(m => m.role === TeamRole.CAPTAIN);
+            const captain = await this.userRepo.findById(membersCaptain?.userId as number);
+            if (captain.id === 0){
+                return Result.Failure(`Team captain doesn't exist`, ErrorType.NotFound);
+            }
+            return Result.Success(new UserDto(captain.id, captain.gamerTag, captain.email, captain.role,
+                captain.profilePicture, captain.isActive, captain.createdAt
+            ));
+        }
 }

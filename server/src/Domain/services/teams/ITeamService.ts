@@ -17,4 +17,5 @@ export interface ITeamService{
     getAllMyTeams(gamerTag: string) : Promise<Result<TeamDto[]>>
     
     getByIdGuest(teamId: number) : Promise<Result<GuestTeamDto>>
+     
 }
