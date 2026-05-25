@@ -16,10 +16,14 @@ import LandingPage from "./pages/common_pages/LandingPage";
 import TeamsPage from "./pages/common_pages/TeamsPage";
 import TeamsAddPage from "./pages/common_pages/TeamsAddPage";
 import TeamsEditPage from "./pages/common_pages/TeamsEditPage";
+import TournamentRegistrationPage from "./pages/common_pages/TournamentRegistrationPage";
+import UserWatchList from "./pages/user/UserWatchlist";
 //import TeamsAddPage from "./pages/common_pages/TeamsAddPage";
 
 import { Layout } from "./components/layout/Layout";
 import UserOverview from "./pages/user/UserOverview";
+import TeamsDetailPage from "./pages/common_pages/TeamsDetailPage";
+import TeamsInboxPage from "./pages/common_pages/TeamsInboxPage";
 
 export default function App() {
   return (
@@ -30,12 +34,19 @@ export default function App() {
       <Route path="/home" element={<LandingPage/>}/>
       <Route path="/game_catalog" element={<GameCatalog/>} />
       <Route path="/tournament_list" element={<TournamentList />} />
-      <Route path="/teams" element = {<TeamsPage/>}/>
-      {<Route path="/teams/add" element = {<TeamsAddPage/>}/>}
-      {<Route path="/teams/edit/:id" element = {<TeamsEditPage/>}/>}
+      {/* <Route path="/teams" element = {<TeamsPage/>}/> */}
+      {/* {<Route path="/teams/add" element = {<TeamsAddPage/>}/>}
+      {<Route path="/teams/edit/:id" element = {<TeamsEditPage/>}/>} */}
       {/* User routes */}
       <Route path="/dashboard" element={<ProtectedRoute requiredRole="player"><UserDashboard /></ProtectedRoute>} />
       <Route path="/user_info" element={<ProtectedRoute requiredRole="player"><UserOverview/></ProtectedRoute>}/>
+      <Route path="/tournament_registration/:id" element={<ProtectedRoute requiredRole="player"><TournamentRegistrationPage /></ProtectedRoute>}/>
+      <Route path="/teams" element ={<ProtectedRoute requiredRole="player"> <TeamsPage/></ProtectedRoute>} />
+      <Route path="/teams/add" element ={<ProtectedRoute requiredRole="player"> <TeamsAddPage/></ProtectedRoute>} />
+      <Route path="/teams/edit/:id" element ={<ProtectedRoute requiredRole="player"> <TeamsEditPage/></ProtectedRoute>} />
+      <Route path="/teams/details/:id" element ={<ProtectedRoute requiredRole="player"> <TeamsDetailPage/></ProtectedRoute>} />
+      <Route path="/teams/inbox" element ={<ProtectedRoute requiredRole="player"> <TeamsInboxPage/></ProtectedRoute>} />
+      <Route path="/watchlist" element={<ProtectedRoute requiredRole="player"><UserWatchList/></ProtectedRoute>} />
 
       {/* Admin routes */}
       <Route path="/admin_info" element={<ProtectedRoute requiredRole="admin"><UserOverview/></ProtectedRoute>}/>
@@ -45,8 +56,15 @@ export default function App() {
       <Route path="/admin/tournament_list" element={<ProtectedRoute requiredRole="admin"><TournamentList/></ProtectedRoute>} />
       <Route path="/admin/tournament_list/add" element={<ProtectedRoute requiredRole="admin"><TournamentAddPage/></ProtectedRoute>} />
       <Route path="/admin/dashboard" element={<ProtectedRoute requiredRole="admin"><AdminDashboard/></ProtectedRoute>}/>
-      {/* <Route path="/admin/teams" element ={<ProtectedRoute requiredRole="admin"> <TeamsPage/></ProtectedRoute>} /> */}
-
+      <Route path="/tournament_list" element={<ProtectedRoute requiredRole="admin"><TournamentList/></ProtectedRoute>} />
+      <Route path="/admin/tournament_list/add" element={<ProtectedRoute requiredRole="admin"><TournamentAddPage/></ProtectedRoute>} />
+      <Route path="/admin/tournament_registration/:id" element={<ProtectedRoute requiredRole="admin"><TournamentRegistrationPage /></ProtectedRoute>}/>
+      <Route path="/admin/watchlist" element={<ProtectedRoute requiredRole="admin"><UserWatchList/></ProtectedRoute>}/>
+      <Route path="/admin/teams" element ={<ProtectedRoute requiredRole="admin"> <TeamsPage/></ProtectedRoute>} />
+      <Route path="/admin/teams/add" element ={<ProtectedRoute requiredRole="admin"> <TeamsAddPage/></ProtectedRoute>} />
+      <Route path="/admin/teams/edit/:id" element ={<ProtectedRoute requiredRole="admin"> <TeamsEditPage/></ProtectedRoute>} />
+      <Route path="/admin/teams/details/:id" element ={<ProtectedRoute requiredRole="admin"> <TeamsDetailPage/></ProtectedRoute>} />
+      <Route path="/admin/teams/inbox" element ={<ProtectedRoute requiredRole="admin"> <TeamsInboxPage/></ProtectedRoute>} />
 
       <Route path="/"    element={<Navigate to="/home" replace />} />
       <Route path="/404" element={<NotFoundPage />} />

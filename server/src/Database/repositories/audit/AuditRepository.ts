@@ -18,8 +18,8 @@ export class AuditRepository implements IAuditRepository {
       const [result] = await res.conn.execute<ResultSetHeader>(
         `INSERT INTO audit_log (user_id, action, entity, entity_id, meta, ipAddress)
          VALUES (?, ?, ?, ?, ?, ?)`,
-        [log.userId ?? null, log.action, log.entity ?? null,
-         log.entityId ?? null, log.meta ?? null, log.ipAddress ?? null]
+        [log.userId ?? 0, log.action, log.entity ?? "",
+         log.entityId ?? 0, log.meta ?? "", log.ipAddress ?? ""]
       );
       if (result.insertId === 0) return new AuditLog();
       return new AuditLog(result.insertId, log.userId, log.action,
@@ -44,10 +44,10 @@ export class AuditRepository implements IAuditRepository {
       );
       const items = rows.map(
         (l) => new AuditLog(
-          l.id, l.user_id ?? null,
-          l.action, l.entity ?? null, l.entity_id ?? null,
-          l.meta ?? null,
-          l.ipAddress ?? null, new Date(l.createdAt as string)
+          l.id, l.user_id ?? "",
+          l.action, l.entity ?? "", l.entity_id ?? 0,
+          l.meta ?? "",
+          l.ipAddress ?? "", new Date(l.createdAt as string)
         )
       );
       return items;

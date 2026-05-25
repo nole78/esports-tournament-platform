@@ -24,7 +24,7 @@ CREATE TABLE teams(
   team_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   team_name VARCHAR(100) NOT NULL UNIQUE,
   team_tag VARCHAR(10) NOT NULL UNIQUE,
-  team_logotip TEXT,
+  team_logotip LONGTEXT,
   team_description TEXT,
   CONSTRAINT team_name_length CHECK (
     LENGTH(team_name) BETWEEN 2 AND 80
@@ -125,4 +125,14 @@ CREATE TABLE audit_log (
   ipAddress  VARCHAR(45),
   createdAt  DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+CREATE TABLE team_invites(
+  user_id INT UNSIGNED NOT NULL,
+  team_id INT UNSIGNED NOT NULL,
+  status ENUM('pending', 'accepted', 'rejected'),
+  invited_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (user_id, team_id),
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  FOREIGN KEY (team_id) REFERENCES teams(team_id)
 );

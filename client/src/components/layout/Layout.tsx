@@ -5,6 +5,7 @@ import logo from "../../assets/logo.png";
 import avatarPlaceholder from "../../assets/avatar_placeholder.jpg";
 import { usersApi } from "../../api_services/users/UsersAPIService";
 import { authApi } from "../../api_services/auth/AuthAPIService";
+import NotificationDropdown from "../account/NotificationDropDown";
 
 // TODO: Update nav items to match your routes and roles
 const guestNav = [
@@ -16,6 +17,7 @@ const userNav = [
   { to: "/game_catalog", label: "Game Catalog"},
   { to: "/teams", label: "Teams List"},
   { to: "/tournament_list", label: "Tournaments"},
+  { to: "/watchlist", label: "My Watchlist"},
   // add more user routes here
 ];
 const adminNav = [
@@ -23,7 +25,9 @@ const adminNav = [
   { to: "/game_catalog", label: "Game Catalog"},
   { to: "/teams", label: "Teams List"},
   { to: "/tournament_list", label: "Tournaments"},
-
+  { to: "/admin/teams", label: "Teams List"},
+  { to: "/tournament_list", label: "Tournaments"},
+  { to: "/admin/watchlist", label: "My Watchlist"},
   // add more admin routes here
 ];
 
@@ -32,7 +36,6 @@ export function Layout() {
   const navigate = useNavigate();
   const nav = user?.role === "admin" ? adminNav : user? userNav : guestNav;
   const [avatar, setAvatar] = useState("");
-  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     if(user)
@@ -87,14 +90,7 @@ export function Layout() {
             {user && (
               <div className="flex items-center gap-2">
                 <div className="w-10 mr-2">
-                  <button onClick={() => setIsOpen(!isOpen)}>
-                    <div className="px-2 py-1 w-12 font-bold text-2xl rounded-4xl transition-all text-primary/60 hover:text-primary hover:bg-white/5 cursor-pointer">
-                      {isOpen?
-                        "🗁":
-                        "🗀"
-                      }
-                    </div>
-                  </button>
+                  <NotificationDropdown />
                 </div>
                 <button onClick={() => navigate(user.role == "admin"?"/admin_info":"user_info")}
                   className="cursor-pointer w-8 h-8 rounded-full bg-white/10 border border-primary/50 flex items-center justify-center">
@@ -120,7 +116,7 @@ export function Layout() {
       </header>
 
       <main className="main-scroll flex-1 overflow-y-auto">
-        <div className="max-w-5xl mx-auto px-8 py-8" onClick={() => setIsOpen(false)}><Outlet/></div>
+        <div className="max-w-5xl mx-auto px-8 py-8"><Outlet/></div>
       </main>
     </div>
   );

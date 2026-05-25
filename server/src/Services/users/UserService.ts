@@ -5,6 +5,7 @@ import { Result } from "../../Domain/common/Result";
 import { ErrorType } from "../../Domain/common/ErrorType";
 import { UserRole } from "../../Domain/enums/UserRole";
 
+
 export class UserService implements IUserService {
   public constructor(private readonly userRepo: IUserRepository) {}
 
@@ -35,5 +36,12 @@ export class UserService implements IUserService {
 
     var res = await this.userRepo.logOut(user.id);
     return res? Result.Success():Result.Failure("Couldn't log out user",ErrorType.Internal);
+  }
+
+  async getForSearch(username: string): Promise<Result<UserDto[]>> {
+    const users = await this.userRepo.findAll();
+    const retUsers = users.filter(user => user.gamerTag.includes(username))
+    return Result.Success(retUsers.map((u) => new UserDto(u.id, u.gamerTag, u.email, u.role, u.profilePicture, u.isActive)));
+ 
   }
 }

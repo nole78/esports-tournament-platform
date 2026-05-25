@@ -2,6 +2,9 @@ import axios from "axios";
 import { readItem } from "../../helpers/local_storage";
 import type { ApiResponse, ITeamAPIService } from './ITeamAPIService';
 import type { TeamDto } from "../../models/team/TeamDto";
+import type { UserForMembersDto } from "../../models/user/UserForMembers";
+import type { IniviteDto } from "../../models/invite/InviteDto";
+//import type { UserDto } from "../../models/user/UserTypes";
 //import { Team } from '../../../../server/src/Domain/models/Team';
 //import type { TeamDto } from "../../models/team/TeamDto";
 
@@ -38,5 +41,37 @@ export const teamApi: ITeamAPIService ={
     async update(id, payload){
         return axios.patch<ApiResponse<void>>(`${BASE}/${id}`, payload, {headers: authHeader()})
         .then(r => r.data).catch(e => err(e, "Failed to update"))
-    }
+    },
+    async getMembers(id){
+        return axios.get<ApiResponse<UserForMembersDto[]>>(`${BASE}/members/${id}`, {headers: authHeader()})
+        .then(r => r.data).catch(e => err(e, "Failed to get team members"))
+    },
+    async transferCaptainship(idTeam, idReciever){
+        return axios.patch<ApiResponse<void>>(
+            `${BASE}/${idTeam}/members/${idReciever}/role`,
+            {},
+            {headers: authHeader()}
+        )
+        .then(r=>r.data).catch(e => err(e, "Failed to transfer role"))
+    },
+    async inviteMember(teamId, username) {
+        return axios.post<ApiResponse<void>>(`${BASE}/${teamId}/invite`, {userTag : username}, {headers: authHeader()})
+        .then(r=> r.data).catch(e => err(e, "Failed to invite user"))
+    }, 
+    async userInvites() {
+        return axios.get<ApiResponse<IniviteDto[]>>(`${BASE}/invites/all`, {headers: authHeader()})
+        .then(r => r.data).catch(e=> err(e, "Failed to load invites"))
+    },
+    async inviteRespond(teamId, answer) {
+        return axios.post<ApiResponse<void>>(`${BASE}/${teamId}/invite/respond`, {answer: answer}, {headers: authHeader()})
+        .then(r => r.data).catch(e => err(e, "Failed to send response"))
+    },
+    async leaveTeam(teamId, userId){
+        return axios.delete<ApiResponse<void>>(`${BASE}/${teamId}/members/${userId}`, {headers: authHeader()})
+        .then(r => r.data).catch(e => err(e, "Failed to delete member"))
+    },
+    async getMyTeams() {
+        return axios.get<ApiResponse<TeamDto[]>>(`${BASE}/mine/all`, {headers: authHeader()})
+        .then(r => r.data).catch(e => err(e, "Failed to get your teams"))
+    },
 };

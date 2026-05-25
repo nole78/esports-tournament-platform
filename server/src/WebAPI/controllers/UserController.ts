@@ -14,6 +14,7 @@ export class UserController {
     this.router.get("/users",          authenticate, authorize(UserRole.ADMIN), this.getAll.bind(this));
     this.router.get("/users/:id",       this.getById.bind(this));
     this.router.put("/users/:id/role", authenticate, authorize(UserRole.ADMIN), this.changeRole.bind(this));
+    this.router.get("/users/search/:username", this.getUsersSearch.bind(this));
   }
 
   private async getAll(req: Request, res: Response): Promise<void> {
@@ -40,6 +41,13 @@ export class UserController {
     const parsedRole: UserRole = role as UserRole;
 
     const result = await this.userService.changeRole(id,parsedRole);  
+    handleResult(result, res);
+  }
+
+  private async getUsersSearch(req: Request, res: Response): Promise<void>{
+    const username = req.params.username as string ?? "";
+
+    const result = await this.userService.getForSearch(username);
     handleResult(result, res);
   }
 

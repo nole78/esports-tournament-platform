@@ -5,7 +5,7 @@ export interface NodeStatusDto {
     host: string;
     port: number;
     status: NodeStatus;
-    lastCheck: string | null;
+    lastCheck: string;
     successfulReads: number;
     failedReads: number;
     successfulWrites: number;

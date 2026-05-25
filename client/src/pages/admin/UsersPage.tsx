@@ -6,7 +6,8 @@ import type { UserDto } from "../../models/user/UserTypes";
 export default function UsersPage() {
   const [users, setUsers] = useState<UserDto[]>([]);
   const [error, setError] = useState<string>("");
-  const [selectedUser, setSelectedUser] = useState<UserDto | null>(null);
+  const [selectedUser, setSelectedUser] = useState<UserDto>();
+  const [open, setOpen] = useState<boolean>(false);
 
   useEffect(() => {
     usersApi.getAll()
@@ -28,7 +29,7 @@ export default function UsersPage() {
                 <td className="px-5 py-3.5 text-bgsecondary/80 text-sm">{u.gamerTag}</td>
                 <td className="px-5 py-3.5 text-bgsecondary/40 text-sm">{u.email}</td>
                 <td className="px-5 py-3.5">
-                  <button onClick={() => setSelectedUser(u)} className="cursor-pointer">
+                  <button onClick={() => {setSelectedUser(u); setOpen(true);}} className="cursor-pointer">
                     <RoleBadge role={u.role} />
                   </button>
                 </td>
@@ -51,9 +52,9 @@ export default function UsersPage() {
           </tbody>
         </Table>
       )}
-      {selectedUser && (
+      {selectedUser && open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setSelectedUser(null)}/>
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setOpen(false)}/>
           <div className=" relative w-85 rounded-3xl border border-secondary/40 bg-[#111814] p-6 shadow-[0_0_60px_rgba(120,255,120,0.08)] animate-in fade-in zoom-in-95 duration-200">
             <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-secondary to-transparent opacity-70" />
             <div className="mb-5">
@@ -81,7 +82,7 @@ export default function UsersPage() {
                     if(selectedUser.role === "admin")
                     {
                       role = selectedUser.role;
-                      setSelectedUser(null);
+                      setOpen(false);
                       setError("Cannot change the role of an admin")
                       setTimeout(() => {setError("")}, 3000);
                       return;
@@ -91,7 +92,7 @@ export default function UsersPage() {
                       usersApi.changeRole(selectedUser.id, role)
                     }
                     
-                    setSelectedUser(null);
+                    setOpen(false);
                   }}
                   className={`w-full rounded-2xl border py-3 text-sm font-medium transition-all duration-200 cursor-pointer justify-center-safe items-center
                     ${
@@ -105,7 +106,7 @@ export default function UsersPage() {
               ))}
             </div>
             <button
-              onClick={() => setSelectedUser(null)}
+              onClick={() => setOpen(false)}
               className="mt-5 w-full rounded-2xl border border-bgsecondary/5 bg-bgsecondary/3 py-3 text-sm text-bgsecondary/50 transition hover:bg-bgsecondary/6 cursor-pointer">
               Cancel
             </button>
