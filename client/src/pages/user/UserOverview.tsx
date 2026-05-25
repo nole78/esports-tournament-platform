@@ -27,52 +27,44 @@ export default function UserOverview() {
   },[user])
 
   return (
-<div className="w-1/2 flex mx-auto justify-center items-center py-10 bg-bgprimary/60 rounded-xl">
-      <div className="flex flex-col items-center gap-4">
+<div className="w-1/2 flex mx-auto justify-center items-center py-10 bg-primary border-bgprimary/80 border-3 shadow-[0_0_25px] shadow-bgprimary/80 rounded-xl mt-25 min-w-110">
 
         {error && <ErrorBox message={error} />}
+        {userInfo && (
+        <div className="grid lg:grid-cols-2 sm:grid-cols-1 items-center lg:gap-10 sm:gap-1">
+          <div className="relative w-40 h-40 justify-self-center">
+            <img draggable={false} alt="Profile" className="w-40 h-40 object-cover rounded-full image-rendering-auto justify-self-center" src = {userInfo.profilePicture ? userInfo.profilePicture : avatarPlaceholder}/>
+            <div className="absolute bottom-2 right-2 w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+              <div className={`w-6 h-6 rounded-full ${
+                            userInfo.isActive
+                                ? "animate-pulse bg-green-500 shadow-[0_0_8px_#22c55e]"
+                                : "bg-bgsecondary/30"
+                        }`}/>
+              </div>
+          </div>
 
-        {userInfo?.profilePicture ?
-          <img
-            src={userInfo.profilePicture}
-            draggable={false}
-            alt="Profile"
-            className="w-40 h-40 object-cover rounded-2xl image-rendering-auto"/>
-            : <div>
-              <img src={avatarPlaceholder}
-              draggable={false}
-              alt="Profile"
-              className="w-40 h-40 object-cover rounded-2xl image-rendering-auto"/>
-            </div>
-        }
-
-        <div className="flex flex-col items-center gap-2">
-          <div>
-            <strong className="text-bgsecondary">ID:</strong> 
-            {userInfo?.id && <span className="ml-2 text-primary">{userInfo.id}</span>}
+        <div className="grid sm:grid-rows-3 lg:grid-rows-6 sm:grid-cols-2 lg:grid-cols-1 sm:col-1 lg:col-2 gap-1 mt-2">
+          <div className="col-1 row-1">
+            <strong className="text-bgsecondary">Gamer Tag:</strong>
           </div>
-          <div>
-            <strong className="text-bgsecondary">Gamer Tag:</strong> 
-            {userInfo?.gamerTag && <span className="ml-2 text-primary">{userInfo.gamerTag}</span>}
+          <div className="sm:col-2 lg:col-1 sm:row-1 lg:row-2">
+            <span className="text-bgprimary">{userInfo.gamerTag} <RoleBadge role={userInfo.role}/></span>
           </div>
-          <div>
-            <strong className="text-bgsecondary">Full Name:</strong> 
-            {userInfo?.fullName && <span className="ml-2 text-primary">{userInfo.fullName}</span>}
+          <div className="sm:col-1 lg:col-1 sm:row-2 lg:row-3">
+            <strong className="text-bgsecondary">Full Name:</strong>
           </div>
-          <div>
-            <strong className="text-bgsecondary">Email:</strong> 
-            {userInfo?.email && <span className="ml-2 text-primary">{userInfo.email}</span>}
+          <div className="sm:col-2 lg:col-1 sm:row-2 lg:row-4">
+            <span className="text-bgprimary">{userInfo.fullName}</span>
           </div>
-          <div>
-            <strong className="text-bgsecondary">Role:</strong> 
-            {userInfo?.role && <span className="ml-2 text-primary"><RoleBadge role = {userInfo.role}/> </span>}
+          <div className="sm:col-1 lg:col-1 sm:row-3 lg:row-5">
+            <strong className="text-bgsecondary">Email:</strong>
           </div>
-          <div>
-            <strong className="text-bgsecondary">Status:</strong>{" "}
-            <span className="ml-2 text-primary">{userInfo?.isActive ? "Active" : "Inactive"}</span>
+          <div className="sm:col-2 lg:col-1 sm:row-3 lg:row-6">
+            <span className="text-bgprimary">{userInfo.email}</span>
           </div>
         </div>
-      </div>
+        </div>
+        )}
     </div>
   );
 }
