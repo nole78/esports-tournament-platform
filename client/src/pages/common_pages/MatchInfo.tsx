@@ -26,8 +26,10 @@ type PlayerOverlayState =
     | { status: "closed" }
     | { status: "open"; userId: number };
 
-export default function TestPage() {
-    const matchId = Number(useParams());
+export default function MatchInfo() {
+    const {id} = useParams();
+    const matchId = Number(id);
+    
     const { user } = useAuth();
     const [matchState, setMatchState] = useState<MatchState>({ status: "loading" });
     const [players, setPlayers] = useState<PlayersState>({ left: [], right: [] });
@@ -41,7 +43,6 @@ export default function TestPage() {
 
     useEffect(() => {
         let cancelled = false;
-
         async function checkCaptain() {
             if (matchState.status !== "loaded" || !user) {
                 setIsBlueCaptain(false);
@@ -246,8 +247,14 @@ export default function TestPage() {
             )}
 
             {selectedPlayer.status === "open" && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
-                    <div className="w-full max-w-2xl rounded-2xl border border-white/10 bg-bgprimary/95 p-4 shadow-2xl">
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
+                    onClick={() => setSelectedPlayer({ status: "closed" })}
+                >
+                    <div
+                        className="relative w-full max-w-2xl rounded-2xl border border-white/10 bg-bgprimary/95 p-4 shadow-2xl"
+                        onClick={(event) => event.stopPropagation()}
+                    >
                         <div className="mb-4 flex items-center justify-between">
                             <h2 className="text-lg font-bold text-bgsecondary">Player Overview</h2>
                             <button
@@ -258,7 +265,7 @@ export default function TestPage() {
                                 Close
                             </button>
                         </div>
-                        <UserOverview userId={selectedPlayer.userId} />
+                        <UserOverview id={selectedPlayer.userId} />
                     </div>
                 </div>
             )}
