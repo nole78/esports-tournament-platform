@@ -8,11 +8,11 @@ import { MatchStatus } from "../../Domain/enums/MatchStatus";
 import { MatchPlayer } from "../../Domain/models/MatchPlayer";
 import { IMatchPlayerReadRepository } from "../../Domain/repositories/match_players/IMatchPlayerReadRepository";
 import { IMatchPlayerWriteRepository } from "../../Domain/repositories/match_players/IMatchPlayerWriteRepository";
-import { ITeamMemberRepository } from "../../Domain/repositories/team_members/ITeamMemberRepository";
-import { ITeamRepository } from "../../Domain/repositories/teams/ITeamRepository";
 import { IUserRepository } from "../../Domain/repositories/users/IUserRepository";
 import { IMatchPlayerService } from "../../Domain/services/match_players/IMatchPlayerService";
 import { IMatchReadRepository } from "../../Domain/repositories/matches/IMatchReadRepository";
+import { ITeamRepositoryRead } from "../../Domain/repositories/teams/ITeamRepositoryRead";
+import { ITeamMemberRepositoryRead } from '../../Domain/repositories/team_members/ITeamMemberRepositoryRead';
 
 export class MatchPlayerService implements IMatchPlayerService{
     constructor(
@@ -20,8 +20,8 @@ export class MatchPlayerService implements IMatchPlayerService{
         private readonly matchPlayerReadRepo: IMatchPlayerReadRepository,
         private readonly matchPlayerWriteRepo: IMatchPlayerWriteRepository,
         private readonly userRepo: IUserRepository,
-        private readonly teamRepo: ITeamRepository,
-        private readonly teamMemberRepo: ITeamMemberRepository
+        private readonly teamRepo: ITeamRepositoryRead,
+        private readonly teamMemberRepo: ITeamMemberRepositoryRead
     ) {}
 
     public async getMatchPlayers(id: number): Promise<Result<MatchPlayerDto[]>> {

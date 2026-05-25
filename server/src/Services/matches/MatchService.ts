@@ -4,8 +4,6 @@ import { ErrorType } from '../../Domain/common/ErrorType';
 import { MatchDto } from "../../Domain/DTOs/matches/MatchDto";
 import { PaginatedListDto } from "../../Domain/DTOs/PaginatedListDto";
 import { Match } from '../../Domain/models/Match';
-import { ITeamRepository } from "../../Domain/repositories/teams/ITeamRepository";
-import { ITournamentRepository } from "../../Domain/repositories/tournaments/ITournamentRepository";
 import { MatchResultDto } from "../../Domain/DTOs/matches/MatchResultDto";
 import { MatchSlot } from "../../Domain/enums/MatchSlot";
 import { MatchStatus } from "../../Domain/enums/MatchStatus";
@@ -13,14 +11,16 @@ import { IMatchReadRepository } from "../../Domain/repositories/matches/IMatchRe
 import { IMatchWriteRepository } from "../../Domain/repositories/matches/IMatchWriteRepository";
 import { MatchDetailsDto } from "../../Domain/DTOs/matches/MatchDetailsDto";
 import { IGameRepository } from "../../Domain/repositories/games/IGameRepository";
+import { ITeamRepositoryRead } from "../../Domain/repositories/teams/ITeamRepositoryRead";
+import { ITournamentRepositoryRead } from "../../Domain/repositories/tournaments/ITournamentRepositoryRead";
 
 // TODO: fix N+1 problem for geting team names
 export class MatchService implements IMatchService{
     constructor(
         private readonly matchReadRepo: IMatchReadRepository,
         private readonly matchWriteRepo: IMatchWriteRepository,
-        private readonly teamRepo: ITeamRepository,
-        private readonly tournamentRepo: ITournamentRepository,
+        private readonly teamRepo: ITeamRepositoryRead,
+        private readonly tournamentRepo: ITournamentRepositoryRead,
         private readonly gameRepo: IGameRepository
     ){}
 
