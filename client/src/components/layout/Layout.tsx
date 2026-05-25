@@ -10,7 +10,8 @@ import NotificationDropdown from "../account/NotificationDropDown";
 // TODO: Update nav items to match your routes and roles
 const guestNav = [
   {to: "/game_catalog", label: "Game Catalog"},
-  {to: "/tournament_list", label: "Tournaments"}
+  {to: "/tournament_list", label: "Tournaments"},
+  {to: "/guest/teams", label: "Teams List"}
 ]
 
 const userNav = [
@@ -114,7 +115,7 @@ export function Layout() {
       </header>
 
       <main className="main-scroll flex-1 overflow-y-auto">
-        <div className="max-w-5xl mx-auto px-8 py-8"><Outlet/></div>
+        <div className="mx-auto px-8 py-8"><Outlet/></div>
       </main>
     </div>
   );

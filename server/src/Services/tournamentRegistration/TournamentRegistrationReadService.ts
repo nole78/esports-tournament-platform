@@ -5,7 +5,7 @@ import { TournamentRegistrationDto } from "../../Domain/DTOs/tournament_registra
 import { TournamentRegistrationStatus } from "../../Domain/enums/TournamentRegistrationStatus";
 import { Team } from "../../Domain/models/Team";
 import { Tournament } from "../../Domain/models/Tournament";
-import { ITeamRepository } from "../../Domain/repositories/teams/ITeamRepository";
+import { ITeamRepositoryRead } from "../../Domain/repositories/teams/ITeamRepositoryRead";
 import { ITournamentRegistrationReadRepository } from "../../Domain/repositories/tournament_registrations/ITournamentRegistrationReadRepository";
 import { ITournamentReadRepository } from "../../Domain/repositories/tournaments/ITournamentReadRepository";
 import { ILoggerService } from "../../Domain/services/logger/ILoggerService";
@@ -14,13 +14,13 @@ import { ITournamentRegistrationReadService } from "../../Domain/services/tourna
 export class TournamentRegistrationReadService implements ITournamentRegistrationReadService{
     public constructor(
         private readonly tournamentRegistrationReadRepo: ITournamentRegistrationReadRepository,
-        private readonly teamRepo: ITeamRepository,
+        private readonly teamRepoRead: ITeamRepositoryRead,
         private readonly tournamentReadRepo : ITournamentReadRepository,
         private readonly logger: ILoggerService,
     ){}
 
     async getByTeamId(teamId: number, page?:number, limit?:number): Promise<Result<PaginatedListDto<TournamentRegistrationDto>>>{
-        const team = await this.teamRepo.findById(teamId);
+        const team = await this.teamRepoRead.findById(teamId);
         if(team.teamId === 0)
         {
             this.logger.error("TournamentRegistrationServiceRead", "getByTeamId failed", `Team with teamId "${teamId}" not found`);
@@ -79,7 +79,7 @@ export class TournamentRegistrationReadService implements ITournamentRegistratio
 
         for(let i:number = 0; i < teamIds.length; i++)
         {
-            const team = await this.teamRepo.findById(teamIds[i]);
+            const team = await this.teamRepoRead.findById(teamIds[i]);
             if(team.teamId !== 0)
                 teams.push(team);
         }
