@@ -1,4 +1,4 @@
-type MatchStatus =  "scheduled" | "ongoing" | "completed"
+export type MatchStatus =  "scheduled" | "ongoing" | "completed"
 type BracketType = "winner" | "loser" | "grand_finale"
 type MatchSlot = "none" | "blue" | "red" 
 
