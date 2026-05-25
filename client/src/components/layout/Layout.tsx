@@ -18,15 +18,15 @@ const userNav = [
   { to: "/game_catalog", label: "Game Catalog"},
   { to: "/teams", label: "Teams List"},
   { to: "/tournament_list", label: "Tournaments"},
+  { to: "/watchlist", label: "My Watchlist"},
   // add more user routes here
 ];
 const adminNav = [
-  { to: "/admin/users", label: "Users"},
+  { to: "/admin/dashboard", label: "Admin Dashboard"},
   { to: "/game_catalog", label: "Game Catalog"},
-  { to: "/admin/audit_log", label: "Audit Log"},
   { to: "/admin/teams", label: "Teams List"},
   { to: "/tournament_list", label: "Tournaments"},
-  { to: "/admin/health", label: "Health"},
+  { to: "/admin/watchlist", label: "My Watchlist"},
   // add more admin routes here
 ];
 

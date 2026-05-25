@@ -1,10 +1,9 @@
 import { useState } from 'react';
-import BurgerIcon from '../heroIcons/BurgerIcon';
 import type { SidebarProps } from '../../models/SideMenu/SidebarProps';
+import BurgerIcon from '../heroIcons/BurgerIcon';
 
 
-export function TournamentSidebar({ menuItems, activeItem, onItemSelect }: SidebarProps) {
-  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+export function SidebarMenu({ menuItems, activeItem, onItemSelect }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(true);
 
   return (
@@ -13,7 +12,7 @@ export function TournamentSidebar({ menuItems, activeItem, onItemSelect }: Sideb
     }`}>
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="w-12 h-12 rounded-xl bg-linear-to-br from-[#f7d494] to-[#d2aa60] flex items-center justify-center mb-4 hover:shadow-lg hover:shadow-white/20 transition-all cursor-pointer hover:scale-105 active:scale-95"
+        className="w-12 h-12 rounded-xl bg-linear-to-br from-[#f7d494] to-[#d2aa60] flex items-center justify-center mb-4 hover:shadow-lg hover:shadow-bgsecondary/30 transition-all cursor-pointer hover:scale-105 active:scale-95"
         title={isCollapsed ? "Expand menu" : "Collapse menu"}>
         <span className={`text-xl font-bold text-secondary transition-transform duration-300 ${isCollapsed ? 'rotate-180' : ''}`}>
           <BurgerIcon />
@@ -26,11 +25,9 @@ export function TournamentSidebar({ menuItems, activeItem, onItemSelect }: Sideb
           <button
             key={item.id}
             onClick={() => onItemSelect(item.id)}
-            onMouseEnter={() => setHoveredItem(item.id)}
-            onMouseLeave={() => setHoveredItem(null)}
             className={`relative group w-full h-12 rounded-xl flex items-center justify-center transition-all duration-200 text-5xl
               ${activeItem === item.id 
-                ? 'bg-linear-to-br  from-[#f7d494] to-[#d2aa60] text-[#41542b] shadow-lg shadow-blue-400/30' 
+                ? 'bg-linear-to-br  from-[#f7d494] to-[#d2aa60] text-[#41542b] shadow-lg shadow-bgsecondary/30' 
                 : 'text-secondary hover:bg-white/10'
               }
             `}
@@ -45,13 +42,6 @@ export function TournamentSidebar({ menuItems, activeItem, onItemSelect }: Sideb
                 {item.label}
               </span>
             </div>
-            
-            {/* Tooltip - Show only when collapsed and hovering */}
-            {isCollapsed && hoveredItem === item.id && (
-              <div className="absolute left-16 bg-secondary/95 text-white/90 text-xs px-3 py-1 rounded-lg whitespace-nowrap pointer-events-none z-50">
-                {item.label}
-              </div>
-            )}
           </button>
         ))}
       </div>

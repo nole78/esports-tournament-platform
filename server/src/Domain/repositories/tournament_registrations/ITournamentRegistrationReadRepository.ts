@@ -1,7 +1,7 @@
 import { TournamentRegistrationStatus } from "../../enums/TournamentRegistrationStatus";
 import { TournamentRegistration } from "../../models/TournamentRegistration";
 
-export interface ITournamentRegistrationRepositoryRead{
+export interface ITournamentRegistrationReadRepository{
     findTotalByTeamId(teamId: number): Promise<number>;
     findTotalByTournamentId(tournamentId: number, status?:TournamentRegistrationStatus): Promise<number>;
     findByTeamId(teamId: number, page?:number, limit?:number): Promise<TournamentRegistration[]>;

@@ -9,9 +9,9 @@ import { ITeamRepositoryRead } from "../../Domain/repositories/teams/ITeamReposi
 import { ITournamentRegistrationRepositoryRead } from "../../Domain/repositories/tournament_registrations/ITournamentRegistrationRepositoryRead";
 import { ITournamentRepositoryRead } from "../../Domain/repositories/tournaments/ITournamentRepositoryRead";
 import { ILoggerService } from "../../Domain/services/logger/ILoggerService";
-import { ITournamentRegistrationServiceRead } from "../../Domain/services/tournamentRegistration/ITournamentRegistrationServiceRead";
+import { ITournamentRegistrationReadService } from "../../Domain/services/tournamentRegistration/ITournamentRegistrationReadService";
 
-export class TournamentRegistrationServiceRead implements ITournamentRegistrationServiceRead{
+export class TournamentRegistrationReadService implements ITournamentRegistrationReadService{
     public constructor(
         private readonly tournamentRegistrationRepoRead: ITournamentRegistrationRepositoryRead,
         private readonly teamRepoRead: ITeamRepositoryRead,
@@ -26,7 +26,7 @@ export class TournamentRegistrationServiceRead implements ITournamentRegistratio
             this.logger.error("TournamentRegistrationServiceRead", "getByTeamId failed", `Team with teamId "${teamId}" not found`);
             return Result.Failure("Could not find team with id "+teamId, ErrorType.NotFound);
         }
-        const tournamentRegs = await this.tournamentRegistrationRepoRead.findByTeamId(teamId, page, limit);
+        const tournamentRegs = await this.tournamentRegistrationReadRepo.findByTeamId(teamId, page, limit);
         if (!tournamentRegs) {
             this.logger.error("TournamentRegistrationServiceRead", "getByTeamId failed", `Tournament registrations with teamId "${teamId}" not found`);
             return Result.Failure("Could not find any tournament registrations for team with id "+teamId, ErrorType.NotFound);
@@ -37,7 +37,7 @@ export class TournamentRegistrationServiceRead implements ITournamentRegistratio
 
         for(let i:number = 0; i < tournamentIds.length; i++)
         {
-            const tournament = await this.tournamentRepoRead.findById(tournamentIds[i]);
+            const tournament = await this.tournamentReadRepo.findById(tournamentIds[i]);
             if(tournament.tournamentId !== 0)
                 tournaments.push(tournament);
         }
@@ -56,19 +56,19 @@ export class TournamentRegistrationServiceRead implements ITournamentRegistratio
                 tr.status
               )
         );  
-        const total = await this.tournamentRegistrationRepoRead.findTotalByTeamId(teamId);
+        const total = await this.tournamentRegistrationReadRepo.findTotalByTeamId(teamId);
 
         return Result.Success(new PaginatedListDto(items, total, page, limit));
     }
 
     async getByTournamentId(tournamentId: number, status:TournamentRegistrationStatus, page?:number, limit?:number): Promise<Result<PaginatedListDto<TournamentRegistrationDto>>>{
-        const tournament = await this.tournamentRepoRead.findById(tournamentId);
+        const tournament = await this.tournamentReadRepo.findById(tournamentId);
         if(tournament.tournamentId === 0)
         {
             this.logger.error("TournamentRegistrationServiceRead", "getByTournamentId failed", `Tournament with tournamentId "${tournamentId}" not found`);
             return Result.Failure("Could not find tournament with id " + tournamentId, ErrorType.NotFound);
         }
-        const tournamentRegs = await this.tournamentRegistrationRepoRead.findByTournamentId(tournamentId, status, page, limit);
+        const tournamentRegs = await this.tournamentRegistrationReadRepo.findByTournamentId(tournamentId, status, page, limit);
         if (!tournamentRegs) {
             this.logger.error("TournamentRegistrationServiceRead", "getByTournamentId failed", `Tournament registrations with tournamentId "${tournamentId}" not found`);
             return Result.Failure("Could not find any tournament registrations for tournament with id " + tournamentId, ErrorType.NotFound);
@@ -98,7 +98,7 @@ export class TournamentRegistrationServiceRead implements ITournamentRegistratio
                 tr.status
               )
         );  
-        const total = await this.tournamentRegistrationRepoRead.findTotalByTournamentId(tournamentId, status);
+        const total = await this.tournamentRegistrationReadRepo.findTotalByTournamentId(tournamentId, status);
 
         return Result.Success(new PaginatedListDto(items, total, page, limit));
     }

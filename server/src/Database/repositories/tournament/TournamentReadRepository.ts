@@ -1,10 +1,10 @@
 import { RowDataPacket } from "mysql2";
-import { ITournamentRepositoryRead } from "../../../Domain/repositories/tournaments/ITournamentRepositoryRead";
+import { ITournamentReadRepository } from "../../../Domain/repositories/tournaments/ITournamentReadRepository";
 import { ILoggerService } from "../../../Domain/services/logger/ILoggerService";
 import { DbManager } from "../../connection/DbConnectionPool";
 import { Tournament } from "../../../Domain/models/Tournament";
 
-export class TournamentRepositoryRead implements ITournamentRepositoryRead {
+export class TournamentReadRepository implements ITournamentReadRepository {
   public constructor(
     private readonly db: DbManager,
     private readonly logger: ILoggerService,
@@ -40,7 +40,7 @@ export class TournamentRepositoryRead implements ITournamentRepositoryRead {
     }
     const filter = {tournamentGameId, tournamentFormat, tournamentStatus};
     try {
-      const entries = Object.entries(filter).filter(([, v]) => v !== undefined).map(([k,v]) => [fieldMap[k] ?? k, v]);
+      const entries = Object.entries(filter).filter(([, v]) => v).map(([k,v]) => [fieldMap[k] ?? k, v]);
       if (entries.length === 0) return 0;
       const filterClause = entries.map(([k]) => `${k} = ?`).join(" AND ");
       const values = entries.map(([, v]) => v);
@@ -96,7 +96,7 @@ export class TournamentRepositoryRead implements ITournamentRepositoryRead {
     } finally { res.conn.release(); }
   }
 
-  async findFiltered(tournamentGameId:number, tournamentFormat:string, tournamentStatus:string, page:number, limit:number): Promise<Tournament[]>{
+  async findFiltered(tournamentGameId?:number, tournamentFormat?:string, tournamentStatus?:string, page:number = 1, limit:number = 10): Promise<Tournament[]>{
     const res = await this.db.getReadConnection();
     if (!res) return [];
     const offset = Math.max(0, Math.floor((page - 1) * limit));
@@ -109,19 +109,19 @@ export class TournamentRepositoryRead implements ITournamentRepositoryRead {
     }
     const filter = {tournamentGameId, tournamentFormat, tournamentStatus};
     try {
-      const entries = Object.entries(filter).filter(([, v]) => v !== undefined).map(([k,v]) => [fieldMap[k] ?? k, v]);
+      const entries = Object.entries(filter).filter(([, v]) => v).map(([k,v]) => [fieldMap[k] ?? k, v]);
       if (entries.length === 0) return [];
       const filterClause = entries.map(([k]) => `${k} = ?`).join(" AND ");
       const values = entries.map(([, v]) => v);
       
       const [rows] = await res.conn.query<RowDataPacket[]>(
-        `SELECT tournament_name, tournament_game_id, tournament_format, tournament_max_teams, tournament_application_deadline, tournament_prize_fund, tournament_status
+        `SELECT tournament_id, tournament_name, tournament_game_id, tournament_format, tournament_max_teams, tournament_application_deadline, tournament_prize_fund, tournament_status
          FROM tournaments
          WHERE ${filterClause}
          ORDER BY tournament_id DESC LIMIT ? OFFSET ?`, [...values, lim, offset]
       );
 
-      const [cnt] = await res.conn.execute<RowDataPacket[]>(
+      const [cnt] = await res.conn.query<RowDataPacket[]>(
         `SELECT COUNT(*) as total FROM tournaments 
         WHERE ${filterClause}`,
         [...values]

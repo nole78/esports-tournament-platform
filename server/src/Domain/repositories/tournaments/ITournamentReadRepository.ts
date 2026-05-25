@@ -1,6 +1,6 @@
 import { Tournament } from "../../models/Tournament";
 
-export interface ITournamentRepositoryRead {
+export interface ITournamentReadRepository {
   findTotal(): Promise<number>;
   findTotalFiltered(tournamentGameId?:number, tournamentFormat?:string, tournamentStatus?:string): Promise<number>;
   findById(id: number): Promise<Tournament>;

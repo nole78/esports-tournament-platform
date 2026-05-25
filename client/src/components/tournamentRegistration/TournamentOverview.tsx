@@ -8,7 +8,7 @@ import { formatDeadline } from "../../helpers/date_formatter";
 export default function TournamentOverview() {
     
     const {id} = useParams();
-    const [tournament, setTournament] = useState<TournamentDto|null>(null);
+    const [tournament, setTournament] = useState<TournamentDto>();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string>("");
     
@@ -22,7 +22,6 @@ export default function TournamentOverview() {
           else
           {
             setError(res.message);
-            setTournament(null);
           }
         })
         .finally(() => setLoading(false));

@@ -1,10 +1,10 @@
 import { ResultSetHeader, RowDataPacket } from "mysql2";
-import { ITournamentRegistrationRepositoryWrite } from "../../../Domain/repositories/tournament_registrations/ITournamentRegistrationRepositoryWrite";
+import { ITournamentRegistrationWriteRepository } from "../../../Domain/repositories/tournament_registrations/ITournamentRegistrationWriteRepository";
 import { ILoggerService } from "../../../Domain/services/logger/ILoggerService";
 import { DbManager } from "../../connection/DbConnectionPool";
 import { TournamentRegistration } from '../../../Domain/models/TournamentRegistration';
 
-export class TournamentRegistrationRepositoryWrite implements ITournamentRegistrationRepositoryWrite {
+export class TournamentRegistrationRepositoryWrite implements ITournamentRegistrationWriteRepository {
   public constructor(
     private readonly db: DbManager,
     private readonly logger: ILoggerService,
@@ -30,7 +30,7 @@ export class TournamentRegistrationRepositoryWrite implements ITournamentRegistr
     const res = await this.db.getWriteConnection();
     if (!res) return false;
     try {
-      const entries = Object.entries(fields).filter(([, v]) => v !== undefined);
+      const entries = Object.entries(fields).filter(([, v]) => v);
       if (entries.length === 0) return false;
       const setClause = entries.map(([k]) => `${k} = ?`).join(", ");
       const values = entries.map(([, v]) => v);
