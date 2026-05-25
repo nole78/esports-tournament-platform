@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { teamApi } from "../../api_services/teams/TeamAPIService";
 import { useNavigate } from "react-router-dom";
 import type { TeamDto } from "../../models/team/TeamDto";
-
 import type { UserForMembersDto } from "../../models/user/UserForMembers";
 import { ErrorBox } from "../../components/ui/UI";
 import { useAuth } from "../../hooks/auth/useAuthHook";
@@ -118,10 +117,17 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
                     .then(res =>{
                         setMember(res.data ?? []);
                     }).catch(()=> setError("Failed to load team members"))
+                    teamApi.getInvitesByTeamId(Number(id))
+                    .then(
+                        res => {
+                            setInvitedMembers(res.data ?? []);
+                        }
+                    ).catch(()=> setError("Failed to load invites"))
                     return;
                 }
             }
         ).catch(() => setError("Failed to delete member"));
+
         if (user?.id === userId){
             if(user?.role === UserRole.ADMIN)
                         navigate("/admin/teams", {state: {left : true} });
@@ -151,9 +157,6 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
                             setInvitedMembers(res.data ?? []);
                         }
                     ).catch(()=> setError("Failed to load invites"))
-    }, [id])
-
-    useEffect(()=>{
         teamApi.getMembers(Number(id))
         .then(res =>{
             setMember(res.data ?? []);
@@ -165,6 +168,7 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
                 }
         }).catch(()=> setError("Failed to load team captain"))
     }, [id])
+
     
     useEffect(()=>{
         debounce(()=>{

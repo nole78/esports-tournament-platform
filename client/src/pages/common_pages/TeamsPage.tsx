@@ -3,7 +3,7 @@ import { useAuth } from "../../hooks/auth/useAuthHook";
 import type { TeamDto } from "../../models/team/TeamDto";
 import { useLocation, useNavigate } from 'react-router-dom';
 import { teamApi } from "../../api_services/teams/TeamAPIService";
-import { Empty, ErrorBox, PageHeader, Pagination } from "../../components/ui/UI";
+import { Empty, ErrorBox, PageHeader} from "../../components/ui/UI";
 import { TeamRole } from "../../types/teamMembers/teamMemberRole";
 
 
@@ -18,7 +18,7 @@ export default function TeamsPage(){
     const [edited, setEdited] = useState<boolean>(location.state?.edited ?? false);
      const [left, setLeft] = useState<boolean>(location.state?.left ?? false);
     const [page, setPage] = useState(1);
-    const limit = 20;
+    const limit = 6;
     const navigate = useNavigate();
 
     useEffect(()=>{
@@ -93,7 +93,7 @@ export default function TeamsPage(){
                 {teams.length === 0 && !error ? <Empty message="No teams found"/> : (
                 <section className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">     
                     {teams.map(t => (
-                        <div className=" rounded-2xl group relative aspect-4/3 border-2 border-white/5 bg-bgprimary/30 overflow-hidden">
+                        <div onClick={() => user?.role == "admin" ? navigate(`/admin/teams/details/${t.teamId}`) : navigate(`/teams/details/${t.teamId}`)} className=" rounded-2xl group relative aspect-4/3 border-2 border-white/5 bg-bgprimary/30 overflow-hidden">
                             <div className="w-full h-full">
                                 <img src ={t.teamLogotip} className="object-cover w-full h-full rounded-x1 transition-transform duration-300 group-hover:scale-110"/>
                             </div>
@@ -129,11 +129,7 @@ export default function TeamsPage(){
                                     </button>
                                     </>
                                 )}
-                                     <button className="w-1/3 mb-2 float-right bg-gray-400/40 border-2 border-gray-400 hover:bg-bgsecondary/30 hover:border-bgsecondary text-gray-400 font-semibold rounded-xl p-1 text-sm transition-colors"
-                                            onClick={() => user?.role == "admin" ? navigate(`/admin/teams/details/${t.teamId}`) : navigate(`/teams/details/${t.teamId}`)}
-                                            >
-                                        Details
-                                    </button>
+                                    
 
                                 </div>
                                 <span className="float-left font-semibold text-sm text-bgsecondary">{t.teamTag}</span>
@@ -144,7 +140,27 @@ export default function TeamsPage(){
                 </section>
                 )}
                 
-                <Pagination page={page} total={limit} pageSize={limit} onChange={setPage} />
+                <div className="flex items-center justify-center gap-4 mt-6">
+                <button
+                    type="button"
+                    onClick={() => setPage(p => p - 1)}
+                    disabled={page === 1}
+                    className="px-4 py-2 text-sm font-semibold rounded-xl border-2 border-gray-400 text-gray-400 bg-gray-400/10 hover:bg-gray-400/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                >
+                    Previous
+                </button>
+
+                <span className="text-sm text-bgsecondary font-bold">Page {page}</span>
+
+                <button
+                    type="button"
+                    onClick={() => setPage(p => p + 1)}
+                    disabled={teams.length < limit}
+                    className="px-4 py-2 text-sm font-semibold rounded-xl border-2 border-gray-400 text-gray-400 bg-gray-400/10 hover:bg-gray-400/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                >
+                    Next
+                </button>
             </div>
+        </div>
     );
 }

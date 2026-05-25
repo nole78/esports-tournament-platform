@@ -31,7 +31,7 @@ export const TeamsGuestDetailsForm: React.FC<{id: string}> = ({id}) =>{
                 teamTag:res.data?.teamTag as string};
                 setTeam(teamHelp);
         }).catch(() => setError("Failed to load the team"))
-        //Load the members too
+   
         teamApi.getMembers(Number(id))
                     .then(res =>{
                         setMember(res.data ?? []);
