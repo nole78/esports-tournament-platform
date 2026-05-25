@@ -25,6 +25,7 @@ export class TournamentController{
         this.router.post("/tournaments", authenticate, authorize(UserRole.ADMIN), this.create.bind(this));
         this.router.put("/tournaments/:id", authenticate, authorize(UserRole.ADMIN), this.update.bind(this));
         this.router.delete("/tournaments/:id", authenticate, authorize(UserRole.ADMIN), this.delete.bind(this));
+        this.router.post("/tournaments/:id/generate-bracket", authenticate, authorize(UserRole.ADMIN), this.generateBracket.bind(this));
     }
 
     private async getAll(req: Request, res: Response) : Promise<void>{
@@ -100,12 +101,19 @@ export class TournamentController{
 
     private async findWatchListItem(req: Request, res: Response): Promise<void>
     {
-        console.log(req.user);
         const userId = parseInt(req.body.userId as string, 10);
         const tournamentId = parseInt(req.body.tournamentId as string, 10);
         if (isNaN(userId) || isNaN(tournamentId)) { res.status(400).json({ success: false, message: "Invalid id" }); return; }
         const result = await this.watchlistService.findWatchListItem(userId, tournamentId);
         handleResult(result,res);
+    }
+
+    private async generateBracket(req: Request, res: Response): Promise<void>
+    {
+        const tournamentId = parseInt(req.params.id as string, 10);
+        if (isNaN(tournamentId)) { res.status(400).json({ success: false, message: "Invalid id" }); return; }
+        const result = await this.tournamentWriteService.generateBracket(tournamentId);
+        handleResult(result, res);
     }
 
     public getRouter(): Router { return this.router; }

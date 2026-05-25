@@ -7,4 +7,5 @@ export interface ITournamentWriteService {
   create(dto: CreateTournamentDto): Promise<Result<TournamentDto>>;
   update(id: number, fields: Partial<Tournament>): Promise<Result<void>>;
   delete(id: number): Promise<Result<void>>;
+  generateBracket(id: number): Promise<Result<void>>;
 }
