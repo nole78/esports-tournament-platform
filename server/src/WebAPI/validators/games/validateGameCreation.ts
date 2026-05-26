@@ -1,4 +1,4 @@
-import { ValidationResult } from '../../../Domain/types/ValidationResult';
+import { ValidationResult } from '../../../Domain/types/validation/ValidationResult';
 
 export const validateGameCreation = (n: string, g:string, p:number) : ValidationResult => {
     if(!n)

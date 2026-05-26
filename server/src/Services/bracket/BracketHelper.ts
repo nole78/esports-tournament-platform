@@ -1,7 +1,7 @@
 import { MatchStatus } from "../../Domain/enums/MatchStatus";
 import { Match } from "../../Domain/models/Match";
-import { BracketNode } from "../../Domain/types/BracketNode";
-import { MatchRelationUpdate } from "../../Domain/types/MatchRelationUpdate";
+import { BracketNode } from "../../Domain/types/bracket/BracketNode";
+import { MatchRelationUpdate } from "../../Domain/types/bracket/MatchRelationUpdate";
 
 export class BracketHelpers {
 

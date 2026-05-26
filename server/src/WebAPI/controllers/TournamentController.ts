@@ -4,7 +4,7 @@ import { authorize } from "../../Middlewares/authorization/AuthorizeMiddleware";
 import { UserRole } from "../../Domain/enums/UserRole";
 import { IUserWatchlistService } from "../../Domain/services/user_watchlist/IUserWatchlistService";
 import { CreateTournamentDto } from "../../Domain/DTOs/tournaments/CreateTournamentDto";
-import { ValidationResult } from '../../Domain/types/ValidationResult';
+import { ValidationResult } from '../../Domain/types/validation/ValidationResult';
 import { validateTournamentCreation } from "../validators/tournaments/validateTournamentCreation";
 import { TournamentFormat } from '../../Domain/enums/TournamentFormat';
 import { TournamentStatus } from '../../Domain/enums/TournamentStatus';

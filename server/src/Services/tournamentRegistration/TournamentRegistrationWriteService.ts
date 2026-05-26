@@ -18,7 +18,7 @@ import { ITournamentWriteRepository } from "../../Domain/repositories/tournament
 import { MIN_TOURNAMENT_TEAMS } from "../../Domain/constants/Constants";
 import { TournamentFormat } from "../../Domain/enums/TournamentFormat";
 import { IBracketGeneratorService } from "../../Domain/services/bracket/IBracketGeneratorService";
-import { BracketNode } from '../../Domain/types/BracketNode';
+import { BracketNode } from '../../Domain/types/bracket/BracketNode';
 import { BracketHelpers } from "../bracket/BracketHelper";
 import { IMatchWriteRepository } from "../../Domain/repositories/matches/IMatchWriteRepository";
 
