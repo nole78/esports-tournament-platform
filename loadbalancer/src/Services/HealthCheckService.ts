@@ -1,4 +1,3 @@
-import { servers } from "../Configs/servers";
 import { ServerInstance } from "../Domain/models/ServerInstance";
 import { ILoggerService } from "../Domain/interfaces/ILoggerService";
 import { ServerStatus } from "../Domain/enums/ServerStatus";
@@ -8,12 +7,15 @@ import { LoadBalancerConfig } from "../Domain/types/LoadBalancerConfig";
 export class HealthCheckService {
     private running = false;
     private config: LoadBalancerConfig;
+    private servers: ServerInstance[] = [];
 
     public constructor(
         private readonly logger: ILoggerService,
-        config: LoadBalancerConfig
+        config: LoadBalancerConfig,
+        servers: ServerInstance[]
     ) {
         this.config = config;
+        this.servers = servers;
     }
 
     public async init(): Promise<void> {
@@ -24,7 +26,7 @@ export class HealthCheckService {
     }
 
     public async getApiHealth(): Promise<ApiStatusDto[]> {
-        return servers.map((server) => (new ApiStatusDto(server.id, server.url, server.status, server.lastCheck, server.latency)));
+        return this.servers.map((server) => (new ApiStatusDto(server.id, server.url, server.status, server.lastCheck, server.latency)));
     }
 
     private async run(): Promise<void> {
@@ -32,7 +34,7 @@ export class HealthCheckService {
         this.running = true;
         try {
             const results = await Promise.all(
-                servers.map(async (server) => {
+                this.servers.map(async (server) => {
                     const result = await this.checkServer(server);
                     return { server, result };
                     }
@@ -54,7 +56,7 @@ export class HealthCheckService {
                     server.status = ServerStatus.HEALTHY;
             }
             if(running === 0) this.logger.error("API","There is no server running");
-            this.logger.info("API",servers.map((s) => `${s.id}=${s.status}`).join(" | "));
+            this.logger.info("API", this.servers.map((s) => `${s.id}=${s.status}`).join(" | "));
         } finally {
             this.running = false;
         }
