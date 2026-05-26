@@ -21,7 +21,7 @@ export class MatchService implements IMatchService{
         private readonly matchWriteRepo: IMatchWriteRepository,
         
         private readonly teamRepo: ITeamRepositoryRead,
-        private readonly tournamentRepo: ITournamentReadRepository,
+        private readonly tournamentReadRepo: ITournamentReadRepository,
         private readonly gameRepo: IGameRepository,
 
         private readonly bracketAdvancementService: IBracketAdvancementService,
