@@ -12,7 +12,7 @@ export const servers: ServerInstance[] = [
         0
     ),
         new ServerInstance(
-        'server1',
+        'server2',
         process.env.SERVER_2 ?? "http://localhost:4000",
         parseInt(process.env.SERVER_2_WEIGHT ?? "3", 10),
         ServerStatus.UNREACHABLE,
@@ -21,7 +21,7 @@ export const servers: ServerInstance[] = [
         0
     ),
         new ServerInstance(
-        'server1',
+        'server3',
         process.env.SERVER_3 ?? "http://localhost:4000",
         parseInt(process.env.SERVER_3_WEIGHT ?? "1", 10),
         ServerStatus.UNREACHABLE,
