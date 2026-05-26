@@ -93,7 +93,7 @@ export default function RegisteredTeams() {
                       #{i + 1 + (page - 1) * limit}
                     </span>
                     {user?.role === "admin" && (
-                      <button onClick={() => Disqualify(t.tournamentId, t.teamId)} className="px-3 py-1 text-xs bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded transition-colors duration-200">
+                      <button onClick={() => Disqualify(t.tournamentId, t.teamId)} className="cursor-pointer px-3 py-1 text-xs bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded transition-colors duration-200">
                         Disqualify
                       </button>
                     )}

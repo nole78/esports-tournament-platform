@@ -1,4 +1,4 @@
-import { createRef, useState } from 'react';
+import { useState } from 'react';
 import type { TeamDto } from '../../models/team/TeamDto';
 import type { ITeamAPIService } from '../../api_services/teams/ITeamAPIService';
 import { useNavigate } from 'react-router-dom';
@@ -16,9 +16,7 @@ export default function TeamsAddForm({teamApi} : {teamApi:ITeamAPIService}){
     const [error, setError] = useState<string>("");
     const [preview,setPreview] = useState<string>("");
 
-    const [creating,setCreating] = useState<boolean>(false);
-
-    const fileRef = createRef<HTMLInputElement>();
+    
     const navigate = useNavigate();
 
     const openFilePicker = () => {

@@ -129,7 +129,7 @@ export default function PendingTeams(){
                       <button 
                         onClick={() => Disqualify(t.tournamentId, t.teamId)} 
                         disabled={isProcessing}
-                        className="px-3 py-1 text-xs bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                        className="cursor-pointer px-3 py-1 text-xs bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
                         {isProcessing ? "Processing..." : "Disqualify"}
                       </button>
                   </div>

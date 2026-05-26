@@ -1,4 +1,4 @@
-import { createRef, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { teamApi } from "../../api_services/teams/TeamAPIService";
 import type { TeamDtoEdit } from "../../models/team/TeamDtoEdit";
@@ -12,9 +12,7 @@ export const TeamsEditForm: React.FC<{id: string}> = ({id}) =>{
     const emptyTeam : TeamDtoEdit = {teamName:"", teamLogotip:"", teamDescription:"", teamTag:""};
     const [team, setTeam] = useState<TeamDtoEdit>(emptyTeam);
     const [error, setError] = useState<string>("");
-    const [editing,setEditing] = useState<boolean>(false);
-
-    const fileRef = createRef<HTMLInputElement>();
+    
     const navigate = useNavigate();
 
     const openFilePicker = () => {
