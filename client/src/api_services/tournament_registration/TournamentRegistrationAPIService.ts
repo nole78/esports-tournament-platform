@@ -33,7 +33,7 @@ export const tournamentRegistrationApi : ITournamentRegistrationAPIService = {
       .then(r => r.data).catch(e => err(e, "Failed to update"));
     },
     async generateBracket(tournamentId){
-        return axios.post<ApiResponse<void>>(`${BASE}/${tournamentId}/generate-bracket`, { headers: authHeader() })
+        return axios.post<ApiResponse<void>>(`${BASE}/${tournamentId}/generate-bracket`,{}, { headers: authHeader() })
       .then(r=> r.data).catch(e => err(e, "Failed to generate bracket"));
     }
 }

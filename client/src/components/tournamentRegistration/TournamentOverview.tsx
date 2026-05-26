@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { tournamentApi } from "../../api_services/tournament_list/TournamentAPIService";
 import type { TournamentDto } from "../../models/tournament/TournamentDto";
 import { formatDeadline } from "../../helpers/date_formatter";
+import { tournamentRegistrationApi } from "../../api_services/tournament_registration/TournamentRegistrationAPIService";
 
 export default function TournamentOverview() {
     
@@ -11,6 +12,7 @@ export default function TournamentOverview() {
     const [tournament, setTournament] = useState<TournamentDto>();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string>("");
+    const [generatingBracket, setGeneratingBracket] = useState(false);
     
     useEffect(() => {
         Promise.resolve().then(() => setLoading(true));
@@ -26,6 +28,22 @@ export default function TournamentOverview() {
         })
         .finally(() => setLoading(false));
     }, [id]);
+
+    const handleGenerateBracket = async () => {
+        setGeneratingBracket(true);
+        try {
+            
+            const response = await tournamentRegistrationApi.generateBracket(Number(id));
+            if(!response)
+            {
+                setError("Generating brackets unseccesefull!");
+            }
+        } catch (err) {
+            setError('Failed to generate bracket ' + err);
+        } finally {
+            setGeneratingBracket(false);
+        }
+    };
 
     return (
         <div>
@@ -94,6 +112,17 @@ export default function TournamentOverview() {
                 ) : (
                     <div className="bg-primary border border-secondary/40 rounded-xl p-6 text-center">
                         <p className="text-white/50">Tournament not found</p>
+                    </div>
+                )}
+
+                {tournament && tournament.tournamentStatus === 'upcoming' && (
+                    <div className="mt-8 flex justify-center">
+                        <button
+                            onClick={handleGenerateBracket}
+                            disabled={generatingBracket}
+                            className="px-8 py-3 bg-green-500/20 border-2 border-green-500 hover:bg-green-500/30 text-green-400 font-semibold rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                            {generatingBracket ? 'Generating Bracket...' : 'Generate Bracket'}
+                        </button>
                     </div>
                 )}
             </div>
