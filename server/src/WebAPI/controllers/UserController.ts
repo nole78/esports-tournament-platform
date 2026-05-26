@@ -6,11 +6,12 @@ import { UserRole } from "../../Domain/enums/UserRole";
 import { handleResult } from "../mappers/ResultMapper";
 import { ErrorType } from '../../Domain/common/ErrorType';
 import { Result } from "../../Domain/common/Result";
+import { IAuditService } from "../../Domain/services/audit/IAuditService";
 
 export class UserController {
   private readonly router = Router();
 
-  public constructor(private readonly userService: IUserService) {
+  public constructor(private readonly userService: IUserService, private readonly auditService: IAuditService) {
     this.router.get("/users",          authenticate, authorize(UserRole.ADMIN), this.getAll.bind(this));
     this.router.get("/users/:id",       this.getById.bind(this));
     this.router.put("/users/:id/role", authenticate, authorize(UserRole.ADMIN), this.changeRole.bind(this));
@@ -41,6 +42,14 @@ export class UserController {
     const parsedRole: UserRole = role as UserRole;
 
     const result = await this.userService.changeRole(id,parsedRole);  
+    await this.auditService.log({
+            userId: req.user?.id,
+            action: "ROLE_CHANGED",
+            entity: "User",
+            entityId: id,
+            meta: {},
+            ipAddress: req.ip
+          });
     handleResult(result, res);
   }
 

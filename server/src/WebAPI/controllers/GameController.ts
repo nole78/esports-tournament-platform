@@ -7,11 +7,12 @@ import { CreateGameDto } from '../../Domain/DTOs/games/CreateGameDto';
 import { ValidationResult } from '../../Domain/types/ValidationResult';
 import { validateGameCreation } from "../validators/games/validateGameCreation";
 import { handleResult } from "../mappers/ResultMapper";
+import { IAuditService } from "../../Domain/services/audit/IAuditService";
 
 export class GameController{
     private readonly router = Router();
 
-    public constructor(private readonly gameService: IGameService){
+    public constructor(private readonly gameService: IGameService, private readonly auditService: IAuditService){
         this.router.get("/games", this.getAll.bind(this))
         this.router.get("/games/:id", this.getById.bind(this))
         this.router.post("/games", authenticate, authorize(UserRole.ADMIN), this.create.bind(this));
@@ -37,8 +38,15 @@ export class GameController{
         const {gameName,gameGenre,gameLogotip,gamePlayers} = req.body as {gameName?:string, gameGenre?:string, gameLogotip?:string, gamePlayers?:number};
         const v:ValidationResult = validateGameCreation(gameName ?? "",gameGenre ?? "",gamePlayers ?? 0);
         if(!v.valid) {res.status(400).json({ success: false, message: v.message }); return;}
-
         const result = await this.gameService.create(new CreateGameDto( gameName, gameLogotip, gameGenre, gamePlayers ));
+        await this.auditService.log({
+            userId: req.user?.id,
+            action: "GAME_CREATED",
+            entity: "Game",
+            entityId: result.value!.gameId,
+            meta: {},
+            ipAddress: req.ip
+          });
         handleResult(result,res);
     }
 
@@ -46,6 +54,14 @@ export class GameController{
         const id = parseInt(req.params.id as string, 10);
         if (isNaN(id)) { res.status(400).json({ success: false, message: "Invalid id" }); return; }
         const result = await this.gameService.update(id, req.body);
+        await this.auditService.log({
+            userId: req.user?.id,
+            action: "GAME_UPDATED",
+            entity: "Game",
+            entityId: id,
+            meta: {},
+            ipAddress: req.ip
+          });
         handleResult(result, res);
     }
 
@@ -53,6 +69,14 @@ export class GameController{
         const id = parseInt(req.params.id as string, 10);
         if (isNaN(id)) { res.status(400).json({ success: false, message: "Invalid id" }); return; }
         const result = await this.gameService.delete(id);
+        await this.auditService.log({
+            userId: req.user?.id,
+            action: "GAME_DELETED",
+            entity: "Game",
+            entityId: id,
+            meta: {},
+            ipAddress: req.ip
+          });
         handleResult(result,res);
     }
 
