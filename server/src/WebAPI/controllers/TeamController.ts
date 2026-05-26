@@ -76,7 +76,9 @@ export class TeamController{
         if (!v.valid){res.status(400).json({success:false, message: v.message}); return;}
         
         const result = await this.teamService.create(new CreateTeamDto(safeTeamName, safeTeamTag, safeTeamLogotip, safeTeamDescription), gamerTag);
-        await this.auditService.log({
+        if(result.isSuccess)
+        {
+            await this.auditService.log({
             userId: req.user?.id,
             action: "TEAM_CREATED",
             entity: "Team",
@@ -84,6 +86,7 @@ export class TeamController{
             meta: {},
             ipAddress: req.ip
           });
+        }
         handleResult(result, res);
     } 
 
@@ -104,7 +107,9 @@ export class TeamController{
         if (!v.valid){res.status(400).json({success:false, message: v.message}); return;}
 
         const result = await this.teamService.update(gamerTag, req.body, id);
-        await this.auditService.log({
+        if(result.isSuccess)
+        {
+            await this.auditService.log({
             userId: req.user?.id,
             action: "TEAM_UPDATED",
             entity: "Team",
@@ -112,6 +117,7 @@ export class TeamController{
             meta: {},
             ipAddress: req.ip
           });
+        }
         handleResult(result, res);
     }
 
@@ -122,7 +128,9 @@ export class TeamController{
         if(isNaN(id)) {res.status(400).json({ success: false, message: "Invalid id"}); return; }
         
         const result = await this.teamService.delete(gamerTag, id);
-        await this.auditService.log({
+        if(result.isSuccess)
+        {
+            await this.auditService.log({
             userId: req.user?.id,
             action: "TEAM_DELETED",
             entity: "Team",
@@ -130,6 +138,7 @@ export class TeamController{
             meta: {},
             ipAddress: req.ip
         });
+        }
         handleResult(result, res);
     }
 
