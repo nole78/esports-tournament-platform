@@ -1,8 +1,5 @@
 import { Result } from "../../common/Result";
-import { Match } from "../../models/Match";
-import { BracketNode } from "../../types/BracketNode";
-
-
+import { BracketNode } from "../../types/bracket/BracketNode";
 
 export interface IBracketGeneratorService {
     

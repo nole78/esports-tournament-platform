@@ -1,34 +1,7 @@
-import { MatchStatus } from "../../Domain/enums/MatchStatus";
-import { Match } from "../../Domain/models/Match";
-import { BracketNode } from "../../Domain/types/BracketNode";
-import { MatchRelationUpdate } from "../../Domain/types/MatchRelationUpdate";
+import { BracketNode } from "../../../Domain/types/bracket/BracketNode";
+import { MatchRelationUpdate } from "../../../Domain/types/bracket/MatchRelationUpdate";
 
-export class BracketHelpers {
-
-    public static mapNodeToMatch(node: BracketNode): Match {
-        return new Match(
-            0,
-            node.tournamentId,
-            node.blueTeamId,
-            node.redTeamId,
-            0,
-            MatchStatus.SCHEDULED,
-            node.roundNumber,
-            node.bracketType,
-            0,
-            0
-        );
-    }
-
-    public static createTempIdMap(nodes: BracketNode[], matches: Match[]): Map<number, number> {
-        const map = new Map<number, number>();
-        nodes.forEach((node, index) => {
-            map.set(node.tempId, matches[index].matchId);
-        });
-
-        return map;
-    }
-
+export class BracketRelationBuilder{
     public static generateRelationUpdates(nodes: BracketNode[],tempIdMap: Map<number, number>): MatchRelationUpdate[] {
         const updates: MatchRelationUpdate[] = [];
 

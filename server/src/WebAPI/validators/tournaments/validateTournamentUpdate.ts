@@ -1,6 +1,6 @@
 import { TournamentFormat } from "../../../Domain/enums/TournamentFormat";
 import { TournamentStatus } from "../../../Domain/enums/TournamentStatus";
-import { ValidationResult } from "../../../Domain/types/ValidationResult";
+import { ValidationResult } from "../../../Domain/types/validation/ValidationResult";
 
 const isPowerOfTwo = (n: number): boolean => {
   return n > 0 && (n & (n - 1)) === 0;

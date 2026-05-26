@@ -1,4 +1,4 @@
-import { ValidationResult } from "../../../Domain/types/ValidationResult";
+import { ValidationResult } from "../../../Domain/types/validation/ValidationResult";
 
 export const validateRegister = (u: string, e: string, p: string): ValidationResult => {
   if (!u || u.trim().length < 3 || u.length > 40 || !/^[a-zA-Z0-9-]+$/.test(u))

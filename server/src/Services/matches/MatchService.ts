@@ -12,7 +12,7 @@ import { IGameRepository } from "../../Domain/repositories/games/IGameRepository
 import { ITeamRepositoryRead } from "../../Domain/repositories/teams/ITeamRepositoryRead";
 import { ITournamentReadRepository } from "../../Domain/repositories/tournaments/ITournamentReadRepository";
 import { IBracketAdvancementService } from "../../Domain/services/bracket/IBracketAdvancmentService";
-import { MatchMapper } from './helpers/MatchMapper';
+import { MatchMapper } from './mappers/MatchMapper';
 import { MatchTeamHelper } from './helpers/MatchTeamHelper';
 
 export class MatchService implements IMatchService{

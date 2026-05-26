@@ -3,7 +3,7 @@ import { Result } from "../../Domain/common/Result";
 import { BracketType } from "../../Domain/enums/BracketType";
 import { MatchSlot } from "../../Domain/enums/MatchSlot";
 import { IBracketGeneratorService } from "../../Domain/services/bracket/IBracketGeneratorService";
-import { BracketNode } from "../../Domain/types/BracketNode";
+import { BracketNode } from "../../Domain/types/bracket/BracketNode";
 
 export class BracketGeneratorService implements IBracketGeneratorService{
     
