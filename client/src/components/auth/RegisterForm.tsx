@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { createRef, useState } from "react";
 import { useAuth } from "../../hooks/auth/useAuthHook";
 import type { IAuthAPIService } from "../../api_services/auth/IAuthAPIService";
 import logo from "../../assets/logo.png";
@@ -12,7 +12,7 @@ export function RegisterForm({ authApi }: { authApi: IAuthAPIService }) {
   const [preview, setPreview] = useState<string>("");
   const [picture, setPicture] = useState<string>("");
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => setForm(f => ({ ...f, [k]: e.target.value }));
-  const ref = useRef<HTMLInputElement>(null);
+  const ref = createRef<HTMLInputElement>();
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); setError(""); setLoading(true);

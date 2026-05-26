@@ -6,4 +6,5 @@ export interface ITournamentReadRepository {
   findById(id: number): Promise<Tournament>;
   findAll(page?: number, limit?: number): Promise<Tournament[]>;
   findFiltered(tournamentGameId?:number, tournamentFormat?:string, tournamentStatus?:string, page?:number, limit?: number): Promise<Tournament[]>;
+  findByIds(ids: number[]): Promise<Tournament[]>;
 }

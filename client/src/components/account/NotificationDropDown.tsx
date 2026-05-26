@@ -1,10 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, createRef, useState } from "react";
 import TeamsInboxForm from "../../pages/user_forms/TeamsInboxForm";
 import { EnvelopeOpen, EnvelopeClosed } from "../heroIcons/EnvelopeIcons";
 
 export default function NotificationDropdown() {
   const [open, setOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = createRef<HTMLDivElement>();
 
   useEffect(() => {
     function handleOutsideClick(e: MouseEvent) {

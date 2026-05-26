@@ -3,8 +3,6 @@ import { Result } from "../../Domain/common/Result";
 import { PaginatedListDto } from "../../Domain/DTOs/PaginatedListDto";
 import { TournamentRegistrationDto } from "../../Domain/DTOs/tournament_registrations/TournamentRegistrationDto";
 import { TournamentRegistrationStatus } from "../../Domain/enums/TournamentRegistrationStatus";
-import { Team } from "../../Domain/models/Team";
-import { Tournament } from "../../Domain/models/Tournament";
 import { ITeamRepositoryRead } from "../../Domain/repositories/teams/ITeamRepositoryRead";
 import { ITournamentRegistrationReadRepository } from "../../Domain/repositories/tournament_registrations/ITournamentRegistrationReadRepository";
 import { ITournamentReadRepository } from "../../Domain/repositories/tournaments/ITournamentReadRepository";
@@ -33,14 +31,7 @@ export class TournamentRegistrationReadService implements ITournamentRegistratio
         }
 
         const tournamentIds = [...new Set(tournamentRegs.map(tr => tr.tournamentId))];
-        const tournaments:Tournament[] = [];
-
-        for(let i:number = 0; i < tournamentIds.length; i++)
-        {
-            const tournament = await this.tournamentReadRepo.findById(tournamentIds[i]);
-            if(tournament.tournamentId !== 0)
-                tournaments.push(tournament);
-        }
+        const tournaments = await this.tournamentReadRepo.findByIds(tournamentIds);
 
         const tournamentMap = new Map(tournaments.map(t => [t.tournamentId, t]));
 
@@ -75,14 +66,7 @@ export class TournamentRegistrationReadService implements ITournamentRegistratio
         }
 
         const teamIds = [...new Set(tournamentRegs.map(tr => tr.teamId))];
-        const teams:Team[] = [];
-
-        for(let i:number = 0; i < teamIds.length; i++)
-        {
-            const team = await this.teamRepoRead.findById(teamIds[i]);
-            if(team.teamId !== 0)
-                teams.push(team);
-        }
+        const teams = await this.teamRepoRead.findByIds(teamIds)
 
         const teamMap = new Map(teams.map(t => [t.teamId, t]));
 

@@ -12,7 +12,7 @@ import placeholder from "../../assets/placeholder.png"
 export default function RegisterTeam() {
   const { id } = useParams();
   const [teams, setTeams] = useState<TeamDto[]>([]);
-  const [tournament, setTournament] = useState<TournamentDto | null>(null);
+  const [tournament, setTournament] = useState<TournamentDto>();
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
