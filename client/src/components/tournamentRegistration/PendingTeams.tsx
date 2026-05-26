@@ -9,9 +9,11 @@ export default function PendingTeams(){
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [isProcessing, setIsProcessing] = useState(false);
   const limit = 20;
   const {id} = useParams();
   const [error, setError] = useState<string>("");
+  const [success, setSuccess] = useState<string>("");
   const [pendingTeams, setPendingTeams] = useState<TournamentRegistrationDto[]>([]); 
 
   const loadPage = (pages: number) => {
@@ -37,13 +39,44 @@ export default function PendingTeams(){
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [page]);
 
-    const Add =async (tournamentId: number, teamId: number) =>{  
-      await tournamentRegistrationApi.update(tournamentId, teamId, {status: TournamentRegistrationStatus.CONFIRMED})
-      loadPage(page);
+    const Add = async (tournamentId: number, teamId: number) => {
+      setError("");
+      setSuccess("");
+      setIsProcessing(true);
+      try {
+        const res = await tournamentRegistrationApi.update(tournamentId, teamId, {status: TournamentRegistrationStatus.CONFIRMED});
+        if (res.success) {
+          setSuccess("Team successfully confirmed!");
+          setTimeout(() => setSuccess(""), 3000);
+          loadPage(page);
+        } else {
+          setError(res.message ?? "Failed to confirm team");
+        }
+      } catch (err) {
+        setError("Failed to confirm team: " + err);
+      } finally {
+        setIsProcessing(false);
+      }
     }
-    const Disqualify =async (tournamentId: number, teamId: number) =>{  
-      await tournamentRegistrationApi.update(tournamentId, teamId, {status: TournamentRegistrationStatus.DISQUALIFIED})
-      loadPage(page);
+
+    const Disqualify = async (tournamentId: number, teamId: number) => {
+      setError("");
+      setSuccess("");
+      setIsProcessing(true);
+      try {
+        const res = await tournamentRegistrationApi.update(tournamentId, teamId, {status: TournamentRegistrationStatus.DISQUALIFIED});
+        if (res.success) {
+          setSuccess("Team successfully disqualified!");
+          setTimeout(() => setSuccess(""), 3000);
+          loadPage(page);
+        } else {
+          setError(res.message ?? "Failed to disqualify team");
+        }
+      } catch (err) {
+        setError("Failed to disqualify team: " + err);
+      } finally {
+        setIsProcessing(false);
+      }
     }
 
   return (
@@ -59,6 +92,11 @@ export default function PendingTeams(){
         ) : (
           <>
             {error && <ErrorBox message={error} />}
+            {success && (
+              <div className="bg-green-600/20 border border-green-500/50 rounded-lg p-4">
+                <p className="text-green-400 font-medium">{success}</p>
+              </div>
+            )}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {pendingTeams.map((t, i) => (
                 <div
@@ -82,11 +120,17 @@ export default function PendingTeams(){
                     <span className="text-xs text-white/40">
                       #{i + 1 + (page - 1) * limit}
                     </span>
-                      <button onClick={() => Add(t.tournamentId, t.teamId)} className="px-3 py-1 text-xs bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded transition-colors duration-200">
-                        Add
+                      <button 
+                        onClick={() => Add(t.tournamentId, t.teamId)} 
+                        disabled={isProcessing}
+                        className="px-3 py-1 text-xs bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                        {isProcessing ? "Processing..." : "Add"}
                       </button>
-                      <button onClick={() => Disqualify(t.tournamentId, t.teamId)} className="px-3 py-1 text-xs bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded transition-colors duration-200">
-                        Disqualify
+                      <button 
+                        onClick={() => Disqualify(t.tournamentId, t.teamId)} 
+                        disabled={isProcessing}
+                        className="px-3 py-1 text-xs bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                        {isProcessing ? "Processing..." : "Disqualify"}
                       </button>
                   </div>
                 </div>

@@ -48,7 +48,7 @@ export class TournamentRegistrationReadRepository implements ITournamentRegistra
     } finally { res.conn.release(); }
   }
 
-  async findByTeamId(teamId: number, page:number, limit:number): Promise<TournamentRegistration[]> {
+  async findByTeamId(teamId: number, page = 1, limit = 9): Promise<TournamentRegistration[]> {
     const res = await this.db.getReadConnection();
     if (!res) return [];
     const offset = Math.max(0, Math.floor((page - 1) * limit));
@@ -67,13 +67,12 @@ export class TournamentRegistrationReadRepository implements ITournamentRegistra
     } finally { res.conn.release(); }
   }
 
-  async findByTournamentId(tournamentId: number, status:TournamentRegistrationStatus, page:number, limit:number): Promise<TournamentRegistration[]> {
+  async findByTournamentId(tournamentId: number, status?:TournamentRegistrationStatus, page = 1, limit=9): Promise<TournamentRegistration[]> {
     const res = await this.db.getReadConnection();
     if (!res) return [];
     const offset = Math.max(0, Math.floor((page - 1) * limit));
     const lim    = Math.max(1, Math.floor(limit));
     const statusClause = status ? "AND status = ?" : "";
-    console.log(statusClause);
     try {
       const [rows] = await res.conn.query<RowDataPacket[]>(
         `SELECT * 
@@ -84,6 +83,25 @@ export class TournamentRegistrationReadRepository implements ITournamentRegistra
       return rows.map((r) => this.map(r));
     } catch (err) {
       this.logger.error("TournamentRegistrationRepository", "findByTournamentId failed", err);
+      return [];
+    } finally { res.conn.release(); }
+  }
+
+  async findAllByTournamentId(tournamentId: number, status?: TournamentRegistrationStatus): Promise<TournamentRegistration[]> {
+    const res = await this.db.getReadConnection();
+    if (!res) return [];
+    const statusClause = status ? "AND status = ?" : "";
+    try {
+      const [rows] = await res.conn.query<RowDataPacket[]>(
+        `SELECT * 
+        FROM tournament_registrations 
+        WHERE tournament_id = ? ${statusClause}
+        ORDER BY registered_at ASC`, 
+        [tournamentId, ...(status ? [status] : [])]
+      );
+      return rows.map((r) => this.map(r));
+    } catch (err) {
+      this.logger.error("TournamentRegistrationRepository", "findAllByTournamentId failed", err);
       return [];
     } finally { res.conn.release(); }
   }
