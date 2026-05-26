@@ -6,7 +6,7 @@ import { teamApi } from "../../api_services/teams/TeamAPIService";
 import { Empty, ErrorBox, PageHeader, Pagination} from "../../components/ui/UI";
 import { TeamRole } from "../../types/teamMembers/teamMemberRole";
 import { UserRole } from "../../types/user/UserRole";
-
+import placeholder from "../../assets/placeholder.png"
 
 
 export default function TeamsPage(){
@@ -45,7 +45,10 @@ export default function TeamsPage(){
         }
     }, [location.state, location.pathname, navigate]);
 
-    const loadPage = (p : number)=>{
+
+
+    useEffect(() =>{
+        const loadPage = (p : number)=>{
         if (!user?.username) return;
 
         teamApi.getByGamerTag(p, limit)
@@ -59,15 +62,13 @@ export default function TeamsPage(){
         })
         .catch(() => setError("Failed to load teams"))
     }
-
-    useEffect(() =>{
         loadPage(page);   
-    }, [page]);
+    }, [page,user]);
 
     return (
             <div>
                 <PageHeader eyebrow="" title="Team Catalog"/>
-                <button onClick={() => user?.role === UserRole.ADMIN ? navigate(`/admin/teams/add`) : navigate(`/teams/add`)}
+                <button onClick={() => navigate(`/teams/add`)}
                         className="mb-2 w-1/6 bg-bgsecondary/40 border-2 border-bgsecondary hover:bg-bgsecondary/30 text-bgsecondary font-semibold rounded-xl py-3 text-sm transition-colors">
                 Add Team</button>
                 
@@ -96,9 +97,9 @@ export default function TeamsPage(){
                 {teams.length === 0 && !error ? <Empty message="No teams found"/> : (
                 <section className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">     
                     {teams.map(t => (
-                        <div onClick={() => user?.role === UserRole.ADMIN ? navigate(`/admin/teams/details/${t.teamId}`) : navigate(`/teams/details/${t.teamId}`)} className=" rounded-2xl group relative aspect-4/3 border-2 border-white/5 bg-bgprimary/30 overflow-hidden">
+                        <div onClick={() => navigate(`/teams/details/${t.teamId}`)} className=" rounded-2xl group relative aspect-4/3 border-2 border-white/5 bg-bgprimary/30 overflow-hidden">
                             <div className="w-full h-full">
-                                <img src ={t.teamLogotip} className="object-cover w-full h-full rounded-x1 transition-transform duration-300 group-hover:scale-110"/>
+                                <img src ={t.teamLogotip? t.teamLogotip : placeholder} className="object-cover w-full h-full rounded-x1 transition-transform duration-300 group-hover:scale-110"/>
                             </div>
                             <div className="absolute rounded-t-lg bg-primary/90 h-min inset-0 origin-top scale-y-0 group-hover:scale-y-100 transition-transform duration-300">
                                 <h2 className="text-bgsecondary text-center text-2xl font-bold">{t.teamName}</h2>

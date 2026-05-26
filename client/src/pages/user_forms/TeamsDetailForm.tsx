@@ -20,6 +20,8 @@ import avatarPlaceholder from "../../assets/avatar_placeholder.jpg";
 import UserOverview from '../../components/account/UserOverview';
 import UserPlusIcon from "../../components/heroIcons/UserPlusIcon";
 import type { UserDto } from "../../models/user/UserTypes";
+import placeholder from "../../assets/placeholder.png"
+
 
 export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
     
@@ -246,8 +248,7 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
            
             <div className='grid grid-cols-2 gap-4 p-5'>
                 <div className="columns-1">
-                    {team.teamLogotip && 
-                    <img src={team.teamLogotip} className="rounded-full object-cover w-64 h-64 border-2 border-secondary shadow-lg shadow-secondary/80"/>}
+                    <img src={team.teamLogotip? team.teamLogotip: placeholder} className="rounded-full object-cover w-64 h-64 border-2 border-secondary shadow-lg shadow-secondary/80"/>
                 </div> 
                 <div className="grid grid-rows-2 gap-5 columns-2 mt-10">
                     <div>

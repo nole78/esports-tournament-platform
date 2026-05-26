@@ -1,7 +1,6 @@
 import { useParams } from "react-router-dom";
 import { TeamsDetailForm } from "../user_forms/TeamsDetailForm";
 
-
 export default function TeamsDetailPage(){
     const {id} = useParams();
     return (

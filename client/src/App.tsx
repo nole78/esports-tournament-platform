@@ -22,8 +22,6 @@ import UserWatchList from "./pages/user/UserWatchlist";
 import { Layout } from "./components/layout/Layout";
 import TeamsDetailPage from "./pages/common_pages/TeamsDetailPage";
 import TeamsInboxPage from "./pages/common_pages/TeamsInboxPage";
-import TeamsGuestPage from "./pages/common_pages/TeamsGuestPage";
-//import TeamsGuestDetailsPage from "./pages/common_pages/TeamsGuestDetailsPage";
 import MatchInfo from "./pages/common_pages/MatchInfo";
 import AccountDetailsPage from "./pages/user/AccountDetails";
 
@@ -38,8 +36,8 @@ export default function App() {
       <Route path="/home" element={<LandingPage/>}/>
       <Route path="/game_catalog" element={<GameCatalog/>} />
       <Route path="/tournament_list" element={<TournamentList />} />
-      <Route path="/teams" element = {<TeamsGuestPage/>}/>
-      <Route path="/teams/:id" element = {<TeamsDetailPage/>}/>
+      <Route path="/teams" element = {<TeamsPage/>}/>
+      <Route path="/teams/details/:id" element = {<TeamsDetailPage/>}/>
       
       {/* User routes */}
       <Route path="/account_details" element={<ProtectedRoute><AccountDetailsPage/></ProtectedRoute>}/>

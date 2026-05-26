@@ -7,6 +7,7 @@ import { tournamentRegistrationApi } from "../../api_services/tournament_registr
 import { useParams } from "react-router-dom";
 import { tournamentApi } from "../../api_services/tournament_list/TournamentAPIService";
 import type { TournamentDto } from "../../models/tournament/TournamentDto";
+import placeholder from "../../assets/placeholder.png"
 
 export default function RegisteredTeams() {
   const { user } = useAuth();
@@ -76,7 +77,7 @@ export default function RegisteredTeams() {
                 >
                   <div className="flex items-center gap-3 mb-3">
                     <img
-                      src={t.teamLogotip}
+                      src={t.teamLogotip? t.teamLogotip : placeholder}
                       alt={t.teamName}
                       className="w-12 h-12 rounded-lg object-cover border border-secondary/40"
                     />
