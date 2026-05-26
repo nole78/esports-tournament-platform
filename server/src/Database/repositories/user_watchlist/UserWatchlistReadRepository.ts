@@ -1,4 +1,4 @@
-import { ResultSetHeader, RowDataPacket } from 'mysql2';
+import { RowDataPacket } from 'mysql2';
 import { IUserWatchlistReadRepository } from '../../../Domain/repositories/user_watchlist/IUserWatchlistReadRepository';
 import { ILoggerService } from '../../../Domain/services/logger/ILoggerService';
 import { DbManager } from '../../connection/DbConnectionPool';

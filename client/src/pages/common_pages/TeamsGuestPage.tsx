@@ -1,4 +1,4 @@
-import TeamsGuestForm from "../user_forms/TeamsGuestForm";
+import TeamsGuestForm from "../../components/teams_forms/TeamsGuestForm";
 
 export default function TeamsGuestPage(){
     return(
