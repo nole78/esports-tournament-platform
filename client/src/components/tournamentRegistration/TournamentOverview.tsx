@@ -8,6 +8,9 @@ import { tournamentRegistrationApi } from "../../api_services/tournament_registr
 import { matchApi } from "../../api_services/matches/MatchAPIService";
 import Bracket from "../matches/Bracket";
 import type { MatchDto } from "../../models/match/MatchDto";
+import { TournamentFormat } from "../../types/tournament/TournamentFormat";
+import RoundRobin from "../matches/RoundRobin";
+import DoubleBracket from "../matches/DoubleBracket";
 
 export default function TournamentOverview() {
     
@@ -72,7 +75,7 @@ export default function TournamentOverview() {
             }
             else
             {
-                setBracketError("Generating brackets unsuccessful!");
+                setBracketError("Generating bracket failed!");
                 setTimeout(() => setBracketError(""), 5000);
             }
         } catch (err) {
@@ -176,7 +179,11 @@ export default function TournamentOverview() {
                                 <Spinner />
                             </div>
                         ) : matches.length > 0 ? (
-                            <Bracket matches={matches} title={`${tournament.tournamentName} - ${tournament.tournamentFormat}`} />
+                            tournament.tournamentFormat === TournamentFormat.SINGLE_ELIMINATION ?
+                            <Bracket matches={matches} title={`${tournament.tournamentName} - ${tournament.tournamentFormat}`} />:
+                            tournament.tournamentFormat === TournamentFormat.ROUND_ROBIN?
+                            <RoundRobin matches={matches} />:
+                            <DoubleBracket matches={matches} />
                         ) : (
                             <div className="bg-primary border border-secondary/40 rounded-xl p-6 text-center">
                                 <p className="text-white/50">No matches available yet</p>
