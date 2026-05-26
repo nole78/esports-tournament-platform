@@ -60,14 +60,13 @@ export class MatchWriteRepository implements  IMatchWriteRepository{
     if (!res) return new Match;
     try {
       const [result] = await res.conn.execute<ResultSetHeader>(
-        `INSERT INTO matches (tournament_id, blue_team_id, red_team_id, winner_team_id,
+        `INSERT INTO matches (tournament_id, blue_team_id, red_team_id,
         status, round_number, bracket_type, blue_team_score, red_team_score,
         winner_to_match_id, winner_to_slot, loser_to_match_id, loser_to_slot) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [ match.tournamentId, 
           match.blueTeamId, 
           match.redTeamId, 
-          match.winnerTeamId, 
           match.status,
           match.roundNumber,
           match.bracketType,
