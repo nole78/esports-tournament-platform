@@ -47,7 +47,6 @@ import { MatchReadRepository } from "./Database/repositories/matches/MatchReadRe
 import { MatchWriteRepository } from "./Database/repositories/matches/MatchWriteRepository";
 import { MatchPlayerReadRepository } from "./Database/repositories/match_players/MatchPlayerReadRepository";
 import { MatchPlayerWriteRepository } from "./Database/repositories/match_players/MatchPlayerWriteRepository";
-import { match } from "node:assert";
 import { UserWatchlistRepository } from "./Database/repositories/user_watchlist/UserWatchlistRepository";
 import { UserWatchlistService } from "./Services/user_watchlist/UserWatchlistService";
 import { UserWatchlistController } from "./WebAPI/controllers/UserWatchlistController";
@@ -108,7 +107,6 @@ app.use("/api/v1", new TournamentController(tournamentReadService, tournamentWri
 app.use("/api/v1", new AuditController(auditService).getRouter());
 app.use("/api/v1", new HealthController(healthService).getRouter());
 app.use("/api/v1", new TeamController(teamService, teamMemberService).getRouter());
-app.use("/api/v1", new HealthController(healthService).getRouter());
 app.use("/api/v1", new UserWatchlistController(watchlistService).getRouter());
 app.use("/api/v1", new TournamentRegistrationController(tournamentRegistrationReadService, tournamentRegistrationWriteService).getRouter());
 app.use("/api/v1", new MatchController(matchService, matchPlayerService).getRouter());
