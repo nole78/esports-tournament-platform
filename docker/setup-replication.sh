@@ -49,7 +49,6 @@ echo "[ 2/5 ] Creating schema on Master..."
 $M -e "DROP DATABASE IF EXISTS ${DB_NAME};"
 $M -e "CREATE DATABASE ${DB_NAME} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 
-# TODO: Replace the SQL below with your actual table definitions
 
 $M ${DB_NAME} << 'SQL'
 CREATE TABLE users (

@@ -1,4 +1,3 @@
-//TODO: implement entity tournament
 
 import { TournamentFormat } from "../enums/TournamentFormat";
 import { TournamentStatus } from "../enums/TournamentStatus";

@@ -1,4 +1,3 @@
-//TODO: implement entity tournament_registration
 
 import { TournamentRegistrationStatus } from "../enums/TournamentRegistrationStatus";
 

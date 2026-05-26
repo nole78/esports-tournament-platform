@@ -1,5 +1,4 @@
 import { TeamRole } from '../enums/TeamRole';
-//TODO: implement entity team_member
 
 export class TeamMember{
     constructor(
