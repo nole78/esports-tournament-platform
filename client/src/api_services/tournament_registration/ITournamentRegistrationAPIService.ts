@@ -8,5 +8,5 @@ export interface ITournamentRegistrationAPIService {
     registerTournament(id: number, payload: Record<string, unknown>): Promise<ApiResponse<TournamentRegistrationDto>>;
     delete(tournamentId: number, teamId: number): Promise<ApiResponse<void>>;
     update(tournamentId: number, teamId: number, payload: Partial<TournamentRegistrationDto>): Promise<ApiResponse<void>>;
-    
+    generateBracket(tournamentId: number): Promise<ApiResponse<void>>;
 }

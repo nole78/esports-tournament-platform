@@ -1,6 +1,6 @@
 import { TournamentFormat } from '../../../Domain/enums/TournamentFormat';
 import { TournamentStatus } from '../../../Domain/enums/TournamentStatus';
-import { ValidationResult } from '../../../Domain/types/ValidationResult';
+import { ValidationResult } from '../../../Domain/types/validation/ValidationResult';
 
 const isPowerOfTwo = (n: number): boolean => {
   return n > 0 && (n & (n - 1)) === 0;
@@ -9,12 +9,14 @@ const isPowerOfTwo = (n: number): boolean => {
 export const validateTournamentCreation = (tname: string, tgame:string, tmaxteams:number, tappldeadline: Date, tprizefund: number, tformat?:TournamentFormat, tstatus?: TournamentStatus) : ValidationResult => {
     if(!tname || tname.trim().length === 0)
         return {valid:false, message:"Tournament name is mandatory"};
+    if(tname.length < 3 || tname.length > 120)
+        return {valid:false, message:"Tournament name must be between 3 and 120 characters long!"};
     if(!tgame || tgame.trim().length === 0)
         return {valid:false, message:"Game name is mandatory"};
     if(tmaxteams < 4 || tmaxteams > 256)
         return {valid:false, message:"Maximum number of teams must be greater or equal to 4 and less or equal to 256"};
-    if(!isPowerOfTwo(tmaxteams))
-        return {valid:false, message:"Maximum number of teams must be a power of 2 (2, 4, 8, 16, 32, 64, ...)"};
+    if(!isPowerOfTwo(tmaxteams) && tformat !== TournamentFormat.ROUND_ROBIN)
+        return {valid:false, message:"Maximum number of teams must be a power of 2 (2, 4, 8, 16, 32, 64, ...) for formats other than round robin"};
     if(tprizefund <= 0)
         return {valid:false, message:"Prize fund must be greater than 0"};
     if(!tformat)

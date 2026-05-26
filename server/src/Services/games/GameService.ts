@@ -30,8 +30,7 @@ export class GameService implements IGameService {
         const game = await this.gameRepo.findByName(dto.gameName);
         if(game.gameId !== 0)
             return Result.Failure("Game with same name already exists", ErrorType.Conflict);
-
-        const created = await this.gameRepo.create(new Game(0, game.gameName, game.gameLogotip, game.gameGenre, game.gamePlayers));
+        const created = await this.gameRepo.create(new Game(0, dto.gameName, dto.gameLogotip, dto.gameGenre, dto.gamePlayers));
         if(created.gameId === 0) 
             return Result.Failure("Couldn't create game", ErrorType.Internal);
 

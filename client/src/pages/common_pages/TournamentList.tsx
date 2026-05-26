@@ -8,7 +8,7 @@ import { formatDeadline, daysUntilDeadline, getDeadlineStatus, getDeadlineColor 
 import type { GameDto } from "../../models/game/GameDto";
 import { gameApi } from "../../api_services/game_catalog/GameAPIService";
 import { TournamentStatus } from "../../types/tournament/TournamentStatus";
-import { TournamentFormatValues } from "../../types/tournament/TournamentFormat";
+import { TournamentFormat } from "../../types/tournament/TournamentFormat";
 import type { TournamentFilterDto } from '../../models/tournament/TournamentFilterDto';
 
 export default function TournamentList(){
@@ -146,7 +146,7 @@ export default function TournamentList(){
                         <option value="" className='bg-lime-950'>
                             Any format
                         </option>
-                        {Object.entries(TournamentFormatValues).map(([key, value]) => (
+                        {Object.entries(TournamentFormat).map(([key, value]) => (
                             <option className='bg-lime-950' key={key} value={value}>
                                 {key.replace(/_/g, ' ')}
                             </option>
@@ -164,7 +164,7 @@ export default function TournamentList(){
                         const isInWatchList = watchListMap[t.tournamentId] ?? false;
                         
                         return (
-                            <div className="border-2 border-bgsecondary bg-bgprimary/30 p-4 rounded-xl hover:border-secondary/60 transition-all duration-200 hover:shadow-lg hover:shadow-secondary/20 cursor-pointer">
+                            <div className="border-2 border-bgsecondary bg-bgprimary/30 p-4 rounded-xl hover:border-secondary/60 transition-all duration-200 hover:shadow-lg hover:shadow-secondary/20 cursor-pointer" key={t.tournamentId}>
                                 <a onClick={() => user?.role == "admin" ? navigate(`/admin/tournament_registration/${t.tournamentId}`) : navigate(`/tournament_registration/${t.tournamentId}`)}>
                                     <h2 className="text-bgsecondary text-2xl font-bold">{t.tournamentName}</h2>
                                     <p className="text-bgsecondary mb-3">{t.tournamentGame}</p>

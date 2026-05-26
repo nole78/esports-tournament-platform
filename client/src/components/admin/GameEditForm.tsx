@@ -32,6 +32,27 @@ export const GameEditForm: React.FC<{id: string }> = ({id}) => {
 
         const gamePlayers = Number(players);
 
+        if(!gameName || gameName.trim().length === 0 || gameName.length < 3)
+        {
+            setError("Game name is mandatory, and must be at least 3 characters long");
+            setEditing(false);
+            return;
+        }
+
+        if(!gameGenre || gameGenre.trim().length === 0|| gameGenre.length < 3)
+        {
+            setError("Game genre is mandatory, and must be at least 3 characters long");
+            setEditing(false);
+            return;
+        }
+
+        if(!gamePlayers || gamePlayers <= 0)
+        {
+            setError("Number of players must be above 0");
+            setEditing(false);
+            return;
+        }
+
         const res = await gameApi.update(gameId,{gameName,gameGenre,gamePlayers,gameLogotip});
         
         setEditing(false);

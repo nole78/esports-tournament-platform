@@ -10,16 +10,29 @@ export class MatchWriteRepository implements  IMatchWriteRepository{
     private readonly logger: ILoggerService,
   ) {}
 
-  async create(match: Match): Promise<Match> {
+  async createBulk(matches: Match[]): Promise<Match[]> {
+    if(matches.length === 0) return [];
     const res = await this.db.getWriteConnection();
-    if (!res) return new Match;
+    if (!res) return [];
     try {
-      const [result] = await res.conn.execute<ResultSetHeader>(
-        `INSERT INTO matches (tournament_id, blue_team_id, red_team_id, winner_team_id,
-        status, round_number, bracket_type, blue_team_score, red_team_score,
-        winner_to_match_id, winner_to_slot, loser_to_match_id, loser_to_slot) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [ match.tournamentId, 
+      const placeholder = matches.map(() => "(?, ?, ?, ?, ?, ?)").join(",");
+      const query = `INSERT INTO matches (tournament_id, status, round_number, 
+          bracket_type, blue_team_score, red_team_score)
+          VALUES ${placeholder}`;
+      const values = matches.flatMap(match => [ 
+        match.tournamentId, 
+        match.status,
+        match.roundNumber,
+        match.bracketType,
+        match.blueTeamScore,
+        match.redTeamScore
+      ]);
+      const [result] = await res.conn.execute<ResultSetHeader>(query,values);
+      if (result.affectedRows === 0 || result.insertId === 0) return [];
+      let firstId = result.insertId;
+      return matches.map(match => new Match(
+          firstId++,
+          match.tournamentId, 
           match.blueTeamId, 
           match.redTeamId, 
           match.winnerTeamId, 
@@ -31,25 +44,11 @@ export class MatchWriteRepository implements  IMatchWriteRepository{
           match.winnerToMatchId,
           match.winnerToSlot,
           match.loserToMatchId,
-          match.loserToSlot ]
-      );
-      if (result.insertId === 0) return new Match;
-      return new Match(result.insertId, match.tournamentId, 
-                                        match.blueTeamId, 
-                                        match.redTeamId, 
-                                        match.winnerTeamId, 
-                                        match.status,
-                                        match.roundNumber,
-                                        match.bracketType,
-                                        match.blueTeamScore,
-                                        match.redTeamScore,
-                                        match.winnerToMatchId,
-                                        match.winnerToSlot,
-                                        match.loserToMatchId,
-                                        match.loserToSlot );
+          match.loserToSlot 
+      ));
     } catch (err) {
-      this.logger.error("MatchRepository", "create failed", err);
-      return new Match;
+      this.logger.error("MatchRepository", "create bulk failed", err);
+      return [];
     } finally { res.conn.release(); }
   }
 
@@ -58,6 +57,7 @@ export class MatchWriteRepository implements  IMatchWriteRepository{
     if (!res) return false;
 
     const  fieldMap: Record<string, string> = {
+      matchId: "match_id",
       tournamentId: "tournament_id", 
       blueTeamId: "blue_team_id", 
       redTeamId: "red_team_id", 
