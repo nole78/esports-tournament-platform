@@ -239,7 +239,7 @@ export default function DoubleBracket({ matches }: BracketProps) {
     const winnerMatches = matches.filter((m) => m.bracketType === "winner");
     const loserMatches = matches.filter((m) => m.bracketType === "loser");
     const grandFinalMatches = matches.filter(
-        (m) => m.bracketType === "grand_finale"
+        (m) => m.bracketType === "grand_final"
     );
 
     const winnerRounds = createRounds(winnerMatches);
