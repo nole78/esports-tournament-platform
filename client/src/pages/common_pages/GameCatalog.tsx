@@ -34,7 +34,7 @@ export default function GameCatalog(){
         <div>
             <PageHeader eyebrow="" title="Game Catalog"/>
             {user?.role === "admin" && (
-                <button onClick={() => navigate("/game_catalog/add")}
+                <button onClick={() => navigate("/admin/game_catalog/add")}
                         className="cursor-pointer mb-2 w-1/6 bg-bgsecondary/40 border-2 border-bgsecondary hover:bg-bgsecondary/30 text-bgsecondary font-semibold rounded-xl py-3 text-sm transition-colors">
                 Add Game</button>
             )}
@@ -73,7 +73,7 @@ export default function GameCatalog(){
                                     Delete
                                 </button>
                                 <button className="cursor-pointer w-1/3 mb-2 float-right bg-green-400/40 border-2 border-green-500 hover:bg-bgsecondary/30 hover:border-bgsecondary text-green-500 font-semibold rounded-xl p-1 text-sm transition-colors"
-                                        onClick={() => navigate(`/game_catalog/edit/${g.gameId}`)}>
+                                        onClick={() => navigate(`/admin/game_catalog/edit/${g.gameId}`)}>
                                     Edit
                                 </button>
                             </div>)}
