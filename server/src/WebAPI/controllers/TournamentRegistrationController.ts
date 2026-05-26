@@ -3,7 +3,7 @@ import { ITournamentRegistrationWriteService } from '../../Domain/services/tourn
 import { authenticate } from "../../Middlewares/authentification/AuthMiddleware";
 import { authorize } from "../../Middlewares/authorization/AuthorizeMiddleware";
 import { UserRole } from "../../Domain/enums/UserRole";
-import { ValidationResult } from "../../Domain/types/ValidationResult";
+import { ValidationResult } from "../../Domain/types/validation/ValidationResult";
 import { CreateTournamentRegistrationDto } from "../../Domain/DTOs/tournament_registrations/CreateTournamentRegistrationDto";
 import { validateTournamentRegistration } from "../validators/tournamentRegistrations/validateTournamentRegistration";
 import { handleResult } from "../mappers/ResultMapper";

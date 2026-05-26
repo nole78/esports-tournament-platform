@@ -47,7 +47,7 @@ export default function GameCatalog(){
             {games.length === 0 && !error ? <Empty message="No games found"/> : (
                 <section className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                     {games.map(g => (
-                    <div className="group relative aspect-4/3 border-2 h-2xl border-white/5 bg-bgprimary/30  rounded-xl overflow-hidden">
+                    <div className="group relative aspect-4/3 border-2 h-2xl border-white/5 bg-bgprimary/30  rounded-xl overflow-hidden" key={g.gameId}>
                         <div className="w-full h-full">
                             <img src={g.gameLogotip ? g.gameLogotip : placeholder} className="object-cover w-full h-full rounded-xl transition-transform duration-300 group-hover:scale-110"/>
                         </div>

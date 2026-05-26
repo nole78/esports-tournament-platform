@@ -2,7 +2,7 @@ import { Request, Response, Router } from "express";
 import jwt from "jsonwebtoken";
 import { IAuthService } from "../../Domain/services/auth/IAuthService";
 import { IUserService } from "../../Domain/services/users/IUserService";
-import { ValidationResult } from "../../Domain/types/ValidationResult";
+import { ValidationResult } from "../../Domain/types/validation/ValidationResult";
 import { validateLogin } from "../validators/auth/validateLogin";
 import { validateRegister } from "../validators/auth/validateRegister";
 import { handleResult } from "../mappers/ResultMapper";

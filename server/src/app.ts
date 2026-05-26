@@ -50,6 +50,8 @@ import { MatchPlayerWriteRepository } from "./Database/repositories/match_player
 import { UserWatchlistRepository } from "./Database/repositories/user_watchlist/UserWatchlistRepository";
 import { UserWatchlistService } from "./Services/user_watchlist/UserWatchlistService";
 import { UserWatchlistController } from "./WebAPI/controllers/UserWatchlistController";
+import { BracketAdvancementService } from "./Services/bracket/BracketAdvancmentService";
+import { BracketGeneratorService } from "./Services/bracket/BracketGeneratorService";
 
 export const logger = new ConsoleLoggerService();
 export const db     = new DbManager(logger);
@@ -89,8 +91,10 @@ const teamMemberService = new TeamMemberService(teamRepoRead, teamMemberRepoWrit
 const healthService = new HealthService(gameRepo, tournamentReadRepo, userRepo, teamRepoRead, db);
 const watchlistService = new UserWatchlistService(userWatchlistRepo, tournamentReadRepo, gameRepo);
 const tournamentRegistrationReadService = new TournamentRegistrationReadService(tournamentRegistrationReadRepo, teamRepoRead, tournamentReadRepo, logger);
-const tournamentRegistrationWriteService = new TournamentRegistrationWriteService(tournamentRegistrationWriteRepo, tournamentRegistrationReadRepo, teamRepoRead, teamMemberRepoRead, tournamentReadRepo, tournamentWriteRepo, gameRepo, logger);
-const matchService = new MatchService(matchReadRepo, matchWriteRepo, teamRepoRead, tournamentReadRepo, gameRepo);
+const bracketGeneratorService = new BracketGeneratorService();
+const tournamentRegistrationWriteService = new TournamentRegistrationWriteService(tournamentRegistrationWriteRepo, tournamentRegistrationReadRepo, teamRepoRead, teamMemberRepoRead, tournamentReadRepo, tournamentWriteRepo, gameRepo, logger, bracketGeneratorService, matchWriteRepo);
+const bracketAdvancementService = new BracketAdvancementService(matchReadRepo,matchWriteRepo);
+const matchService = new MatchService(matchReadRepo, matchWriteRepo, teamRepoRead, tournamentReadRepo, gameRepo,bracketAdvancementService);
 const matchPlayerService = new MatchPlayerService(matchReadRepo, matchPlayerReadRepo, matchPlayerWriteRepo, userRepo, teamRepoRead, teamMemberRepoRead);
 
 // Express
@@ -105,7 +109,6 @@ app.use("/api/v1", new TournamentController(tournamentReadService, tournamentWri
 app.use("/api/v1", new AuditController(auditService).getRouter());
 app.use("/api/v1", new HealthController(healthService).getRouter());
 app.use("/api/v1", new TeamController(teamService, teamMemberService, auditService).getRouter());
-app.use("/api/v1", new HealthController(healthService).getRouter());
 app.use("/api/v1", new UserWatchlistController(watchlistService).getRouter());
 app.use("/api/v1", new TournamentRegistrationController(tournamentRegistrationReadService, tournamentRegistrationWriteService).getRouter());
 app.use("/api/v1", new MatchController(matchService, matchPlayerService).getRouter());

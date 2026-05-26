@@ -162,12 +162,14 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
     }, [id])
     
     useEffect(()=>{
+        if(search !== "")
+        {
         debounce(()=>{
         usersApi.searchUsername(search)
         .then(res =>{
             setUserSearch(res.data ?? []);
         }).catch(()=> setError("Failed to load searched users"))
-    })
+        })}
     }, [search])
 
     return(
@@ -216,15 +218,11 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
                             <th className=" pb-2 pr-4">Gamer Tag</th>
                             <th className=" pb-2 pr-4">ID</th>
                             { team.userRole === "captain" && (
-                            <>
-                               {captain}
-                            </>
+                                <th className=" pb-2 pr-4">{captain?.role}</th>
                             )
                             }
                             { team.userRole === "member" && (
-                            <>
-                                
-                            </>
+                                <th className=" pb-2 pr-4"></th>
                             )
                             }
                         </tr>

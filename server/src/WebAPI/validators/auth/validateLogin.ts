@@ -1,4 +1,4 @@
-import { ValidationResult } from "../../../Domain/types/ValidationResult";
+import { ValidationResult } from "../../../Domain/types/validation/ValidationResult";
 
 export const validateLogin = (u: string, p: string): ValidationResult => {
   if (!u || u.trim().length < 3) return { valid: false, message: "Username must be at least 3 characters" };
