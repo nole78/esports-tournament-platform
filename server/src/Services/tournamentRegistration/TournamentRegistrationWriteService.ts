@@ -7,7 +7,7 @@ import { TournamentRegistration } from "../../Domain/models/TournamentRegistrati
 import { TournamentRegistrationStatus } from "../../Domain/enums/TournamentRegistrationStatus";
 import { Result } from '../../Domain/common/Result';
 import { ErrorType } from "../../Domain/common/ErrorType";
-import { IGameRepository } from "../../Domain/repositories/games/IGameRepository";
+import { IGameReadRepository } from "../../Domain/repositories/games/IGameReadRepository";
 import { TeamMemberDto } from "../../Domain/DTOs/team_members/TeamMemberDto";
 import { ITeamMemberRepositoryRead } from "../../Domain/repositories/team_members/ITeamMemberRepositoryRead";
 import { ITournamentReadRepository } from "../../Domain/repositories/tournaments/ITournamentReadRepository";
@@ -32,7 +32,7 @@ export class TournamentRegistrationWriteService implements ITournamentRegistrati
         private readonly teamMemberRepoRead: ITeamMemberRepositoryRead,
         private readonly tournamentReadRepo : ITournamentReadRepository,
         private readonly tournamentWriteRepo : ITournamentWriteRepository,
-        private readonly gameRepo: IGameRepository,
+        private readonly gameReadRepo: IGameReadRepository,
         private readonly logger: ILoggerService,
         private readonly generator: IBracketGeneratorService,
         private readonly matchWriteRepo: IMatchWriteRepository
@@ -64,7 +64,7 @@ export class TournamentRegistrationWriteService implements ITournamentRegistrati
             return Result.Failure("You can't register to ongoing tournament!", ErrorType.Conflict);
         }
 
-        const game = await this.gameRepo.findById(tournament.tournamentGameId);
+        const game = await this.gameReadRepo.findById(tournament.tournamentGameId);
         const team_members:TeamMemberDto[] = await this.teamMemberRepoRead.findByTeamId(team.teamId);
         if(team_members.length < game.gamePlayers)
             return Result.Failure("Not enough players in team " + team.teamName, ErrorType.Validation);
