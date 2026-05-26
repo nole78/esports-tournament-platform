@@ -5,7 +5,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { teamApi } from "../../api_services/teams/TeamAPIService";
 import { Empty, ErrorBox, PageHeader, Pagination} from "../../components/ui/UI";
 import { TeamRole } from "../../types/teamMembers/teamMemberRole";
-import { UserRole } from "../../types/user/UserRole";
 import placeholder from "../../assets/placeholder.png"
 
 
@@ -132,10 +131,7 @@ export default function TeamsPage(){
                                             onClick={
                                                 (e) => {
                                                      e.stopPropagation();
-                                                    if (user?.role === UserRole.ADMIN) 
-                                                        navigate(`/admin/teams/edit/${t.teamId}`) 
-                                                    else 
-                                                        navigate(`/teams/edit/${t.teamId}`)
+                                                    navigate(`/teams/edit/${t.teamId}`)
                                                 }}
                                             >
                                         Edit

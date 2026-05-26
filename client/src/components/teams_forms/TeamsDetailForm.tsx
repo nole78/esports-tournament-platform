@@ -146,10 +146,7 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
         ).catch(() => setError("Failed to delete member"));
 
         if (user?.id === userId){
-            if(user?.role === UserRole.ADMIN)
-                        navigate("/admin/teams", {state: {left : true} });
-                    else
-                        navigate("/teams", {state: {left : true} });
+            navigate("/teams", {state: {left : true} });
         }else{
             setTimeout(()=> {setKicked(false)}, 3000);
         }

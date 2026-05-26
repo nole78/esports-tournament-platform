@@ -145,7 +145,7 @@ export default function Settings() {
     }
     
     setSuccess(true);
-    setTimeout(() => navigate("/admin/tournament_list"), 1500);
+    setTimeout(() => navigate("/tournament_list"), 1500);
   };
 
   if (loading) {

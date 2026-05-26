@@ -37,12 +37,11 @@ export default function App() {
       <Route path="/game_catalog" element={<GameCatalog/>} />
       <Route path="/tournament_list" element={<TournamentList />} />
       <Route path="/teams/details/:id" element = {<TeamsDetailPage/>}/>
-      <Route path="/guest/tournament_registration/:id" element={<TournamentRegistrationPage />}/>
+      <Route path="/tournament_registration/:id" element={<TournamentRegistrationPage />}/>
       <Route path="/guest/teams/" element={<TeamsGuestPage />} />
       
       {/* User routes */}
       <Route path="/account_details" element={<ProtectedRoute><AccountDetailsPage/></ProtectedRoute>}/>
-      <Route path="/tournament_registration/:id" element={<ProtectedRoute><TournamentRegistrationPage /></ProtectedRoute>}/>
       <Route path="/teams" element ={<ProtectedRoute> <TeamsPage/></ProtectedRoute>} />
       <Route path="/teams/add" element ={<ProtectedRoute> <TeamsAddPage/></ProtectedRoute>} />
       <Route path="/teams/edit/:id" element ={<ProtectedRoute> <TeamsEditPage/></ProtectedRoute>} />
@@ -55,7 +54,6 @@ export default function App() {
       <Route path="/admin/game_catalog/edit/:id" element={<ProtectedRoute requiredRoles={["admin"]}><GameEditPage/></ProtectedRoute>}/>
       <Route path="/admin/tournament_list/add" element={<ProtectedRoute requiredRoles={["admin"]}><TournamentAddPage/></ProtectedRoute>} />
       <Route path="/admin/dashboard" element={<ProtectedRoute requiredRoles={["admin"]}><AdminDashboard/></ProtectedRoute>}/>
-      <Route path="/admin/tournament_registration/:id" element={<ProtectedRoute requiredRoles={["admin"]}><TournamentRegistrationPage /></ProtectedRoute>}/>
       <Route path="/admin/teams/add" element ={<ProtectedRoute requiredRoles={["admin"]}> <TeamsAddPage/></ProtectedRoute>} />
       <Route path="/admin/teams/edit/:id" element ={<ProtectedRoute requiredRoles={["admin"]}> <TeamsEditPage/></ProtectedRoute>} />
 

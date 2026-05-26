@@ -2,13 +2,9 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { teamApi } from "../../api_services/teams/TeamAPIService";
 import type { TeamDtoEdit } from "../../models/team/TeamDtoEdit";
-import { useAuth } from "../../hooks/auth/useAuthHook";
-import { UserRole } from "../../types/user/UserRole";
-
 
 export const TeamsEditForm: React.FC<{id: string}> = ({id}) =>{
 
-    const {user} = useAuth();
     const emptyTeam : TeamDtoEdit = {teamName:"", teamLogotip:"", teamDescription:"", teamTag:""};
     const [team, setTeam] = useState<TeamDtoEdit>(emptyTeam);
     const [error, setError] = useState<string>("");
@@ -58,10 +54,7 @@ export const TeamsEditForm: React.FC<{id: string}> = ({id}) =>{
 
         
         setTeam(emptyTeam);
-        if(user?.role === UserRole.ADMIN)
-            navigate("/admin/teams", {state: {edited : true} });
-        else
-            navigate("/teams", {state: {edited : true} });
+        navigate("/teams", {state: {edited : true} });
     }
 
     useEffect(() =>{

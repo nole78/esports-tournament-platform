@@ -44,7 +44,7 @@ export default function UserWatchlist() {
                         <tbody>
                             {watchlist.map(w => (
                                 <tr key={w.tournamentId} className="border-b border-secondary/50 hover:bg-bgprimary/20 transition-colors cursor-pointer"
-                                    onClick={() => user?.role == "admin" ? navigate(`/admin/tournament_registration/${w.tournamentId}`) : navigate(`/tournament_registration/${w.tournamentId}`)}>
+                                    onClick={() => navigate(`/tournament_registration/${w.tournamentId}`)}>
                                     
                                     <td className="px-5 py-4">
                                         <img src={w.gameLogotip ?? placeholder} alt={w.gameName} className="w-12 h-12 rounded object-cover" />

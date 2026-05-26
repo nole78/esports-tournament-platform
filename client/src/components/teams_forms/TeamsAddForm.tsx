@@ -2,15 +2,9 @@ import { useState } from 'react';
 import type { TeamDto } from '../../models/team/TeamDto';
 import type { ITeamAPIService } from '../../api_services/teams/ITeamAPIService';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../hooks/auth/useAuthHook';
 import { TeamRole } from '../../types/teamMembers/teamMemberRole';
-import { UserRole } from '../../types/user/UserRole';
-
-
-
 
 export default function TeamsAddForm({teamApi} : {teamApi:ITeamAPIService}){
-    const {user} = useAuth();
     const emptyTeam : TeamDto = {teamId: 0, teamName:"", teamLogotip:"", teamDescription:"", teamTag:"", userRole: TeamRole.MEMBER};
     const [team, setTeam] = useState<TeamDto>(emptyTeam);
     const [error, setError] = useState<string>("");
@@ -61,11 +55,7 @@ export default function TeamsAddForm({teamApi} : {teamApi:ITeamAPIService}){
         
         if (!res.success || !res.data){setError(res.message ?? "Invalid values"); return;}
 
-        
-        if(user?.role === UserRole.ADMIN)
-            navigate("/admin/teams", {state: {added : true} });
-        else
-            navigate("/teams", {state: {added : true} });
+        navigate("/teams", {state: {added : true} });
     }
 
     return(
