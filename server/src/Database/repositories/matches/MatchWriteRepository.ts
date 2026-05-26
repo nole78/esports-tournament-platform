@@ -75,7 +75,7 @@ export class MatchWriteRepository implements  IMatchWriteRepository{
 
     try {
       const entries = Object.entries(fields)
-          .filter(([, v]) => v !== undefined)
+          .filter(([, v]) => v)
           .map(([k,v]) => [fieldMap[k] ?? k, v]);
       
       if (entries.length === 0) return false;

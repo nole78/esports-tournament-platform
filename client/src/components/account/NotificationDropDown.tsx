@@ -1,5 +1,5 @@
 import { useEffect, createRef, useState } from "react";
-import TeamsInboxForm from "../../pages/user_forms/TeamsInboxForm";
+import TeamsInboxForm from "../teams_forms/TeamsInboxForm";
 import { EnvelopeOpen, EnvelopeClosed } from "../heroIcons/EnvelopeIcons";
 
 export default function NotificationDropdown() {

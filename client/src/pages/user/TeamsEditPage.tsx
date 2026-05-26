@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { TeamsEditForm } from "../user_forms/TeamsEditForm";
+import { TeamsEditForm } from "../../components/teams_forms/TeamsEditForm";
 
 
 export default function TeamsEditPage(){

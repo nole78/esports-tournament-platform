@@ -1,5 +1,3 @@
-// Should be allright, need to check
-
 import { TeamRole } from "../../enums/TeamRole";
 
 export class TeamDto{

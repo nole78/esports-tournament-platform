@@ -23,7 +23,7 @@ export class InvitesRepositoryWrite implements IInvitesRepositoryWrite{
             `INSERT INTO team_invites (user_id, team_id, status) VALUES (?, ?, ?)`, [invite.userId, invite.teamId, invite.status]
         );
         if (result.affectedRows === 0) return new Invite;
-
+        //to do remove
         const [row] = await res.conn.execute<RowDataPacket[]>(
             `SELECT * FROM team_invites WHERE team_id=? AND user_id=?`, [invite.teamId, invite.userId]
         );

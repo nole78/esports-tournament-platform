@@ -1,5 +1,4 @@
 import { RowDataPacket, ResultSetHeader } from "mysql2";
-import { TeamRole } from "../../../Domain/enums/TeamRole";
 import { TeamMember } from "../../../Domain/models/TeamMember";
 import { ITeamMemberRepositoryRead } from "../../../Domain/repositories/team_members/ITeamMemberRepositoryRead";
 import { ILoggerService } from "../../../Domain/services/logger/ILoggerService";

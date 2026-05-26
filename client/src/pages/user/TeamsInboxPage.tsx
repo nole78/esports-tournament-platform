@@ -1,4 +1,4 @@
-import TeamsInboxForm from "../user_forms/TeamsInboxForm";
+import TeamsInboxForm from "../../components/teams_forms/TeamsInboxForm";
 
 export default function TeamsInboxPage(){
     return(
