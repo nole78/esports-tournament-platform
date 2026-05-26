@@ -133,7 +133,8 @@ export class BracketGeneratorService implements IBracketGeneratorService{
         // first lower round comes from loser of first upper round
         const firstUpperRound = upperRounds[0];
 
-        for(let i = 0; i < firstUpperRound.length; i++) {
+        // Pair losers from adjacent matches in the upper bracket
+        for(let i = 0; i < firstUpperRound.length; i += 2) {
             const node: BracketNode = {
                 tempId: tempId++,
                 tournamentId,
@@ -146,9 +147,13 @@ export class BracketGeneratorService implements IBracketGeneratorService{
             lowerRound.push(node);
             nodes.push(node);
 
-            // loser from upper goes u lower
+            // loser from first match goes to blue
             firstUpperRound[i].loserToTempId = node.tempId;
             firstUpperRound[i].loserToSlot = MatchSlot.BLUE;
+
+            // loser from second match goes to red
+            firstUpperRound[i + 1].loserToTempId = node.tempId;
+            firstUpperRound[i + 1].loserToSlot = MatchSlot.RED;
         }
 
         lowerRounds.push(lowerRound);
@@ -217,18 +222,37 @@ export class BracketGeneratorService implements IBracketGeneratorService{
         const nodes: BracketNode[] = [];
         const n = seededTeamIds.length;
 
+        // Generate all matchups
+        const matches: Array<{i: number, j: number}> = [];
         for(let i=0; i<n; i++) {
             for(let j=i+1; j<n; j++) {
-                nodes.push({
-                tempId: i*n + j, 
-                tournamentId: tournamentId,
-                blueTeamId: seededTeamIds[i],
-                redTeamId: seededTeamIds[j],  
-                roundNumber: i+1,
-                bracketType: BracketType.WINNER
-                });
+                matches.push({i, j});
             }
         }
+
+        // Assign rounds ensuring each team plays at most once per round
+        const teamRoundsUsed: Set<number>[] = Array(n).fill(null).map(() => new Set());
+        let nextTempId = 1;
+
+        for(const match of matches) {
+            let round = 1;
+            while(teamRoundsUsed[match.i].has(round) || teamRoundsUsed[match.j].has(round)) {
+                round++;
+            }
+            
+            nodes.push({
+                tempId: nextTempId++, 
+                tournamentId: tournamentId,
+                blueTeamId: seededTeamIds[match.i],
+                redTeamId: seededTeamIds[match.j],  
+                roundNumber: round,
+                bracketType: BracketType.WINNER
+            });
+
+            teamRoundsUsed[match.i].add(round);
+            teamRoundsUsed[match.j].add(round);
+        }
+
         return Result.Success(nodes);    
     }
 }
