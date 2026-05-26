@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { teamApi } from "../../api_services/teams/TeamAPIService";
 import type { TeamDtoEdit } from "../../models/team/TeamDtoEdit";
@@ -12,9 +12,17 @@ export const TeamsEditForm: React.FC<{id: string}> = ({id}) =>{
     const emptyTeam : TeamDtoEdit = {teamName:"", teamLogotip:"", teamDescription:"", teamTag:""};
     const [team, setTeam] = useState<TeamDtoEdit>(emptyTeam);
     const [error, setError] = useState<string>("");
-    const fileRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
 
+    const openFilePicker = () => {
+        const element = document.getElementById("team-logo-input");
+
+        if(!(element instanceof HTMLInputElement)) {
+            return;
+        }
+
+        element.click();
+    }
     const submit = async (e: React.FormEvent<HTMLFormElement>)=>{
         e.preventDefault();
         setError("");
@@ -95,9 +103,9 @@ export const TeamsEditForm: React.FC<{id: string}> = ({id}) =>{
                 <div>
                     <label className="mr-5 w-min text-xs text-bgprimary mb-2 font-bold">Team Logo</label>
                     <button type="button" className=" rounded-xl w-1/3 py-3 border-bgprimary bg-bgprimary text-primary font-semibold text-sm hover:bg-bgprimary/80 cursor-pointer"
-                        onClick={() => {if(fileRef.current) fileRef.current.click()}}
+                        onClick={openFilePicker}
                         >Choose Image</button>
-                    <input type="file" accept="image/*" ref={fileRef}
+                    <input type="file" accept="image/*" id="team-logo-input"
                     onChange={e => {
                         const file = e.target.files?.[0];
                         if(!file) {
