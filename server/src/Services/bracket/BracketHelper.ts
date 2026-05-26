@@ -67,7 +67,7 @@ export class BracketHelpers {
             }
 
             // ONLY PUSH IF THERE IS AT LEAST ONE RELATION
-            if(update.winnerToMatchId || update.loserToMatchId
+            if(update.winnerToMatchId || update.loserToMatchId || update.blueTeamId || update.redTeamId
             ) {
                 updates.push(update);
             }
