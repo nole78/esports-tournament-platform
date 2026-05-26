@@ -43,8 +43,8 @@ export default function TeamsInboxForm(){
 
                 names[invite.teamId] =
                     teamRes.success
-                        ? teamRes.data?.teamName ?? "Unknown"
-                        : "Unknown";
+                        ? teamRes.data?.teamName ?? "N/A"
+                        : "N/A";
                 images[invite.teamId] =
                     teamRes.success
                         ? teamRes.data?.teamLogotip ?? ""

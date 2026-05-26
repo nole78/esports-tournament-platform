@@ -4,15 +4,24 @@ import type { AuthContextType } from "../../types/auth/AuthContext";
 import type { AuthUser } from "../../types/auth/AuthUser";
 import type { JwtTokenClaims } from "../../types/auth/JwtTokenClaims";
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const defaultContext: AuthContextType = {
+  user: {},
+  token: "",
+  login: () => {},
+  logout: () => {},
+  isAuthenticated: false,
+  isLoading: false
+};
+
+const AuthContext = createContext<AuthContextType>(defaultContext);
 const KEY = "authToken";
 
-const decode = (token: string): JwtTokenClaims | null => {
+const decode = (token: string): JwtTokenClaims | {} => {
   try {
     const d = jwtDecode<JwtTokenClaims>(token);
-    return d?.id ? d : null;
+    return d?.id ? d : {};
   } catch {
-    return null;
+    return {};
   }
 };
 
@@ -30,7 +39,7 @@ const getInitialAuth = () => {
 
   if (saved && !expired(saved)) {
     const claims = decode(saved);
-    if (claims) {
+    if (claims && "id" in claims) {
       return {
         token: saved,
         user: { id: claims.id, username: claims.username, role: claims.role, } as AuthUser,
@@ -40,19 +49,19 @@ const getInitialAuth = () => {
 
   if (saved) localStorage.removeItem(KEY);
 
-  return { token: null, user: null };
+  return { token: "", user: {} };
 };
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const initial = getInitialAuth();
 
-  const [token, setToken] = useState<string | null>(initial.token);
-  const [user, setUser] = useState<AuthUser | null>(initial.user);
+  const [token, setToken] = useState<string>(initial.token || "");
+  const [user, setUser] = useState<AuthUser | {}>(initial.user || {});
   const [isLoading] = useState(false);
 
   const login = (t: string) => {
     const claims = decode(t);
-    if (!claims || expired(t)) return;
+    if (!claims || !("id" in claims) || expired(t)) return;
 
     setToken(t);
     setUser({ id: claims.id, username: claims.username, role: claims.role });
@@ -60,13 +69,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const logout = () => {
-    setToken(null);
-    setUser(null);
+    setToken("");
+    setUser({});
     localStorage.removeItem(KEY);
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, isAuthenticated: !!user && !!token, isLoading}}>
+    <AuthContext.Provider value={{ user: user as AuthUser, token, login, logout, isAuthenticated: !!user && "id" in user && !!token, isLoading}}>
       {children}
     </AuthContext.Provider>
   );

@@ -11,10 +11,12 @@ import type { UserDto } from "../../models/user/UserTypes";
 
 export type ApiResponse<T> = {success: boolean; message: string; data?: T};
 
+export type TeamCreatePayload = Omit<TeamDto, 'teamId' | 'userRole'>;
+
 export interface ITeamAPIService {
     getAll(page: number, limit: number): Promise<ApiResponse<{items: TeamDto[], total: number}>>;
     getByGamerTag(page: number, limit: number): Promise<ApiResponse<{items: TeamDto[], total: number}>>;
-    create(payload: Record<string, unknown>): Promise<ApiResponse<TeamDto>>;
+    create(payload: TeamCreatePayload): Promise<ApiResponse<TeamDto>>;
     delete(id: number): Promise<ApiResponse<void>>;
     getById(id: number): Promise<ApiResponse<TeamDto>>;
     update(id: number, payload: Partial<TeamDto>) : Promise<ApiResponse<void>>;

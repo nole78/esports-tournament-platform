@@ -7,7 +7,7 @@ import { readItem } from "../../helpers/local_storage";
 import type { ApiResponse } from "../tournament_list/ITournamentAPIService";
 
 const BASE = import.meta.env.VITE_API_URL;
-const err = <T>(e: unknown): ApiResponse<T> => ({ success: false, message: "Error: " + e });
+const err = <T>(e: Error): ApiResponse<T> => ({ success: false, message: "Error: " + e.message });
 
 const authHeader = () => {
   const token = readItem("authToken");

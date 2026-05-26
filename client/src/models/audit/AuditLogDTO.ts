@@ -1,3 +1,5 @@
+export type AuditMeta = Record<string, string | number | boolean>;
+
 export interface AuditLogDto {
   id: number;
   userId: number;
@@ -5,7 +7,7 @@ export interface AuditLogDto {
   action: string;
   entity: string;
   entityId: number;
-  meta: Record<string, unknown>;
+  meta: AuditMeta;
   ipAddress: string;
   createdAt: string;
 };

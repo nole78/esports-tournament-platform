@@ -1,3 +1,5 @@
+import type { AuditMeta } from "../../services/audit/IAuditService";
+
 export class AuditLogDto {
   public constructor(
     public id: number = 0,
@@ -6,7 +8,7 @@ export class AuditLogDto {
     public action: string = "",
     public entity: string = "",
     public entityId: number = 0,
-    public meta: Record<string, unknown> = {},
+    public meta: AuditMeta = {},
     public ipAddress: string = "",
     public createdAt: Date = new Date()
   ) {}

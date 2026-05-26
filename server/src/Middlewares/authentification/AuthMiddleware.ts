@@ -13,8 +13,11 @@ export const authenticate = (req: Request, res: Response, next: NextFunction): v
   const header = req.headers.authorization;
   if (!header?.startsWith("Bearer ")) { res.status(401).json({ success: false, message: "Missing token" }); return; }
   const token = header.slice(7);
-  const decoded = (() => { try { return jwt.verify(token, process.env.JWT_SECRET ?? "") as JwtPayload; } catch { return null; } })();
-  if (!decoded) { res.status(401).json({ success: false, message: "Invalid token" }); return; }
-  req.user = { id: decoded.id, username: decoded.username, role: decoded.role as UserRole };
-  next();
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET ?? "") as JwtPayload;
+    req.user = { id: decoded.id, username: decoded.username, role: decoded.role as UserRole };
+    next();
+  } catch {
+    res.status(401).json({ success: false, message: "Invalid token" });
+  }
 };

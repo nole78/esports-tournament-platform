@@ -231,7 +231,7 @@ export class BracketGeneratorService implements IBracketGeneratorService{
         }
 
         // Assign rounds ensuring each team plays at most once per round
-        const teamRoundsUsed: Set<number>[] = Array(n).fill(null).map(() => new Set());
+        const teamRoundsUsed: Set<number>[] = Array.from({ length: n }, () => new Set<number>());
         let nextTempId = 1;
 
         for(const match of matches) {

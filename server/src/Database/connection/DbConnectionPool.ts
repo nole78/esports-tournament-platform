@@ -48,7 +48,7 @@ export class DbManager {
   private readonly master: NodeInfo;
   private readonly slaves: NodeInfo[];
   private slaveRrIndex: number = 0;
-  private healthTimer: NodeJS.Timeout | null = null;
+  private healthTimer?: NodeJS.Timeout;
 
   public constructor(private readonly logger: ILoggerService) {
     this.master = {
@@ -63,22 +63,23 @@ export class DbManager {
 
   private async checkNode(info: NodeInfo): Promise<void> {
     const start = Date.now();
-    let conn: PoolConnection | null = null;
     try {
-      conn = await info.pool.getConnection();
-      await conn.query("SELECT 1");
-      const ms = Date.now() - start;
-      info.node.latency = ms;
-      info.node.status = ms > HEALTH_CHECK_TIMEOUT ? NodeStatus.DEGRADED : NodeStatus.HEALTHY;
+      const conn = await info.pool.getConnection();
+      try {
+        await conn.query("SELECT 1");
+        const ms = Date.now() - start;
+        info.node.latency = ms;
+        info.node.status = ms > HEALTH_CHECK_TIMEOUT ? NodeStatus.DEGRADED : NodeStatus.HEALTHY;
+      } finally {
+        conn.release();
+      }
     } catch (err) {
       info.node.status = NodeStatus.UNREACHABLE;
       info.node.failedReads++;
       info.node.latency = -1;
       this.logger.warn("DB", `Node ${info.name} failed health check`);
-    } finally {
-      if (conn) conn.release();
-      info.node.lastCheck = new Date();
     }
+    info.node.lastCheck = new Date();
   }
 
   public async runHealthCheck(): Promise<void> {
@@ -92,10 +93,11 @@ export class DbManager {
   }
 
   /** All writes (INSERT/UPDATE/DELETE) → Master only */
-  public async getWriteConnection(): Promise<{ conn: PoolConnection; nodeName: string } | null> {
+  public async getWriteConnection(): Promise<{ conn: PoolConnection; nodeName: string }> {
     if (this.master.node.status === NodeStatus.UNREACHABLE) {
-      this.logger.error("DB", "Master is UNREACHABLE — write not possible");
-      return null;
+      const err = new Error("Master is UNREACHABLE — write not possible");
+      this.logger.error("DB", "Master is UNREACHABLE — write not possible", err);
+      throw err;
     }
     try {
       const conn = await this.master.pool.getConnection();
@@ -104,13 +106,13 @@ export class DbManager {
     } catch (err) {
       this.master.node.status = NodeStatus.UNREACHABLE;
       this.master.node.failedWrites++;
-      this.logger.error("DB", "Failed to connect to master", err);
-      return null;
+      this.logger.error("DB", "Failed to connect to master", err as Error);
+      throw new Error("Failed to get write connection");
     }
   }
 
   /** All reads (SELECT) → Round-Robin slaves, fallback to Master */
-  public async getReadConnection(): Promise<{ conn: PoolConnection; nodeName: string } | null> {
+  public async getReadConnection(): Promise<{ conn: PoolConnection; nodeName: string }> {
     const n = this.slaves.length;
     for (let i = 0; i < n; i++) {
       const idx = (this.slaveRrIndex + i) % n;
@@ -130,8 +132,9 @@ export class DbManager {
     // Fallback to master
     this.logger.warn("DB", "All slaves offline — falling back to master for read");
     if (this.master.node.status === NodeStatus.UNREACHABLE) {
-      this.logger.error("DB", "Master also offline — read not possible");
-      return null;
+      const err = new Error("Master also offline — read not possible");
+      this.logger.error("DB", "Master also offline — read not possible", err);
+      throw err;
     }
     try {
       const conn = await this.master.pool.getConnection();
@@ -140,8 +143,8 @@ export class DbManager {
     } catch (err) {
       this.master.node.status = NodeStatus.UNREACHABLE;
       this.master.node.failedReads++;
-      this.logger.error("DB", "Failed to connect to master for fallback read", err);
-      return null;
+      this.logger.error("DB", "Failed to connect to master for fallback read", err as Error);
+      throw new Error("Failed to get read connection");
     }
   }
 

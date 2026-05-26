@@ -26,7 +26,7 @@ export function proxyMiddleware(serverPool: IServerPoolService) {
         const clientIp = req.ip || 
                         req.headers['x-forwarded-for']?.toString().split(',')[0].trim() ||
                         req.socket.remoteAddress ||
-                        'unknown';
+                        'invalid';
 
         const server = serverPool.getNextServer(clientIp);
         if (!server.id) {

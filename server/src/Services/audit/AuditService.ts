@@ -1,4 +1,4 @@
-import { IAuditService } from "../../Domain/services/audit/IAuditService";
+import { IAuditService, AuditMeta } from "../../Domain/services/audit/IAuditService";
 import { IAuditRepository } from "../../Domain/repositories/audit/IAuditRepository";
 import { AuditLogDto } from "../../Domain/DTOs/audit/AuditLogDto";
 import { PaginatedListDto } from "../../Domain/DTOs/PaginatedListDto";
@@ -17,7 +17,7 @@ export class AuditService implements IAuditService {
     action: string;
     entity?: string;
     entityId?: number;
-    meta?: Record<string, unknown>;
+    meta?: AuditMeta;
     ipAddress?: string;
   }): Promise<void> {
     const entry = new AuditLog(
@@ -40,7 +40,7 @@ export class AuditService implements IAuditService {
       (l) => new AuditLogDto(
           l.id, l.userId ?? 0, "",
           l.action, l.entity ?? "", l.entityId ?? 0,
-          l.meta ? (JSON.parse(l.meta as string) as Record<string, unknown>) : {},
+          l.meta ? (JSON.parse(l.meta as string) as AuditMeta) : {},
           l.ipAddress ?? "", l.createdAt ?? new Date()
       )
     );

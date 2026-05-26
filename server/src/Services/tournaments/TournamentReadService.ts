@@ -40,7 +40,7 @@ export class TournamentReadService implements ITournamentReadService {
       new TournamentDto(
         t.tournamentId,
         t.tournamentName,
-        gameMap.get(t.tournamentGameId) || "Unknown",
+        gameMap.get(t.tournamentGameId) || "N/A",
         t.tournamentFormat,
         t.tournamentMaxTeams,
         t.tournamentApplicationDeadline,
@@ -80,7 +80,7 @@ export class TournamentReadService implements ITournamentReadService {
       new TournamentDto(
         t.tournamentId,
         t.tournamentName,
-        gameMap.get(t.tournamentGameId) || "Unknown",
+        gameMap.get(t.tournamentGameId) || "N/A",
         t.tournamentFormat,
         t.tournamentMaxTeams,
         t.tournamentApplicationDeadline,
@@ -100,7 +100,7 @@ export class TournamentReadService implements ITournamentReadService {
 
     const game = await this.gameReadRepo.findById(tournament.tournamentGameId);
     if (!game) {
-      this.logger.error("TournamentService", "getById failed", `Game with id "${tournament.tournamentGameId}" not found`);
+      this.logger.error("TournamentService", "getById failed", new Error(`Game with id "${tournament.tournamentGameId}" not found`));
       return Result.Failure("Game with id " + tournament.tournamentGameId + " does not exist!", ErrorType.NotFound);
     }
 
