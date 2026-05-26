@@ -83,12 +83,11 @@ CREATE TABLE matches(
     REFERENCES tournaments(tournament_id)
     ON DELETE CASCADE,
   FOREIGN KEY (blue_team_id)
-    REFERENCES teams(team_id)
+    REFERENCES teams(team_id),
   FOREIGN KEY (red_team_id)
-    REFERENCES teams(team_id)
+    REFERENCES teams(team_id),
   FOREIGN KEY (winner_team_id)
-    REFERENCES teams(team_id)
-    ON DELETE SET NULL,
+    REFERENCES teams(team_id),
   FOREIGN KEY (winner_to_match_id)
     REFERENCES matches(match_id)
     ON DELETE CASCADE,
