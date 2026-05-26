@@ -4,6 +4,7 @@ import type { UserWatchlistDto } from "../../models/user_watchlist/UserWatchlist
 import { userWatchlistApi } from '../../api_services/user_watchlist/UserWatchlistAPIService';
 import { useAuth } from "../../hooks/auth/useAuthHook";
 import { useNavigate } from "react-router-dom";
+import placeholder from "../../assets/placeholder.png";
 
 export default function UserWatchlist() {
     const { user } = useAuth();
@@ -43,7 +44,7 @@ export default function UserWatchlist() {
                             <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
                                 <div className="overflow-hidden rounded-xl shrink-0 w-full sm:w-32 lg:w-40">
                                     <a onClick={() => user?.role == "admin" ? navigate(`/admin/tournament_registration/${w.tournamentId}`) : navigate(`/tournament_registration/${w.tournamentId}`)}>
-                                    <img src={w.gameLogotip} className="w-full aspect-square object-cover rounded-xl cursor-pointer transition-transform duration-300 hover:scale-110"/>
+                                    <img src={w.gameLogotip ? w.gameLogotip : placeholder} className="w-full aspect-square object-cover rounded-xl cursor-pointer transition-transform duration-300 hover:scale-110"/>
                                     </a>
                                 </div>
                                 <div className="flex flex-col lg:gap-10 sm:gap-10 overflow-hidden">
