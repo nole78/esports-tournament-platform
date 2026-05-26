@@ -7,7 +7,7 @@ import { BracketNode } from "../../Domain/types/BracketNode";
 
 export class BracketGeneratorService implements IBracketGeneratorService{
     
-    public async generateSingleElimination(tournamentId: number, seededTeamIds: number[]) : Promise<Result<BracketNode[]>>{
+    public generateSingleElimination(tournamentId: number, seededTeamIds: number[]) : Result<BracketNode[]>{
         if(seededTeamIds.length < 2) {
             return Result.Failure("Not enough teams", ErrorType.Validation);
         }
@@ -67,7 +67,7 @@ export class BracketGeneratorService implements IBracketGeneratorService{
         return Result.Success(nodes);    
     }
 
-    public async generateDoubleElimination(tournamentId: number, seededTeamIds: number[]): Promise<Result<BracketNode[]>> {
+    public generateDoubleElimination(tournamentId: number, seededTeamIds: number[]): Result<BracketNode[]> {
         if(seededTeamIds.length < 2) {
             return Result.Failure("Not enough teams", ErrorType.Validation);
         }
@@ -209,7 +209,7 @@ export class BracketGeneratorService implements IBracketGeneratorService{
         return Result.Success(nodes);
     }
 
-    public async generateRoundRobin(tournamentId: number, seededTeamIds: number[]) : Promise<Result<BracketNode[]>>{
+    public generateRoundRobin(tournamentId: number, seededTeamIds: number[]) : Result<BracketNode[]>{
         if(seededTeamIds.length < 2) {
             return Result.Failure("Not enough teams", ErrorType.Validation);
         }
