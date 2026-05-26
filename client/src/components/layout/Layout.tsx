@@ -7,7 +7,6 @@ import { usersApi } from "../../api_services/users/UsersAPIService";
 import { authApi } from "../../api_services/auth/AuthAPIService";
 import NotificationDropdown from "../account/NotificationDropDown";
 
-// TODO: Update nav items to match your routes and roles
 const guestNav = [
   {to: "/game_catalog", label: "Game Catalog"},
   {to: "/tournament_list", label: "Tournaments"},
@@ -24,9 +23,9 @@ const userNav = [
 const adminNav = [
   { to: "/admin/dashboard", label: "Admin Dashboard"},
   { to: "/game_catalog", label: "Game Catalog"},
-  { to: "/admin/teams", label: "Teams List"},
+  { to: "/teams", label: "Teams List"},
   { to: "/tournament_list", label: "Tournaments"},
-  { to: "/admin/watchlist", label: "My Watchlist"},
+  { to: "/watchlist", label: "My Watchlist"},
   // add more admin routes here
 ];
 
