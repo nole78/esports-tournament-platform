@@ -57,6 +57,7 @@ export class MatchWriteRepository implements  IMatchWriteRepository{
     if (!res) return false;
 
     const  fieldMap: Record<string, string> = {
+      matchId: "match_id",
       tournamentId: "tournament_id", 
       blueTeamId: "blue_team_id", 
       redTeamId: "red_team_id", 
