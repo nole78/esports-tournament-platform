@@ -18,15 +18,14 @@ const userNav = [
   { to: "/teams", label: "Teams List"},
   { to: "/tournament_list", label: "Tournaments"},
   { to: "/watchlist", label: "My Watchlist"},
-  // add more user routes here
 ];
+
 const adminNav = [
   { to: "/admin/dashboard", label: "Admin Dashboard"},
   { to: "/game_catalog", label: "Game Catalog"},
   { to: "/teams", label: "Teams List"},
   { to: "/tournament_list", label: "Tournaments"},
   { to: "/watchlist", label: "My Watchlist"},
-  // add more admin routes here
 ];
 
 export function Layout() {
@@ -102,6 +101,7 @@ export function Layout() {
                 if (user) {
                   logout();
                   authApi.logout(user.id);
+                  navigate("/home");
                 }
                 else navigate("/login");
               }}
