@@ -5,6 +5,9 @@ import { tournamentApi } from "../../api_services/tournament_list/TournamentAPIS
 import type { TournamentDto } from "../../models/tournament/TournamentDto";
 import { formatDeadline } from "../../helpers/date_formatter";
 import { tournamentRegistrationApi } from "../../api_services/tournament_registration/TournamentRegistrationAPIService";
+import { matchApi } from "../../api_services/matches/MatchAPIService";
+import Bracket from "../matches/Bracket";
+import type { MatchDto } from "../../models/match/MatchDto";
 
 export default function TournamentOverview() {
     
@@ -13,6 +16,8 @@ export default function TournamentOverview() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string>("");
     const [generatingBracket, setGeneratingBracket] = useState(false);
+    const [matches, setMatches] = useState<MatchDto[]>([]);
+    const [loadingMatches, setLoadingMatches] = useState(false);
     
     useEffect(() => {
         Promise.resolve().then(() => setLoading(true));
@@ -29,12 +34,41 @@ export default function TournamentOverview() {
         .finally(() => setLoading(false));
     }, [id]);
 
+    useEffect(() => {
+        if (tournament && tournament.tournamentStatus !== 'upcoming') {
+            setLoadingMatches(true);
+            matchApi.getAllForTorunament(Number(id))
+            .then(res => {
+                if (res.success && res.data) {
+                    setMatches(res.data);
+                } else {
+                    setError("Error while loading matches "+res.message);
+                }
+            })
+            .catch(() => setError('Failed to load matches'))
+            .finally(() => setLoadingMatches(false));
+        }
+    }, [tournament, id]);
+
     const handleGenerateBracket = async () => {
         setGeneratingBracket(true);
         try {
             
             const response = await tournamentRegistrationApi.generateBracket(Number(id));
-            if(!response)
+            if(response.success)
+            {
+                //load page again
+                setTimeout(() => {
+                    tournamentApi.getById(Number(id))
+                    .then(res => {
+                        if (res.success && res.data) {
+                            setTournament(res.data);
+                        }
+                    })
+                    .catch(() => setError("Failed to reload tournament"));
+                }, 1000);
+            }
+            else
             {
                 setError("Generating brackets unseccesefull!");
             }
@@ -125,7 +159,24 @@ export default function TournamentOverview() {
                         </button>
                     </div>
                 )}
+
+                {tournament && tournament.tournamentStatus !== 'upcoming' && (
+                    <div className="mt-8">
+                        {loadingMatches ? (
+                            <div className="flex justify-center py-8">
+                                <Spinner />
+                            </div>
+                        ) : matches.length > 0 ? (
+                            <Bracket matches={matches} title={`${tournament.tournamentName} - ${tournament.tournamentFormat}`} />
+                        ) : (
+                            <div className="bg-primary border border-secondary/40 rounded-xl p-6 text-center">
+                                <p className="text-white/50">No matches available yet</p>
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
+            {}
         </div>
     );
 }
