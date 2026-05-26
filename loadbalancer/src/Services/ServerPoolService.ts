@@ -1,14 +1,20 @@
-import { servers } from '../Configs/servers';
 import { ServerInstance } from '../Domain/models/ServerInstance';
 import { ILoadBalancingStrategy } from '../Domain/interfaces/ILoadbalancingStrategy';
 import { ServerStatus } from '../Domain/enums/ServerStatus';
 import { IServerPoolService } from '../Domain/interfaces/IServerPoolService';
 
 export class ServerPoolService implements IServerPoolService {
-    public constructor( private readonly strategy: ILoadBalancingStrategy){}
+    private servers :ServerInstance[] = []
+
+    public constructor( 
+        private readonly strategy: ILoadBalancingStrategy,
+        servers: ServerInstance[]
+    ){
+        this.servers = servers;
+    }
 
     public getAvailableServers(): ServerInstance[] {
-        return servers.filter(server => server.status !== ServerStatus.UNREACHABLE);
+        return this.servers.filter(server => server.status !== ServerStatus.UNREACHABLE);
     }
 
     public getNextServer(clientIp?: string): ServerInstance {
@@ -24,7 +30,7 @@ export class ServerPoolService implements IServerPoolService {
 
     public incrementConnections(serverId: string): void {
 
-        const server = servers.find(s => s.id === serverId);
+        const server = this.servers.find(s => s.id === serverId);
 
         if (!server) {
             return;
@@ -35,7 +41,7 @@ export class ServerPoolService implements IServerPoolService {
 
     public decrementConnections(serverId: string): void {
 
-        const server = servers.find(s => s.id === serverId);
+        const server = this.servers.find(s => s.id === serverId);
 
         if (!server) {
             return;
