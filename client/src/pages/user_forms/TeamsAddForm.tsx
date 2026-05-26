@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { createRef, useState } from 'react';
 import type { TeamDto } from '../../models/team/TeamDto';
 import type { ITeamAPIService } from '../../api_services/teams/ITeamAPIService';
 import { useNavigate } from 'react-router-dom';
@@ -16,7 +16,7 @@ export default function TeamsAddForm({teamApi} : {teamApi:ITeamAPIService}){
 
     const [creating,setCreating] = useState<boolean>(false);
 
-    const fileRef = useRef<HTMLInputElement>(null);
+    const fileRef = createRef<HTMLInputElement>();
     const navigate = useNavigate();
 
     const submit = async (e: React.FormEvent<HTMLFormElement>)=>{
