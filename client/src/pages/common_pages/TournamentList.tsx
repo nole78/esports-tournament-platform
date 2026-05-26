@@ -26,35 +26,6 @@ export default function TournamentList(){
     const limit = 12;
     const userId = user?.id ?? 0;
 
-    const loadPage = (p : number) =>{
-        tournamentApi.getAll(p, limit)
-        .then(res => {
-            if(res.success && res.data)
-            {
-                setTournaments(res.data?.items);
-                setTotal(res.data.total);
-            }
-            else
-            {
-                setError(res.message);
-                setTournaments([]);
-            }
-        })
-        .catch(() => setError("Failed to load tournaments!"))
-
-        gameApi.getAll()
-        .then(res => {
-            if (res.success) {
-                setGames(res.data?.items ?? []);
-                setError("");
-            } else {
-                setError(res.message ?? "Failed to load games");
-                setGames([]);
-            } 
-        })
-        .catch(() => setError("Failed to load games!"));
-    }
-
     const checkWatchList = async (userId: number, tournamentId: number) => {
     try {
         const res = await tournamentApi.findWatchListItem({
@@ -71,28 +42,55 @@ export default function TournamentList(){
         }
     };
 
-    useEffect(() =>{
-        loadPage(page);
-
-    }, [page]);
+    const handleFilterChange = (setter: (value: string) => void, value: string) => {
+        setter(value);
+        setPage(1);
+    };
 
     useEffect(() => {
-        const filter: TournamentFilterDto = {
-            tournamentGame: gameNameFilter === "" ? "" : gameNameFilter,
-            tournamentFormat: formatFilter === "" ? "" : formatFilter,
-            tournamentStatus: statusFilter === "" ? "" : statusFilter
-        };
-        tournamentApi.getFiltered(filter, page, limit)
-        .then(res => {
-            if(res.success && res.data)
-            {
-                setTournaments(res.data?.items ?? []);
-                setTotal(res.data.total);
-            }
-                else
-                setError(res.message);
-        })
-        .catch(() => setError("Failed to load tournaments!"))
+        const isFiltering = gameNameFilter || statusFilter || formatFilter;
+        
+        if (isFiltering) {
+            const filter: TournamentFilterDto = {
+                tournamentGame: gameNameFilter,
+                tournamentFormat: formatFilter,
+                tournamentStatus: statusFilter
+            };
+            tournamentApi.getFiltered(filter, page, limit)
+                .then(res => {
+                    if(res.success && res.data) {
+                        setTournaments(res.data?.items ?? []);
+                        setTotal(res.data.total);
+                    } else {
+                        setError(res.message);
+                    }
+                })
+                .catch(() => setError("Failed to load tournaments!"));
+        } else {
+            tournamentApi.getAll(page, limit)
+                .then(res => {
+                    if(res.success && res.data) {
+                        setTournaments(res.data?.items);
+                        setTotal(res.data.total);
+                    } else {
+                        setError(res.message);
+                        setTournaments([]);
+                    }
+                })
+                .catch(() => setError("Failed to load tournaments!"));
+        }
+        
+        gameApi.getAll()
+            .then(res => {
+                if (res.success) {
+                    setGames(res.data?.items ?? []);
+                    setError("");
+                } else {
+                    setError(res.message ?? "Failed to load games");
+                    setGames([]);
+                }
+            })
+            .catch(() => setError("Failed to load games!"));
     }, [gameNameFilter, statusFilter, formatFilter, page]);
 
     useEffect(() => {
@@ -115,7 +113,7 @@ export default function TournamentList(){
                 <div className="flex flex-row w-full gap-2">
                     <select 
                         value={gameNameFilter} 
-                        onChange={(e) => setGameNameFilter(e.target.value)}
+                        onChange={(e) => handleFilterChange(setGameNameFilter, e.target.value)}
                         className="bg-bgprimary/10 border w-1/3 border-secondary/50 rounded-xl px-4 py-3 text-bgsecondary text-sm focus:outline-none focus:border-white/30 transition-colors disabled:opacity-50">
                         <option value="" className='bg-lime-950'>
                             Game
@@ -128,7 +126,7 @@ export default function TournamentList(){
                     </select>
                     <select 
                         value={statusFilter} 
-                        onChange={(e) => setStatusFilter(e.target.value)}
+                        onChange={(e) => handleFilterChange(setStatusFilter, e.target.value)}
                         className="bg-bgprimary/10 w-1/3 border border-secondary/50 rounded-xl px-4 py-3 text-bgsecondary text-sm focus:outline-none focus:border-white/30 transition-colors">
                         <option value="" className='bg-lime-950'>
                             Status
@@ -141,7 +139,7 @@ export default function TournamentList(){
                     </select>
                     <select 
                         value={formatFilter} 
-                        onChange={(e) => setFormatFilter(e.target.value)}
+                        onChange={(e) => handleFilterChange(setFormatFilter, e.target.value)}
                         className="bg-bgprimary/10 border w-1/3 border-secondary/50 rounded-xl px-4 py-3 text-bgsecondary text-sm focus:outline-none focus:border-white/30 transition-colors">
                         <option value="" className='bg-lime-950'>
                             Format
