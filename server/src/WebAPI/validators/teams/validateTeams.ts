@@ -1,4 +1,4 @@
-import { ValidationResult } from "../../../Domain/types/ValidationResult"
+import { ValidationResult } from "../../../Domain/types/validation/ValidationResult"
 
 export const validateTeams = (teamName: string, teamTag: string, teamLogotip: string, teamDescription: string) : ValidationResult =>{
     if (!teamName || teamName.trim().length === 0){

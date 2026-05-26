@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { Empty, PageHeader, Pagination } from "../../components/ui/UI";
+import { Empty, PageHeader, Pagination, Table, TableHead } from "../../components/ui/UI";
 import type { UserWatchlistDto } from "../../models/user_watchlist/UserWatchlistDto";
 import { userWatchlistApi } from '../../api_services/user_watchlist/UserWatchlistAPIService';
 import { useAuth } from "../../hooks/auth/useAuthHook";
 import { useNavigate } from "react-router-dom";
+import placeholder from "../../assets/placeholder.png";
 
 export default function UserWatchlist() {
     const { user } = useAuth();
@@ -37,101 +38,63 @@ export default function UserWatchlist() {
                 </div>
             )}
             {watchlist.length === 0 && !error ? <Empty message="Nothing on your watchlist" /> : (
-                <section className="grid gap-5 sm:grid-cols-1 lg:grid-cols-1">
-                    {watchlist.map(w => (
-                        <div key={w.tournamentName} className="bg-white/2 border border-white/6 rounded-2xl p-4 sm:p-5 lg:p-6 relative">
-                            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
-                                <div className="overflow-hidden rounded-xl shrink-0 w-full sm:w-32 lg:w-40">
-                                    <a onClick={() => user?.role == "admin" ? navigate(`/admin/tournament_registration/${w.tournamentId}`) : navigate(`/tournament_registration/${w.tournamentId}`)}>
-                                    <img src={w.gameLogotip} className="w-full aspect-square object-cover rounded-xl cursor-pointer transition-transform duration-300 hover:scale-110"/>
-                                    </a>
-                                </div>
-                                <div className="flex flex-col lg:gap-10 sm:gap-10 overflow-hidden">
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 sm:gap-10 lg:gap-25 text-xs font-mono">
+                <>
+                    <Table>
+                        <TableHead columns={["Logo", "Tournament Name", "Game Name", "Status", "Added At", "Action"]} />
+                        <tbody>
+                            {watchlist.map(w => (
+                                <tr key={w.tournamentId} className="border-b border-secondary/50 hover:bg-bgprimary/20 transition-colors cursor-pointer"
+                                    onClick={() => user?.role == "admin" ? navigate(`/admin/tournament_registration/${w.tournamentId}`) : navigate(`/tournament_registration/${w.tournamentId}`)}>
+                                    
+                                    <td className="px-5 py-4">
+                                        <img src={w.gameLogotip ?? placeholder} alt={w.gameName} className="w-12 h-12 rounded object-cover" />
+                                    </td>
+                                    <td className="px-5 py-4 text-sm text-bgsecondary">
+                                            {w.tournamentName}
+                                    </td>
+                                    <td className="px-5 py-4 text-sm text-bgsecondary">{w.gameName}</td>
+                                    <td className="px-5 py-4 text-sm text-bgsecondary">{w.tournamentStatus}</td>
+                                    <td className="px-5 py-4 text-sm text-white/60">{w.addedAt ? new Date(w.addedAt).toLocaleString() : "—"}</td>
+                                    
+                                    <td className="px-5 py-4 text-sm">
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
 
-                                        <div className="min-w-0">
-                                            <p className="text-white/20 uppercase tracking-wider text-[15px] mb-1.5">
-                                                Tournament Name
-                                            </p>
-                                            <p className="text-bgsecondary wrap-break-words text-[15px]">
-                                                {w.tournamentName}
-                                            </p>
-                                        </div>
-
-                                        <div className="min-w-0">
-                                            <p className="text-white/20 uppercase tracking-wider text-[15px] mb-1.5">
-                                                Tournament Status
-                                            </p>
-                                            <p className="text-bgsecondary wrap-break-words text-[15px]">
-                                                {w.tournamentStatus}
-                                            </p>
-                                        </div>
-
-                                        <div className="min-w-0">
-                                            <p className="text-white/20 uppercase tracking-wider text-[15px] mb-1.5">
-                                                Added to watchlist
-                                            </p>
-                                            <p className="text-white/40 wrap-break-words">
-                                                {w.addedAt ? new Date(w.addedAt).toLocaleString(): "—"}
-                                            </p>
-                                        </div>
-
-                                    </div>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 text-xs font-mono items-end">
-
-                                        <div className="min-w-0">
-                                            <p className="text-white/20 uppercase tracking-wider text-[15px] mb-1.5">
-                                                Game Name
-                                            </p>
-
-                                            <p className="text-bgsecondary wrap-break-word text-[15px]">
-                                                {w.gameName}
-                                            </p>
-                                        </div>
-
-                                        <div className="relative group flex lg:justify-center sm:justify-end lg:col-start-3">
-                                            <button
-                                                className="cursor-pointer w-1/3 min-w-30 bg-red-400/40 border-2 border-red-500 hover:bg-bgsecondary/30 hover:border-bgsecondary text-red-500 font-semibold rounded-xl p-1 text-sm transition-colors"
-                                                
-                                                onClick={() => {
-                                                    setDeleted(false);
-                                                    userWatchlistApi.delete(w.userId, w.tournamentId)
-                                                        .then(res => {
-                                                            if (res.success) {
-                                                                setDeleted(true);
-                                                                setWatchlist(prev =>
-                                                                    prev.filter(
-                                                                        watchlist =>
-                                                                            watchlist.tournamentId !== w.tournamentId
-                                                                    )
-                                                                );
-                                                                setTimeout(() => {
-                                                                    setDeleted(false);
-                                                                }, 3000);
-                                                                return;
-                                                            }
-                                                            setError(res.message);
-                                                        })
-                                                        .catch(() =>
-                                                            setError("Failed to remove tournament from watchlist")
-                                                        );
-                                                }}
-                                            >
-                                                Remove
-                                            </button>
-                                            <div className="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 rounded-md bg-bgsecondary/30 px-2 py-1 text-xs text-bgsecondary opacity-0 transition-opacity duration-200 group-hover:opacity-100 whitespace-nowrap">
-                                                Remove item from watchlist
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </section>
+                                                setDeleted(false);
+                                                userWatchlistApi.delete(w.userId, w.tournamentId)
+                                                    .then(res => {
+                                                        if (res.success) {
+                                                            setDeleted(true);
+                                                            setWatchlist(prev =>
+                                                                prev.filter(
+                                                                    watchlist =>
+                                                                        watchlist.tournamentId !== w.tournamentId
+                                                                )
+                                                            );
+                                                            setTimeout(() => {
+                                                                setDeleted(false);
+                                                            }, 3000);
+                                                            return;
+                                                        }
+                                                        setError(res.message);
+                                                    })
+                                                    .catch(() =>
+                                                        setError("Failed to remove tournament from watchlist")
+                                                    );
+                                            }}
+                                            className="cursor-pointer px-3 py-1 bg-red-400/40 border border-red-500 hover:bg-red-500/20 text-red-400 font-semibold rounded-lg text-xs transition-colors"
+                                        >
+                                            Remove
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </Table>
+                    <Pagination page={page} total={total} pageSize={limit} onChange={setPage} />
+                </>
             )}
-            <Pagination page={page} total={total} pageSize={limit} onChange={setPage} />
         </div>
     )
 

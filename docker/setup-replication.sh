@@ -22,7 +22,7 @@ echo "========================================================"
 echo "  Project -- MySQL Replication Setup"
 echo "========================================================"
 # ── 1. Wait for all nodes ─────────────────────────────────────
-wait_mysql() {
+wait_mysql(){
   HOST=$1; NAME=$2
   printf "  Waiting for %s" "$NAME"
   i=0
@@ -109,7 +109,7 @@ CREATE TABLE tournaments(
   CONSTRAINT tournament_name_length CHECK (LENGTH(tournament_name) BETWEEN 3 AND 120),
   CONSTRAINT tournament_max_teams_check CHECK (
     tournament_max_teams BETWEEN 4 AND 256 AND 
-    ((tournament_max_teams & (tournament_max_teams - 1)) = 0)
+    (tournament_format = 'round_robin' OR ((tournament_max_teams & (tournament_max_teams - 1)) = 0))
   )
   
 );
@@ -143,9 +143,11 @@ CREATE TABLE matches(
   FOREIGN KEY (winner_team_id)
     REFERENCES teams(team_id),
   FOREIGN KEY (winner_to_match_id)
-    REFERENCES matches(match_id),
+    REFERENCES matches(match_id)
+    ON DELETE CASCADE,
   FOREIGN KEY (loser_to_match_id)
     REFERENCES matches(match_id)
+    ON DELETE CASCADE
 );
 
 CREATE TABLE team_members(
@@ -179,8 +181,10 @@ CREATE TABLE match_players(
   match_id INT UNSIGNED NOT NULL,
   performance_notes TEXT, 
   PRIMARY KEY (user_id, match_id, team_id),
-  FOREIGN KEY (team_id, user_id) REFERENCES team_members(team_id, user_id),
+  FOREIGN KEY (team_id, user_id) REFERENCES team_members(team_id, user_id)
+    ON DELETE CASCADE,
   FOREIGN KEY (match_id) REFERENCES matches(match_id)
+    ON DELETE CASCADE
 );
 
 CREATE TABLE user_watchlist(

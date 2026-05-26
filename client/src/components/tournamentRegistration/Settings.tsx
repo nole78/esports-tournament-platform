@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { TournamentFormatValues, type TournamentFormat } from '../../types/tournament/TournamentFormat';
+import { TournamentFormat } from '../../types/tournament/TournamentFormat';
 import { tournamentApi } from '../../api_services/tournament_list/TournamentAPIService';
 import { ErrorBox, PageHeader } from '../ui/UI';
 import { TournamentStatus } from '../../types/tournament/TournamentStatus';
@@ -14,12 +14,12 @@ export default function Settings() {
     const [error, setError] = useState<string>("");
     const [success, setSuccess] = useState<boolean>(false);
 
+    const [status, setStatus] = useState<TournamentStatus>();
     const [tournamentName, setTournamentName] = useState<string>("");
     const [format, setFormat] = useState<TournamentFormat>('single_elimination');
     const [maxTeams, setMaxTeams] = useState<string>("");
     const [applicationDeadline, setApplicationDeadline] = useState<string>("");
     const [prizeFund, setPrizeFund] = useState<string>("");
-    const [status, setStatus] = useState<string>("");
 
     const navigate = useNavigate();
 
@@ -28,6 +28,7 @@ export default function Settings() {
       try {
         const tournamentRes = await tournamentApi.getById(Number(id));
         if (tournamentRes.success && tournamentRes.data) {
+          setStatus(tournamentRes.data.tournamentStatus);
           setTournamentName(tournamentRes.data.tournamentName);
           setFormat(tournamentRes.data.tournamentFormat);
           setMaxTeams(tournamentRes.data.tournamentMaxTeams.toString());
@@ -37,7 +38,6 @@ export default function Settings() {
           const day = String(date.getDate()).padStart(2, '0');
           setApplicationDeadline(`${year}-${month}-${day}`);
           setPrizeFund(tournamentRes.data.tournamentPrizeFund.toString());
-          setStatus(tournamentRes.data.tournamentStatus);
         } else {
           setError("Failed to load tournament");
         }
@@ -62,14 +62,59 @@ export default function Settings() {
     const maxTeamsNum = Number(maxTeams);
     const prizeFundNum = Number(prizeFund);
 
+    if(!tournamentName || tournamentName.trim().length === 0)
+    {
+        setError("Tournament name is mandatory");
+        setSaving(false);
+        return;
+    }
+    if(tournamentName.length < 3 || tournamentName.length > 120)
+    {    
+        setError("Tournament name must be between 3 and 120 characters long!");
+        setSaving(false);
+        return;
+    }
+    if(maxTeamsNum < 4 || maxTeamsNum > 256)
+    {    
+        setError("Maximum number of teams must be greater or equal to 4 and less or equal to 256")
+        setSaving(false);
+        return;
+    }
+    if(!format)
+    {       
+        setError("Invalid tournament format");
+        setSaving(false);
+        return;
+    }
+    if(format !== TournamentFormat.ROUND_ROBIN)
+    {    
+        if((maxTeamsNum & (maxTeamsNum - 1)) !== 0)
+        {
+            setError("Maximum number of teams must be a power of 2 (2, 4, 8, 16, 32, 64, ...) for formats other than round robin");
+            setSaving(false);
+            return;
+        }
+    }
+    if(prizeFundNum <= 0)
+    {    
+        setError("Prize fund must be greater than 0");
+        setSaving(false);
+        return;
+    }
+    if(!applicationDeadline || new Date(applicationDeadline) <= new Date())
+    {    
+        setError("Application deadline must be in the future");
+        setSaving(false);
+        return;
+    }
+
     const payload = {
         tournamentId: Number(id),
         tournamentName,
         tournamentFormat: format,
         tournamentMaxTeams: maxTeamsNum,
         tournamentApplicationDeadline: new Date(applicationDeadline),
-        tournamentPrizeFund: prizeFundNum,
-        tournamentStatus: status as TournamentStatus
+        tournamentPrizeFund: prizeFundNum
     };      
 
     const res = await tournamentApi.update(Number(id), payload);
@@ -141,12 +186,15 @@ export default function Settings() {
                     disabled={status === TournamentStatus.ACTIVE || status === TournamentStatus.COMPLETED}
                     className="w-full bg-bgprimary/10 border border-secondary/50 rounded-xl px-4 py-3 text-bgsecondary text-sm focus:outline-none focus:border-white/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                {Object.entries(TournamentFormatValues).map(([key, value]) => (
+                {Object.entries(TournamentFormat).map(([key, value]) => (
                     <option className="bg-lime-950" key={key} value={value}>
                         {key.replace(/_/g, " ")}
                     </option>
                 ))}
             </select>
+            {(status === TournamentStatus.ACTIVE || status === TournamentStatus.COMPLETED) && (
+              <p className="text-xs text-yellow-400 mt-1">Cannot be changed after tournament has started</p>
+            )}
             </div>
 
             <div>
@@ -156,8 +204,12 @@ export default function Settings() {
                     value={maxTeams}
                     onChange={(e) => setMaxTeams(e.target.value)}
                     placeholder="max_teams"
-                    className="w-full bg-bgprimary/10 border border-secondary/50 rounded-xl px-4 py-3 text-bgsecondary text-sm placeholder-bgsecondary/30 focus:outline-none focus:border-white/30 transition-colors"
+                    disabled={status === TournamentStatus.ACTIVE || status === TournamentStatus.COMPLETED}
+                    className="w-full bg-bgprimary/10 border border-secondary/50 rounded-xl px-4 py-3 text-bgsecondary text-sm placeholder-bgsecondary/30 focus:outline-none focus:border-white/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 />
+                {(status === TournamentStatus.ACTIVE || status === TournamentStatus.COMPLETED) && (
+                    <p className="text-xs text-yellow-400 mt-1">Cannot be changed after tournament has started</p>
+                )}
             </div>
 
             <div>
@@ -177,31 +229,13 @@ export default function Settings() {
                     type="date"
                     value={applicationDeadline}
                     onChange={(e) => setApplicationDeadline(e.target.value)}
-                    className="w-full bg-bgprimary/10 border border-secondary/50 rounded-xl px-4 py-3 text-bgsecondary text-sm focus:outline-none focus:border-white/30 transition-colors"
+                    disabled={status === TournamentStatus.ACTIVE || status === TournamentStatus.COMPLETED}
+                    className="w-full bg-bgprimary/10 border border-secondary/50 rounded-xl px-4 py-3 text-bgsecondary text-sm focus:outline-none focus:border-white/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     style={{ colorScheme: "dark" }}
                 />
-            </div>
-
-            <div>
-                <label className="block text-xs text-bgprimary mb-2 font-medium">Tournament status</label>
-                <div>
-        <div className="flex gap-2">
-            {[TournamentStatus.UPCOMING, TournamentStatus.ACTIVE, TournamentStatus.COMPLETED].map((s) => (
-                <button
-                    key={s}
-                    type="button"
-                    onClick={() => setStatus(s)}
-                    className={`flex-1 py-3 rounded-xl font-semibold text-sm transition-colors ${
-                    status === s
-                        ? 'bg-bgsecondary text-primary'
-                        : 'bg-bgprimary/10 border border-secondary/50 text-bgsecondary hover:bg-bgprimary/20'
-                    }`}
-                >
-                {s.charAt(0).toUpperCase() + s.slice(1)}
-            </button>
-            ))}
-        </div>
-        </div>
+                {(status === TournamentStatus.ACTIVE || status === TournamentStatus.COMPLETED) && (
+                    <p className="text-xs text-yellow-400 mt-1">Cannot be changed after tournament has started</p>
+                )}
             </div>
 
             <div className="flex gap-2 mt-4">

@@ -4,7 +4,7 @@ import { authorize } from "../../Middlewares/authorization/AuthorizeMiddleware";
 import { UserRole } from "../../Domain/enums/UserRole";
 import { IUserWatchlistService } from "../../Domain/services/user_watchlist/IUserWatchlistService";
 import { CreateTournamentDto } from "../../Domain/DTOs/tournaments/CreateTournamentDto";
-import { ValidationResult } from '../../Domain/types/ValidationResult';
+import { ValidationResult } from '../../Domain/types/validation/ValidationResult';
 import { validateTournamentCreation } from "../validators/tournaments/validateTournamentCreation";
 import { TournamentFormat } from '../../Domain/enums/TournamentFormat';
 import { TournamentStatus } from '../../Domain/enums/TournamentStatus';
@@ -13,6 +13,7 @@ import { ITournamentReadService } from "../../Domain/services/tournaments/ITourn
 import { handleResult } from "../mappers/ResultMapper";
 import { CreateUserWatchlistDto } from "../../Domain/DTOs/user_watchlists/CreateUserWatchlistDto";
 import { ITournamentWriteService } from "../../Domain/services/tournaments/ITournamentWriteService";
+import { TournamentRegistrationWriteService } from '../../Services/tournamentRegistration/TournamentRegistrationWriteService';
 import { IAuditService } from "../../Domain/services/audit/IAuditService";
 export class TournamentController{
     private readonly router = Router();
@@ -125,7 +126,6 @@ export class TournamentController{
 
     private async findWatchListItem(req: Request, res: Response): Promise<void>
     {
-        console.log(req.user);
         const userId = parseInt(req.body.userId as string, 10);
         const tournamentId = parseInt(req.body.tournamentId as string, 10);
         if (isNaN(userId) || isNaN(tournamentId)) { res.status(400).json({ success: false, message: "Invalid id" }); return; }

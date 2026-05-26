@@ -3,8 +3,8 @@ import { TournamentStatus } from "../../enums/TournamentStatus";
 
 export class TournamentFilterDto{
     constructor(
-            public tournamentGame : string|undefined,
-            public tournamentFormat : TournamentFormat|undefined,
-            public tournamentStatus : TournamentStatus|undefined
+            public tournamentGame : string,
+            public tournamentFormat : TournamentFormat,
+            public tournamentStatus : TournamentStatus
         ){}
 }

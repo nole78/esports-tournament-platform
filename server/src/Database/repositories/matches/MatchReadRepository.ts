@@ -13,7 +13,8 @@ export class MatchReadRepository implements IMatchReadRepository {
   ) {}
 
   private map(r: RowDataPacket): Match {
-    return new Match(r.match_id, 
+    return new Match(
+      r.match_id, 
       r.tournament_id, 
       r.blue_team_id, 
       r.red_team_id, 
@@ -61,11 +62,11 @@ export class MatchReadRepository implements IMatchReadRepository {
     if (!res) return [];
     try {
       const [rows] = await res.conn.execute<RowDataPacket[]>(
-        `SELECT * FROM matches WHERE blue_team_id = ? OR red_team_id = ? ORDER BY id DESC`, [teamId,teamId]
+        `SELECT * FROM matches WHERE blue_team_id = ? OR red_team_id = ?`, [teamId,teamId]
       );
       return rows.map((r) => this.map(r));
     } catch (err) {
-      this.logger.error("MatchRepository", "findByUserId failed", err);
+      this.logger.error("MatchRepository", "findByTeamId failed", err);
       return [];
     } finally { res.conn.release(); }
   }
@@ -75,11 +76,11 @@ export class MatchReadRepository implements IMatchReadRepository {
     if (!res) return [];
     try {
       const [rows] = await res.conn.execute<RowDataPacket[]>(
-        `SELECT * FROM matches WHERE tournament_id = ? ORDER BY id DESC`, [tournamentId]
+        `SELECT * FROM matches WHERE tournament_id = ?`, [tournamentId]
       );
       return rows.map((r) => this.map(r));
     } catch (err) {
-      this.logger.error("MatchRepository", "findByUserId failed", err);
+      this.logger.error("MatchRepository", "findByTournamentId failed", err);
       return [];
     } finally { res.conn.release(); }
   }

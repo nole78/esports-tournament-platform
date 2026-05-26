@@ -3,7 +3,7 @@ import { ITeamService } from "../../Domain/services/teams/ITeamService";
 import { authenticate } from "../../Middlewares/authentification/AuthMiddleware";
 import { authorize } from "../../Middlewares/authorization/AuthorizeMiddleware";
 import { UserRole } from "../../Domain/enums/UserRole";
-import { ValidationResult } from '../../Domain/types/ValidationResult';
+import { ValidationResult } from '../../Domain/types/validation/ValidationResult';
 import { validateTeams } from "../validators/teams/validateTeams";
 import { CreateTeamDto } from "../../Domain/DTOs/teams/CreateTeamDto";
 import { handleResult } from "../mappers/ResultMapper";

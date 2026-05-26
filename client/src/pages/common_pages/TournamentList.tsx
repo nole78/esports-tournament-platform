@@ -8,7 +8,7 @@ import { formatDeadline, daysUntilDeadline, getDeadlineStatus, getDeadlineColor 
 import type { GameDto } from "../../models/game/GameDto";
 import { gameApi } from "../../api_services/game_catalog/GameAPIService";
 import { TournamentStatus } from "../../types/tournament/TournamentStatus";
-import { TournamentFormatValues } from "../../types/tournament/TournamentFormat";
+import { TournamentFormat } from "../../types/tournament/TournamentFormat";
 import type { TournamentFilterDto } from '../../models/tournament/TournamentFilterDto';
 
 export default function TournamentList(){
@@ -117,7 +117,7 @@ export default function TournamentList(){
                         value={gameNameFilter} 
                         onChange={(e) => setGameNameFilter(e.target.value)}
                         className="bg-bgprimary/10 border w-1/3 border-secondary/50 rounded-xl px-4 py-3 text-bgsecondary text-sm focus:outline-none focus:border-white/30 transition-colors disabled:opacity-50">
-                        <option value="" className='bg-lime-950'>
+                        <option value="" className='bg-[secondary/50]'>
                             Any game
                         </option>
                         {games.map(game => (
@@ -146,7 +146,7 @@ export default function TournamentList(){
                         <option value="" className='bg-lime-950'>
                             Any format
                         </option>
-                        {Object.entries(TournamentFormatValues).map(([key, value]) => (
+                        {Object.entries(TournamentFormat).map(([key, value]) => (
                             <option className='bg-lime-950' key={key} value={value}>
                                 {key.replace(/_/g, ' ')}
                             </option>
@@ -164,8 +164,8 @@ export default function TournamentList(){
                         const isInWatchList = watchListMap[t.tournamentId] ?? false;
                         
                         return (
-                            <div className="border-2 border-bgsecondary bg-bgprimary/30 p-4 rounded-xl hover:border-secondary/60 transition-all duration-200 hover:shadow-lg hover:shadow-secondary/20 cursor-pointer">
-                                <a onClick={() => user?.role == "admin" ? navigate(`/admin/tournament_registration/${t.tournamentId}`) : navigate(`/tournament_registration/${t.tournamentId}`)}>
+                            <div className="border-2 border-bgsecondary bg-bgprimary/30 p-4 rounded-xl hover:border-secondary/60 transition-all duration-200 hover:shadow-lg hover:shadow-secondary/20 cursor-pointer flex flex-col" key={t.tournamentId}>
+                                <a onClick={() => user?.role == "admin" ? navigate(`/admin/tournament_registration/${t.tournamentId}`) : user?.role == "player" ? navigate(`/tournament_registration/${t.tournamentId}`) : navigate(`/guest/tournament_registration/${t.tournamentId}`)}>
                                     <h2 className="text-bgsecondary text-2xl font-bold">{t.tournamentName}</h2>
                                     <p className="text-bgsecondary mb-3">{t.tournamentGame}</p>
                                     <div className="space-y-2">
@@ -188,7 +188,7 @@ export default function TournamentList(){
                                     <p className="text-bgsecondary">{t.tournamentStatus}</p>
                                 </a>
                                 {user?.role === "admin" || user?.role === "player" ? 
-                                <div>
+                                <div className="mt-auto">
                                 <br></br>
                                     <button
                                         onClick={async (e) => {
@@ -225,7 +225,7 @@ export default function TournamentList(){
                                                 setError("Failed to update watchlist!");
                                             }
                                         }}
-                                        className={`cursor-pointer w-full min-w-3 rounded-xl p-1 text-sm transition-colors justify-self-center
+                                        className={`cursor-pointer w-full min-w-3 rounded-xl p-1 text-sm transition-colors justify-self-center align-bottom
                                         ${
                                             isInWatchList
                                                 ? "bg-red-400/40 border-2 border-red-500 hover:bg-bgsecondary/30 hover:border-bgsecondary text-red-500 font-semibold"
