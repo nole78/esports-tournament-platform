@@ -15,15 +15,14 @@ export class MatchWriteRepository implements  IMatchWriteRepository{
     const res = await this.db.getWriteConnection();
     if (!res) return [];
     try {
-      const placeholder = matches.map(() => "(?, ?, ?, ?, ?, ?, ?, ?, ?)").join(",");
-      const query = `INSERT INTO matches (tournament_id, blue_team_id, red_team_id, winner_team_id,
+      const placeholder = matches.map(() => "(?, ?, ?, ?, ?, ?, ?, ?)").join(",");
+      const query = `INSERT INTO matches (tournament_id, blue_team_id, red_team_id,
           status, round_number, bracket_type, blue_team_score, red_team_score)
           VALUES ${placeholder}`;
       const values = matches.flatMap(match => [ 
         match.tournamentId, 
         match.blueTeamId, 
         match.redTeamId, 
-        match.winnerTeamId, 
         match.status,
         match.roundNumber,
         match.bracketType,
