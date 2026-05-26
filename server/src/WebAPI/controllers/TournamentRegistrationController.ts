@@ -14,8 +14,8 @@ export class TournamentRegistrationController{
     private readonly router = Router();
 
     public constructor(private readonly tournamentRegistrationReadService: ITournamentRegistrationReadService, private readonly tournamentRegistrationWriteService: ITournamentRegistrationWriteService){
-        this.router.get("/tournaments/:id/registered", authenticate, this.getByTournamentId.bind(this));
-        this.router.post("/tournaments/:id/register",  this.register.bind(this));
+        this.router.get("/tournaments/:id/registered", this.getByTournamentId.bind(this));
+        this.router.post("/tournaments/:id/register", authenticate, this.register.bind(this));
         this.router.delete("/tournaments/:id/register/:teamId", authenticate, this.delete.bind(this));
         this.router.patch("/tournaments/:id/registrations/:teamId", authenticate, authorize(UserRole.ADMIN), this.update.bind(this));
         this.router.post("/tournaments/:id/generate-bracket", authenticate, authorize(UserRole.ADMIN), this.generateBracket.bind(this));

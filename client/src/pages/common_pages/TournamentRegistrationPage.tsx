@@ -29,6 +29,10 @@ export default function TournamentRegistrationPage() {
       { id: 'pendingTeams', icon: <UserPlusIcon />, label: 'Pending teams', tooltip: 'Accept teams into tournament'},
       { id: 'settings', icon: <WrenchScrewdriverIcon />, label: 'Tournament settings', tooltip: 'Setting for your tournament'},
     ] ;
+    const menuItemsGuest: SideMenuItem[] =[
+      { id: 'overview', icon: <EyeIcon />, label: 'Overview', tooltip: 'Tournament overview' },
+      { id: 'myTeams', icon: <UserGroupIcon />, label: 'Teams', tooltip: 'Registered teams' },
+    ] ;
     const renderContent = () => {
         switch (activeItem) {
         case 'overview':
@@ -49,7 +53,7 @@ export default function TournamentRegistrationPage() {
   return (
     <div className="flex gap-0 bg-primary min-h-screen">
       {/* Sidebar */}
-      <SidebarMenu menuItems={user?.role == "admin" ? menuItemsAdmin : menuItems} activeItem={activeItem} onItemSelect={setActiveItem}/>
+      <SidebarMenu menuItems={user?.role == "admin" ? menuItemsAdmin : user?.role == "player" ? menuItems : menuItemsGuest} activeItem={activeItem} onItemSelect={setActiveItem}/>
 
       {/* Content Area */}
       <div className="flex-1">
