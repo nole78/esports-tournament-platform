@@ -22,7 +22,7 @@ echo "========================================================"
 echo "  Project -- MySQL Replication Setup"
 echo "========================================================"
 # ── 1. Wait for all nodes ─────────────────────────────────────
-wait_mysql() {
+wait_mysql(){
   HOST=$1; NAME=$2
   printf "  Waiting for %s" "$NAME"
   i=0

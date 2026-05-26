@@ -25,7 +25,6 @@ export class MatchController {
 
     private async getAllForTournament(req: Request, res: Response) : Promise<void> {
         const id = parseInt(req.params.id as string, 10);
-        console.log(id);
         if(isNaN(id)) {res.status(400).json({ success: false, message: "Invalid tournament id"}); return;}
 
         const result = await this.matchService.getByTournamentId(id);

@@ -164,7 +164,7 @@ export default function TournamentList(){
                         const isInWatchList = watchListMap[t.tournamentId] ?? false;
                         
                         return (
-                            <div className="border-2 border-bgsecondary bg-bgprimary/30 p-4 rounded-xl hover:border-secondary/60 transition-all duration-200 hover:shadow-lg hover:shadow-secondary/20 cursor-pointer" key={t.tournamentId}>
+                            <div className="border-2 border-bgsecondary bg-bgprimary/30 p-4 rounded-xl hover:border-secondary/60 transition-all duration-200 hover:shadow-lg hover:shadow-secondary/20 cursor-pointer flex flex-col" key={t.tournamentId}>
                                 <a onClick={() => user?.role == "admin" ? navigate(`/admin/tournament_registration/${t.tournamentId}`) : navigate(`/tournament_registration/${t.tournamentId}`)}>
                                     <h2 className="text-bgsecondary text-2xl font-bold">{t.tournamentName}</h2>
                                     <p className="text-bgsecondary mb-3">{t.tournamentGame}</p>
@@ -188,7 +188,7 @@ export default function TournamentList(){
                                     <p className="text-bgsecondary">{t.tournamentStatus}</p>
                                 </a>
                                 {user?.role === "admin" || user?.role === "player" ? 
-                                <div>
+                                <div className="mt-auto">
                                 <br></br>
                                     <button
                                         onClick={async (e) => {
@@ -225,7 +225,7 @@ export default function TournamentList(){
                                                 setError("Failed to update watchlist!");
                                             }
                                         }}
-                                        className={`cursor-pointer w-full min-w-3 rounded-xl p-1 text-sm transition-colors justify-self-center
+                                        className={`cursor-pointer w-full min-w-3 rounded-xl p-1 text-sm transition-colors justify-self-center align-bottom
                                         ${
                                             isInWatchList
                                                 ? "bg-red-400/40 border-2 border-red-500 hover:bg-bgsecondary/30 hover:border-bgsecondary text-red-500 font-semibold"

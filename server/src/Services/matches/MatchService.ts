@@ -119,7 +119,6 @@ export class MatchService implements IMatchService{
             const match = await this.matchReadRepo.findById(id);
             if(match.matchId === 0)
                 return Result.Failure(`Match doesn't exist`, ErrorType.NotFound);
-            console.log(match);
 
             if(match.blueTeamId === 0 || match.redTeamId === 0)
                 return Result.Failure("There is no team in this match", ErrorType.Conflict);

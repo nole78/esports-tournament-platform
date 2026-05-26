@@ -27,7 +27,6 @@ export class MatchWriteRepository implements  IMatchWriteRepository{
         match.blueTeamScore,
         match.redTeamScore
       ]);
-      console.log(matches);
       const [result] = await res.conn.execute<ResultSetHeader>(query,values);
       if (result.affectedRows === 0 || result.insertId === 0) return [];
       let firstId = result.insertId;
@@ -75,7 +74,6 @@ export class MatchWriteRepository implements  IMatchWriteRepository{
     }
 
     try {
-      console.log("------------"+fields);
       const entries = Object.entries(fields)
           .filter(([, v]) => v !== undefined)
           .map(([k,v]) => [fieldMap[k] ?? k, v]);
