@@ -69,6 +69,13 @@ export default function GameAddForm({gameApi} : {gameApi:IGameAPIService}){
     };
     return(
         <div className="w-full max-w-sm">
+            <button
+                    type="button"
+                    onClick={() => navigate(-1)}
+                    className="py-3 bg-red-400/40  cursor-pointer border-red-500 hover:bg-red-400/30 hover:border-bgsecondary/70 text-red-500 font-semibold rounded-xl px-4 text-sm transition-colors"
+                >
+                  {"<- " + "Back"}
+            </button>
             <div className="text-center mb-10">
                 <h1 className="text-3xl font-semibold text-bgsecondary">Game Adder</h1>
                 <p className="text-sm text-secondary mt-1">Add new game</p>
@@ -129,9 +136,18 @@ export default function GameAddForm({gameApi} : {gameApi:IGameAPIService}){
                         className="w-1/2 cursor-pointer bg-bgprimary hover:bg-bgprimary/80 disabled:opacity-50 text-primary font-semibold rounded-xl py-3 text-sm transition-colors">
                         {creating ? "Creating…" : "Create"}
                     </button>
-                    <button type="button" onClick={() => navigate("/game_catalog")}
+                    <button type="button" onClick={() => {
+                        // Clear all inputs
+                        setName("");
+                        setGenre("");
+                        setLogo("");
+                        setPlayers("");
+                        setPreview("");
+                        setError("");
+                        setSucces(false);
+                    }}
                         className="py-3 bg-red-400/40  cursor-pointer border-red-500 hover:bg-red-400/30 hover:border-bgsecondary/70 text-red-500 font-semibold rounded-xl w-1/2 text-sm transition-colors">
-                    Cancel</button>
+                    Clear</button>
                 </div>
             </form>
         </div>

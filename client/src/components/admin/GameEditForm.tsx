@@ -80,6 +80,13 @@ export const GameEditForm: React.FC<{id: string }> = ({id}) => {
 
     return(
         <div className="w-full max-w-sm">
+            <button
+                type="button"
+                onClick={() => navigate(-1)}
+                className="py-3 bg-red-400/40  cursor-pointer border-red-500 hover:bg-red-400/30 hover:border-bgsecondary/70 text-red-500 font-semibold rounded-xl px-4 text-sm transition-colors"
+            >
+               {"<- " + "Back"}
+            </button>
             <div className="text-center mb-10">
                 <h1 className="text-3xl font-semibold text-bgsecondary">Game Editor</h1>
                 <p className="text-sm text-secondary mt-1">Edit game fields</p>
