@@ -39,6 +39,14 @@ export class BracketHelpers {
 
             const update: MatchRelationUpdate = {matchId};
 
+            // TEAM IDS
+            if(node.blueTeamId) {
+                update.blueTeamId = node.blueTeamId;
+            }
+            if(node.redTeamId) {
+                update.redTeamId = node.redTeamId;
+            }
+
             // WINNER RELATIONS
             if(node.winnerToTempId) {
                 const winnerToMatchId = tempIdMap.get(node.winnerToTempId);
