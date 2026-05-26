@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { createProxyMiddleware } from 'http-proxy-middleware';
-import { ServerPoolService } from '../Services/serverPoolService';
+import { IServerPoolService } from '../Domain/interfaces/IServerPoolService';
 
 
 const proxyCache = new Map();
@@ -19,9 +19,7 @@ function getProxy(target: string) {
     return proxyCache.get(target);
 }
 
-export function proxyMiddleware(
-    serverPool: ServerPoolService
-) {
+export function proxyMiddleware(serverPool: IServerPoolService) {
     return (req: Request, res: Response, next: NextFunction) => {
 
         // Extract client IP from request (handles proxies and direct connections)
