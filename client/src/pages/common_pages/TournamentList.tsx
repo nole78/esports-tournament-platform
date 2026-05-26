@@ -117,7 +117,7 @@ export default function TournamentList(){
                         value={gameNameFilter} 
                         onChange={(e) => setGameNameFilter(e.target.value)}
                         className="bg-bgprimary/10 border w-1/3 border-secondary/50 rounded-xl px-4 py-3 text-bgsecondary text-sm focus:outline-none focus:border-white/30 transition-colors disabled:opacity-50">
-                        <option value="" className='bg-lime-950'>
+                        <option value="" className='bg-[secondary/50]'>
                             Any game
                         </option>
                         {games.map(game => (
