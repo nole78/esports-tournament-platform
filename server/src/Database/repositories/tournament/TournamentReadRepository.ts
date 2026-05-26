@@ -135,4 +135,26 @@ export class TournamentReadRepository implements ITournamentReadRepository {
       return [];
     } finally { res.conn.release(); }
   }
+
+  async findByIds(ids: number[]): Promise<Tournament[]>{
+    if (!ids || ids.length === 0) return [];
+    
+    const res = await this.db.getReadConnection();
+    if (!res) return [];
+    try {
+      const placeholders = ids.map(() => "?").join(",");
+      const [rows] = await res.conn.query<RowDataPacket[]>(
+        `SELECT tournament_id, tournament_name, tournament_game_id, tournament_format, tournament_max_teams, tournament_application_deadline, tournament_prize_fund, tournament_status
+         FROM tournaments
+         WHERE tournament_id IN (${placeholders})`, 
+        ids
+      );
+
+      const items = rows.map((r) => this.map(r));
+      return items;
+    } catch (err) {
+      this.logger.error("TournamentRepository", "findByIds failed", err);
+      return [];
+    } finally { res.conn.release(); }
+  }
 }
