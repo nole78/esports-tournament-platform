@@ -24,7 +24,7 @@ import { Layout } from "./components/layout/Layout";
 import TeamsDetailPage from "./pages/common_pages/TeamsDetailPage";
 import TeamsInboxPage from "./pages/common_pages/TeamsInboxPage";
 import TeamsGuestPage from "./pages/common_pages/TeamsGuestPage";
-import TeamsGuestDetailsPage from "./pages/common_pages/TeamsGuestDetailsPage";
+//import TeamsGuestDetailsPage from "./pages/common_pages/TeamsGuestDetailsPage";
 import MatchInfo from "./pages/common_pages/MatchInfo";
 import AccountDetailsPage from "./pages/user/AccountDetails";
 
@@ -39,7 +39,7 @@ export default function App() {
       <Route path="/game_catalog" element={<GameCatalog/>} />
       <Route path="/tournament_list" element={<TournamentList />} />
       <Route path="/guest/teams" element = {<TeamsGuestPage/>}/>
-      <Route path="/guest/teams/:id" element = {<TeamsGuestDetailsPage/>}/>
+      <Route path="/guest/teams/:id" element = {<TeamsDetailPage/>}/>
       
       {/* User routes */}
       <Route path="/dashboard" element={<ProtectedRoute requiredRole="player"><UserDashboard /></ProtectedRoute>} />

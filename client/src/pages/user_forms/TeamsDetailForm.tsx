@@ -1,23 +1,14 @@
 import { useEffect, useState } from "react";
-
 import { teamApi } from "../../api_services/teams/TeamAPIService";
 import { useNavigate } from "react-router-dom";
 import type { TeamDto } from "../../models/team/TeamDto";
-
-
 import type { UserForMembersDto } from "../../models/user/UserForMembers";
 import { ErrorBox, Table, TableHead } from "../../components/ui/UI";
 import { useAuth } from "../../hooks/auth/useAuthHook";
 import { usersApi } from "../../api_services/users/UsersAPIService";
-//import useDebounce from 'react-debounced';
 import type { IniviteDto } from "../../models/invite/InviteDto";
-//import type { UserDto } from "../../models/user/UserTypes";
 import { TeamRole } from "../../types/teamMembers/teamMemberRole";
 import { UserRole } from "../../types/user/UserRole";
-
-
-//import FireIcon from "../../components/heroIcons/FireIcon";
-
 import FireIcon from "../../components/heroIcons/FireIcon";
 import useDebounce from 'react-debounced';
 import ArrowLeftIcon from "../../components/heroIcons/ArrowLeftIcon";
@@ -28,6 +19,7 @@ import SearchIcon from "../../components/heroIcons/SearchIcon";
 import avatarPlaceholder from "../../assets/avatar_placeholder.jpg";
 import UserOverview from '../../components/account/UserOverview';
 import UserPlusIcon from "../../components/heroIcons/UserPlusIcon";
+import type { UserDto } from "../../models/user/UserTypes";
 
 export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
     
@@ -46,6 +38,8 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
     const debounce = useDebounce(1000);
     const [open, setOpen] = useState(false);
     const [userPreview, setUserPreview] = useState(0);
+    const [captain, setCaptain] = useState<UserDto>();
+    const [columns, setColumns] = useState<string[]>([]);
 
     const giveCaptainShip = async (idTransfer: number)=>{
         await teamApi.transferCaptainship(team.teamId, idTransfer).then(
@@ -76,6 +70,14 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
                             setInvitedMembers(res.data ?? []);
                         }
                     ).catch(()=> setError("Failed to load invites"))
+                     teamApi.getCaptain(Number(id)).then(
+                        res => {
+                            if (res.success){
+                                console.log(res.data);
+                                setCaptain(res.data);
+                            }
+                        }
+                    )
                     return;
                 }else setError(res.message);
             }
@@ -152,8 +154,23 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
     }
 
     useEffect(() =>{
+        if (user?.role !== UserRole.ADMIN && user?.role !== UserRole.PLAYER){
+             teamApi.getTeamGuest(Number(id)).then(res => {
+                    const teamHelp : TeamDto = {
+                    teamId: res.data?.teamId as number,
+                    teamName:res.data?.teamName as string,
+                    teamLogotip:res.data?.teamLogotip as string,
+                    teamDescription:res.data?.teamDescription as string,
+                    teamTag:res.data?.teamTag as string,
+                    userRole: TeamRole.GUEST as TeamRole};
+                    setColumns(["Gamer Tag", "ID"]);
+                    setTeam(teamHelp);
+                }).catch(()=> setError("Failed to load team data for guest"))
+        }
+        else{
         teamApi.getById(Number(id))
         .then(res => {
+            if (res.success){
             const teamHelp : TeamDto = {
                 teamId: res.data?.teamId as number,
                 teamName:res.data?.teamName as string,
@@ -162,18 +179,36 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
                 teamTag:res.data?.teamTag as string,
                 userRole:res.data?.userRole as TeamRole};
                 setTeam(teamHelp);
-        }).catch(() => setError("Failed to load the team"))
+                setColumns(["Gamer Tag", "ID", "Actions"]);
+            }
+          
+               
+            
 
+        }).catch(() => setError("Failed to load the team"))
         teamApi.getInvitesByTeamId(Number(id))
                     .then(
                         res => {
                             setInvitedMembers(res.data ?? []);
                         }
                     ).catch(()=> setError("Failed to load invites"))
+        }
+
         teamApi.getMembers(Number(id))
         .then(res =>{
-            setMember(res.data ?? []);
+            if (res.success){
+            setMember(res.data ?? []);}
+            
         }).catch(()=> setError("Failed to load team members"))
+
+        teamApi.getCaptain(Number(id)).then(
+            res => {
+                if (res.success){
+                    setCaptain(res.data);
+                }
+            }
+        ).catch(()=> setError("Failed to load captain"))
+
     }, [id])
 
     
@@ -232,16 +267,16 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
                     <span className="block text-2xl text-bgprimary mb-2 font-bold border-b-secondary border-b">Members</span>
                     <div className="w-full overflow-x-auto mt-6">
                         <Table>
-                            <TableHead columns={["Gamer Tag", "ID", "Actions"]}></TableHead>
+                            <TableHead columns={columns}></TableHead>
+                            
+                            
                             <tbody>
                                 {members.map(m => (
                                 <tr key={m.id} className="border-b border-gray-400/30">
-                                    { team.userRole === "captain" && user?.id === m.id as number && <td className="px-5 py-3.5 font-mono text-xl text-bgsecondary flex"><span className="flex cursor-pointer" onClick={() => {setOpen(true); setUserPreview(m.id)}}>{m.gamerTag} <FireIcon/></span></td>}
-                                    { team.userRole === "member" && user?.id === m.id as number && <td className="px-5 py-3.5 font-mono text-xl text-bgsecondary"><span className="cursor-pointer" onClick={() => {setOpen(true); setUserPreview(m.id)}}>{m.gamerTag}</span></td>}
-                                    {  user?.id !== m.id && <td className="px-5 py-3.5 font-mono text-xl text-bgsecondary"><span className="cursor-pointer" onClick={() => {setOpen(true); setUserPreview(m.id)}}>{m.gamerTag}</span>   </td>}
+                                    {<td className="px-5 py-3.5 font-mono text-xl text-bgsecondary flex"><span className="flex cursor-pointer" onClick={() => {setOpen(true); setUserPreview(m.id)}}>{m.gamerTag} {captain?.id === m.id && <FireIcon/>}</span></td>}
                                     <td className="px-5 py-3.5 font-mono text-xl text-bgsecondary">{m.id} </td>
 
-                                    { team.userRole === "captain" && user?.id !== m.id as number &&(
+                                    { team.userRole === TeamRole.CAPTAIN && user?.id !== m.id as number &&(
                                     <td>
                                         <div className="grid grid-cols-2 gap-6 px-6">
                                             <button type="button" onClick={() => giveCaptainShip(m.id)} className="columns-1 inline-flex items-center justify-center bg-amber-500/10 text-amber-400 border-amber-500/40 border-2 hover:text-amber-900 hover:bg-amber-400/80 hover:border-amber-900 cursor-pointer font-semibold rounded-xl h-8 w-full text-sm transition-colors">
@@ -254,7 +289,7 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
                                     </td>
                                     )
                                     }
-                                    { team.userRole === "member" && user?.id === m.id as number &&(
+                                    { team.userRole === TeamRole.MEMBER && user?.id === m.id as number &&(
                                     <td className="py-2 px-8 font-normal text-center">
                                         <button type="button" onClick={() => deleteMember(team.teamId, user.id)} className="columns-2 inline-flex items-center justify-center text-red-500 bg-red-400/40 border-2 border-red-500 hover:bg-red-500 hover:border-red-900 hover:text-red-900 cursor-pointer font-semibold rounded-xl h-8 w-full text-sm transition-colors">
                                                 <LeaveIcon/> Leave
@@ -269,7 +304,7 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
                         </Table>
                     
                     
-                    { team.userRole === "captain" && 
+                    { team.userRole === TeamRole.CAPTAIN && 
                     <div className="mt-5">
                         <span className="block text-2xl text-bgprimary mb-2 font-bold border-b-secondary border-b">Invite Players</span>
                         <div className="relative flex w-full mt-5">

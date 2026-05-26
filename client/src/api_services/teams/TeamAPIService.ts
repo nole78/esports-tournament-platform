@@ -2,16 +2,11 @@ import axios from "axios";
 import { readItem } from "../../helpers/local_storage";
 import type { ApiResponse, ITeamAPIService } from './ITeamAPIService';
 import type { TeamDto } from "../../models/team/TeamDto";
-// import { ApiResponse } from './ITeamAPIService';
-// import ApiHealthDisplay from '../../components/admin/ApiHealthDisplay';
-//import { InviteDto } from '../../../../server/src/Domain/DTOs/invite/InviteDto';
 import type { UserForMembersDto } from "../../models/user/UserForMembers";
 import type { IniviteDto } from "../../models/invite/InviteDto";
 import type { TeamDtoGuest } from "../../models/team/TeamDtoGuest";
 import type { UserDto } from "../../models/user/UserTypes";
-//import type { UserDto } from "../../models/user/UserTypes";
-//import { Team } from '../../../../server/src/Domain/models/Team';
-//import type { TeamDto } from "../../models/team/TeamDto";
+
 
 
 const BASE = import.meta.env.VITE_API_URL + "teams";

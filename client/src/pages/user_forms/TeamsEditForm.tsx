@@ -11,10 +11,7 @@ export const TeamsEditForm: React.FC<{id: string}> = ({id}) =>{
     const {user} = useAuth();
     const emptyTeam : TeamDtoEdit = {teamName:"", teamLogotip:"", teamDescription:"", teamTag:""};
     const [team, setTeam] = useState<TeamDtoEdit>(emptyTeam);
-    
     const [error, setError] = useState<string>("");
-    const [editing,setEditing] = useState<boolean>(false);
-
     const fileRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
 
@@ -45,11 +42,9 @@ export const TeamsEditForm: React.FC<{id: string}> = ({id}) =>{
             setError("Team name must be between 2 and 80 characters");
             return;
         }
-        setEditing(true);
 
         const res = await teamApi.update(Number(id), team);
 
-        setEditing(false);
         if (!res.success){setError(res.message ?? "Invalid values"); return;}
 
         
@@ -128,9 +123,9 @@ export const TeamsEditForm: React.FC<{id: string}> = ({id}) =>{
                     className="w-full bg-bgprimary/10 border border-secondary/50 rounded-xl px-4 py-3 text-bgsecondary text-sm placeholder-bgsecondary/30 focus:outline-none focus:border-white/30 transition-colors"/>
                 </div>
                 <div className="flex gap-2">
-                    <button type="submit" disabled={editing}
+                    <button type="submit"
                         className="w-1/2 cursor-pointer bg-bgprimary hover:bg-bgprimary/80 disabled:opacity-50 text-primary font-semibold rounded-xl py-3 text-sm transition-colors">
-                        {editing ? "Editing…" : "Edit"}
+                        Edit
                     </button>
                     <button type="button" onClick={() => navigate(-1)}
                         className="py-3 bg-red-400/40  cursor-pointer border-red-500 hover:bg-red-400/30 hover:border-bgsecondary/70 text-red-500 font-semibold rounded-xl w-1/2 text-sm transition-colors">

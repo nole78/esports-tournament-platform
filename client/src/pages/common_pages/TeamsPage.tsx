@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { teamApi } from "../../api_services/teams/TeamAPIService";
 import { Empty, ErrorBox, PageHeader, Pagination} from "../../components/ui/UI";
 import { TeamRole } from "../../types/teamMembers/teamMemberRole";
+import { UserRole } from "../../types/user/UserRole";
 
 
 
@@ -17,7 +18,7 @@ export default function TeamsPage(){
     const location = useLocation();
     const [added, setAdded] = useState<boolean>(location.state?.added ?? false);
     const [edited, setEdited] = useState<boolean>(location.state?.edited ?? false);
-     const [left, setLeft] = useState<boolean>(location.state?.left ?? false);
+    const [left, setLeft] = useState<boolean>(location.state?.left ?? false);
     const [page, setPage] = useState(1);
     const limit = 6;
     const navigate = useNavigate();
@@ -58,15 +59,15 @@ export default function TeamsPage(){
         })
         .catch(() => setError("Failed to load teams"))
     }
+
     useEffect(() =>{
-        loadPage(page);
-        
+        loadPage(page);   
     }, [page]);
 
     return (
             <div>
                 <PageHeader eyebrow="" title="Team Catalog"/>
-                <button onClick={() => user?.role == "admin" ? navigate(`/admin/teams/add`) : navigate(`/teams/add`)}
+                <button onClick={() => user?.role === UserRole.ADMIN ? navigate(`/admin/teams/add`) : navigate(`/teams/add`)}
                         className="mb-2 w-1/6 bg-bgsecondary/40 border-2 border-bgsecondary hover:bg-bgsecondary/30 text-bgsecondary font-semibold rounded-xl py-3 text-sm transition-colors">
                 Add Team</button>
                 
@@ -95,7 +96,7 @@ export default function TeamsPage(){
                 {teams.length === 0 && !error ? <Empty message="No teams found"/> : (
                 <section className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">     
                     {teams.map(t => (
-                        <div onClick={() => user?.role == "admin" ? navigate(`/admin/teams/details/${t.teamId}`) : navigate(`/teams/details/${t.teamId}`)} className=" rounded-2xl group relative aspect-4/3 border-2 border-white/5 bg-bgprimary/30 overflow-hidden">
+                        <div onClick={() => user?.role === UserRole.ADMIN ? navigate(`/admin/teams/details/${t.teamId}`) : navigate(`/teams/details/${t.teamId}`)} className=" rounded-2xl group relative aspect-4/3 border-2 border-white/5 bg-bgprimary/30 overflow-hidden">
                             <div className="w-full h-full">
                                 <img src ={t.teamLogotip} className="object-cover w-full h-full rounded-x1 transition-transform duration-300 group-hover:scale-110"/>
                             </div>
@@ -130,7 +131,7 @@ export default function TeamsPage(){
                                             onClick={
                                                 (e) => {
                                                      e.stopPropagation();
-                                                    if (user?.role === "admin") 
+                                                    if (user?.role === UserRole.ADMIN) 
                                                         navigate(`/admin/teams/edit/${t.teamId}`) 
                                                     else 
                                                         navigate(`/teams/edit/${t.teamId}`)

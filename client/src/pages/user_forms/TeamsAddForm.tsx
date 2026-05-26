@@ -15,9 +15,6 @@ export default function TeamsAddForm({teamApi} : {teamApi:ITeamAPIService}){
     const [team, setTeam] = useState<TeamDto>(emptyTeam);
     const [error, setError] = useState<string>("");
     const [preview,setPreview] = useState<string>("");
-
-    const [creating,setCreating] = useState<boolean>(false);
-
     const fileRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
 
@@ -49,11 +46,9 @@ export default function TeamsAddForm({teamApi} : {teamApi:ITeamAPIService}){
             return;
         }
 
-        setCreating(true);
 
         const res = await teamApi.create({team});
         
-        setCreating(false);
         if (!res.success || !res.data){setError(res.message ?? "Invalid values"); return;}
 
         
@@ -122,9 +117,9 @@ export default function TeamsAddForm({teamApi} : {teamApi:ITeamAPIService}){
                     className="w-full bg-bgprimary/10 border border-secondary/50 rounded-xl px-4 py-3 text-bgsecondary text-sm placeholder-bgsecondary/30 focus:outline-none focus:border-white/30 transition-colors"/>
                 </div>
                 <div className="flex gap-2">
-                    <button type="submit" disabled={creating}
+                    <button type="submit" 
                         className="w-1/2 cursor-pointer bg-bgprimary hover:bg-bgprimary/80 disabled:opacity-50 text-primary font-semibold rounded-xl py-3 text-sm transition-colors">
-                        {creating ? "Creating…" : "Create"}
+                        Create
                     </button>
                     <button type="button" onClick={() => navigate(-1)}
                         className="py-3 bg-red-400/40  cursor-pointer border-red-500 hover:bg-red-400/30 hover:border-bgsecondary/70 text-red-500 font-semibold rounded-xl w-1/2 text-sm transition-colors">
