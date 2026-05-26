@@ -18,6 +18,7 @@ export class TournamentRegistrationController{
         this.router.post("/tournaments/:id/register",  this.register.bind(this));
         this.router.delete("/tournaments/:id/register/:teamId", authenticate, this.delete.bind(this));
         this.router.patch("/tournaments/:id/registrations/:teamId", authenticate, authorize(UserRole.ADMIN), this.update.bind(this));
+        this.router.post("/tournaments/:id/generate-bracket", authenticate, authorize(UserRole.ADMIN), this.generateBracket.bind(this));
     }
 
     private async getByTournamentId(req: Request, res: Response): Promise<void>{
@@ -50,9 +51,16 @@ export class TournamentRegistrationController{
     private async update(req: Request, res: Response): Promise<void> {
         const tournamentId = parseInt(req.params.id as string, 10);
         const teamId = parseInt(req.params.teamId as string, 10);
-        console.log("tournamentId: "+tournamentId+" teamId: "+teamId);
         if (isNaN(tournamentId) || isNaN(teamId)) { res.status(400).json({ success: false, message: "Invalid id" }); return; }
         const result = await this.tournamentRegistrationWriteService.update(tournamentId, teamId, req.body);
+        handleResult(result, res);
+    }
+
+    private async generateBracket(req: Request, res: Response): Promise<void>
+    {
+        const tournamentId = parseInt(req.params.id as string, 10);
+        if (isNaN(tournamentId)) { res.status(400).json({ success: false, message: "Invalid id" }); return; }
+        const result = await this.tournamentRegistrationWriteService.generateBracket(tournamentId);
         handleResult(result, res);
     }
 

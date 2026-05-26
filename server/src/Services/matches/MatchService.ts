@@ -20,7 +20,7 @@ export class MatchService implements IMatchService{
         private readonly matchReadRepo: IMatchReadRepository,
         private readonly matchWriteRepo: IMatchWriteRepository,
         private readonly teamRepo: ITeamRepositoryRead,
-        private readonly tournamentRepo: ITournamentReadRepository,
+        private readonly tournamentReadRepo: ITournamentReadRepository,
         private readonly gameRepo: IGameRepository
     ){}
 
@@ -84,7 +84,7 @@ export class MatchService implements IMatchService{
         
         const result = await this.getTeamName(match);
 
-        const tournament = await this.tournamentRepo.findById(match.tournamentId);
+        const tournament = await this.tournamentReadRepo.findById(match.tournamentId);
         const game = await this.gameRepo.findById(tournament.tournamentGameId);
 
         return Result.Success(new MatchDetailsDto(match.matchId,match.status,match.roundNumber,match.blueTeamId,
@@ -95,7 +95,7 @@ export class MatchService implements IMatchService{
     }
 
     public async getByTournamentId(tournamentId: number): Promise<Result<MatchDto[]>>{
-        const tournament = await this.tournamentRepo.findById(tournamentId);
+        const tournament = await this.tournamentReadRepo.findById(tournamentId);
         if(tournament.tournamentId === 0)
             return Result.Failure(`Tournament doesn't exist`,ErrorType.NotFound);
 

@@ -10,7 +10,7 @@ import { ErrorType } from '../../Domain/common/ErrorType';
 import { ITournamentReadRepository } from "../../Domain/repositories/tournaments/ITournamentReadRepository";
 import { ITournamentWriteRepository } from "../../Domain/repositories/tournaments/ITournamentWriteRepository";
 
-export class TournamentServiceWrite implements ITournamentWriteService {
+export class TournamentWriteService implements ITournamentWriteService {
   public constructor(
     private readonly tournamentReadRepo: ITournamentReadRepository,
     private readonly tournamentWriteRepo: ITournamentWriteRepository,

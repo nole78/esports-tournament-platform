@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { ITournamentAPIService } from '../../api_services/tournament_list/ITournamentAPIService';
-import { TournamentFormatValues, type TournamentFormat } from '../../types/tournament/TournamentFormat';
+import { TournamentFormat } from '../../types/tournament/TournamentFormat';
 import { TournamentStatus } from '../../types/tournament/TournamentStatus';
 import type { IGameAPIService } from '../../api_services/game_catalog/IGameAPIService';
 import type { GameDto } from '../../models/game/GameDto';
@@ -48,6 +48,58 @@ export default function TournamentAddForm({tournamentApi, gameApi} : {tournament
 
     const maxTeamsNum = Number(maxTeams);
     const prizeFundNum = Number(prizeFund);
+
+    if(!tournamentName || tournamentName.trim().length === 0)
+    {
+        setError("Tournament name is mandatory");
+        setCreating(false);
+        return;
+    }
+    if(tournamentName.length < 3 || tournamentName.length > 120)
+    {    
+        setError("Tournament name must be between 3 and 120 characters long!");
+        setCreating(false);
+        return;
+    }   
+    if(!gameName || gameName.trim().length === 0)
+    {    
+        setError("Game name is mandatory");
+        setCreating(false);
+        return;
+    }
+    if(maxTeamsNum < 4 || maxTeamsNum > 256)
+    {    
+        setError("Maximum number of teams must be greater or equal to 4 and less or equal to 256")
+        setCreating(false);
+        return;
+    }
+    if(!format)
+    {       
+        setError("Invalid tournament format");
+        setCreating(false);
+        return;
+    }
+    if(format !== TournamentFormat.ROUND_ROBIN)
+    {    
+        if((maxTeamsNum & (maxTeamsNum - 1)) !== 0)
+        {
+            setError("Maximum number of teams must be a power of 2 (2, 4, 8, 16, 32, 64, ...) for formats other than round robin");
+            setCreating(false);
+            return;
+        }
+    }
+    if(prizeFundNum <= 0)
+    {    
+        setError("Prize fund must be greater than 0");
+        setCreating(false);
+        return;
+    }
+    if(!applicationDeadline || new Date(applicationDeadline) <= new Date())
+    {    
+        setError("Application deadline must be in the future");
+        setCreating(false);
+        return;
+    }
 
     const payload = {
         tournamentName, 
@@ -114,7 +166,7 @@ export default function TournamentAddForm({tournamentApi, gameApi} : {tournament
                                 value={format} 
                                 onChange={e => setFormat(e.target.value as TournamentFormat)}
                                 className="w-full bg-bgprimary/10 border border-secondary/50 rounded-xl px-4 py-3 text-bgsecondary text-sm focus:outline-none focus:border-white/30 transition-colors">
-                                {Object.entries(TournamentFormatValues).map(([key, value]) => (
+                                {Object.entries(TournamentFormat).map(([key, value]) => (
                                     <option className='bg-lime-950' key={key} value={value}>
                                         {key.replace(/_/g, ' ')}
                                     </option>

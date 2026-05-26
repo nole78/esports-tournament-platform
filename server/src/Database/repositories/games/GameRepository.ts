@@ -59,7 +59,7 @@ export class GameRepository implements IGameRepository{
         }
 
     async create(game: Game): Promise<Game> {
-                const res = await this.db.getWriteConnection();
+        const res = await this.db.getWriteConnection();
         if (!res) return new Game;
         try {
         const [result] = await res.conn.execute<ResultSetHeader>(
