@@ -127,8 +127,10 @@ CREATE TABLE match_players(
   match_id INT UNSIGNED NOT NULL,
   performance_notes TEXT, 
   PRIMARY KEY (user_id, match_id, team_id),
-  FOREIGN KEY (team_id, user_id) REFERENCES team_members(team_id, user_id),
+  FOREIGN KEY (team_id, user_id) REFERENCES team_members(team_id, user_id)
+    ON DELETE CASCADE,
   FOREIGN KEY (match_id) REFERENCES matches(match_id)
+    ON DELETE CASCADE
 );
 
 CREATE TABLE user_watchlist(

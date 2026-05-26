@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { HealthCheckService } from '../Services/healthCheckService';
+import { HealthCheckService } from '../Services/HealthCheckService';
 import { authenticate } from '../Middlewares/authMiddleware';
 import { UserRole } from '../Domain/enums/UserRole';
 import { authorize } from '../Middlewares/authorizeMiddleware';

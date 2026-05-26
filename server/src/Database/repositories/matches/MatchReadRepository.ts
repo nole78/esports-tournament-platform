@@ -13,7 +13,8 @@ export class MatchReadRepository implements IMatchReadRepository {
   ) {}
 
   private map(r: RowDataPacket): Match {
-    return new Match(r.match_id, 
+    return new Match(
+      r.match_id, 
       r.tournament_id, 
       r.blue_team_id, 
       r.red_team_id, 

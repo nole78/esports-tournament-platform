@@ -27,12 +27,12 @@ export class BracketAdvancementService implements IBracketAdvancementService {
         if(nextMatch.status === MatchStatus.COMPLETED)
             return Result.Failure("Can't add team to completed match", ErrorType.Conflict);
 
-        if(slot === MatchSlot.BLUE && nextMatch.blueTeamId !== 0 && nextMatch.blueTeamId !== teamId
+        if(slot === MatchSlot.BLUE && nextMatch.blueTeamId && nextMatch.blueTeamId !== teamId
         ) {
             return Result.Failure( "There is already a team in the blue slot", ErrorType.Conflict);
         }
 
-        if(slot === MatchSlot.RED && nextMatch.redTeamId !== 0 && nextMatch.redTeamId !== teamId
+        if(slot === MatchSlot.RED && nextMatch.redTeamId && nextMatch.redTeamId !== teamId
         ) {
             return Result.Failure("There is already a team in the red slot", ErrorType.Conflict);
         }
