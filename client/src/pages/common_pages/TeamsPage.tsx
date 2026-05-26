@@ -108,7 +108,8 @@ export default function TeamsPage(){
                                 {(t.userRole === TeamRole.CAPTAIN &&
                                     <>
                                     <button className="w-1/3 mb-2 bg-red-400/40 border-2 border-red-500 hover:bg-bgsecondary/30 hover:border-bgsecondary text-red-500 font-semibold rounded-xl p-1 text-sm transition-colors"
-                                            onClick={() => {
+                                            onClick={(e) => {
+                                                e.stopPropagation();
                                                 setDeleted(false);
                                                 teamApi.delete(t.teamId)
                                                     .then(res =>{
@@ -124,8 +125,16 @@ export default function TeamsPage(){
                                                 >
                                         Delete
                                     </button>
+
                                     <button className="w-1/3 mb-2 float-right bg-green-400/40 border-2 border-green-500 hover:bg-bgsecondary/30 hover:border-bgsecondary text-green-500 font-semibold rounded-xl p-1 text-sm transition-colors"
-                                            onClick={() => user?.role == "admin" ? navigate(`/admin/teams/edit/${t.teamId}`) : navigate(`/teams/edit/${t.teamId}`)}
+                                            onClick={
+                                                (e) => {
+                                                     e.stopPropagation();
+                                                    if (user?.role === "admin") 
+                                                        navigate(`/admin/teams/edit/${t.teamId}`) 
+                                                    else 
+                                                        navigate(`/teams/edit/${t.teamId}`)
+                                                }}
                                             >
                                         Edit
                                     </button>

@@ -3,15 +3,16 @@ import type { TeamDto } from '../../models/team/TeamDto';
 import type { ITeamAPIService } from '../../api_services/teams/ITeamAPIService';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/auth/useAuthHook';
+import { TeamRole } from '../../types/teamMembers/teamMemberRole';
 import { UserRole } from '../../types/user/UserRole';
 
-const DEFAULT_TEAM_ROLE: TeamDto['userRole'] = 'member' as TeamDto['userRole'];
+
+
 
 export default function TeamsAddForm({teamApi} : {teamApi:ITeamAPIService}){
     const {user} = useAuth();
-    const emptyTeam : TeamDto = {teamId: 0, teamName:"", teamLogotip:"", teamDescription:"", teamTag:"", userRole: DEFAULT_TEAM_ROLE};
+    const emptyTeam : TeamDto = {teamId: 0, teamName:"", teamLogotip:"", teamDescription:"", teamTag:"", userRole: TeamRole.MEMBER};
     const [team, setTeam] = useState<TeamDto>(emptyTeam);
-    
     const [error, setError] = useState<string>("");
     const [preview,setPreview] = useState<string>("");
 
@@ -23,11 +24,35 @@ export default function TeamsAddForm({teamApi} : {teamApi:ITeamAPIService}){
     const submit = async (e: React.FormEvent<HTMLFormElement>)=>{
         e.preventDefault();
         setError("");
+        if (team.teamName === ""){
+            setError("Team name is required!");
+            return;
+        }
+        if (team.teamTag === ""){
+            setError("Team tag is required!");
+            return;
+        }
+        if (team.teamLogotip === ""){
+            setError("Team logo is required!");
+            return;
+        }
+        if (team.teamDescription === ""){
+            setError("Team description is required!");
+            return;
+        }
+        if (team.teamTag.length < 2 || team.teamTag.length >6 ){
+            setError("Team tag must be between 2 and 6 characters");
+            return;
+        }
+        if (team.teamName.length < 2 || team.teamName.length > 80 ){
+            setError("Team name must be between 2 and 80 characters");
+            return;
+        }
 
         setCreating(true);
 
         const res = await teamApi.create({team});
-
+        
         setCreating(false);
         if (!res.success || !res.data){setError(res.message ?? "Invalid values"); return;}
 
@@ -54,7 +79,7 @@ export default function TeamsAddForm({teamApi} : {teamApi:ITeamAPIService}){
             <form onSubmit={submit} className='flex flex-col gap-4'>
                 <div>
                     <label className="block text-xs text-bgprimary mb-2 font-bold">Team Name</label>
-                    <input type="text" value={team?.teamName} onChange={e => setTeam(x => ({...x, teamName : e.target.value}))} placeholder="team_name"
+                    <input type="text" value={team?.teamName} onChange={e => setTeam(x => ({...x, teamName : e.target.value}))} placeholder= "team_name"
                     className="w-full bg-bgprimary/10 border border-secondary/50 rounded-xl px-4 py-3 text-bgsecondary text-sm placeholder-bgsecondary/30 focus:outline-none focus:border-white/30 transition-colors"/>
                 </div>
 

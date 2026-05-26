@@ -21,7 +21,30 @@ export const TeamsEditForm: React.FC<{id: string}> = ({id}) =>{
     const submit = async (e: React.FormEvent<HTMLFormElement>)=>{
         e.preventDefault();
         setError("");
-
+        if (team.teamName === ""){
+            setError("Team name is required!");
+            return;
+        }
+        if (team.teamTag === ""){
+            setError("Team tag is required!");
+            return;
+        }
+        if (team.teamLogotip === ""){
+            setError("Team logo is required!");
+            return;
+        }
+        if (team.teamDescription === ""){
+            setError("Team description is required!");
+            return;
+        }
+        if (team.teamTag.length < 2 || team.teamTag.length >6 ){
+            setError("Team tag must be between 2 and 6 characters");
+            return;
+        }
+        if (team.teamName.length < 2 || team.teamName.length > 80 ){
+            setError("Team name must be between 2 and 80 characters");
+            return;
+        }
         setEditing(true);
 
         const res = await teamApi.update(Number(id), team);

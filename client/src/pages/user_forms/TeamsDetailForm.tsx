@@ -229,14 +229,6 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
                         <tr className="border-b border-gray-200 text-left">
                             <th className=" pb-2 pr-4">Gamer Tag</th>
                             <th className=" pb-2 pr-4">ID</th>
-                            { team.userRole === "captain" && (
-                                <th className=" pb-2 pr-4">{captain?.role}</th>
-                            )
-                            }
-                            { team.userRole === "member" && (
-                                <th className=" pb-2 pr-4"></th>
-                            )
-                            }
                         </tr>
                         </thead>
                         <tbody>
@@ -311,7 +303,8 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
                 
 
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 py-5 pl-30">
+                    
                     <button type="button" onClick={() => navigate(-1)}
                         className="py-3 bg-red-400/40  cursor-pointer border-red-500 hover:bg-red-400/30 hover:border-bgsecondary/70 text-red-500 font-semibold rounded-xl w-1/2 text-sm transition-colors">
                     Cancel</button>
