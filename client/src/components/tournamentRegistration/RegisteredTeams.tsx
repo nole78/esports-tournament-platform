@@ -75,7 +75,9 @@ export default function RegisteredTeams() {
                 <div
                   key={t.teamId}
                   className="bg-primary border border-secondary/40 rounded-lg p-4 hover:border-secondary/60 transition-all duration-200 hover:shadow-lg hover:shadow-secondary/20"
-                  onClick={() => navigate(`/teams/details/${t.teamId}`)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/teams/details/${t.teamId}`)}}
                 >
                   <div className="flex items-center gap-3 mb-3">
                     <img
