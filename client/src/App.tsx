@@ -23,7 +23,7 @@ import { Layout } from "./components/layout/Layout";
 import TeamsDetailPage from "./pages/common_pages/TeamsDetailPage";
 import TeamsInboxPage from "./pages/common_pages/TeamsInboxPage";
 import TeamsGuestPage from "./pages/common_pages/TeamsGuestPage";
-import TeamsGuestDetailsPage from "./pages/common_pages/TeamsGuestDetailsPage";
+//import TeamsGuestDetailsPage from "./pages/common_pages/TeamsGuestDetailsPage";
 import MatchInfo from "./pages/common_pages/MatchInfo";
 import AccountDetailsPage from "./pages/user/AccountDetails";
 

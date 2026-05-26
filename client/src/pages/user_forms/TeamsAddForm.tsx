@@ -1,37 +1,66 @@
-import { useRef, useState } from 'react';
+import {useState } from 'react';
 import type { TeamDto } from '../../models/team/TeamDto';
 import type { ITeamAPIService } from '../../api_services/teams/ITeamAPIService';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/auth/useAuthHook';
+import { TeamRole } from '../../types/teamMembers/teamMemberRole';
+import { UserRole } from '../../types/user/UserRole';
 
-const DEFAULT_TEAM_ROLE: TeamDto['userRole'] = 'member' as TeamDto['userRole'];
+
+
 
 export default function TeamsAddForm({teamApi} : {teamApi:ITeamAPIService}){
     const {user} = useAuth();
-    const emptyTeam : TeamDto = {teamId: 0, teamName:"", teamLogotip:"", teamDescription:"", teamTag:"", userRole: DEFAULT_TEAM_ROLE};
+    const emptyTeam : TeamDto = {teamId: 0, teamName:"", teamLogotip:"", teamDescription:"", teamTag:"", userRole: TeamRole.MEMBER};
     const [team, setTeam] = useState<TeamDto>(emptyTeam);
-    
     const [error, setError] = useState<string>("");
     const [preview,setPreview] = useState<string>("");
-
-    const [creating,setCreating] = useState<boolean>(false);
-
-    const fileRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
 
+    const openFilePicker = () => {
+        const element = document.getElementById("team-logo-input");
+
+        if(!(element instanceof HTMLInputElement)) {
+            return;
+        }
+
+        element.click();
+    }
     const submit = async (e: React.FormEvent<HTMLFormElement>)=>{
         e.preventDefault();
         setError("");
+        if (team.teamName === ""){
+            setError("Team name is required!");
+            return;
+        }
+        if (team.teamTag === ""){
+            setError("Team tag is required!");
+            return;
+        }
+        if (team.teamLogotip === ""){
+            setError("Team logo is required!");
+            return;
+        }
+        if (team.teamDescription === ""){
+            setError("Team description is required!");
+            return;
+        }
+        if (team.teamTag.length < 2 || team.teamTag.length >6 ){
+            setError("Team tag must be between 2 and 6 characters");
+            return;
+        }
+        if (team.teamName.length < 2 || team.teamName.length > 80 ){
+            setError("Team name must be between 2 and 80 characters");
+            return;
+        }
 
-        setCreating(true);
 
         const res = await teamApi.create({team});
-
-        setCreating(false);
+        
         if (!res.success || !res.data){setError(res.message ?? "Invalid values"); return;}
 
         
-        if(user?.role == "admin")
+        if(user?.role === UserRole.ADMIN)
             navigate("/admin/teams", {state: {added : true} });
         else
             navigate("/teams", {state: {added : true} });
@@ -53,7 +82,7 @@ export default function TeamsAddForm({teamApi} : {teamApi:ITeamAPIService}){
             <form onSubmit={submit} className='flex flex-col gap-4'>
                 <div>
                     <label className="block text-xs text-bgprimary mb-2 font-bold">Team Name</label>
-                    <input type="text" value={team?.teamName} onChange={e => setTeam(x => ({...x, teamName : e.target.value}))} placeholder="team_name"
+                    <input type="text" value={team?.teamName} onChange={e => setTeam(x => ({...x, teamName : e.target.value}))} placeholder= "team_name"
                     className="w-full bg-bgprimary/10 border border-secondary/50 rounded-xl px-4 py-3 text-bgsecondary text-sm placeholder-bgsecondary/30 focus:outline-none focus:border-white/30 transition-colors"/>
                 </div>
 
@@ -65,9 +94,9 @@ export default function TeamsAddForm({teamApi} : {teamApi:ITeamAPIService}){
                 <div>
                     <label className="mr-5 w-min text-xs text-bgprimary mb-2 font-bold">Team Logo</label>
                     <button type="button" className=" rounded-xl w-1/3 py-3 border-bgprimary bg-bgprimary text-primary font-semibold text-sm hover:bg-bgprimary/80 cursor-pointer"
-                        onClick={() => {if(fileRef.current) fileRef.current.click()}}
+                        onClick={openFilePicker}
                         >Choose Image</button>
-                    <input type="file" accept="image/*" ref={fileRef}
+                    <input type="file" accept="image/*" id="team-logo-input" 
                     onChange={e => {
                         const file = e.target.files?.[0];
                         if(!file) {
@@ -96,9 +125,9 @@ export default function TeamsAddForm({teamApi} : {teamApi:ITeamAPIService}){
                     className="w-full bg-bgprimary/10 border border-secondary/50 rounded-xl px-4 py-3 text-bgsecondary text-sm placeholder-bgsecondary/30 focus:outline-none focus:border-white/30 transition-colors"/>
                 </div>
                 <div className="flex gap-2">
-                    <button type="submit" disabled={creating}
+                    <button type="submit" 
                         className="w-1/2 cursor-pointer bg-bgprimary hover:bg-bgprimary/80 disabled:opacity-50 text-primary font-semibold rounded-xl py-3 text-sm transition-colors">
-                        {creating ? "Creating…" : "Create"}
+                        Create
                     </button>
                     <button type="button" onClick={() => navigate(-1)}
                         className="py-3 bg-red-400/40  cursor-pointer border-red-500 hover:bg-red-400/30 hover:border-bgsecondary/70 text-red-500 font-semibold rounded-xl w-1/2 text-sm transition-colors">

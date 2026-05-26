@@ -3,24 +3,24 @@ import { useAuth } from "../../hooks/auth/useAuthHook";
 import type { TeamDto } from "../../models/team/TeamDto";
 import { useLocation, useNavigate } from 'react-router-dom';
 import { teamApi } from "../../api_services/teams/TeamAPIService";
-import { Empty, ErrorBox, PageHeader, Pagination } from "../../components/ui/UI";
+import { Empty, ErrorBox, PageHeader, Pagination} from "../../components/ui/UI";
+import { TeamRole } from "../../types/teamMembers/teamMemberRole";
+import { UserRole } from "../../types/user/UserRole";
 
 
-const TeamRole: Record<string, string> = new Proxy({}, {
-    get: (_target, prop) => String(prop),
-});
 
 export default function TeamsPage(){
     const {user} = useAuth();
+    const [total, setTotal] = useState<number>(0);
     const [teams, setTeams] = useState<TeamDto[]>([]);
     const [error, setError] = useState<string>("");
     const [deleted, setDeleted] = useState<boolean>(false);
     const location = useLocation();
     const [added, setAdded] = useState<boolean>(location.state?.added ?? false);
     const [edited, setEdited] = useState<boolean>(location.state?.edited ?? false);
-     const [left, setLeft] = useState<boolean>(location.state?.left ?? false);
+    const [left, setLeft] = useState<boolean>(location.state?.left ?? false);
     const [page, setPage] = useState(1);
-    const limit = 20;
+    const limit = 6;
     const navigate = useNavigate();
 
     useEffect(()=>{
@@ -52,21 +52,22 @@ export default function TeamsPage(){
         .then((res) => {
             if (res.success){
                 setTeams(res.data?.items ?? []);
+                setTotal(res.data?.total ?? 0);
             }else{
                 setError(res.message);
             }
         })
         .catch(() => setError("Failed to load teams"))
     }
+
     useEffect(() =>{
-        loadPage(page);
-        
+        loadPage(page);   
     }, [page]);
 
     return (
             <div>
                 <PageHeader eyebrow="" title="Team Catalog"/>
-                <button onClick={() => user?.role == "admin" ? navigate(`/admin/teams/add`) : navigate(`/teams/add`)}
+                <button onClick={() => user?.role === UserRole.ADMIN ? navigate(`/admin/teams/add`) : navigate(`/teams/add`)}
                         className="mb-2 w-1/6 bg-bgsecondary/40 border-2 border-bgsecondary hover:bg-bgsecondary/30 text-bgsecondary font-semibold rounded-xl py-3 text-sm transition-colors">
                 Add Team</button>
                 
@@ -95,7 +96,7 @@ export default function TeamsPage(){
                 {teams.length === 0 && !error ? <Empty message="No teams found"/> : (
                 <section className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">     
                     {teams.map(t => (
-                        <div className=" rounded-2xl group relative aspect-4/3 border-2 border-white/5 bg-bgprimary/30 overflow-hidden" key={t.teamId}>
+                        <div onClick={() => user?.role === UserRole.ADMIN ? navigate(`/admin/teams/details/${t.teamId}`) : navigate(`/teams/details/${t.teamId}`)} className=" rounded-2xl group relative aspect-4/3 border-2 border-white/5 bg-bgprimary/30 overflow-hidden">
                             <div className="w-full h-full">
                                 <img src ={t.teamLogotip} className="object-cover w-full h-full rounded-x1 transition-transform duration-300 group-hover:scale-110"/>
                             </div>
@@ -105,10 +106,11 @@ export default function TeamsPage(){
                             
                             <div className="absolute rounded-b-lg bottom-0 bg-primary/90 w-full p-2 origin-bottom scale-y-0 group-hover:scale-y-100 transition-transform duration-300">
                                 <div className="top-0">
-                                {(t.userRole === TeamRole.captain &&
+                                {(t.userRole === TeamRole.CAPTAIN &&
                                     <>
                                     <button className="w-1/3 mb-2 bg-red-400/40 border-2 border-red-500 hover:bg-bgsecondary/30 hover:border-bgsecondary text-red-500 font-semibold rounded-xl p-1 text-sm transition-colors"
-                                            onClick={() => {
+                                            onClick={(e) => {
+                                                e.stopPropagation();
                                                 setDeleted(false);
                                                 teamApi.delete(t.teamId)
                                                     .then(res =>{
@@ -124,18 +126,22 @@ export default function TeamsPage(){
                                                 >
                                         Delete
                                     </button>
+
                                     <button className="w-1/3 mb-2 float-right bg-green-400/40 border-2 border-green-500 hover:bg-bgsecondary/30 hover:border-bgsecondary text-green-500 font-semibold rounded-xl p-1 text-sm transition-colors"
-                                            onClick={() => user?.role == "admin" ? navigate(`/admin/teams/edit/${t.teamId}`) : navigate(`/teams/edit/${t.teamId}`)}
+                                            onClick={
+                                                (e) => {
+                                                     e.stopPropagation();
+                                                    if (user?.role === UserRole.ADMIN) 
+                                                        navigate(`/admin/teams/edit/${t.teamId}`) 
+                                                    else 
+                                                        navigate(`/teams/edit/${t.teamId}`)
+                                                }}
                                             >
                                         Edit
                                     </button>
                                     </>
                                 )}
-                                     <button className="w-1/3 mb-2 float-right bg-gray-400/40 border-2 border-gray-400 hover:bg-bgsecondary/30 hover:border-bgsecondary text-gray-400 font-semibold rounded-xl p-1 text-sm transition-colors"
-                                            onClick={() => user?.role == "admin" ? navigate(`/admin/teams/details/${t.teamId}`) : navigate(`/teams/details/${t.teamId}`)}
-                                            >
-                                        Details
-                                    </button>
+                                    
 
                                 </div>
                                 <span className="float-left font-semibold text-sm text-bgsecondary">{t.teamTag}</span>
@@ -146,7 +152,9 @@ export default function TeamsPage(){
                 </section>
                 )}
                 
-                <Pagination page={page} total={limit} pageSize={limit} onChange={setPage} />
+                <div className="flex items-center justify-center gap-4 mt-6">
+               <Pagination page={page} total={total} pageSize={limit} onChange={setPage}/>
             </div>
+        </div>
     );
 }

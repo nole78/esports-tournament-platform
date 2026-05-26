@@ -1,5 +1,6 @@
+import type { TeamRole } from "../../types/teamMembers/teamMemberRole"
 
-type TeamRole = string;
+
 
 export type TeamDto = {
          teamId : number,

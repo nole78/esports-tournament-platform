@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
+import { JwtPayload } from "../../Domain/types/auth/JwtPayload";
 import { UserRole } from "../../Domain/enums/UserRole";
 import { JwtPayload } from "../../Domain/types/auth/JwtPayload";
 
