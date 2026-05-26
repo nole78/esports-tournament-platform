@@ -27,7 +27,7 @@ export class TournamentRegistrationReadService implements ITournamentRegistratio
         const tournamentRegs = await this.tournamentRegistrationReadRepo.findByTeamId(teamId, page, limit);
         if (!tournamentRegs) {
             this.logger.error("TournamentRegistrationServiceRead", "getByTeamId failed", `Tournament registrations with teamId "${teamId}" not found`);
-            return Result.Failure("Could not find any tournament registrations for team with id "+teamId, ErrorType.NotFound);
+            return Result.Failure("Could not find tournament registrations for team with id "+teamId, ErrorType.NotFound);
         }
 
         const tournamentIds = [...new Set(tournamentRegs.map(tr => tr.tournamentId))];
@@ -62,7 +62,7 @@ export class TournamentRegistrationReadService implements ITournamentRegistratio
         const tournamentRegs = await this.tournamentRegistrationReadRepo.findByTournamentId(tournamentId, status, page, limit);
         if (!tournamentRegs) {
             this.logger.error("TournamentRegistrationServiceRead", "getByTournamentId failed", `Tournament registrations with tournamentId "${tournamentId}" not found`);
-            return Result.Failure("Could not find any tournament registrations for tournament with id " + tournamentId, ErrorType.NotFound);
+            return Result.Failure("Could not find tournament registrations for tournament with id " + tournamentId, ErrorType.NotFound);
         }
 
         const teamIds = [...new Set(tournamentRegs.map(tr => tr.teamId))];

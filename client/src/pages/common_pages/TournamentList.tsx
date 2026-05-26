@@ -117,8 +117,8 @@ export default function TournamentList(){
                         value={gameNameFilter} 
                         onChange={(e) => setGameNameFilter(e.target.value)}
                         className="bg-bgprimary/10 border w-1/3 border-secondary/50 rounded-xl px-4 py-3 text-bgsecondary text-sm focus:outline-none focus:border-white/30 transition-colors disabled:opacity-50">
-                        <option value="" className='bg-[secondary/50]'>
-                            Any game
+                        <option value="" className='bg-lime-950'>
+                            Game
                         </option>
                         {games.map(game => (
                             <option className='bg-lime-950' key={game.gameId} value={game.gameName}>
@@ -131,7 +131,7 @@ export default function TournamentList(){
                         onChange={(e) => setStatusFilter(e.target.value)}
                         className="bg-bgprimary/10 w-1/3 border border-secondary/50 rounded-xl px-4 py-3 text-bgsecondary text-sm focus:outline-none focus:border-white/30 transition-colors">
                         <option value="" className='bg-lime-950'>
-                            Any status
+                            Status
                         </option>
                         {Object.entries(TournamentStatus).map(([key, value]) => (
                             <option className='bg-lime-950' key={key} value={value}>
@@ -144,7 +144,7 @@ export default function TournamentList(){
                         onChange={(e) => setFormatFilter(e.target.value)}
                         className="bg-bgprimary/10 border w-1/3 border-secondary/50 rounded-xl px-4 py-3 text-bgsecondary text-sm focus:outline-none focus:border-white/30 transition-colors">
                         <option value="" className='bg-lime-950'>
-                            Any format
+                            Format
                         </option>
                         {Object.entries(TournamentFormat).map(([key, value]) => (
                             <option className='bg-lime-950' key={key} value={value}>

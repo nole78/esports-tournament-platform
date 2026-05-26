@@ -115,7 +115,7 @@ export default function RegisterTeam() {
         </div>
       ) : teams.length === 0 ? (
         <div className="max-w-2xl bg-primary border border-secondary/40 rounded-xl p-6 text-center">
-          <p className="text-white/80 text-lg">You don't have any teams to register for this tournament.</p>
+          <p className="text-white/80 text-lg">You don't have teams to register for this tournament.</p>
           <p className="text-white/60 text-sm mt-2">Create a team first and make sure you are the captain.</p>
         </div>
       ) : (
