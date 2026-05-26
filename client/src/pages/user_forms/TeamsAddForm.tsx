@@ -3,7 +3,7 @@ import type { TeamDto } from '../../models/team/TeamDto';
 import type { ITeamAPIService } from '../../api_services/teams/ITeamAPIService';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/auth/useAuthHook';
-import { UserRole } from '../../types/user/userRole';
+import { UserRole } from '../../types/user/UserRole';
 
 const DEFAULT_TEAM_ROLE: TeamDto['userRole'] = 'member' as TeamDto['userRole'];
 

@@ -43,6 +43,20 @@ export class UserRepository implements IUserRepository {
     } finally { res.conn.release(); }
   }
 
+  async findByIds(ids: number[]): Promise<User[]> {
+    const res = await this.db.getReadConnection();
+    if (!res) return [];
+    try {
+      const setClause = ids.map(() => "?").join(",");
+      const [rows] = await res.conn.execute<RowDataPacket[]>(
+        `SELECT * FROM users WHERE id IN (${setClause})`, ids);
+      return rows.map(r => this.map(r));
+    } catch (err) {
+      this.logger.error("UserRepository", "findByIds failed", err);
+      return [];
+    } finally { res.conn.release(); }
+  }
+
   async findByUsername(username: string): Promise<User> {
     const res = await this.db.getReadConnection();
     if (!res) return new User();
@@ -94,7 +108,7 @@ export class UserRepository implements IUserRepository {
 
     try {
       const entries = Object.entries(fields)
-                .filter(([, v]) => v !== undefined)
+                .filter(([, v]) => v)
                 .map(([k,v]) => [fieldMap[k] ?? k, v]);  
 
       if (entries.length === 0) return false;

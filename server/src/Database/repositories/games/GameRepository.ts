@@ -12,7 +12,7 @@ export class GameRepository implements IGameRepository{
     ){}
 
       private map(r: RowDataPacket): Game {
-        return new Game(r.game_id, r.game_name, r.game_logotip, r.game_genre, r.game_players);
+        return new Game(r.game_id, r.game_name, r.game_logotip, r.game_genre, r.players_per_team);
       }
 
     async findById(id: number): Promise<Game> {
@@ -58,16 +58,16 @@ export class GameRepository implements IGameRepository{
         } finally { res.conn.release(); }
         }
 
-    async create(dto: CreateGameDto): Promise<Game> {
+    async create(game: Game): Promise<Game> {
                 const res = await this.db.getWriteConnection();
         if (!res) return new Game;
         try {
         const [result] = await res.conn.execute<ResultSetHeader>(
-            `INSERT INTO games (game_name, game_logotip, game_genre, game_players) VALUES (?, ?, ?, ?)`,
-            [dto.gameName, dto.gameLogotip, dto.gameGenre, dto.gamePlayers]
+            `INSERT INTO games (game_name, game_logotip, game_genre, players_per_team) VALUES (?, ?, ?, ?)`,
+            [game.gameName, game.gameLogotip, game.gameGenre, game.gamePlayers]
         );
         if (result.insertId === 0) return new Game;
-        return new Game(result.insertId, dto.gameName, dto.gameLogotip, dto.gameGenre, dto.gamePlayers);
+        return new Game(result.insertId, game.gameName, game.gameLogotip, game.gameGenre, game.gamePlayers);
         } catch (err) {
         this.logger.error("GameRepository", "create failed", err);
         return new Game;
@@ -81,7 +81,7 @@ export class GameRepository implements IGameRepository{
         const fieldMap: Record<string, string> = {
             gameName: "game_name",
             gameGenre: "game_genre",
-            gamePlayers: "game_players",
+            gamePlayers: "players_per_team",
             gameLogotip: "game_logotip"
         }
 

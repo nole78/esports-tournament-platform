@@ -19,26 +19,26 @@ export class AuditService implements IAuditService {
   }): Promise<void> {
     const entry = new AuditLog(
       0,
-      params.userId ?? null,
+      params.userId ?? 0,
       params.action,
-      params.entity ?? null,
-      params.entityId ?? null,
-      params.meta ? JSON.stringify(params.meta) : null,
-      params.ipAddress ?? null
+      params.entity ?? "",
+      params.entityId ?? 0,
+      params.meta ? JSON.stringify(params.meta) : "",
+      params.ipAddress ?? ""
     );
     await this.auditRepo.create(entry);
   }
 
   async getAllLogs(page: number, limit: number): Promise<Result<PaginatedListDto<AuditLogDto>>> {
     let auditLogs = await this.auditRepo.findAll(page, limit);
-    if(auditLogs[0] == null) return Result.Success(new PaginatedListDto([], 0, page, limit));
+    if(!auditLogs[0]) return Result.Success(new PaginatedListDto([], 0, page, limit));
     let total = await this.auditRepo.getTotal();
     const DTOs = auditLogs.map(
       (l) => new AuditLogDto(
-          l.id, l.userId ?? null, null,
-          l.action, l.entity ?? null, l.entityId ?? null,
-          l.meta ? (JSON.parse(l.meta as string) as Record<string, unknown>) : null,
-          l.ipAddress ?? null, l.createdAt ?? null
+          l.id, l.userId ?? 0, "",
+          l.action, l.entity ?? "", l.entityId ?? 0,
+          l.meta ? (JSON.parse(l.meta as string) as Record<string, unknown>) : {},
+          l.ipAddress ?? "", l.createdAt ?? new Date()
       )
     );
     for (const log of DTOs) {

@@ -1,10 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { gameApi } from "../../api_services/game_catalog/GameAPIService";
 import { useNavigate } from "react-router-dom";
 
 export const GameEditForm: React.FC<{id: string }> = ({id}) => {
     const [error,setError] = useState<string>("");
-    const [succes,setSucces] = useState<boolean>(false);
+    const [success,setSucces] = useState<boolean>(false);
     const [editing,setEditing] = useState<boolean>(false);
 
     const [gameId,setId] = useState<number>(0);
@@ -12,9 +12,17 @@ export const GameEditForm: React.FC<{id: string }> = ({id}) => {
     const [gameGenre,setGenre] = useState<string>("");
     const [players,setPlayers] = useState<string>("");
     const [gameLogotip,setLogo] = useState<string>("");
-
     const navigate = useNavigate();
-    const fileRef = useRef<HTMLInputElement>(null);
+
+    const openFilePicker = () => {
+        const element = document.getElementById("game-logo-input");
+
+        if(!(element instanceof HTMLInputElement)) {
+            return;
+        }
+
+        element.click();
+    }
 
     const submit = async (e : React.FormEvent<HTMLFormElement>) =>{
         e.preventDefault();
@@ -35,6 +43,10 @@ export const GameEditForm: React.FC<{id: string }> = ({id}) => {
     useEffect(() => {
         gameApi.getById(Number(id))
             .then(res => {
+                if(!res.success || !res.data) {
+                    setError(res.message ?? "Couldn't load game");
+                    return;
+                }
                 setName(res.data?.gameName ?? "");
                 setGenre(res.data?.gameGenre ?? "");
                 setLogo(res.data?.gameLogotip ?? "");
@@ -56,7 +68,7 @@ export const GameEditForm: React.FC<{id: string }> = ({id}) => {
                 {error}
             </div>
             )}
-            {succes && (
+            {success && (
                 <div className="mb-5 bg-green-500/10 border border-green-500/20 text-green-300 text-sm px-4 py-3 rounded-xl">
                     Succesfully edited game
                 </div>
@@ -70,9 +82,9 @@ export const GameEditForm: React.FC<{id: string }> = ({id}) => {
                 <div>
                     <label className="mr-5 text-xs text-bgprimary mb-2 font-medium">Logo</label>
                     <button type="button" className=" rounded-xl w-1/3 py-3 border-bgprimary bg-bgprimary text-primary font-semibold text-sm hover:bg-bgprimary/80 cursor-pointer"
-                        onClick={() => {if(fileRef.current) fileRef.current.click()}}
+                        onClick={openFilePicker}
                         >Choose Image</button>
-                    <input ref={fileRef} type="file" accept="image/*"
+                    <input id="game-logo-input" type="file" accept="image/*"
                     onChange={e => {
                         const file = e.target.files?.[0];
                         if(!file) { setLogo(""); return;}

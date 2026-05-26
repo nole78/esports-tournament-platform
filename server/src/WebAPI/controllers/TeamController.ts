@@ -11,13 +11,14 @@ import { Result } from '../../Domain/common/Result';
 import { User } from "../../Domain/models/User";
 import { logger } from '../../app';
 import { ILoggerService } from "../../Domain/services/logger/ILoggerService";
+import { IAuditService } from "../../Domain/services/audit/IAuditService";
 import { ITeamMemberService } from "../../Domain/services/teamMember/ITeamMemberService";
 
 
 export class TeamController{
     private readonly  router = Router();
 
-    public constructor(private readonly teamService: ITeamService, private readonly teamMemberService: ITeamMemberService){
+    public constructor(private readonly teamService: ITeamService, private readonly teamMemberService: ITeamMemberService, private readonly auditService: IAuditService){
         this.router.get("/teams", authenticate, this.getByGamerTag.bind(this));
         this.router.post("/teams", authenticate, this.create.bind(this));
         this.router.get("/teams/user/:id", authenticate,this.getTeamsById.bind(this));
@@ -75,6 +76,14 @@ export class TeamController{
         if (!v.valid){res.status(400).json({success:false, message: v.message}); return;}
         
         const result = await this.teamService.create(new CreateTeamDto(safeTeamName, safeTeamTag, safeTeamLogotip, safeTeamDescription), gamerTag);
+        await this.auditService.log({
+            userId: req.user?.id,
+            action: "TEAM_CREATED",
+            entity: "Team",
+            entityId: result.value!.teamId,
+            meta: {},
+            ipAddress: req.ip
+          });
         handleResult(result, res);
     } 
 
@@ -95,6 +104,14 @@ export class TeamController{
         if (!v.valid){res.status(400).json({success:false, message: v.message}); return;}
 
         const result = await this.teamService.update(gamerTag, req.body, id);
+        await this.auditService.log({
+            userId: req.user?.id,
+            action: "TEAM_UPDATED",
+            entity: "Team",
+            entityId: id,
+            meta: {},
+            ipAddress: req.ip
+          });
         handleResult(result, res);
     }
 
@@ -105,6 +122,14 @@ export class TeamController{
         if(isNaN(id)) {res.status(400).json({ success: false, message: "Invalid id"}); return; }
         
         const result = await this.teamService.delete(gamerTag, id);
+        await this.auditService.log({
+            userId: req.user?.id,
+            action: "TEAM_DELETED",
+            entity: "Team",
+            entityId: id,
+            meta: {},
+            ipAddress: req.ip
+        });
         handleResult(result, res);
     }
 

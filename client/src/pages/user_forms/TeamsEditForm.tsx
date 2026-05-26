@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { teamApi } from "../../api_services/teams/TeamAPIService";
 import type { TeamDtoEdit } from "../../models/team/TeamDtoEdit";
 import { useAuth } from "../../hooks/auth/useAuthHook";
-import { UserRole } from "../../types/user/userRole";
+import { UserRole } from "../../types/user/UserRole";
 
 
 export const TeamsEditForm: React.FC<{id: string}> = ({id}) =>{

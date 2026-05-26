@@ -6,11 +6,12 @@ import { UserRole } from "../../Domain/enums/UserRole";
 import { handleResult } from "../mappers/ResultMapper";
 import { ErrorType } from '../../Domain/common/ErrorType';
 import { Result } from "../../Domain/common/Result";
+import { IAuditService } from "../../Domain/services/audit/IAuditService";
 
 export class UserController {
   private readonly router = Router();
 
-  public constructor(private readonly userService: IUserService) {
+  public constructor(private readonly userService: IUserService, private readonly auditService: IAuditService) {
     this.router.get("/users",          authenticate, authorize(UserRole.ADMIN), this.getAll.bind(this));
     this.router.get("/users/:id",       this.getById.bind(this));
     this.router.put("/users/:id/role", authenticate, authorize(UserRole.ADMIN), this.changeRole.bind(this));
@@ -33,15 +34,22 @@ export class UserController {
     const id = parseInt(req.params.id as string, 10);
     if (isNaN(id)) { res.status(400).json({ success: false, message: "Invalid id" }); return; }
     
-    const role = req.body.role as string;
-    const roles = ["ADMIN", "PLAYER"];
-    if (!roles.includes(role)) {
+    const role = req.body.role as UserRole;
+    if (!Object.values(UserRole).includes(role) || !role) {
         handleResult(Result.Failure("Invalid role",ErrorType.Validation),res);
         return;
     }
     const parsedRole: UserRole = role as UserRole;
 
     const result = await this.userService.changeRole(id,parsedRole);  
+    await this.auditService.log({
+            userId: req.user?.id,
+            action: "ROLE_CHANGED",
+            entity: "User",
+            entityId: id,
+            meta: {},
+            ipAddress: req.ip
+          });
     handleResult(result, res);
   }
 

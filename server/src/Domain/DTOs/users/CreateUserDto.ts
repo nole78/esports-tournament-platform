@@ -3,6 +3,7 @@ import { UserRole } from "../../enums/UserRole";
 export class UserDto {
   constructor(
     public gamerTag: string = "",
+    public fullName: string = "",
     public email: string     = "",
     public role: UserRole    = UserRole.PLAYER,
     public profilePicture: string = "",

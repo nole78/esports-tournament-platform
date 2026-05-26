@@ -5,6 +5,7 @@ export class UserDto {
   constructor(
     public id: number       = 0,
     public gamerTag: string = "",
+    public fullName: string = "",
     public email: string     = "",
     public role: UserRole    = UserRole.PLAYER,
     public profilePicture: string = "",

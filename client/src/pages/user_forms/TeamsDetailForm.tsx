@@ -3,18 +3,20 @@ import { useEffect, useState } from "react";
 import { teamApi } from "../../api_services/teams/TeamAPIService";
 import { useNavigate } from "react-router-dom";
 import type { TeamDto } from "../../models/team/TeamDto";
+
+
 import type { UserForMembersDto } from "../../models/user/UserForMembers";
 import { ErrorBox } from "../../components/ui/UI";
 import { useAuth } from "../../hooks/auth/useAuthHook";
 import { usersApi } from "../../api_services/users/UsersAPIService";
-import FireIcon from "../../components/heroicons/FireIcon";
 import useDebounce from 'react-debounced';
 import type { IniviteDto } from "../../models/invite/InviteDto";
 import type { UserDto } from "../../models/user/UserTypes";
 import { TeamRole } from "../../types/teamMembers/teamMemberRole";
-import { UserRole } from "../../types/user/userRole";
+import { UserRole } from "../../types/user/UserRole";
 
 
+import FireIcon from "../../components/heroIcons/FireIcon";
 
 
 export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
@@ -225,13 +227,13 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
                         <tr className="border-b border-gray-200 text-left">
                             <th className=" pb-2 pr-4">Gamer Tag</th>
                             <th className=" pb-2 pr-4">ID</th>
-                            { team.userRole === TeamRole.CAPTAIN && (
+                            { team.userRole === "captain" && (
                             <>
-                               
+                               {captain}
                             </>
                             )
                             }
-                            { team.userRole === TeamRole.MEMBER && (
+                            { team.userRole === "member" && (
                             <>
                                 
                             </>
@@ -245,7 +247,7 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
                                 { <td className="flex flex-row items-center gap-1 py-3 pr-4 font-normal text-left">{m.gamerTag} {captain?.id === m.id && <FireIcon/>} </td>}
                                 <td className="py-3 pr-4 font-normal text-left">{m.id} </td>
 
-                                { team.userRole === TeamRole.CAPTAIN && user?.id !== m.id as number &&(
+                                { team.userRole === "captain" && user?.id !== m.id as number &&(
                                 <>
                                 <td className="py-2 font-normal text-center">
                                     <button type="button" onClick={() => giveCaptainShip(m.id)} className="inline-flex items-center justify-center bg-gray-400/40 border-2 border-gray-400 hover:bg-bgsecondary/30 hover:border-bgsecondary text-gray-400 font-semibold rounded-xl h-8 w-16 text-sm transition-colors mx-auto">
@@ -260,7 +262,7 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
                                 </>
                                 )
                                  }
-                                 { team.userRole === TeamRole.MEMBER && user?.id === m.id as number &&(
+                                 { team.userRole === "member" && user?.id === m.id as number &&(
                                 <>
                                 <td className="py-2 font-normal text-center">
                                     <button type="button" onClick={() => deleteMember(team.teamId, user.id)} className="inline-flex items-center justify-center bg-gray-400/40 border-2 border-gray-400 hover:bg-bgsecondary/30 hover:border-bgsecondary text-gray-400 font-semibold rounded-xl h-8 w-10 text-sm transition-colors mx-auto">
@@ -277,7 +279,7 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
                     </table>
                 
                 
-                {team.userRole === TeamRole.CAPTAIN && <div>
+                { team.userRole === "captain" && <div>
                     <label className="block text-xs text-bgprimary mb-2 font-bold">Invite member</label>
                     <input type="text" className=" font-bold" placeholder="Search by username" onChange={(e)=>(setSearch(e.target.value))}></input>
                     {search && userSearch.length > 0 && (
@@ -312,7 +314,6 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
 
                 </div>
                 <div className="flex gap-2">
-                    
                     <button type="button" onClick={() => navigate(-1)}
                         className="py-3 bg-red-400/40  cursor-pointer border-red-500 hover:bg-red-400/30 hover:border-bgsecondary/70 text-red-500 font-semibold rounded-xl w-1/2 text-sm transition-colors">
                     Cancel</button>
@@ -321,3 +322,4 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
         </div>
     );
 }
+// ...existing code...

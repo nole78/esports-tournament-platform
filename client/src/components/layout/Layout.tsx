@@ -18,15 +18,15 @@ const userNav = [
   { to: "/game_catalog", label: "Game Catalog"},
   { to: "/teams", label: "Teams List"},
   { to: "/tournament_list", label: "Tournaments"},
+  { to: "/watchlist", label: "My Watchlist"},
   // add more user routes here
 ];
 const adminNav = [
-  { to: "/admin/users", label: "Users"},
+  { to: "/admin/dashboard", label: "Admin Dashboard"},
   { to: "/game_catalog", label: "Game Catalog"},
-  { to: "/admin/audit_log", label: "Audit Log"},
   { to: "/admin/teams", label: "Teams List"},
   { to: "/tournament_list", label: "Tournaments"},
-  { to: "/admin/health", label: "Health"},
+  { to: "/admin/watchlist", label: "My Watchlist"},
   // add more admin routes here
 ];
 
@@ -91,7 +91,7 @@ export function Layout() {
                 <div className="w-10 mr-2">
                   <NotificationDropdown />
                 </div>
-                <button onClick={() => navigate(user.role == "admin"?"/admin_info":"user_info")}
+                <button onClick={() => navigate(user.role == "admin"?"/admin_details":"/account_details")}
                   className="cursor-pointer w-8 h-8 rounded-full bg-white/10 border border-primary/50 flex items-center justify-center">
                   <img src={avatar? avatar : avatarPlaceholder} className="rounded-full"/>
                 </button>
@@ -115,7 +115,7 @@ export function Layout() {
       </header>
 
       <main className="main-scroll flex-1 overflow-y-auto">
-        <div className="max-w-5xl mx-auto px-8 py-8"><Outlet/></div>
+        <div className="mx-auto px-8 py-8"><Outlet/></div>
       </main>
     </div>
   );

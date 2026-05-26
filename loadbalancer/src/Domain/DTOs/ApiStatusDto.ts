@@ -5,7 +5,7 @@ export class ApiStatusDto {
     public name: string = "",
     public url: string = "",
     public status: ServerStatus = ServerStatus.UNREACHABLE,
-    public lastCheck: Date | null = null,
+    public lastCheck: Date  = new Date,
     public latency: number = 0,
     ){}
 }

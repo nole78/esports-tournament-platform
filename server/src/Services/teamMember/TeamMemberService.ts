@@ -203,7 +203,7 @@ export class TeamMemberService implements ITeamMemberService{
             
             const usersReturn = allUsers.filter(user => members.some(m => m.userId === user.id));
     
-            return Result.Success(usersReturn.map((u) => new UserDto(u.id, u.gamerTag, u.email, u.role, u.profilePicture, u.isActive)))
+            return Result.Success(usersReturn.map((u) => new UserDto(u.id, u.gamerTag, u.fullName, u.email, u.role, u.profilePicture, u.isActive)))
         }
         async getInvites(gamerTag: string): Promise<Result<InviteDto[]>> {
             const currentUser = await this.userRepo.findByUsername(gamerTag);
@@ -233,7 +233,7 @@ export class TeamMemberService implements ITeamMemberService{
             if (captain.id === 0){
                 return Result.Failure(`Team captain doesn't exist`, ErrorType.NotFound);
             }
-            return Result.Success(new UserDto(captain.id, captain.gamerTag, captain.email, captain.role,
+            return Result.Success(new UserDto(captain.id, captain.gamerTag, captain.fullName, captain.email, captain.role,
                 captain.profilePicture, captain.isActive, captain.createdAt
             ));
         }
