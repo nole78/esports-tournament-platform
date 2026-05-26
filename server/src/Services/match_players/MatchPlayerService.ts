@@ -10,6 +10,7 @@ import { IMatchPlayerReadRepository } from "../../Domain/repositories/match_play
 import { IMatchPlayerWriteRepository } from "../../Domain/repositories/match_players/IMatchPlayerWriteRepository";
 import { IUserRepository } from "../../Domain/repositories/users/IUserRepository";
 import { IMatchPlayerService } from "../../Domain/services/match_players/IMatchPlayerService";
+import { TeamRole } from "../../Domain/enums/TeamRole";
 import { IMatchReadRepository } from "../../Domain/repositories/matches/IMatchReadRepository";
 import { ITeamRepositoryRead } from "../../Domain/repositories/teams/ITeamRepositoryRead";
 import { ITeamMemberRepositoryRead } from '../../Domain/repositories/team_members/ITeamMemberRepositoryRead';
@@ -60,7 +61,7 @@ export class MatchPlayerService implements IMatchPlayerService{
     }
 
     
-    public async setPerformanceNotes(id: number, userId: number, notes: string) : Promise<Result<void>>{
+    public async setPerformanceNotes(id: number, userId: number, actorUserId: number, notes: string) : Promise<Result<void>>{
         const match = await this.matchReadRepository.findById(id);
         if(match.matchId === 0)
             return Result.Failure("Match doesn't exist",ErrorType.NotFound);
@@ -75,6 +76,12 @@ export class MatchPlayerService implements IMatchPlayerService{
         const matchPlayer = await this.matchPlayerReadRepo.findOne(userId, id)
         if(!matchPlayer)
             return Result.Failure("User isn't a player of this match",ErrorType.NotFound);
+
+        const members = await this.teamMemberRepo.findByTeamId(matchPlayer.teamId);
+        const actorIsCaptain = members.some(m => m.userId === actorUserId && m.role === TeamRole.CAPTAIN);
+        if (!actorIsCaptain) {
+            return Result.Failure("Only team captain can change performance notes", ErrorType.Unauthorized);
+        }
 
         const result = await this.matchPlayerWriteRepo.update(matchPlayer.userId, matchPlayer.teamId, matchPlayer.matchId,{performanceNotes: notes});
         return result? Result.Success() : Result.Failure("Couldn't set players performance notes",ErrorType.Internal);

@@ -66,7 +66,8 @@ export class MatchController {
         const v:ValidationResult = validatePerformanceNotes(notes);
         if(!v.valid) {res.status(400).json({ success: false, message: v.message }); return;}
 
-        const result = await this.matchPlayerService.setPerformanceNotes(id, userId, notes ?? "");
+        const actorId = req.user?.id ?? 0;
+        const result = await this.matchPlayerService.setPerformanceNotes(id, userId, actorId, notes ?? "");
         handleResult(result, res);
     }
 

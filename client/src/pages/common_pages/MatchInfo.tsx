@@ -203,13 +203,18 @@ export default function MatchInfo() {
     }, [showLineup, selectedPlayer.status, isNotesOpen]);
 
     const canEditLineup = isBlueCaptain || isRedCaptain;
-    const isCaptain = canEditLineup;
     const lineupTeamId =
         matchState.status === "loaded"
             ? isRedCaptain
                 ? matchState.match.redTeamId
                 : matchState.match.blueTeamId
             : 0;
+
+    const isCaptainForSelectedPlayer =
+        matchState.status === "loaded"
+            ? (isBlueCaptain && selectedNotesPlayer.teamId === matchState.match.blueTeamId) ||
+              (isRedCaptain && selectedNotesPlayer.teamId === matchState.match.redTeamId)
+            : false;
 
     return (
         <div className="min-h-screen py-8">
@@ -332,7 +337,7 @@ export default function MatchInfo() {
                     playerId={selectedNotesPlayer.userId}
                     playerName={selectedNotesPlayer.gamerTag}
                     performanceNotes={selectedNotesPlayer.performanceNotes}
-                    isCaptain={isCaptain}
+                    isCaptain={isCaptainForSelectedPlayer}
                     onClose={() => setIsNotesOpen(false)}
                     onSaved={(performanceNotes) => updatePlayerNotes(selectedNotesPlayer.userId, performanceNotes)}
                 />
