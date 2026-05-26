@@ -19,8 +19,10 @@ import { MIN_TOURNAMENT_TEAMS } from "../../Domain/constants/Constants";
 import { TournamentFormat } from "../../Domain/enums/TournamentFormat";
 import { IBracketGeneratorService } from "../../Domain/services/bracket/IBracketGeneratorService";
 import { BracketNode } from '../../Domain/types/bracket/BracketNode';
-import { BracketHelpers } from "../bracket/BracketHelper";
 import { IMatchWriteRepository } from "../../Domain/repositories/matches/IMatchWriteRepository";
+import { BracketMatchMapper } from "../bracket/mappers/BracketMatchMapper";
+import { BracketIdMapper } from "../bracket/mappers/BracketIdMapper";
+import { BracketRelationBuilder } from "../bracket/mappers/BracketRelationBuilder";
 
 export class TournamentRegistrationWriteService implements ITournamentRegistrationWriteService{
     public constructor(
@@ -219,15 +221,15 @@ export class TournamentRegistrationWriteService implements ITournamentRegistrati
                     break;
             }
 
-            const matches = nodes.map(BracketHelpers.mapNodeToMatch);
+            const matches = nodes.map(BracketMatchMapper.mapNodeToMatch);
 
             const created = await this.matchWriteRepo.createBulk(matches);
             if(created.length === 0)
                 return Result.Failure("Failed to create matches", ErrorType.Internal);
 
-            const tempMap = BracketHelpers.createTempIdMap(nodes,created);
+            const tempMap = BracketIdMapper.mapTempIdsToMatchIds(nodes,created);
 
-            const updates = BracketHelpers.generateRelationUpdates(nodes, tempMap);
+            const updates = BracketRelationBuilder.generateRelationUpdates(nodes, tempMap);
 
             for(const update of updates) {
                 await this.matchWriteRepo.update(update.matchId, update);
