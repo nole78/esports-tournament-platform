@@ -11,6 +11,7 @@ import type { MatchDto } from "../../models/match/MatchDto";
 import { TournamentFormat } from "../../types/tournament/TournamentFormat";
 import RoundRobin from "../matches/RoundRobin";
 import DoubleBracket from "../matches/DoubleBracket";
+import { useAuth } from "../../hooks/auth/useAuthHook";
 
 export default function TournamentOverview() {
     
@@ -22,7 +23,7 @@ export default function TournamentOverview() {
     const [generatingBracket, setGeneratingBracket] = useState(false);
     const [matches, setMatches] = useState<MatchDto[]>([]);
     const [loadingMatches, setLoadingMatches] = useState(false);
-    
+    const {user} = useAuth();
     useEffect(() => {
         Promise.resolve().then(() => setLoading(true));
         tournamentApi.getById(Number(id))
@@ -156,7 +157,7 @@ export default function TournamentOverview() {
                     </div>
                 )}
 
-                {tournament && tournament.tournamentStatus === 'upcoming' && (
+                {tournament && tournament.tournamentStatus === 'upcoming' && user?.role === "admin" &&(
                     <div className="mt-8 flex flex-col items-center gap-4">
                         <button
                             onClick={handleGenerateBracket}
