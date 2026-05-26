@@ -40,6 +40,7 @@ export default function App() {
       <Route path="/tournament_list" element={<TournamentList />} />
       <Route path="/guest/teams" element = {<TeamsGuestPage/>}/>
       <Route path="/guest/teams/:id" element = {<TeamsGuestDetailsPage/>}/>
+      <Route path="/guest/tournament_registration/:id" element = {<TournamentRegistrationPage />} />
       
       {/* User routes */}
       <Route path="/account_details" element={<ProtectedRoute><AccountDetailsPage/></ProtectedRoute>}/>
