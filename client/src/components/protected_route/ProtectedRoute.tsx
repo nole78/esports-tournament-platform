@@ -3,7 +3,9 @@ import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../hooks/auth/useAuthHook";
 import { Spinner } from "../ui/UI";
 
-export const ProtectedRoute: React.FC<{ children: React.ReactNode; requiredRole: string }> = ({ children, requiredRole }) => {
+
+
+export const ProtectedRoute: React.FC<{ children: React.ReactNode; requiredRoles?: string[] ; requireAuth?: boolean}> = ({ children, requiredRoles , requireAuth = true}) => {
   const { isAuthenticated, user, isLoading, logout } = useAuth();
   const location = useLocation();
 
@@ -13,15 +15,21 @@ export const ProtectedRoute: React.FC<{ children: React.ReactNode; requiredRole:
     </div>
   );
 
-  if (!isAuthenticated) return <Navigate to="/home" state={{ from: location }} replace />;
+  if (requireAuth && !isAuthenticated) 
+    return <Navigate to="/home" state={{ from: location }} replace />;
 
-  if (user?.role !== requiredRole) return (
-    <div className="min-h-screen bg-[#080808] flex items-center justify-center">
-      <div className="border border-red-500/20 bg-red-500/10 rounded-2xl p-10 text-center max-w-sm">
-        <p className="text-red-400 text-sm mb-4">You don't have permission to access this page.</p>
-        <button onClick={logout} className="text-xs text-white/40 hover:text-white/60 transition-colors underline">Sign out</button>
+  const hasRequiredRole =
+    !requiredRoles || requiredRoles.length === 0 ||
+    requiredRoles.includes(user?.role ?? "");
+
+  if (!hasRequiredRole) 
+    return (
+      <div className="min-h-screen bg-[#080808] flex items-center justify-center">
+        <div className="border border-red-500/20 bg-red-500/10 rounded-2xl p-10 text-center max-w-sm">
+          <p className="text-red-400 text-sm mb-4">You don't have permission to access this page.</p>
+          <button onClick={logout} className="text-xs text-white/40 hover:text-white/60 transition-colors underline">Sign out</button>
+        </div>
       </div>
-    </div>
   );
 
   return <div>{children}</div>;

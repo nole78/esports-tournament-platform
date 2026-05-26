@@ -34,7 +34,7 @@ export default function GameCatalog(){
         <div>
             <PageHeader eyebrow="" title="Game Catalog"/>
             {user?.role === "admin" && (
-                <button onClick={() => navigate("/game_catalog/add")}
+                <button onClick={() => navigate("/admin/game_catalog/add")}
                         className="cursor-pointer mb-2 w-1/6 bg-bgsecondary/40 border-2 border-bgsecondary hover:bg-bgsecondary/30 text-bgsecondary font-semibold rounded-xl py-3 text-sm transition-colors">
                 Add Game</button>
             )}
@@ -47,7 +47,7 @@ export default function GameCatalog(){
             {games.length === 0 && !error ? <Empty message="No games found"/> : (
                 <section className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                     {games.map(g => (
-                    <div className="group relative aspect-4/3 border-2 h-2xl border-white/5 bg-bgprimary/30  rounded-xl overflow-hidden" key={g.gameId}>
+                    <div className="group relative aspect-4/3 border-2 h-2xl border-white/5 bg-bgprimary/30 rounded-xl overflow-hidden transition-all duration-200 hover:shadow-lg hover:shadow-secondary/20" key={g.gameId}>
                         <div className="w-full h-full">
                             <img src={g.gameLogotip ? g.gameLogotip : placeholder} className="object-cover w-full h-full rounded-xl transition-transform duration-300 group-hover:scale-110"/>
                         </div>
@@ -73,7 +73,7 @@ export default function GameCatalog(){
                                     Delete
                                 </button>
                                 <button className="cursor-pointer w-1/3 mb-2 float-right bg-green-400/40 border-2 border-green-500 hover:bg-bgsecondary/30 hover:border-bgsecondary text-green-500 font-semibold rounded-xl p-1 text-sm transition-colors"
-                                        onClick={() => navigate(`/game_catalog/edit/${g.gameId}`)}>
+                                        onClick={() => navigate(`/admin/game_catalog/edit/${g.gameId}`)}>
                                     Edit
                                 </button>
                             </div>)}

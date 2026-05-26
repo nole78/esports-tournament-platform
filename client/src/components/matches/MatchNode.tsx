@@ -1,8 +1,9 @@
 
 import type { MatchDto } from "../../models/match/MatchDto";
 import { useNavigate } from "react-router-dom";
+import TrophyIcon from "../heroIcons/TrophyIcon";
 
-export function MatchNode({ match }: { match: MatchDto }) {
+export function MatchNode({ match, isFinal }: { match: MatchDto; isFinal?: boolean }) {
     const blueWon = match.winnerTeamId === match.blueTeamId && match.winnerTeamId !== 0;
     const redWon = match.winnerTeamId === match.redTeamId && match.winnerTeamId !== 0;
     const navigate = useNavigate();
@@ -26,7 +27,12 @@ export function MatchNode({ match }: { match: MatchDto }) {
                     className={`text-sm font-bold truncate leading-none max-w-30 
                         ${blueWon? "text-green-400" : redWon? "text-red-500" : "text-blue-400"}`
                 }>
+                    <div className="flex-row flex">
                     {match.blueTeamName}
+                    {isFinal && blueWon && (
+                        <TrophyIcon className="mr-2 text-yellow-400 w-4 h-4" />
+                    )}
+                    </div>
                 </span>
                 <span
                     className={`text-2xl font-black leading-none ${
@@ -44,6 +50,9 @@ export function MatchNode({ match }: { match: MatchDto }) {
                     className={`text-sm font-bold truncate leading-none max-w-30 
                         ${redWon? "text-green-400" : blueWon? "text-red-500" : "text-red-400"}`
                 }>
+                    {isFinal && redWon && (
+                        <TrophyIcon className="mr-2 text-yellow-400 w-4 h-4" />
+                    )}
                     {match.redTeamName}
                 </span>
                 <span

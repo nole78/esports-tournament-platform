@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/auth/useAuthHook";
 import { MatchDetails } from "../../components/matches/MatchDetails";
 import { MatchPlayersTable } from "../../components/matches/MatchPlayersTable";
@@ -11,6 +12,7 @@ import { useParams } from "react-router-dom";
 import MatchLineup from '../../components/matches/MatchLineup';
 import { teamApi } from "../../api_services/teams/TeamAPIService";
 import { Spinner } from '../../components/ui/UI';
+import { PerformanceNotes } from "../../components/matches/PerformanceNotes";
 
 type MatchState =
     | { status: "loading" }
@@ -26,10 +28,19 @@ type PlayerOverlayState =
     | { status: "closed" }
     | { status: "open"; userId: number };
 
+const emptyPlayer: MatchPlayerDto = {
+    gamerTag: "",
+    userId: 0,
+    teamId: 0,
+    matchId: 0,
+    performanceNotes: "",
+};
+
 export default function MatchInfo() {
     const {id} = useParams();
     const matchId = Number(id);
 
+    const navigate = useNavigate();
     const { user } = useAuth();
     const [matchState, setMatchState] = useState<MatchState>({ status: "loading" });
     const [players, setPlayers] = useState<PlayersState>({ left: [], right: [] });
@@ -39,6 +50,8 @@ export default function MatchInfo() {
     const [showLineup, setShowLineup] = useState(false);
     const [lineupReloadKey, setLineupReloadKey] = useState(0);
     const [selectedPlayer, setSelectedPlayer] = useState<PlayerOverlayState>({ status: "closed" });
+    const [selectedNotesPlayer, setSelectedNotesPlayer] = useState<MatchPlayerDto>(emptyPlayer);
+    const [isNotesOpen, setIsNotesOpen] = useState(false);
     const [isBlueCaptain, setIsBlueCaptain] = useState(false);
     const [isRedCaptain, setIsRedCaptain] = useState(false);
 
@@ -134,8 +147,8 @@ export default function MatchInfo() {
                 }
 
                 setPlayers({
-                    left: blue.success && blue.data ? blue.data : [],
-                    right: red.success && red.data ? red.data : [],
+                    left: blue.success && blue.data ? blue.data.map(normalizePlayer) : [],
+                    right: red.success && red.data ? red.data.map(normalizePlayer) : [],
                 });
             } catch {
                 if (!cancelled) {
@@ -165,18 +178,31 @@ export default function MatchInfo() {
         setLineupReloadKey((value) => value + 1);
     };
 
-    useEffect(() => {
-        if (!showLineup) {
-            document.body.style.overflow = "";
-            return;
-        }
+    const normalizePlayer = (player: MatchPlayerDto): MatchPlayerDto => ({
+        ...player,
+        performanceNotes: typeof player.performanceNotes === "string" ? player.performanceNotes : "",
+    });
 
-        document.body.style.overflow = "hidden";
+    const updatePlayerNotes = (userId: number, performanceNotes: string) => {
+        setPlayers((current) => ({
+            left: current.left.map((player) =>
+                player.userId === userId ? { ...player, performanceNotes } : player,
+            ),
+            right: current.right.map((player) =>
+                player.userId === userId ? { ...player, performanceNotes } : player,
+            ),
+        }));
+    };
+
+    useEffect(() => {
+        const shouldLockScroll = showLineup || selectedPlayer.status === "open" || isNotesOpen;
+
+        document.body.style.overflow = shouldLockScroll ? "hidden" : "";
 
         return () => {
             document.body.style.overflow = "";
         };
-    }, [showLineup]);
+    }, [showLineup, selectedPlayer.status, isNotesOpen]);
 
     const canEditLineup = isBlueCaptain || isRedCaptain;
     const lineupTeamId =
@@ -186,20 +212,37 @@ export default function MatchInfo() {
                 : matchState.match.blueTeamId
             : 0;
 
+    const isCaptainForSelectedPlayer =
+        matchState.status === "loaded"
+            ? (isBlueCaptain && selectedNotesPlayer.teamId === matchState.match.blueTeamId) ||
+              (isRedCaptain && selectedNotesPlayer.teamId === matchState.match.redTeamId)
+            : false;
+
     return (
         <div className="min-h-screen py-8">
             <div className="max-w-3xl mx-auto relative">
-                {user && user.role === "admin" && matchState.status === "loaded" && matchState.match.status !== "completed" && (
-                    <div className="mb-2 w-full right-4 top-4 z-10 flex gap-3">
+                <div className="mb-2 w-full right-4 top-4 z-10 flex items-center justify-between gap-3">
+                    <div>
                         <button
                             type="button"
-                            className="cursor-pointer w-1/4 rounded-lg bg-bgsecondary/30 px-4 py-2 font-semibold border-bgsecondary border-2 text-bgsecondary transition-colors hover:bg-bgsecondary/20"
-                            onClick={() => setShowResult(true)}
+                            onClick={() => navigate(-1)}
+                            className="py-3 bg-red-400/40 cursor-pointer border-red-500 hover:bg-red-400/30 hover:border-bgsecondary/70 text-red-500 font-semibold rounded-xl px-4 text-sm transition-colors"
                         >
-                            Set Result
+                            Back
                         </button>
                     </div>
-                )}
+                    {user && user.role === "admin" && matchState.status === "loaded" && matchState.match.status !== "completed" && (
+                        <div>
+                            <button
+                                type="button"
+                                className="cursor-pointer rounded-lg bg-bgsecondary/30 px-4 py-2 font-semibold border-bgsecondary border-2 text-bgsecondary transition-colors hover:bg-bgsecondary/20"
+                                onClick={() => setShowResult(true)}
+                            >
+                                Set Result
+                            </button>
+                        </div>
+                    )}
+                </div>
                 <MatchDetails id={matchId} key={refreshKey} />
 
 
@@ -235,9 +278,15 @@ export default function MatchInfo() {
                     <MatchPlayersTable
                         leftPlayers={players.left}
                         rightPlayers={players.right}
-                        onPlayerClick={(player) =>
-                            setSelectedPlayer({ status: "open", userId: player.userId })
-                        }
+                        onPlayerClick={(player) => {
+                            setIsNotesOpen(false);
+                            setSelectedPlayer({ status: "open", userId: player.userId });
+                        }}
+                        onNotesClick={(player) => {
+                            setSelectedPlayer({ status: "closed" });
+                            setSelectedNotesPlayer(player);
+                            setIsNotesOpen(true);
+                        }}
                     />
                 )}
             </div>
@@ -293,6 +342,18 @@ export default function MatchInfo() {
                         <UserOverview id={selectedPlayer.userId} />
                     </div>
                 </div>
+            )}
+
+            {isNotesOpen && (
+                <PerformanceNotes
+                    matchId={matchId}
+                    playerId={selectedNotesPlayer.userId}
+                    playerName={selectedNotesPlayer.gamerTag}
+                    performanceNotes={selectedNotesPlayer.performanceNotes}
+                    isCaptain={isCaptainForSelectedPlayer}
+                    onClose={() => setIsNotesOpen(false)}
+                    onSaved={(performanceNotes) => updatePlayerNotes(selectedNotesPlayer.userId, performanceNotes)}
+                />
             )}
         </div>
     );

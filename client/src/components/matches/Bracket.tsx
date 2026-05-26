@@ -216,7 +216,7 @@ export default function Bracket({ matches , title}: BracketProps) {
                             className="absolute"
                             style={{ left: item.x, top: item.y }}
                         >
-                            <MatchNode match={item.match} />
+                            <MatchNode match={item.match} isFinal={item.match.roundNumber === rounds[rounds.length - 1]?.round} />
                         </div>
                     ))}
                 </div>

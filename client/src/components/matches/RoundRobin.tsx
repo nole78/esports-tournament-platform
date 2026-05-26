@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { PageHeader, Table, TableHead } from "../ui/UI";
 import type { MatchDto } from "../../models/match/MatchDto";
 import { MatchNode } from "./MatchNode";
+import TrophyIcon from "../heroIcons/TrophyIcon";
 
 type Props = {
     matches: MatchDto[];
@@ -100,6 +101,9 @@ export default function RoundRobin({ matches }: Props) {
                                         {index + 1}
                                     </td>
                                     <td className="px-5 py-3.5 font-bold text-bgsecondary/80  text-sm">
+                                        {index === 0 && (
+                                            <TrophyIcon className="mr-2 text-yellow-400 w-4 h-4" />
+                                        )}
                                         {team.teamName}
                                     </td>
                                     <td className="px-5 py-3.5 text-white/60 text-sm">

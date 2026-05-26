@@ -7,11 +7,12 @@ import { useParams } from "react-router-dom";
 import type { TeamDto } from "../../models/team/TeamDto";
 import type { TournamentDto } from "../../models/tournament/TournamentDto";
 import { TournamentStatus } from "../../types/tournament/TournamentStatus";
+import placeholder from "../../assets/placeholder.png"
 
 export default function RegisterTeam() {
   const { id } = useParams();
   const [teams, setTeams] = useState<TeamDto[]>([]);
-  const [tournament, setTournament] = useState<TournamentDto | null>(null);
+  const [tournament, setTournament] = useState<TournamentDto>();
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
@@ -147,7 +148,7 @@ export default function RegisterTeam() {
                       {selectedTeam?.teamLogotip && (
                         <div className="flex justify-center mb-3">
                           <img 
-                            src={selectedTeam.teamLogotip} 
+                            src={selectedTeam.teamLogotip? selectedTeam.teamLogotip : placeholder} 
                             alt={selectedTeam.teamName} 
                             className="h-16 w-16 rounded-lg object-cover" 
                           />

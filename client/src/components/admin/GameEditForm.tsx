@@ -32,16 +32,16 @@ export const GameEditForm: React.FC<{id: string }> = ({id}) => {
 
         const gamePlayers = Number(players);
 
-        if(!gameName || gameName.trim().length === 0)
+        if(!gameName || gameName.trim().length === 0 || gameName.length < 3)
         {
-            setError("Game name is mandatory");
+            setError("Game name is mandatory, and must be at least 3 characters long");
             setEditing(false);
             return;
         }
 
-        if(!gameGenre || gameGenre.trim().length === 0)
+        if(!gameGenre || gameGenre.trim().length === 0|| gameGenre.length < 3)
         {
-            setError("Game genre is mandatory");
+            setError("Game genre is mandatory, and must be at least 3 characters long");
             setEditing(false);
             return;
         }
@@ -80,6 +80,13 @@ export const GameEditForm: React.FC<{id: string }> = ({id}) => {
 
     return(
         <div className="w-full max-w-sm">
+            <button
+                type="button"
+                onClick={() => navigate(-1)}
+                className="py-3 bg-red-400/40  cursor-pointer border-red-500 hover:bg-red-400/30 hover:border-bgsecondary/70 text-red-500 font-semibold rounded-xl px-4 text-sm transition-colors"
+            >
+               {"<- " + "Back"}
+            </button>
             <div className="text-center mb-10">
                 <h1 className="text-3xl font-semibold text-bgsecondary">Game Editor</h1>
                 <p className="text-sm text-secondary mt-1">Edit game fields</p>

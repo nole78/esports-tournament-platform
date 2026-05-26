@@ -5,7 +5,6 @@ import { Empty } from "../../components/ui/UI";
 
 
 export default function TeamsInboxForm(){
-    // const [error, setError] = useState<string>("");
     const [invites, setInvites] = useState<IniviteDto[]>([]);
     const [teamNames, setTeamNames] = useState<Record<number, string>>({});
     const [teamImages, setTeamImages] = useState<Record<number, string>>({});

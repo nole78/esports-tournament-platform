@@ -76,7 +76,7 @@ export function MatchResult({
     }
 
     return (
-        <ProtectedRoute requiredRole="admin">
+        <ProtectedRoute requiredRoles={["admin"]}>
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur">
                 <div className="relative flex min-w-85 flex-col items-center rounded-2xl border border-white/10 bg-bgprimary p-8 shadow-lg">
                     <button

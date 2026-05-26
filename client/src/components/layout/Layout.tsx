@@ -7,11 +7,10 @@ import { usersApi } from "../../api_services/users/UsersAPIService";
 import { authApi } from "../../api_services/auth/AuthAPIService";
 import NotificationDropdown from "../account/NotificationDropDown";
 
-// TODO: Update nav items to match your routes and roles
 const guestNav = [
   {to: "/game_catalog", label: "Game Catalog"},
   {to: "/tournament_list", label: "Tournaments"},
-  {to: "/guest/teams", label: "Teams List"}
+  {to: "/teams", label: "Teams List"}
 ]
 
 const userNav = [
@@ -24,9 +23,9 @@ const userNav = [
 const adminNav = [
   { to: "/admin/dashboard", label: "Admin Dashboard"},
   { to: "/game_catalog", label: "Game Catalog"},
-  { to: "/admin/teams", label: "Teams List"},
+  { to: "/teams", label: "Teams List"},
   { to: "/tournament_list", label: "Tournaments"},
-  { to: "/admin/watchlist", label: "My Watchlist"},
+  { to: "/watchlist", label: "My Watchlist"},
   // add more admin routes here
 ];
 
@@ -91,7 +90,7 @@ export function Layout() {
                 <div className="w-10 mr-2">
                   <NotificationDropdown />
                 </div>
-                <button onClick={() => navigate(user.role == "admin"?"/admin_details":"/account_details")}
+                <button onClick={() => navigate("/account_details")}
                   className="cursor-pointer w-8 h-8 rounded-full bg-white/10 border border-primary/50 flex items-center justify-center">
                   <img src={avatar? avatar : avatarPlaceholder} className="rounded-full"/>
                 </button>

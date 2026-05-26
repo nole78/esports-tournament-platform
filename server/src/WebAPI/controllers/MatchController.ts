@@ -7,6 +7,10 @@ import { handleResult } from "../mappers/ResultMapper";
 import { MatchResultDto } from '../../Domain/DTOs/matches/MatchResultDto';
 import { AddPlayersDto } from "../../Domain/DTOs/match_players/AddPlayersDto";
 import { IMatchPlayerService } from "../../Domain/services/match_players/IMatchPlayerService";
+import { ValidationResult } from "../../Domain/types/validation/ValidationResult";
+import { validateMatchResult } from "../validators/matches/validateMatchResult";
+import { validatePerformanceNotes } from "../validators/matches/validatePerformanceNotes";
+import { validateAddPlayers } from "../validators/matches/validateAddPlayers";
 
 export class MatchController {
     private readonly router = Router();
@@ -44,8 +48,8 @@ export class MatchController {
         if(isNaN(id)) {res.status(400).json({ success: false, message: "Invalid id"}); return;}
         
         const {teamRedScore,teamBlueScore} = req.body as {teamRedScore?:number,teamBlueScore?:number};
-        if(!teamRedScore || teamRedScore < 0) {res.status(400).json({ success: false, message: "Invalid match result"}); return;}
-        if(!teamBlueScore || teamBlueScore < 0) {res.status(400).json({ success: false, message: "Invalid match result"}); return;}
+        const v:ValidationResult = validateMatchResult(teamRedScore, teamBlueScore);
+        if(!v.valid) {res.status(400).json({ success: false, message: v.message }); return;}
 
         const result = await this.matchService.setResult(id,new MatchResultDto(teamRedScore,teamBlueScore));
         handleResult(result,res);
@@ -59,9 +63,11 @@ export class MatchController {
         if(isNaN(userId)) {res.status(400).json({ success: false, message: "Invalid id"}); return;}
 
         const {notes} = req.body as {notes?: string};
-        if(!notes) {res.status(400).json({ success: false, message: "No notes to add"}); return;}
+        const v:ValidationResult = validatePerformanceNotes(notes);
+        if(!v.valid) {res.status(400).json({ success: false, message: v.message }); return;}
 
-        const result = await this.matchPlayerService.setPerformanceNotes(id, userId, notes ?? "");
+        const actorId = req.user?.id ?? 0;
+        const result = await this.matchPlayerService.setPerformanceNotes(id, userId, actorId, notes ?? "");
         handleResult(result, res);
     }
 
@@ -81,8 +87,8 @@ export class MatchController {
         if(isNaN(id)) {res.status(400).json({ success: false, message: "Invalid id"}); return;}
         
         const {teamId, userIds} = req.body as {teamId?:number,userIds?:number[]};
-        if(!userIds || userIds.length === 0) {res.status(400).json({ success: false, message: "No user to add"}); return;} 
-        if(!teamId || teamId <= 0) {res.status(400).json({ success: false, message: "Team Id required and has to be grater than 0"}); return;} 
+        const v:ValidationResult = validateAddPlayers(teamId,userIds);
+        if(!v.valid) {res.status(400).json({ success: false, message: v.message }); return;}
 
         const result = await this.matchPlayerService.addPlayersToMatch(id,new AddPlayersDto(teamId, userIds));
         handleResult(result, res);
