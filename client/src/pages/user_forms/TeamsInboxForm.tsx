@@ -8,7 +8,7 @@ export default function TeamsInboxForm(){
     const [invites, setInvites] = useState<IniviteDto[]>([]);
     const [teamNames, setTeamNames] = useState<Record<number, string>>({});
     const [teamImages, setTeamImages] = useState<Record<number, string>>({});
-    const [inviteStatus, setInviteStatus] = useState<Record<number, "accepted" | "rejected" | null>>({});
+    const [inviteStatus, setInviteStatus] = useState<Record<number, "accepted" | "rejected">>({});
 
     const answer = async (teamId: number, ans: string) => {
     setInviteStatus(prev => ({
