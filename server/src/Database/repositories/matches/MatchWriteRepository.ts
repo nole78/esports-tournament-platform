@@ -57,6 +57,7 @@ export class MatchWriteRepository implements  IMatchWriteRepository{
     if (!res) return false;
 
     const  fieldMap: Record<string, string> = {
+      matchId: "match_id",
       tournamentId: "tournament_id", 
       blueTeamId: "blue_team_id", 
       redTeamId: "red_team_id", 
@@ -73,6 +74,7 @@ export class MatchWriteRepository implements  IMatchWriteRepository{
     }
 
     try {
+      console.log("------------"+fields);
       const entries = Object.entries(fields)
           .filter(([, v]) => v !== undefined)
           .map(([k,v]) => [fieldMap[k] ?? k, v]);

@@ -15,6 +15,7 @@ export default function TournamentOverview() {
     const [tournament, setTournament] = useState<TournamentDto>();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string>("");
+    const [bracketError, setBracketError] = useState<string>("");
     const [generatingBracket, setGeneratingBracket] = useState(false);
     const [matches, setMatches] = useState<MatchDto[]>([]);
     const [loadingMatches, setLoadingMatches] = useState(false);
@@ -52,6 +53,7 @@ export default function TournamentOverview() {
 
     const handleGenerateBracket = async () => {
         setGeneratingBracket(true);
+        setBracketError("");
         try {
             
             const response = await tournamentRegistrationApi.generateBracket(Number(id));
@@ -65,15 +67,17 @@ export default function TournamentOverview() {
                             setTournament(res.data);
                         }
                     })
-                    .catch(() => setError("Failed to reload tournament"));
+                    .catch(() => setBracketError("Failed to reload tournament"));
                 }, 1000);
             }
             else
             {
-                setError("Generating brackets unseccesefull!");
+                setBracketError("Generating brackets unsuccessful!");
+                setTimeout(() => setBracketError(""), 5000);
             }
         } catch (err) {
-            setError('Failed to generate bracket ' + err);
+            setBracketError('Failed to generate bracket: ' + err);
+            setTimeout(() => setBracketError(""), 5000);
         } finally {
             setGeneratingBracket(false);
         }
@@ -150,13 +154,18 @@ export default function TournamentOverview() {
                 )}
 
                 {tournament && tournament.tournamentStatus === 'upcoming' && (
-                    <div className="mt-8 flex justify-center">
+                    <div className="mt-8 flex flex-col items-center gap-4">
                         <button
                             onClick={handleGenerateBracket}
                             disabled={generatingBracket}
                             className="px-8 py-3 bg-green-500/20 border-2 border-green-500 hover:bg-green-500/30 text-green-400 font-semibold rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                             {generatingBracket ? 'Generating Bracket...' : 'Generate Bracket'}
                         </button>
+                        {bracketError && (
+                            <div className="bg-red-500/10 border border-red-500/20 text-red-300 text-sm px-4 py-3 rounded-xl">
+                                {bracketError}
+                            </div>
+                        )}
                     </div>
                 )}
 
