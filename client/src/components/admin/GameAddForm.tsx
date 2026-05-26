@@ -34,6 +34,27 @@ export default function GameAddForm({gameApi} : {gameApi:IGameAPIService}){
         setCreating(true);
         const gamePlayers = Number(players);
 
+        if(!gameName || gameName.trim().length === 0)
+        {
+            setError("Game name is mandatory");
+            setCreating(false);
+            return;
+        }
+
+        if(!gameGenre || gameGenre.trim().length === 0)
+        {
+            setError("Game genre is mandatory");
+            setCreating(false);
+            return;
+        }
+
+        if(!gamePlayers || gamePlayers <= 0)
+        {
+            setError("Number of players must be above 0");
+            setCreating(false);
+            return;
+        }
+
         const res = await gameApi.create({gameName,gameLogotip,gameGenre,gamePlayers});
         
         setCreating(false);

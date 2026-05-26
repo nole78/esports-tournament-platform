@@ -7,11 +7,12 @@ import { validateLogin } from "../validators/auth/validateLogin";
 import { validateRegister } from "../validators/auth/validateRegister";
 import { handleResult } from "../mappers/ResultMapper";
 import { Result } from "../../Domain/common/Result";
+import { IAuditService } from "../../Domain/services/audit/IAuditService";
 
 export class AuthController {
   private readonly router = Router();
 
-  public constructor(private readonly authService: IAuthService, private readonly userService: IUserService) {
+  public constructor(private readonly authService: IAuthService, private readonly userService: IUserService, private readonly auditService: IAuditService) {
     this.router.post("/auth/login", this.login.bind(this));
     this.router.post("/auth/register", this.register.bind(this));
     this.router.post("/auth/logout", this.logout.bind(this));
@@ -30,6 +31,16 @@ export class AuthController {
       process.env.JWT_SECRET ?? "",
       { expiresIn: "24h" }
     );
+
+    await this.auditService.log({
+            userId: result.value!.id,
+            action: "LOGIN",
+            entity: "User",
+            entityId: result.value!.id,
+            meta: {},
+            ipAddress: req.ip
+          });
+
     handleResult(Result.Success(token),res);
   }
 
@@ -46,6 +57,15 @@ export class AuthController {
       process.env.JWT_SECRET ?? "",
       { expiresIn: "24h" }
     );
+    await this.auditService.log({
+            userId: result.value!.id,
+            action: "REGISTER",
+            entity: "User",
+            entityId: result.value!.id,
+            meta: {},
+            ipAddress: req.ip
+          });
+
     handleResult(Result.Success(token),res);
   }
 
@@ -53,6 +73,14 @@ export class AuthController {
     const id = parseInt(req.body.id as string, 10);
     if (isNaN(id)) { res.status(400).json({ success: false, message: "Invalid id" }); return; }
     const result = await this.userService.logout(id);
+    await this.auditService.log({
+            userId: id,
+            action: "LOGOUT",
+            entity: "User",
+            entityId: id,
+            meta: {},
+            ipAddress: req.ip
+          });
     handleResult(result, res);
   }
 

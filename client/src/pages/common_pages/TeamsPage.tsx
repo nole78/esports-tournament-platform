@@ -95,7 +95,7 @@ export default function TeamsPage(){
                 {teams.length === 0 && !error ? <Empty message="No teams found"/> : (
                 <section className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">     
                     {teams.map(t => (
-                        <div className=" rounded-2xl group relative aspect-4/3 border-2 border-white/5 bg-bgprimary/30 overflow-hidden">
+                        <div className=" rounded-2xl group relative aspect-4/3 border-2 border-white/5 bg-bgprimary/30 overflow-hidden" key={t.teamId}>
                             <div className="w-full h-full">
                                 <img src ={t.teamLogotip} className="object-cover w-full h-full rounded-x1 transition-transform duration-300 group-hover:scale-110"/>
                             </div>

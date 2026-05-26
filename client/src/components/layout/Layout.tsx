@@ -91,7 +91,7 @@ export function Layout() {
                 <div className="w-10 mr-2">
                   <NotificationDropdown />
                 </div>
-                <button onClick={() => navigate(user.role == "admin"?"/admin_info":"user_info")}
+                <button onClick={() => navigate(user.role == "admin"?"/admin_details":"/account_details")}
                   className="cursor-pointer w-8 h-8 rounded-full bg-white/10 border border-primary/50 flex items-center justify-center">
                   <img src={avatar? avatar : avatarPlaceholder} className="rounded-full"/>
                 </button>
