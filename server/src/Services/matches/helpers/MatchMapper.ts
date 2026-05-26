@@ -24,7 +24,11 @@ export class MatchMapper {
             match.roundNumber,
             match.bracketType,
             match.blueTeamScore,
-            match.redTeamScore
+            match.redTeamScore,
+            match.winnerToMatchId,
+            match.winnerToSlot,
+            match.loserToMatchId,
+            match.loserToSlot
         );
     }
 }
