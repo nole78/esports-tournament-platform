@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/auth/useAuthHook";
 import { MatchDetails } from "../../components/matches/MatchDetails";
 import { MatchPlayersTable } from "../../components/matches/MatchPlayersTable";
@@ -39,6 +40,7 @@ export default function MatchInfo() {
     const {id} = useParams();
     const matchId = Number(id);
 
+    const navigate = useNavigate();
     const { user } = useAuth();
     const [matchState, setMatchState] = useState<MatchState>({ status: "loading" });
     const [players, setPlayers] = useState<PlayersState>({ left: [], right: [] });
@@ -219,17 +221,28 @@ export default function MatchInfo() {
     return (
         <div className="min-h-screen py-8">
             <div className="max-w-3xl mx-auto relative">
-                {user && user.role === "admin" && matchState.status === "loaded" && matchState.match.status !== "completed" && (
-                    <div className="mb-2 w-full right-4 top-4 z-10 flex gap-3">
+                <div className="mb-2 w-full right-4 top-4 z-10 flex items-center justify-between gap-3">
+                    <div>
                         <button
                             type="button"
-                            className="cursor-pointer w-1/4 rounded-lg bg-bgsecondary/30 px-4 py-2 font-semibold border-bgsecondary border-2 text-bgsecondary transition-colors hover:bg-bgsecondary/20"
-                            onClick={() => setShowResult(true)}
+                            onClick={() => navigate(-1)}
+                            className="py-3 bg-red-400/40 cursor-pointer border-red-500 hover:bg-red-400/30 hover:border-bgsecondary/70 text-red-500 font-semibold rounded-xl px-4 text-sm transition-colors"
                         >
-                            Set Result
+                            Back
                         </button>
                     </div>
-                )}
+                    {user && user.role === "admin" && matchState.status === "loaded" && matchState.match.status !== "completed" && (
+                        <div>
+                            <button
+                                type="button"
+                                className="cursor-pointer rounded-lg bg-bgsecondary/30 px-4 py-2 font-semibold border-bgsecondary border-2 text-bgsecondary transition-colors hover:bg-bgsecondary/20"
+                                onClick={() => setShowResult(true)}
+                            >
+                                Set Result
+                            </button>
+                        </div>
+                    )}
+                </div>
                 <MatchDetails id={matchId} key={refreshKey} />
 
 
