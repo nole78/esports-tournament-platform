@@ -85,13 +85,15 @@ export class MatchService implements IMatchService{
     public async getByTournamentId(tournamentId: number): Promise<Result<MatchDto[]>>{
         const tournament = await this.tournamentReadRepo.findById(tournamentId);
         if(tournament.tournamentId === 0)
-            return Result.Failure(`Tournament doesn't exist`,ErrorType.NotFound);
+            return Result.Failure(`Tournament doesn't exist`, ErrorType.NotFound);
 
         const matches = await this.matchReadRepo.findByTournamentId(tournamentId);
+        if(matches.length === 0)
+            return Result.Failure("No matches for this tournament", ErrorType.NotFound);
         
         const teamsMap = await MatchTeamHelper.getTeamsMap(matches,this.teamRepo);
 
-        const dtos = matches.map(match => MatchMapper.toMatchDto(match,teamsMap))
+        const dtos = matches.map(match => MatchMapper.toMatchDto(match, teamsMap))
 
         return Result.Success(dtos);
     }

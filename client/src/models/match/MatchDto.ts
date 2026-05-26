@@ -1,5 +1,5 @@
 export type MatchStatus =  "scheduled" | "ongoing" | "completed"
-type BracketType = "winner" | "loser" | "grand_finale"
+type BracketType = "winner" | "loser" | "grand_final"
 type MatchSlot = "none" | "blue" | "red" 
 
 export type MatchDto = {
