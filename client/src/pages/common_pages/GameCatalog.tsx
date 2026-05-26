@@ -4,6 +4,7 @@ import type { GameDto } from "../../models/game/GameDto";
 import { gameApi } from "../../api_services/game_catalog/GameAPIService";
 import { useAuth } from "../../hooks/auth/useAuthHook";
 import { useNavigate } from "react-router-dom";
+import placeholder from "../../assets/placeholder.png";
 
 
 export default function GameCatalog(){
@@ -48,7 +49,7 @@ export default function GameCatalog(){
                     {games.map(g => (
                     <div className="group relative aspect-4/3 border-2 h-2xl border-white/5 bg-bgprimary/30  rounded-xl overflow-hidden">
                         <div className="w-full h-full">
-                            <img src={g.gameLogotip} className="object-cover w-full h-full rounded-xl transition-transform duration-300 group-hover:scale-110"/>
+                            <img src={g.gameLogotip ? g.gameLogotip : placeholder} className="object-cover w-full h-full rounded-xl transition-transform duration-300 group-hover:scale-110"/>
                         </div>
                         <div className="absolute rounded-t-lg bg-primary/90 h-min inset-0 origin-top scale-y-0 group-hover:scale-y-100 transition-transform duration-300">
                             <h2 className="text-bgsecondary text-center text-2xl font-bold">{g.gameName}</h2>
