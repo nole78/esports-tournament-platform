@@ -131,14 +131,6 @@ export class TeamService implements ITeamService {
         const isCaptain = members.some(m => m.role === TeamRole.CAPTAIN && m.userId === currentUser.id);
         if (!isCaptain) return Result.Failure(`User is not authorized to delete the team`, ErrorType.Unauthorized);;
 
-        await Promise.all(
-            members.map(m => this.teamMemberRepoWrite.delete(team?.teamId, m.userId)
-        ));
-
-        const invites = await this.inviteRepoRead.findByTeamId(team.teamId);
-        await Promise.all(
-            invites.map(m => this.inviteRepoWrite.delete(team.teamId, m.userId)
-        ));
         
         const res = await this.teamRepoWrite.delete(team?.teamId as number);
         return res ? Result.Success() : Result.Failure(`Couldn't delete team`, ErrorType.Internal);
