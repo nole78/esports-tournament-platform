@@ -8,7 +8,7 @@ import { formatDeadline, daysUntilDeadline, getDeadlineStatus, getDeadlineColor 
 import type { GameDto } from "../../models/game/GameDto";
 import { gameApi } from "../../api_services/game_catalog/GameAPIService";
 import { TournamentStatus } from "../../types/tournament/TournamentStatus";
-import { TournamentFormatValues } from "../../types/tournament/TournamentFormat";
+import { TournamentFormat } from "../../types/tournament/TournamentFormat";
 import type { TournamentFilterDto } from '../../models/tournament/TournamentFilterDto';
 
 export default function TournamentList(){
@@ -146,7 +146,7 @@ export default function TournamentList(){
                         <option value="" className='bg-lime-950'>
                             Any format
                         </option>
-                        {Object.entries(TournamentFormatValues).map(([key, value]) => (
+                        {Object.entries(TournamentFormat).map(([key, value]) => (
                             <option className='bg-lime-950' key={key} value={value}>
                                 {key.replace(/_/g, ' ')}
                             </option>

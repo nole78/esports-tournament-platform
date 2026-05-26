@@ -9,6 +9,8 @@ const isPowerOfTwo = (n: number): boolean => {
 export const validateTournamentCreation = (tname: string, tgame:string, tmaxteams:number, tappldeadline: Date, tprizefund: number, tformat?:TournamentFormat, tstatus?: TournamentStatus) : ValidationResult => {
     if(!tname || tname.trim().length === 0)
         return {valid:false, message:"Tournament name is mandatory"};
+    if(tname.length < 3 || tname.length > 120)
+        return {valid:false, message:"Tournament name must be between 3 and 120 characters long!"};
     if(!tgame || tgame.trim().length === 0)
         return {valid:false, message:"Game name is mandatory"};
     if(tmaxteams < 4 || tmaxteams > 256)

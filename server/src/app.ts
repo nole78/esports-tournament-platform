@@ -47,7 +47,6 @@ import { MatchReadRepository } from "./Database/repositories/matches/MatchReadRe
 import { MatchWriteRepository } from "./Database/repositories/matches/MatchWriteRepository";
 import { MatchPlayerReadRepository } from "./Database/repositories/match_players/MatchPlayerReadRepository";
 import { MatchPlayerWriteRepository } from "./Database/repositories/match_players/MatchPlayerWriteRepository";
-import { match } from "node:assert";
 import { UserWatchlistRepository } from "./Database/repositories/user_watchlist/UserWatchlistRepository";
 import { UserWatchlistService } from "./Services/user_watchlist/UserWatchlistService";
 import { UserWatchlistController } from "./WebAPI/controllers/UserWatchlistController";
@@ -90,7 +89,7 @@ const teamMemberService = new TeamMemberService(teamRepoRead, teamMemberRepoWrit
 const healthService = new HealthService(gameRepo, tournamentReadRepo, userRepo, teamRepoRead, db);
 const watchlistService = new UserWatchlistService(userWatchlistRepo, tournamentReadRepo, gameRepo);
 const tournamentRegistrationReadService = new TournamentRegistrationReadService(tournamentRegistrationReadRepo, teamRepoRead, tournamentReadRepo, logger);
-const tournamentRegistrationWriteService = new TournamentRegistrationWriteService(tournamentRegistrationWriteRepo, tournamentRegistrationReadRepo, teamRepoRead, teamMemberRepoRead, tournamentReadRepo, gameRepo, logger);
+const tournamentRegistrationWriteService = new TournamentRegistrationWriteService(tournamentRegistrationWriteRepo, tournamentRegistrationReadRepo, teamRepoRead, teamMemberRepoRead, tournamentReadRepo, tournamentWriteRepo, gameRepo, logger);
 const matchService = new MatchService(matchReadRepo, matchWriteRepo, teamRepoRead, tournamentReadRepo, gameRepo);
 const matchPlayerService = new MatchPlayerService(matchReadRepo, matchPlayerReadRepo, matchPlayerWriteRepo, userRepo, teamRepoRead, teamMemberRepoRead);
 

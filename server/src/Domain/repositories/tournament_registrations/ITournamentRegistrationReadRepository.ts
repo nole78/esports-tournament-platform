@@ -6,6 +6,7 @@ export interface ITournamentRegistrationReadRepository{
     findTotalByTournamentId(tournamentId: number, status?:TournamentRegistrationStatus): Promise<number>;
     findByTeamId(teamId: number, page?:number, limit?:number): Promise<TournamentRegistration[]>;
     findByTournamentId(tournamentId: number, status?:TournamentRegistrationStatus, page?:number, limit?:number): Promise<TournamentRegistration[]>;
+    findAllByTournamentId(tournamentId: number, status?: TournamentRegistrationStatus): Promise<TournamentRegistration[]>;
     findByTournamentAndTeamId(tournamentId: number, teamId: number): Promise<TournamentRegistration>;
     findAll(page?: number, limit?: number): Promise<TournamentRegistration[]>;
 }
