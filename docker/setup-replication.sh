@@ -143,9 +143,11 @@ CREATE TABLE matches(
   FOREIGN KEY (winner_team_id)
     REFERENCES teams(team_id),
   FOREIGN KEY (winner_to_match_id)
-    REFERENCES matches(match_id),
+    REFERENCES matches(match_id)
+    ON DELETE CASCADE,
   FOREIGN KEY (loser_to_match_id)
     REFERENCES matches(match_id)
+    ON DELETE CASCADE
 );
 
 CREATE TABLE team_members(
