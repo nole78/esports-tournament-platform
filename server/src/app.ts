@@ -119,5 +119,6 @@ app.use("/api/v1", new UserWatchlistController(watchlistService).getRouter());
 app.use("/api/v1", new TournamentRegistrationController(tournamentRegistrationReadService, tournamentRegistrationWriteService).getRouter());
 app.use("/api/v1", new MatchController(matchService, matchPlayerService).getRouter());
 app.use("/api/v1", new MatchController(matchService, matchPlayerService).getRouter());
+app.set("trust proxy", true);
 
 export default app;
