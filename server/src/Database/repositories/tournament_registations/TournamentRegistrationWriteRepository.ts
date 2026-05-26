@@ -1,4 +1,4 @@
-import { ResultSetHeader, RowDataPacket } from "mysql2";
+import { ResultSetHeader } from "mysql2";
 import { ITournamentRegistrationWriteRepository } from "../../../Domain/repositories/tournament_registrations/ITournamentRegistrationWriteRepository";
 import { ILoggerService } from "../../../Domain/services/logger/ILoggerService";
 import { DbManager } from "../../connection/DbConnectionPool";

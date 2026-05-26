@@ -3,8 +3,6 @@ import { ILoggerService } from "../../../Domain/services/logger/ILoggerService";
 import { DbManager } from "../../connection/DbConnectionPool";
 import { Match } from "../../../Domain/models/Match";
 import { IMatchReadRepository } from "../../../Domain/repositories/matches/IMatchReadRepository";
-import { MatchSlot } from "../../../Domain/enums/MatchSlot";
-import { BracketType } from "../../../Domain/enums/BracketType";
 
 export class MatchReadRepository implements IMatchReadRepository {
   public constructor(

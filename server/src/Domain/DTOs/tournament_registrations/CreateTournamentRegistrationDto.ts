@@ -1,5 +1,3 @@
-import { TournamentRegistrationStatus } from "../../enums/TournamentRegistrationStatus";
-
 export class  CreateTournamentRegistrationDto{
     constructor(
         public teamId: number = 0,

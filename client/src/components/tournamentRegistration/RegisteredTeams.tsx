@@ -4,12 +4,13 @@ import type { TournamentRegistrationDto } from "../../models/tournamentRegistrat
 import { TournamentRegistrationStatus } from "../../types/tournament_registration/TournamentRegistrationStatus";
 import { useAuth } from "../../hooks/auth/useAuthHook";
 import { tournamentRegistrationApi } from "../../api_services/tournament_registration/TournamentRegistrationAPIService";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { tournamentApi } from "../../api_services/tournament_list/TournamentAPIService";
 import type { TournamentDto } from "../../models/tournament/TournamentDto";
 import placeholder from "../../assets/placeholder.png"
 
 export default function RegisteredTeams() {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -74,6 +75,7 @@ export default function RegisteredTeams() {
                 <div
                   key={t.teamId}
                   className="bg-primary border border-secondary/40 rounded-lg p-4 hover:border-secondary/60 transition-all duration-200 hover:shadow-lg hover:shadow-secondary/20"
+                  onClick={() => navigate(`/teams/details/${t.teamId}`)}
                 >
                   <div className="flex items-center gap-3 mb-3">
                     <img

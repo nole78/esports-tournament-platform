@@ -10,7 +10,7 @@ import NotificationDropdown from "../account/NotificationDropDown";
 const guestNav = [
   {to: "/game_catalog", label: "Game Catalog"},
   {to: "/tournament_list", label: "Tournaments"},
-  {to: "/teams", label: "Teams List"}
+  {to: "/guest/teams/", label: "Teams List"}
 ]
 
 const userNav = [

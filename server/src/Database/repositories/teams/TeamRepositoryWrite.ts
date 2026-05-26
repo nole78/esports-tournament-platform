@@ -46,7 +46,7 @@ export class TeamRepositoryWrite implements ITeamRepositoryWrite {
 
     try {
       const providedEntries = Object.entries(fields)
-      .filter(([, v]) => v !== undefined);
+      .filter(([, v]) => v);
       if (providedEntries.length === 0) return false;
 
       const hasUnknownFields = providedEntries.some(([k]) => !(k in fieldMap));

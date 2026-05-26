@@ -23,11 +23,8 @@ export class InvitesRepositoryWrite implements IInvitesRepositoryWrite{
             `INSERT INTO team_invites (user_id, team_id, status) VALUES (?, ?, ?)`, [invite.userId, invite.teamId, invite.status]
         );
         if (result.affectedRows === 0) return new Invite;
-
-        const [row] = await res.conn.execute<RowDataPacket[]>(
-            `SELECT * FROM team_invites WHERE team_id=? AND user_id=?`, [invite.teamId, invite.userId]
-        );
-        return this.map(row[0]);
+        
+        return new Invite(invite.userId, invite.teamId, invite.invitedAt, invite.status);
         }catch (err){
             this.logger.error("InvitesRepository", "create", err);
             return new Invite;

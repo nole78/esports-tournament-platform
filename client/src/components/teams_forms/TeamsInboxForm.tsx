@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { teamApi } from "../../api_services/teams/TeamAPIService";
 import type { IniviteDto } from '../../models/invite/InviteDto';
-import { Empty } from "../../components/ui/UI";
+import { Empty } from "../ui/UI";
 
 
 export default function TeamsInboxForm(){
     const [invites, setInvites] = useState<IniviteDto[]>([]);
     const [teamNames, setTeamNames] = useState<Record<number, string>>({});
     const [teamImages, setTeamImages] = useState<Record<number, string>>({});
-    const [inviteStatus, setInviteStatus] = useState<Record<number, "accepted" | "rejected" | null>>({});
+    const [inviteStatus, setInviteStatus] = useState<Record<number, "accepted" | "rejected">>({});
 
     const answer = async (teamId: number, ans: string) => {
     setInviteStatus(prev => ({

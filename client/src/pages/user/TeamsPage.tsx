@@ -67,9 +67,9 @@ export default function TeamsPage(){
 
     return (
             <div>
-                <PageHeader eyebrow="" title="Team Catalog"/>
+                <PageHeader eyebrow="" title="Your Teams"/>
                 <button onClick={() => navigate(`/teams/add`)}
-                        className="mb-2 w-1/6 bg-bgsecondary/40 border-2 border-bgsecondary hover:bg-bgsecondary/30 text-bgsecondary font-semibold rounded-xl py-3 text-sm transition-colors">
+                        className="cursor-pointer mb-2 w-1/6 bg-bgsecondary/40 border-2 border-bgsecondary hover:bg-bgsecondary/30 text-bgsecondary font-semibold rounded-xl py-3 text-sm transition-colors">
                 Add Team</button>
                 
                 {error && <ErrorBox message={error}/>}
@@ -97,7 +97,7 @@ export default function TeamsPage(){
                 {teams.length === 0 && !error ? <Empty message="No teams found"/> : (
                 <section className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">     
                     {teams.map(t => (
-                        <div onClick={() => navigate(`/teams/details/${t.teamId}`)} className=" rounded-2xl group relative aspect-4/3 border-2 border-white/5 bg-bgprimary/30 overflow-hidden">
+                        <div onClick={() => navigate(`/teams/details/${t.teamId}`)} className="cursor-pointer rounded-2xl group relative aspect-4/3 border-2 border-white/5 bg-bgprimary/30 overflow-hidden">
                             <div className="w-full h-full">
                                 <img src ={t.teamLogotip? t.teamLogotip : placeholder} className="object-cover w-full h-full rounded-x1 transition-transform duration-300 group-hover:scale-110"/>
                             </div>

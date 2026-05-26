@@ -36,10 +36,6 @@ export class TeamMemberRepositoryWrite implements ITeamMemberRepositoryWrite{
     const res = await this.db.getWriteConnection();
     if (!res) return false;
     try {
-      // const entries = Object.entries(fields).filter(([, v]) => v !== undefined);
-      // if (entries.length === 0) return false;
-      // const setClause = entries.map(([k]) => `${k} = ?`).join(", ");
-      // const values = entries.map(([, v]) => v);
       const [result] = await res.conn.execute<ResultSetHeader>(
         `UPDATE team_members SET role = ? WHERE team_id = ? AND user_id = ?`, [role, teamId, userId]
       );

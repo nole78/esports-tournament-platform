@@ -12,18 +12,18 @@ import GameEditPage from "./pages/admin/GameEditPage";
 import TournamentList from "./pages/common_pages/TournamentList";
 import TournamentAddPage from "./pages/admin/TournamentAddPage";
 import LandingPage from "./pages/common_pages/LandingPage";
-import TeamsPage from "./pages/common_pages/TeamsPage";
-import TeamsAddPage from "./pages/common_pages/TeamsAddPage";
-import TeamsEditPage from "./pages/common_pages/TeamsEditPage";
+import TeamsPage from "./pages/user/TeamsPage";
+import TeamsAddPage from "./pages/user/TeamsAddPage";
+import TeamsEditPage from "./pages/user/TeamsEditPage";
 import TournamentRegistrationPage from "./pages/common_pages/TournamentRegistrationPage";
 import UserWatchList from "./pages/user/UserWatchlist";
-//import TeamsAddPage from "./pages/common_pages/TeamsAddPage";
 
 import { Layout } from "./components/layout/Layout";
-import TeamsDetailPage from "./pages/common_pages/TeamsDetailPage";
-import TeamsInboxPage from "./pages/common_pages/TeamsInboxPage";
+import TeamsDetailPage from "./pages/user/TeamsDetailPage";
+import TeamsInboxPage from "./pages/user/TeamsInboxPage";
 import MatchInfo from "./pages/common_pages/MatchInfo";
 import AccountDetailsPage from "./pages/user/AccountDetails";
+import TeamsGuestPage from "./pages/common_pages/TeamsGuestPage";
 
 export default function App() {
   return (
@@ -36,8 +36,9 @@ export default function App() {
       <Route path="/home" element={<LandingPage/>}/>
       <Route path="/game_catalog" element={<GameCatalog/>} />
       <Route path="/tournament_list" element={<TournamentList />} />
-      <Route path="/teams" element = {<TeamsPage/>}/>
       <Route path="/teams/details/:id" element = {<TeamsDetailPage/>}/>
+      <Route path="/guest/tournament_registration/:id" element={<TournamentRegistrationPage />}/>
+      <Route path="/guest/teams/" element={<TeamsGuestPage />} />
       
       {/* User routes */}
       <Route path="/account_details" element={<ProtectedRoute><AccountDetailsPage/></ProtectedRoute>}/>

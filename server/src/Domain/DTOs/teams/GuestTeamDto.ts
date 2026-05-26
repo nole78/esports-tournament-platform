@@ -5,6 +5,5 @@ export class GuestTeamDto{
         public teamTag : string = "",
         public teamLogotip : string = "",
         public teamDescription : string = "",
-        //TODO maybe add the team members here
     ){}
 }

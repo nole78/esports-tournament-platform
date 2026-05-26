@@ -1,16 +1,10 @@
 import {Request, Response, Router} from "express";
 import { ITeamService } from "../../Domain/services/teams/ITeamService";
 import { authenticate } from "../../Middlewares/authentification/AuthMiddleware";
-import { authorize } from "../../Middlewares/authorization/AuthorizeMiddleware";
-import { UserRole } from "../../Domain/enums/UserRole";
 import { ValidationResult } from '../../Domain/types/validation/ValidationResult';
 import { validateTeams } from "../validators/teams/validateTeams";
 import { CreateTeamDto } from "../../Domain/DTOs/teams/CreateTeamDto";
 import { handleResult } from "../mappers/ResultMapper";
-import { Result } from '../../Domain/common/Result';
-import { User } from "../../Domain/models/User";
-import { logger } from '../../app';
-import { ILoggerService } from "../../Domain/services/logger/ILoggerService";
 import { IAuditService } from "../../Domain/services/audit/IAuditService";
 import { ITeamMemberService } from "../../Domain/services/teamMember/ITeamMemberService";
 

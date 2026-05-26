@@ -2,7 +2,7 @@
 //import { teamApi } from '../../api_services/teams/TeamAPIService';
 
 import { teamApi } from '../../api_services/teams/TeamAPIService';
-import TeamsAddForm from '../user_forms/TeamsAddForm';
+import TeamsAddForm from '../../components/teams_forms/TeamsAddForm';
 
 
 export default function TeamsAddPage(){

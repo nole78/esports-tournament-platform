@@ -216,8 +216,10 @@ CREATE TABLE team_invites(
   status ENUM('pending', 'accepted', 'rejected'),
   invited_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (user_id, team_id),
-  FOREIGN KEY (user_id) REFERENCES users(id),
+  FOREIGN KEY (user_id) REFERENCES users(id)
+  ON DELETE CASCADE,
   FOREIGN KEY (team_id) REFERENCES teams(team_id)
+  ON DELETE CASCADE
 );
 SQL
 

@@ -20,7 +20,6 @@ export class BracketAdvancementService implements IBracketAdvancementService {
     public async validateAdvance(matchId: number, slot: MatchSlot, teamId: number): Promise<Result<void>> {
 
         const nextMatch = await this.matchReadRepo.findById(matchId);
-        console.log(nextMatch);
         if(nextMatch.matchId === 0)
             return Result.Failure("There is no match to advance to",ErrorType.NotFound);
 
