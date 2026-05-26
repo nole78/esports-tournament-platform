@@ -27,10 +27,10 @@ export function PerformanceNotes({
     const [saving, setSaving] = useState(false);
 
     useEffect(() => {
-            const timeout = setTimeout(() => {
-        setDraftNotes(performanceNotes);
-        setError("");
-    }, 0);
+        const timeout = setTimeout(() => {
+            setDraftNotes(performanceNotes);
+            setError("");
+        }, 0);
 
     return () => clearTimeout(timeout);
     }, [performanceNotes]);
@@ -50,7 +50,7 @@ export function PerformanceNotes({
         setSaving(true);
         setError("");
 
-        const response = await matchApi.changePerformanceNotes(matchId, playerId, draftNotes);
+        const response = await matchApi.changePerformanceNotes(matchId, playerId, {notes: draftNotes});
 
         setSaving(false);
 
