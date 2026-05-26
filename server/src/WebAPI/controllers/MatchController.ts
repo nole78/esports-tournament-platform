@@ -14,7 +14,7 @@ export class MatchController {
         private readonly matchService: IMatchService,
         private readonly matchPlayerService: IMatchPlayerService
     ){
-        this.router.get("/matches/tournament/:tournamendId", this.getAllForTournament.bind(this));
+        this.router.get("/matches/tournament/:id", this.getAllForTournament.bind(this));
         this.router.get("/matches/:id", this.getDetails.bind(this));
         this.router.get("/matches/:id/players/:teamId", authenticate, this.getPlayers.bind(this));
         this.router.patch("/matches/:id/result", authenticate, authorize(UserRole.ADMIN), this.setResult.bind(this));
@@ -24,10 +24,11 @@ export class MatchController {
     }
 
     private async getAllForTournament(req: Request, res: Response) : Promise<void> {
-        const tournamentId = parseInt(req.params.tournamentId as string, 10);
-        if(isNaN(tournamentId)) {res.status(400).json({ success: false, message: "Invalid tournament id"}); return;}
+        const id = parseInt(req.params.id as string, 10);
+        console.log(id);
+        if(isNaN(id)) {res.status(400).json({ success: false, message: "Invalid tournament id"}); return;}
 
-        const result = await this.matchService.getByTournamentId(tournamentId);
+        const result = await this.matchService.getByTournamentId(id);
         handleResult(result, res);
     }
 

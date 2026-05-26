@@ -1,5 +1,6 @@
-import { BracketType } from "../enums/BracketType";
-import { MatchSlot } from "../enums/MatchSlot";
+import { BracketType } from "../../enums/BracketType";
+import { MatchSlot } from "../../enums/MatchSlot";
+
 
 export type BracketNode = {
 

@@ -17,7 +17,7 @@ const err = <T>(e: unknown, fallback: string): ApiResponse<T> => ({
 
 export const matchApi: IMatchAPIService = {
         async getAllForTorunament(tournamentId: number) {
-            return axios.get(`${BASE}/${tournamentId}`, { headers: authHeader()})
+            return axios.get(`${BASE}/tournament/${tournamentId}`, { headers: authHeader()})
                 .then(r => r.data).catch(e => err(e, "Failed to load matches"));
         },
         async getDetails(id) {

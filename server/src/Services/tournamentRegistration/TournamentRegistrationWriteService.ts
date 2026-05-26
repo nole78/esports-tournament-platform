@@ -205,7 +205,7 @@ export class TournamentRegistrationWriteService implements ITournamentRegistrati
                     break;
                 case TournamentFormat.ROUND_ROBIN:
                     {
-                        const res = this.generator.generateDoubleElimination(id, registrationIds);
+                        const res = this.generator.generateRoundRobin(id, registrationIds);
                         if(!res.isSuccess)
                             return Result.Failure("Couldn't generate bracket", ErrorType.Internal);
                         nodes = res.value as BracketNode[];
@@ -213,7 +213,7 @@ export class TournamentRegistrationWriteService implements ITournamentRegistrati
                     break;
                 default:
                     {
-                        const res = this.generator.generateDoubleElimination(id, registrationIds);
+                        const res = this.generator.generateSingleElimination(id, registrationIds);
                         if(!res.isSuccess)
                             return Result.Failure("Couldn't generate bracket", ErrorType.Internal);
                         nodes = res.value as BracketNode[];
