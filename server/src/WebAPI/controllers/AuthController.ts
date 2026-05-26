@@ -73,7 +73,9 @@ export class AuthController {
     const id = parseInt(req.body.id as string, 10);
     if (isNaN(id)) { res.status(400).json({ success: false, message: "Invalid id" }); return; }
     const result = await this.userService.logout(id);
-    await this.auditService.log({
+    if(result.isSuccess)
+    {
+      await this.auditService.log({
             userId: id,
             action: "LOGOUT",
             entity: "User",
@@ -81,6 +83,7 @@ export class AuthController {
             meta: {},
             ipAddress: req.ip
           });
+    }
     handleResult(result, res);
   }
 

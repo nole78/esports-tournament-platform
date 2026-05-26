@@ -8,7 +8,7 @@ import { MatchStatus } from "../../Domain/enums/MatchStatus";
 import { MatchPlayer } from "../../Domain/models/MatchPlayer";
 import { IMatchPlayerReadRepository } from "../../Domain/repositories/match_players/IMatchPlayerReadRepository";
 import { IMatchPlayerWriteRepository } from "../../Domain/repositories/match_players/IMatchPlayerWriteRepository";
-import { IUserRepository } from "../../Domain/repositories/users/IUserRepository";
+import { IUserReadRepository } from "../../Domain/repositories/users/IUserReadRepository";
 import { IMatchPlayerService } from "../../Domain/services/match_players/IMatchPlayerService";
 import { IMatchReadRepository } from "../../Domain/repositories/matches/IMatchReadRepository";
 import { ITeamRepositoryRead } from "../../Domain/repositories/teams/ITeamRepositoryRead";
@@ -19,7 +19,7 @@ export class MatchPlayerService implements IMatchPlayerService{
         private readonly matchReadRepository: IMatchReadRepository,
         private readonly matchPlayerReadRepo: IMatchPlayerReadRepository,
         private readonly matchPlayerWriteRepo: IMatchPlayerWriteRepository,
-        private readonly userRepo: IUserRepository,
+        private readonly userReadRepo: IUserReadRepository,
         private readonly teamRepo: ITeamRepositoryRead,
         private readonly teamMemberRepo: ITeamMemberRepositoryRead
     ) {}
@@ -42,7 +42,7 @@ export class MatchPlayerService implements IMatchPlayerService{
             return Result.Success([]);
 
         const userIds = [...new Set(teamPlayers.map((mp) => mp.userId))];
-        const users = await this.userRepo.findByIds(userIds);
+        const users = await this.userReadRepo.findByIds(userIds);
         const userMap = new Map(users.map((u) => [u.id, u.gamerTag]));
 
         return Result.Success(
@@ -68,7 +68,7 @@ export class MatchPlayerService implements IMatchPlayerService{
         if(match.status === MatchStatus.SCHEDULED)
             return Result.Failure("Match hasn't started, can't add performance notes now", ErrorType.Conflict);
 
-        const user = await this.userRepo.findById(userId);
+        const user = await this.userReadRepo.findById(userId);
         if(user.id === 0)
             return Result.Failure(`User doesn't exist`,ErrorType.NotFound);
 
@@ -105,7 +105,7 @@ export class MatchPlayerService implements IMatchPlayerService{
         const uniquePlayerIds = [...new Set(dto.userIds)];
         const memberIds = new Set(members.map(m => m.userId));
         const playerIdsInMatch = new Set(players.map(p => p.userId));
-        const users = await this.userRepo.findByIds(uniquePlayerIds);
+        const users = await this.userReadRepo.findByIds(uniquePlayerIds);
         const usersMap = new Map(users.map(u => [u.id, u.gamerTag]));
         
         for(const playerId of uniquePlayerIds)
@@ -152,7 +152,7 @@ export class MatchPlayerService implements IMatchPlayerService{
         if(match.status === MatchStatus.COMPLETED)
             return Result.Failure("Match is completed, can't remove players now", ErrorType.Conflict);
 
-        const user = await this.userRepo.findById(userId);
+        const user = await this.userReadRepo.findById(userId);
         if(user.id === 0)
             return Result.Failure("User doesn't exist",ErrorType.NotFound);
 

@@ -1,7 +1,7 @@
 import { CreateTournamentDto } from "../../Domain/DTOs/tournaments/CreateTournamentDto";
 import { TournamentDto } from "../../Domain/DTOs/tournaments/TorunamentDto";
 import { Tournament } from "../../Domain/models/Tournament";
-import { IGameRepository } from "../../Domain/repositories/games/IGameRepository";
+import { IGameReadRepository } from "../../Domain/repositories/games/IGameReadRepository";
 import { ITournamentWriteService } from "../../Domain/services/tournaments/ITournamentWriteService";
 import { ILoggerService } from "../../Domain/services/logger/ILoggerService";
 import { IDateTimeConverter } from "../../Domain/services/datetime/IDateTimeConverter";
@@ -14,14 +14,14 @@ export class TournamentWriteService implements ITournamentWriteService {
   public constructor(
     private readonly tournamentReadRepo: ITournamentReadRepository,
     private readonly tournamentWriteRepo: ITournamentWriteRepository,
-    private readonly gameRepo: IGameRepository,
+    private readonly gameReadRepo: IGameReadRepository,
     private readonly logger: ILoggerService,
     private readonly dateTimeConverter: IDateTimeConverter,
   ) {}
 
   async create(t: CreateTournamentDto): Promise<Result<TournamentDto>> {
     // find game by name
-    const game = await this.gameRepo.findByName(t.tournamentGame);
+    const game = await this.gameReadRepo.findByName(t.tournamentGame);
     if (!game) {
       this.logger.error("TournamentService", "create failed", `Game with name "${t.tournamentGame}" not found`);
       return Result.Failure("Game with name "+t.tournamentGame+" does not exist!", ErrorType.NotFound);

@@ -61,7 +61,9 @@ export class TournamentController{
         if(!v.valid) {res.status(400).json({ success: false, message: v.message }); return;}
 
         const result = await this.tournamentWriteService.create(new CreateTournamentDto( tournamentName, tournamentGame, tournamentFormat, tournamentMaxTeams, tournamentApplicationDeadline, tournamentPrizeFund, tournamentStatus));
-        await this.auditService.log({
+        if(result.isSuccess)
+        {
+            await this.auditService.log({
             userId: req.user?.id,
             action: "TOURNAMENT_CREATED",
             entity: "Team",
@@ -69,6 +71,7 @@ export class TournamentController{
             meta: {},
             ipAddress: req.ip
           });
+        }
         handleResult(result, res);    
     }
 
@@ -82,7 +85,9 @@ export class TournamentController{
         if(!v.valid) {res.status(400).json({ success: false, message: v.message }); return;}
         
         const result = await this.tournamentWriteService.update(id, req.body);
-        await this.auditService.log({
+        if(result.isSuccess)
+        {
+            await this.auditService.log({
             userId: req.user?.id,
             action: "TOURNAMENT_UPDATED",
             entity: "Team",
@@ -90,6 +95,7 @@ export class TournamentController{
             meta: {},
             ipAddress: req.ip
           });
+        }
         handleResult(result, res);
     }
 
@@ -97,7 +103,9 @@ export class TournamentController{
         const id = parseInt(req.params.id as string, 10);
         if (isNaN(id)) { res.status(400).json({ success: false, message: "Invalid id" }); return; }
         const result = await this.tournamentWriteService.delete(id);
-        await this.auditService.log({
+        if(result.isSuccess)
+        {
+            await this.auditService.log({
             userId: req.user?.id,
             action: "TOURNAMENT_DELETED",
             entity: "Team",
@@ -105,6 +113,7 @@ export class TournamentController{
             meta: {},
             ipAddress: req.ip
           });
+        }
         handleResult(result, res);
     }
 

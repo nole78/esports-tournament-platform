@@ -42,7 +42,9 @@ export class UserController {
     const parsedRole: UserRole = role as UserRole;
 
     const result = await this.userService.changeRole(id,parsedRole);  
-    await this.auditService.log({
+    if(result.isSuccess)
+    {
+      await this.auditService.log({
             userId: req.user?.id,
             action: "ROLE_CHANGED",
             entity: "User",
@@ -50,6 +52,7 @@ export class UserController {
             meta: {},
             ipAddress: req.ip
           });
+    }
     handleResult(result, res);
   }
 

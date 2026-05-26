@@ -4,17 +4,24 @@ import { CreateUserWatchlistDto } from '../../Domain/DTOs/user_watchlists/Create
 import { UserWatchlistDto } from '../../Domain/DTOs/user_watchlists/UserWatchlistDto';
 import { UserWatchlist } from '../../Domain/models/UserWatchlist';
 import { PaginatedListDto } from '../../Domain/DTOs/PaginatedListDto';
-import { IUserWatchlistRepository } from '../../Domain/repositories/user_watchlist/IUserWatchlistRepository';
+import { IUserWatchlistReadRepository } from '../../Domain/repositories/user_watchlist/IUserWatchlistReadRepository';
+import { IUserWatchlistWriteRepository } from '../../Domain/repositories/user_watchlist/IUserWatchlistWriteRepository';
 import { IUserWatchlistService } from '../../Domain/services/user_watchlist/IUserWatchlistService';
-import { IGameRepository } from '../../Domain/repositories/games/IGameRepository';
+import { IGameReadRepository } from '../../Domain/repositories/games/IGameReadRepository';
 import { ITournamentReadRepository } from '../../Domain/repositories/tournaments/ITournamentReadRepository';
+import { UserWatchlistWriteRepository } from '../../Database/repositories/user_watchlist/UserWatchlistWriteRepository';
 
 export class UserWatchlistService implements IUserWatchlistService {
-    public constructor(private readonly watchlistRepo : IUserWatchlistRepository, private readonly tournamentReadRepo : ITournamentReadRepository, private readonly gameRepo : IGameRepository){}
+    public constructor(
+        private readonly watchlistReadRepo: IUserWatchlistReadRepository,
+        private readonly watchlistWriteRepo: IUserWatchlistWriteRepository, 
+        private readonly tournamentReadRepo : ITournamentReadRepository, 
+        private readonly gameReadRepo: IGameReadRepository
+    ){}
 
     private async toUserWatchlistDto(watchlist: UserWatchlist) : Promise<UserWatchlistDto>{
         const tournament = await this.tournamentReadRepo.findById(watchlist.tournamentId);
-        const game = await this.gameRepo.findById(tournament.tournamentGameId);
+        const game = await this.gameReadRepo.findById(tournament.tournamentGameId);
         return new UserWatchlistDto(
             watchlist.userId,
             watchlist.tournamentId,
@@ -28,34 +35,34 @@ export class UserWatchlistService implements IUserWatchlistService {
 
     async getByUserId(userId: number, page?: number, limit?: number) : Promise<Result<PaginatedListDto<UserWatchlistDto>>>
     {
-        const items = await this.watchlistRepo.findByUserId(userId, page ?? 1, limit ?? 20);
-        const total = await this.watchlistRepo.getTotal(userId);
+        const items = await this.watchlistReadRepo.findByUserId(userId, page ?? 1, limit ?? 20);
+        const total = await this.watchlistReadRepo.getTotal(userId);
         const list = await Promise.all(items.map(i => this.toUserWatchlistDto(i)));
         return Result.Success(new PaginatedListDto(list, total, page ?? 1, limit ?? 20));
     }
 
     async findWatchListItem(userId: number, tournamentId: number): Promise<Result<boolean>>
     {
-        const item = await this.watchlistRepo.findWatchlistItem(userId, tournamentId);
+        const item = await this.watchlistReadRepo.findWatchlistItem(userId, tournamentId);
         return Result.Success(item.userId !== 0);
     }
 
     async add(dto: CreateUserWatchlistDto) : Promise<Result<UserWatchlistDto>>
     {
-        const item = await this.watchlistRepo.findWatchlistItem(dto.userId, dto.tournamentId);
+        const item = await this.watchlistReadRepo.findWatchlistItem(dto.userId, dto.tournamentId);
         if(item.userId !== 0)
             return Result.Failure("Tournament is already in watchlist", ErrorType.Conflict);
-        const watchlist = await this.watchlistRepo.create(dto);
+        const watchlist = await this.watchlistWriteRepo.create(dto);
         const list = await this.toUserWatchlistDto(watchlist);
         return Result.Success(list);
     }
     
     async remove(userId: number, tournamentId: number) : Promise<Result<void>>
     {
-        const item = await this.watchlistRepo.findWatchlistItem(userId, tournamentId);
+        const item = await this.watchlistReadRepo.findWatchlistItem(userId, tournamentId);
         if(item.userId === 0)
             return Result.Failure("Tournament is not in watchlist", ErrorType.NotFound);
-        const res = await this.watchlistRepo.delete(userId, tournamentId);
+        const res = await this.watchlistWriteRepo.delete(userId, tournamentId);
         return res? Result.Success(): Result.Failure("Couldn't remove tournament from watchlist", ErrorType.Internal);
     }
 }

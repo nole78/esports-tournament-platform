@@ -8,7 +8,7 @@ import { MatchStatus } from "../../Domain/enums/MatchStatus";
 import { IMatchReadRepository } from "../../Domain/repositories/matches/IMatchReadRepository";
 import { IMatchWriteRepository } from "../../Domain/repositories/matches/IMatchWriteRepository";
 import { MatchDetailsDto } from "../../Domain/DTOs/matches/MatchDetailsDto";
-import { IGameRepository } from "../../Domain/repositories/games/IGameRepository";
+import { IGameReadRepository } from "../../Domain/repositories/games/IGameReadRepository";
 import { ITeamRepositoryRead } from "../../Domain/repositories/teams/ITeamRepositoryRead";
 import { ITournamentReadRepository } from "../../Domain/repositories/tournaments/ITournamentReadRepository";
 import { IBracketAdvancementService } from "../../Domain/services/bracket/IBracketAdvancmentService";
@@ -22,7 +22,7 @@ export class MatchService implements IMatchService{
         
         private readonly teamRepo: ITeamRepositoryRead,
         private readonly tournamentReadRepo: ITournamentReadRepository,
-        private readonly gameRepo: IGameRepository,
+        private readonly gameReadRepo: IGameReadRepository,
 
         private readonly bracketAdvancementService: IBracketAdvancementService,
     ){}
@@ -46,7 +46,7 @@ export class MatchService implements IMatchService{
         const teamsMap = await MatchTeamHelper.getTeamsMap([match], this.teamRepo);
 
         const tournament = await this.tournamentReadRepo.findById(match.tournamentId);
-        const game = await this.gameRepo.findById(tournament.tournamentGameId);
+        const game = await this.gameReadRepo.findById(tournament.tournamentGameId);
 
         const redTeam = teamsMap.get(match.redTeamId);
         const blueTeam = teamsMap.get(match.blueTeamId);

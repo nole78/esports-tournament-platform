@@ -3,11 +3,14 @@ import { IAuditRepository } from "../../Domain/repositories/audit/IAuditReposito
 import { AuditLogDto } from "../../Domain/DTOs/audit/AuditLogDto";
 import { PaginatedListDto } from "../../Domain/DTOs/PaginatedListDto";
 import { AuditLog } from "../../Domain/models/AuditLog";
-import { IUserRepository } from "../../Domain/repositories/users/IUserRepository";
+import { IUserReadRepository } from "../../Domain/repositories/users/IUserReadRepository";
 import { Result } from "../../Domain/common/Result";
 
 export class AuditService implements IAuditService {
-  public constructor(private readonly auditRepo: IAuditRepository, private readonly userRepo: IUserRepository) {}
+  public constructor(
+    private readonly auditRepo: IAuditRepository, 
+    private readonly userReadRepo: IUserReadRepository
+  ) {}
 
   async log(params: {
     userId?: number;
@@ -42,7 +45,7 @@ export class AuditService implements IAuditService {
       )
     );
     for (const log of DTOs) {
-      const user = await this.userRepo.findById(log.userId || 0);
+      const user = await this.userReadRepo.findById(log.userId || 0);
       log.gamer_tag = user ? user.gamerTag : "";
     }
     return Result.Success(new PaginatedListDto(DTOs, total, page, limit));

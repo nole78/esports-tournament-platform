@@ -4,7 +4,7 @@ import { TeamDto } from "../../Domain/DTOs/teams/TeamDto";
 import { PaginatedListDto } from "../../Domain/DTOs/PaginatedListDto";
 import { ITeamService } from "../../Domain/services/teams/ITeamService";
 import { TeamRole } from "../../Domain/enums/TeamRole";
-import { IUserRepository } from "../../Domain/repositories/users/IUserRepository";
+import { IUserReadRepository } from "../../Domain/repositories/users/IUserReadRepository";
 import { TeamMember } from "../../Domain/models/TeamMember";
 import { Team } from '../../Domain/models/Team';
 import { Result } from '../../Domain/common/Result';
@@ -24,7 +24,7 @@ export class TeamService implements ITeamService {
                        private readonly teamRepoRead: ITeamRepositoryRead,
                        private readonly teamMemberRepoWrite: ITeamMemberRepositoryWrite,
                        private readonly teamMemberRepoRead: ITeamMemberRepositoryRead,
-                       private readonly userRepo: IUserRepository,
+                       private readonly userReadRepo: IUserReadRepository,
                        private readonly inviteRepoWrite: IInvitesRepositoryWrite,
                        private readonly inviteRepoRead: IInvitesRepositoryRead
     ){}
@@ -43,7 +43,7 @@ export class TeamService implements ITeamService {
         if(team.teamId === 0){
             return Result.Failure(`Team with id ${id} doesn't exist`, ErrorType.NotFound);
         }
-        const user = await this.userRepo.findByUsername(gamerTag);
+        const user = await this.userReadRepo.findByUsername(gamerTag);
         if (user.id===0){
             return Result.Failure(`User with ${gamerTag} username doesn't exist`, ErrorType.NotFound);
         }
@@ -59,7 +59,7 @@ export class TeamService implements ITeamService {
     }
     async getByGamerTag(tag: string, limit: number, page: number) : Promise<Result<PaginatedListDto<TeamDto>>>{
 
-        const user = await this.userRepo.findByUsername(tag);
+        const user = await this.userReadRepo.findByUsername(tag);
         if (user.id === 0)
             return Result.Failure(`User with ${tag} username doesn't exist`, ErrorType.NotFound);
         ;
@@ -95,7 +95,7 @@ export class TeamService implements ITeamService {
     }
 
     async create(dto: CreateTeamDto, gamerTag: string): Promise<Result<TeamDto>> {
-        const currentUser = await this.userRepo.findByUsername(gamerTag);
+        const currentUser = await this.userReadRepo.findByUsername(gamerTag);
         if (currentUser.id === 0) return Result.Failure(`User with ${gamerTag} username doesn't exist`, ErrorType.NotFound);
         const created = await this.teamRepoWrite.create(dto);
         if (created.teamId === 0) return Result.Failure(`Couldn't create team`, ErrorType.Internal);
@@ -108,7 +108,7 @@ export class TeamService implements ITeamService {
         return Result.Success(new TeamDto(created.teamId, created.teamName, created.teamTag, created.teamLogotip, created.teamDescription));
     }
     async update(gamerTag: string, fields: Partial<Team>, id: number): Promise<Result<void>> {
-        const currentUser = await this.userRepo.findByUsername(gamerTag);
+        const currentUser = await this.userReadRepo.findByUsername(gamerTag);
         if (currentUser.id === 0) return Result.Failure(`User with ${gamerTag} username doesn't exist`, ErrorType.NotFound);;
 
         const team = await this.teamRepoRead.findById(id);
@@ -122,7 +122,7 @@ export class TeamService implements ITeamService {
     }
 
     async delete(gamerTag: string, id: number): Promise<Result<void>> {
-        const currentUser = await this.userRepo.findByUsername(gamerTag);
+        const currentUser = await this.userReadRepo.findByUsername(gamerTag);
         
         if (currentUser.id === 0) return Result.Failure(`User with ${gamerTag} username doesn't exist`, ErrorType.NotFound);;
         const team = await this.teamRepoRead.findById(id);
@@ -146,7 +146,7 @@ export class TeamService implements ITeamService {
 
     
     async getAllMyTeams(gamerTag: string): Promise<Result<TeamDto[]>> {
-        const currentUser = await this.userRepo.findByUsername(gamerTag);
+        const currentUser = await this.userReadRepo.findByUsername(gamerTag);
         if (currentUser.id === 0) return Result.Failure(`User with ${gamerTag} username doesn't exist`, ErrorType.NotFound);;
         
         const members = await this.teamMemberRepoRead.findByUserId(currentUser.id);

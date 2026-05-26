@@ -5,7 +5,7 @@ import { PaginatedListDto } from "../../Domain/DTOs/PaginatedListDto";
 import { TournamentDto } from "../../Domain/DTOs/tournaments/TorunamentDto";
 import { TournamentFilterDto } from "../../Domain/DTOs/tournaments/TournamentFilterDto";
 import { Game } from "../../Domain/models/Game";
-import { IGameRepository } from "../../Domain/repositories/games/IGameRepository";
+import { IGameReadRepository } from "../../Domain/repositories/games/IGameReadRepository";
 import { ITournamentReadRepository } from "../../Domain/repositories/tournaments/ITournamentReadRepository";
 import { ILoggerService } from "../../Domain/services/logger/ILoggerService";
 import { ITournamentReadService } from "../../Domain/services/tournaments/ITournamentReadService";
@@ -13,7 +13,7 @@ import { ITournamentReadService } from "../../Domain/services/tournaments/ITourn
 export class TournamentReadService implements ITournamentReadService {
   public constructor(
     private readonly tournamentReadRepo: ITournamentReadRepository,
-    private readonly gameRepo: IGameRepository,
+    private readonly gameReadRepo: IGameReadRepository,
     private readonly logger: ILoggerService,
   ) {}
 
@@ -28,7 +28,7 @@ export class TournamentReadService implements ITournamentReadService {
     
     for(let i:number = 0; i < gameIds.length; i++)
     {
-      const game = await this.gameRepo.findById(gameIds[i]);
+      const game = await this.gameReadRepo.findById(gameIds[i]);
       if(game)
         games.push(game);
     }
@@ -59,7 +59,7 @@ export class TournamentReadService implements ITournamentReadService {
     let game:GameDto = new GameDto();
     if(fields.tournamentGame)
     {
-      game = await this.gameRepo.findByName(fields.tournamentGame);
+      game = await this.gameReadRepo.findByName(fields.tournamentGame);
     }
     
     const tournaments = await this.tournamentReadRepo.findFiltered(game?.gameId == 0 ? 0 : game?.gameId, fields?.tournamentFormat, fields?.tournamentStatus, page, limit);
@@ -69,7 +69,7 @@ export class TournamentReadService implements ITournamentReadService {
     
     for(let i:number = 0; i < gameIds.length; i++)
     {
-      const game = await this.gameRepo.findById(gameIds[i]);
+      const game = await this.gameReadRepo.findById(gameIds[i]);
       if(game)
         games.push(game);
     }
@@ -98,7 +98,7 @@ export class TournamentReadService implements ITournamentReadService {
       return Result.Failure("Tournament with id "+id+" does not exist!", ErrorType.NotFound);
     }
 
-    const game = await this.gameRepo.findById(tournament.tournamentGameId);
+    const game = await this.gameReadRepo.findById(tournament.tournamentGameId);
     if (!game) {
       this.logger.error("TournamentService", "getById failed", `Game with id "${tournament.tournamentGameId}" not found`);
       return Result.Failure("Game with id " + tournament.tournamentGameId + " does not exist!", ErrorType.NotFound);

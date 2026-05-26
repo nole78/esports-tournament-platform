@@ -1,21 +1,22 @@
 import { IHealthService } from "../../Domain/services/health/IHealthService";
-import { IGameRepository } from "../../Domain/repositories/games/IGameRepository";
+import { IGameReadRepository } from "../../Domain/repositories/games/IGameReadRepository";
 import { ITournamentReadRepository } from "../../Domain/repositories/tournaments/ITournamentReadRepository";
-import { IUserRepository } from "../../Domain/repositories/users/IUserRepository";
+import { IUserReadRepository } from "../../Domain/repositories/users/IUserReadRepository";
 import { StatisticsDto } from "../../Domain/DTOs/statistics/StatisticsDto";
 import { DbManager } from "../../Database/connection/DbConnectionPool";
 import { HealthStatusDto } from "../../Domain/DTOs/health/HealthStatusDto";
 import { NodeStatusDto } from "../../Domain/DTOs/health/NodeStatusDto";
 import { Result } from "../../Domain/common/Result";
 import { ITeamRepositoryRead } from "../../Domain/repositories/teams/ITeamRepositoryRead";
+import { GameReadRepository } from '../../Database/repositories/games/GameReadRepository';
 
 //Add other repos
 
 export class HealthService implements IHealthService {
   public constructor(
-    private readonly gameRepo: IGameRepository,
+    private readonly gameReadRepo: IGameReadRepository,
     private readonly tournamentReadRepo: ITournamentReadRepository,
-    private readonly userRepo: IUserRepository,
+    private readonly userReadRepo: IUserReadRepository,
     private readonly teamRepoRead: ITeamRepositoryRead,
     private readonly db: DbManager
   ) {}
@@ -29,9 +30,9 @@ export class HealthService implements IHealthService {
 
   // Change later when other repos are implemented
   async getStatistics(): Promise<Result<StatisticsDto>> {
-    const games = await this.gameRepo.getTotal();
+    const games = await this.gameReadRepo.getTotal();
     const tournaments = await this.tournamentReadRepo.findAll(); //Change later for getTotal
-    const users = await this.userRepo.findAll();
+    const users = await this.userReadRepo.findAll();
     const teams = await this.teamRepoRead.findAll();
     const matches = 0;
     return Result.Success(new StatisticsDto(
