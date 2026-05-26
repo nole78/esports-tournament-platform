@@ -224,7 +224,7 @@ export class BracketGeneratorService implements IBracketGeneratorService{
                 tournamentId: tournamentId,
                 blueTeamId: seededTeamIds[i],
                 redTeamId: seededTeamIds[j],  
-                roundNumber: i,
+                roundNumber: i+1,
                 bracketType: BracketType.WINNER
                 });
             }
