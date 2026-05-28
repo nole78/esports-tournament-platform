@@ -1,77 +1,189 @@
-# PulseGrid Esports Platform
+# Esports Tournament Platform
 
 ![CI](https://github.com/nole78/odp_C2S_tim_01/actions/workflows/CI.yml/badge.svg)
 [![Vercel](https://img.shields.io/badge/Vercel-Live-black?logo=vercel)](https://odp-c2-s-tim-01.vercel.app)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-19-61dafb?logo=react)](https://react.dev/)
 
-PulseGrid is a full-stack esports platform designed as a distributed, scalable web system with a focus on **high availability, modular architecture, and production-grade backend design patterns**.
+Full-stack web application for managing esports teams, tournaments, matches and player participation.
 
-It simulates a real-world cloud-native application with load balancing, database replication, authentication, and CI/CD integration.
+Built with React, TypeScript, Node.js, Express and MySQL using layered architecture, dependency injection and scalable deployment practices.
 
----
+## Table of Contents
+
+- [Live Demo](#live-demo)
+- [System Overview](#system-overview)
+- [Tech Stack](#tech-stack)
+- [Features](#features)
+- [Screenshots](#screenshots)
+- [Architecture](#architecture)
+- [Tournament Engine](#tournament-engine)
+- [Core Domain Model](#core-domain-model)
+- [Project Structure](#project-structure)
+- [Custom Load Balancer](#custom-load-balancer)
+- [Authentication & Security](#authentication--security)
+- [Health Monitoring](#health-monitoring)
+- [Load Balancing Strategies](#load-balancing-strategies)
+- [CI / CD Pipeline](#ci--cd-pipeline)
+- [Configuration](#configuration)
+- [Deployment](#deployment)
+- [Deployment Topology](#deployment-topology)
+- [Getting Started](#getting-started)
+- [Engineering Challenges](#engineering-challenges)
+- [Team Development](#team-development)
+- [Future Improvements](#future-improvements)
+
+## Live Demo
+
+### Frontend
+
+https://odp-c2-s-tim-01.vercel.app
+
+### Production API (via Load Balancer)
+
+https://odp-c2s-tim-01-loadbalancer.onrender.com
+
+### Individual Backend Instances
+
+- Render Instance
+  https://odp-c2s-tim-01.onrender.com
+
+- Railway Instance
+  https://odpc2stim01-production.up.railway.app
 
 ## System Overview
 
-PulseGrid is built as a multi-layer distributed system:
+Esports Tournament Platform is built as a multi-layer distributed system:
 
 - **Client Layer** → React-based SPA for users and admins
 - **Load Balancer Layer** → Intelligent traffic distribution across backend instances
 - **Backend Layer** → Node.js/Express API with layered architecture
-- **Data Layer** → MySQL with master–slave replication
+- **Data Layer** → MySQL database with optional local replication support
 - **Infrastructure Layer** → Docker + cloud deployment (Render, Aiven, Vercel)
-
----
+> [!NOTE]
+> Local development includes a MySQL master–slave replication setup for experimentation and learning purposes. Production deployment currently uses a single managed MySQL instance hosted on Aiven.
 
 ## Tech Stack
 
-| Layer        | Technology |
-|--------------|------------|
-| Frontend     | React 19, Vite, TailwindCSS v4, React Router v7 |
-| Backend      | Node.js, Express 5, TypeScript |
-| Auth         | JWT (jsonwebtoken), bcryptjs |
-| Database     | MySQL 8, mysql2, Master–Slave replication |
-| Load Balancer| Node.js, http-proxy-middleware |
-| DevOps       | Docker, docker-compose, GitHub Actions |
-| Deployment   | Vercel (FE), Render (BE), Aiven (DB) |
+### Frontend
 
----
+- React
+- TypeScript
+- Vite
+- React Router
 
-## Key Features
+### Backend
 
-- JWT authentication with role-based access control (RBAC)
-- Distributed MySQL architecture (master + replica slaves)
-- Custom Node.js load balancer with pluggable strategies
-- Health-check driven service discovery
-- Connection-aware routing (Least Connections)
-- IP-based session affinity (IP Hash)
-- CI pipeline with automated build validation
-- Environment-based configuration (dev/prod separation)
+- Node.js
+- Express
+- TypeScript
+- JWT Authentication
 
----
+### Database
 
-## Architecture Design
+- MySQL
+- Aiven
 
-PulseGrid follows a **clean layered architecture with separation of concerns across all services**.
+### Infrastructure
 
-### High-Level System Flow
+- Render
+- Railway
+- Custom Load Balancer
+
+
+## Features
+
+- User registration and authentication
+- Role-based authorization (Player / Admin)
+- Team creation and management
+- Tournament creation and administration
+- Automated bracket generation
+- Match scheduling and progression
+- Lineup management
+- Player performance tracking
+- Invitation system
+- Audit logging
+- API and database health monitoring
+- Distributed deployment with load balancing
+
+## Screenshots
+
+### Tournament Bracket
+
+[screenshot]
+
+### Match Management
+
+[screenshot]
+
+### Admin Dashboard
+
+[screenshot]
+
+### Team Management
+
+[screenshot]
+
+## Architecture
+
+The backend follows a layered architecture:
 
 ```text
-Client (React)
-      ↓
-Load Balancer (Node.js)
-      ↓
-Proxy Middleware
-      ↓
-Server Pool Service
-      ↓
-Selected Backend Instance
-      ↓
-MySQL (Master / Slaves)
+Repository Layer
+↓
+Service Layer
+↓
+Controller Layer
+↓
+REST API
 ```
 
----
+Key design principles:
 
+- Dependency Injection
+- Result Pattern
+- SOLID principles
+- Separation of Concerns
+- Repository Pattern
+
+## Tournament Engine
+
+The platform automatically generates tournament brackets and match relations.
+
+Main responsibilities:
+
+- Bracket generation
+- Temporary node mapping
+- Match persistence
+- Parent-child match linking
+- Automatic advancement of winners
+
+```text
+Tournament
+    ↓
+Bracket Generator
+    ↓
+Bracket Nodes
+    ↓
+Persist Matches
+    ↓
+Map Temp IDs
+    ↓
+Link Matches
+    ↓
+Ready Tournament Tree
+```
+
+## Core Domain Model
+
+- Users
+- Teams
+- Tournaments
+- Matches
+- MatchPlayers
+- Games
+- Invitations
+- AuditLogs
 
 
 ## Project Structure
@@ -84,52 +196,19 @@ project/
 └── docker/        # MySQL master-slave replication setup
 ```
 
-### Backend Architecture (Server)
+## Custom Load Balancer
 
-The backend follows a **domain-driven, layered architecture**:
-
-- `Domain/` → Core business models, DTOs, contracts (framework-agnostic)
-- `Services/` → Business logic implementations
-- `Database/` → Repository pattern + DB abstraction layer
-- `WebAPI/` → Controllers + routing layer
-- `Middlewares/` → Auth, validation, authorization
-
-This ensures high testability and loose coupling between layers.
-
----
-
-### Load Balancer Architecture
-
-The load balancer is a standalone service implementing:
-
-- Strategy Pattern (pluggable algorithms)
-- Dependency Injection (runtime algorithm selection)
-- Proxy-based routing (`http-proxy-middleware`)
-- Health-aware server pool management
-
-#### Supported Algorithms
-
-- Round Robin
-- Least Connections
-- IP Hash
-- Weighted Round Robin
-
----
-
-### Database Layer
-
-PulseGrid uses a **master–slave MySQL replication model**:
-
-- **Master** → Write operations
-- **Slaves** → Read operations (scaling reads)
+A separate Node.js load balancer was developed and deployed.
 
 Features:
 
-- Automatic failover detection
-- Health-checked connection pools
-- Transparent routing based on operation type
-
----
+- Weighted Round Robin algorithm
+- Strategy Pattern based balancing algorithms
+- Factory-based strategy resolution
+- Background health checks
+- Proxy routing
+- Server pool management
+- Dependency Injection support
 
 ## Authentication & Security
 
@@ -188,36 +267,42 @@ GitHub Actions pipeline ensures:
 
 ---
 
-## Environment Configuration
+## Configuration
 
-### Load Balancer
+The application uses environment variables for:
 
-```env
-LB_PORT=8080
-LB_ALGORITHM=ROUND_ROBIN
-HEALTH_CHECK_INTERVAL=10000
-HEALTH_CHECK_TIMEOUT=3000
-```
-
-### Backend
-
-- Environment-based config switching (dev / production)
-- Separate DB credentials per environment
-- Secure JWT secret management
-
----
+- database connectivity
+- JWT secrets
+- deployment settings
+- load balancing configuration
+- health monitoring configuration
 
 ## Deployment
 
-### Production Architecture
+Production deployment consists of:
 
-- Frontend → Vercel
-- Backend → Render
-- Database → Aiven (managed MySQL)
+- Render (Load Balancer)
+- Render (Server Instance #1)
+- Render (Server Instance #2)
+- Railway (Server Instance #3)
+- Aiven MySQL Database
 
-This separation ensures scalability and reliability under free-tier constraints.
+Traffic distribution is handled using a Weighted Round Robin balancing strategy.
 
----
+## Deployment Topology
+
+```text
+              Users
+                ↓
+      Load Balancer (Render)
+                ↓
+ ┌──────────────┬──────────────┬──────────────┐
+ │ Server #1    │ Server #2    │ Server #3    │
+ │ Render       │ Render       │ Railway      │
+ └──────────────┴──────────────┴──────────────┘
+                ↓
+          Aiven MySQL
+```
 
 ## Getting Started
 
@@ -259,16 +344,41 @@ npm install
 npm run dev
 ```
 
----
+## Engineering Challenges
 
-## Why This Architecture Matters
+### Tournament Bracket Generation
 
-PulseGrid is designed to simulate real-world distributed systems concepts:
+Generating tournament brackets required mapping temporary bracket nodes to persisted database entities while maintaining match relationships.
 
-- horizontal scaling via load balancing
-- fault tolerance via health checks
-- read scalability via replication
-- modular backend design
-- production CI/CD workflow
+### N+1 Query Reduction
 
-It is not just a CRUD application — it demonstrates **system-level design thinking applied in a full-stack TypeScript ecosystem**.
+Repository methods were extended to support bulk retrieval operations, reducing unnecessary database round trips.
+
+### Distributed Deployment
+
+The application was deployed across multiple cloud providers and routed through a custom load balancer with health monitoring.
+
+## Team Development
+
+This project was developed by a team of four students.
+
+To ensure broad exposure to the full stack, all team members contributed across frontend and backend layers.
+
+Key contributions included:
+
+- tournament management
+- match lifecycle management
+- authentication and authorization
+- administrative dashboard
+- load balancing infrastructure
+- deployment and cloud hosting
+
+## Future Improvements
+
+- Database transaction support through Unit of Work pattern
+- Database provider abstraction
+- Soft delete support
+- Cloud object storage for images
+- External game metadata integration
+- Real-time or polling-based invitation updates
+- Invite read/unread tracking
