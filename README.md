@@ -5,6 +5,8 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-19-61dafb?logo=react)](https://react.dev/)
 
+![Tournament Bracket](README-assets/bracket.png)
+
 Full-stack web application for managing esports teams, tournaments, matches and player participation.
 
 Built with React, TypeScript, Node.js, Express and MySQL using layered architecture, dependency injection and scalable deployment practices.
@@ -110,19 +112,23 @@ Esports Tournament Platform is built as a multi-layer distributed system:
 
 ### Tournament Bracket
 
-[screenshot]
+![Bracket](README-assets/bracket.png)
 
 ### Match Management
 
-[screenshot]
+![Match Details](README-assets/match.png)
 
 ### Admin Dashboard
 
-[screenshot]
+![User List](README-assets/users.png)
+![Audit Log](README-assets/audit.png)
+![DB Health](README-assets/health1.png)
+![API Health](README-assets/health2.png)
 
+User administration, audit logging, and system monitoring.
 ### Team Management
 
-[screenshot]
+![Team Management](README-assets/team.png)
 
 ## Architecture
 
