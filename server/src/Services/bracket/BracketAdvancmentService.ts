@@ -45,9 +45,9 @@ export class BracketAdvancementService implements IBracketAdvancementService {
         if(!validation.isSuccess)
             return validation;
 
-        const ok = slot === MatchSlot.BLUE? 
-                await this.matchWriteRepo.update(matchId, {blueTeamId: teamId })
-                : await this.matchWriteRepo.update(matchId, {redTeamId: teamId });
+        const ok = slot === MatchSlot.BLUE 
+            ? await this.matchWriteRepo.update(matchId, {blueTeamId: teamId })
+            : await this.matchWriteRepo.update(matchId, {redTeamId: teamId });
 
         if(!ok)
             return Result.Failure("Couldn't advance team", ErrorType.Internal);
@@ -56,19 +56,6 @@ export class BracketAdvancementService implements IBracketAdvancementService {
     }
 
     public async advanceMatch(match: Match, winnerTeamId: number, loserTeamId: number): Promise<Result<void>> {
-        // PRE VALIDATION
-        if(match.winnerToMatchId) {
-
-            const validation = await this.validateAdvance( match.winnerToMatchId, match.winnerToSlot, winnerTeamId);
-            if(!validation.isSuccess)
-                return validation;
-        }
-
-        if(match.loserToMatchId) {
-            const validation = await this.validateAdvance( match.loserToMatchId, match.loserToSlot, loserTeamId);
-            if(!validation.isSuccess)
-                return validation;
-        }
         // ADVANCE WINNER
         if(match.winnerToMatchId) {
             const result = await this.advanceTeam(match.winnerToMatchId, match.winnerToSlot, winnerTeamId);
