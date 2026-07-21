@@ -24,7 +24,8 @@ export class UserWatchlistWriteRepository implements IUserWatchlistWriteReposito
     } catch (err) {
       this.logger.error("UserWatchlistRepository", "create failed", err);
       return new UserWatchlist();
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
 
   async delete(userId: number,tournamentId: number): Promise<boolean> {
@@ -38,6 +39,7 @@ export class UserWatchlistWriteRepository implements IUserWatchlistWriteReposito
     } catch (err) {
       this.logger.error("UserWatchlistRepository", "delete failed", err);
       return false;
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
 }

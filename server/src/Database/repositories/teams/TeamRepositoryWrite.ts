@@ -30,7 +30,8 @@ export class TeamRepositoryWrite implements ITeamRepositoryWrite {
     } catch (err) {
       this.logger.error("TeamRepository", "create failed", err);
       return new Team();
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
 
   async update(id: number, fields: Partial<Team>): Promise<boolean> {
@@ -62,7 +63,8 @@ export class TeamRepositoryWrite implements ITeamRepositoryWrite {
     } catch (err) {
       this.logger.error("TeamRepository", "update failed", err);
       return false;
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
 
   async delete(id: number): Promise<boolean> {
@@ -76,7 +78,8 @@ export class TeamRepositoryWrite implements ITeamRepositoryWrite {
     } catch (err) {
       this.logger.error("TeamRepository", "delete failed", err);
       return false;
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
   
 }

@@ -29,7 +29,8 @@ export class TeamMemberRepositoryWrite implements ITeamMemberRepositoryWrite{
     } catch (err) {
       this.logger.error("TeamMemberRepository", "create failed", err);
       return new TeamMember();
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
 
   async update(teamId: number, userId: number, role: TeamRole): Promise<boolean> {
@@ -43,7 +44,8 @@ export class TeamMemberRepositoryWrite implements ITeamMemberRepositoryWrite{
     } catch (err) {
       this.logger.error("TeamMemberRepository", "update failed", err);
       return false;
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
 
   async delete(teamId: number, userId: number): Promise<boolean> {
@@ -57,6 +59,7 @@ export class TeamMemberRepositoryWrite implements ITeamMemberRepositoryWrite{
     } catch (err) {
       this.logger.error("TeamMemberRepository", "delete failed", err);
       return false;
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
 }

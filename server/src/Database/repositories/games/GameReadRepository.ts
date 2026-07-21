@@ -26,7 +26,10 @@ export class GameReadRepository implements IGameReadRepository{
             this.logger.error("GameRepository","findById failed",err);
             return new Game;
         }
-        finally{ res.conn.release();}
+        finally{
+            if(!res.isTransaction)
+                res.conn.release();
+        }
     }
 
     async findByName(name: string): Promise<Game> {
@@ -40,7 +43,8 @@ export class GameReadRepository implements IGameReadRepository{
             this.logger.error("GameRepository","findByName failed",err);
             return new Game;
         }
-        finally{ res.conn.release();}
+        finally{ if(!res.isTransaction)
+        res.conn.release();}
     }
     
     async findAll(page = 1, limit = 20): Promise<Game[]> {
@@ -55,7 +59,8 @@ export class GameReadRepository implements IGameReadRepository{
         } catch (err) {
             this.logger.error("GameRepository", "findAll failed", err);
             return [];
-        } finally { res.conn.release(); }
+        } finally { if(!res.isTransaction)
+        res.conn.release(); }
     }
 
     async getTotal(): Promise<number> {
@@ -68,6 +73,7 @@ export class GameReadRepository implements IGameReadRepository{
         catch (err){
             this.logger.error("GameRepository", "get total failed", err);
             return 0;
-        } finally { res.conn.release(); }
+        } finally { if(!res.isTransaction)
+        res.conn.release(); }
     }
 }

@@ -28,7 +28,8 @@ export class UserWatchlistReadRepository implements IUserWatchlistReadRepository
     } catch (err) {
       this.logger.error("UserWatchlistRepository", "findByUserId failed", err);
       return [];
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
 
   async findWatchlistItem(userId: number, tournamentId: number): Promise<UserWatchlist>{
@@ -42,7 +43,8 @@ export class UserWatchlistReadRepository implements IUserWatchlistReadRepository
     } catch (err) {
       this.logger.error("UserWatchlistRepository", "findWatchlistItem failed", err);
       return new UserWatchlist();
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
 
   async getTotal(userId: number): Promise<number> {
@@ -57,6 +59,7 @@ export class UserWatchlistReadRepository implements IUserWatchlistReadRepository
         catch (err){
             this.logger.error("UserWatchlistRepository", "get total failed", err);
             return 0;
-        } finally { res.conn.release(); }
+        } finally { if(!res.isTransaction)
+        res.conn.release();; }
     }
 }

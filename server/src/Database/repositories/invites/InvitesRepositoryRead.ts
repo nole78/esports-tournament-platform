@@ -26,7 +26,8 @@ export class InvitesRepositoryRead implements IInvitesRepositoryRead{
             this.logger.error("InivteRepository", "findByTeamId failed", err);
             return [];
         }
-        finally { res.conn.release();}
+        finally { if(!res.isTransaction)
+        res.conn.release();;}
     }
 
     async findByUserId(userId: number): Promise<Invite[]> {
@@ -43,7 +44,8 @@ export class InvitesRepositoryRead implements IInvitesRepositoryRead{
             this.logger.error("InvitesRepository", "findByUserId", err);
             return [];
         }
-        finally{ res.conn.release();}
+        finally{ if(!res.isTransaction)
+        res.conn.release();;}
     }
     async find(teamId: number, userId: number): Promise<Invite> {
         const res = await this.db.getReadConnection();
@@ -59,6 +61,7 @@ export class InvitesRepositoryRead implements IInvitesRepositoryRead{
             this.logger.error("InvitesRepository", "findByUserId", err);
             return new Invite;
         }
-        finally{ res.conn.release();}
+        finally{ if(!res.isTransaction)
+        res.conn.release();;}
     }
 }

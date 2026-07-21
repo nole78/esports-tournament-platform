@@ -37,7 +37,10 @@ export class TournamentWriteRepository implements ITournamentWriteRepository {
     } catch (err) {
       this.logger.error("TournamentRepository", "create failed", err);
       return new Tournament();
-    } finally { res.conn.release(); }
+    } finally {
+        if(!res.isTransaction)
+        res.conn.release();
+    }
   }
 
   async update(id: number, fields: Partial<Tournament>): Promise<boolean> {
@@ -65,7 +68,10 @@ export class TournamentWriteRepository implements ITournamentWriteRepository {
     } catch (err) {
       this.logger.error("TournamentRepository", "update failed", err);
       return false;
-    } finally { res.conn.release(); }
+    } finally {
+        if(!res.isTransaction)
+        res.conn.release();
+    }
   }
 
   async delete(id: number): Promise<boolean> {
@@ -79,6 +85,9 @@ export class TournamentWriteRepository implements ITournamentWriteRepository {
     } catch (err) {
       this.logger.error("TournamentRepository", "delete failed", err);
       return false;
-    } finally { res.conn.release(); }
+    } finally { 
+      if(!res.isTransaction)
+        res.conn.release();
+    }
   }
 }

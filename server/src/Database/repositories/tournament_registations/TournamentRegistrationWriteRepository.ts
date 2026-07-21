@@ -22,7 +22,8 @@ export class TournamentRegistrationRepositoryWrite implements ITournamentRegistr
     } catch (err) {
       this.logger.error("TournamentRegistrationRepository", "create failed", err);
       return new TournamentRegistration();
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
 
   async update(tournamentId: number,teamId: number, fields: Partial<TournamentRegistration>): Promise<boolean> {
@@ -40,7 +41,8 @@ export class TournamentRegistrationRepositoryWrite implements ITournamentRegistr
     } catch (err) {
       this.logger.error("TournamentRegistrationRepository", "update failed", err);
       return false;
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
 
   async delete(tournamentId: number,teamId: number): Promise<boolean> {
@@ -54,6 +56,7 @@ export class TournamentRegistrationRepositoryWrite implements ITournamentRegistr
     } catch (err) {
       this.logger.error("TournamentRegistrationRepository", "delete failed", err);
       return false;
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
 }

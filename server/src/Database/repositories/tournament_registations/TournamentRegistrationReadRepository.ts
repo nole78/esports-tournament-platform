@@ -28,7 +28,8 @@ export class TournamentRegistrationReadRepository implements ITournamentRegistra
     } catch (err) {
       this.logger.error("TournamentRegistrationRepository", "findTotalByTeamId failed", err);
       return 0;
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
 
   async findTotalByTournamentId(tournamentId: number, status:TournamentRegistrationStatus): Promise<number>{
@@ -45,7 +46,8 @@ export class TournamentRegistrationReadRepository implements ITournamentRegistra
     } catch (err) {
       this.logger.error("TournamentRegistrationRepository", "findTotalByTournamentId failed", err);
       return 0;
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
 
   async findByTeamId(teamId: number, page = 1, limit = 9): Promise<TournamentRegistration[]> {
@@ -64,7 +66,8 @@ export class TournamentRegistrationReadRepository implements ITournamentRegistra
     } catch (err) {
       this.logger.error("TournamentRegistrationRepository", "findByTeamId failed", err);
       return [];
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
 
   async findByTournamentId(tournamentId: number, status?:TournamentRegistrationStatus, page = 1, limit=9): Promise<TournamentRegistration[]> {
@@ -84,7 +87,8 @@ export class TournamentRegistrationReadRepository implements ITournamentRegistra
     } catch (err) {
       this.logger.error("TournamentRegistrationRepository", "findByTournamentId failed", err);
       return [];
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
 
   async findAllByTournamentId(tournamentId: number, status?: TournamentRegistrationStatus): Promise<TournamentRegistration[]> {
@@ -103,7 +107,8 @@ export class TournamentRegistrationReadRepository implements ITournamentRegistra
     } catch (err) {
       this.logger.error("TournamentRegistrationRepository", "findAllByTournamentId failed", err);
       return [];
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
 
   async findByTournamentAndTeamId(tournamentId: number, teamId: number): Promise<TournamentRegistration>{
@@ -120,7 +125,8 @@ export class TournamentRegistrationReadRepository implements ITournamentRegistra
     }catch (err) {
       this.logger.error("TournamentRepository", "findById failed", err);
       return new TournamentRegistration();
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   } 
 
   async findAll(page:number, limit:number): Promise<TournamentRegistration[]> {
@@ -135,6 +141,7 @@ export class TournamentRegistrationReadRepository implements ITournamentRegistra
     } catch (err) {
       this.logger.error("TournamentRegistrationRepository", "findAll failed", err);
       return [];
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
 }

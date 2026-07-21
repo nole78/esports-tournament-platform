@@ -28,7 +28,8 @@ export class InvitesRepositoryWrite implements IInvitesRepositoryWrite{
         }catch (err){
             this.logger.error("InvitesRepository", "create", err);
             return new Invite;
-        }finally{res.conn.release();}
+        }finally{if(!res.isTransaction)
+        res.conn.release();;}
     }
 
     async delete(teamId: number, userId: number): Promise<boolean> {
@@ -43,7 +44,8 @@ export class InvitesRepositoryWrite implements IInvitesRepositoryWrite{
         }catch(err){
             this.logger.error("InviteRepository", "delete failed", err);
             return false;
-        }finally{res.conn.release();}
+        }finally{if(!res.isTransaction)
+        res.conn.release();;}
     }
 
     async update(teamId: number, userId : number, status: TeamInviteStatus): Promise<boolean> {
@@ -58,6 +60,7 @@ export class InvitesRepositoryWrite implements IInvitesRepositoryWrite{
         }catch(err){
             this.logger.error("InviteRepository", "update failed", err);
             return false;
-        }finally{ res.conn.release();}
+        }finally{ if(!res.isTransaction)
+        res.conn.release();;}
     }
 }

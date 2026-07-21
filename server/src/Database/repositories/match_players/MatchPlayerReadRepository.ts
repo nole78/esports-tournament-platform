@@ -25,7 +25,8 @@ export class MatchPlayerReadRepository implements IMatchPlayerReadRepository {
     } catch (err) {
       this.logger.error("MatchPlayerRepository", "findOne failed", err);
       return new MatchPlayer;
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
 
   async findByUserId(userId: number): Promise<MatchPlayer[]> {
@@ -39,7 +40,8 @@ export class MatchPlayerReadRepository implements IMatchPlayerReadRepository {
     } catch (err) {
       this.logger.error("MatchPlayerRepository", "findByUserId failed", err);
       return [];
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
 
   async findByMatchId(matchId: number): Promise<MatchPlayer[]>{
@@ -53,7 +55,8 @@ export class MatchPlayerReadRepository implements IMatchPlayerReadRepository {
     } catch (err) {
       this.logger.error("MatchPlayerRepository", "findByMatchId failed", err);
       return [];
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
 
   async findByTeamId(teamId: number): Promise<MatchPlayer[]>{
@@ -67,7 +70,8 @@ export class MatchPlayerReadRepository implements IMatchPlayerReadRepository {
     } catch (err) {
       this.logger.error("MatchPlayerRepository", "findByMatchId failed", err);
       return [];
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
 
 
@@ -83,6 +87,7 @@ export class MatchPlayerReadRepository implements IMatchPlayerReadRepository {
     } catch (err) {
       this.logger.error("MatchPlayerRepository", "findAll failed", err);
       return [];
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
 }
