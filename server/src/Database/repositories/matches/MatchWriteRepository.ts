@@ -49,7 +49,8 @@ export class MatchWriteRepository implements  IMatchWriteRepository{
     } catch (err) {
       this.logger.error("MatchRepository", "create bulk failed", err);
       return [];
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
 
   async update(id: number, fields: Partial<Match>): Promise<boolean> {
@@ -88,7 +89,8 @@ export class MatchWriteRepository implements  IMatchWriteRepository{
     } catch (err) {
       this.logger.error("MatchRepository", "update failed", err);
       return false;
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
 
   async delete(id: number): Promise<boolean> {
@@ -102,6 +104,7 @@ export class MatchWriteRepository implements  IMatchWriteRepository{
     } catch (err) {
       this.logger.error("EntityRepository", "delete failed", err);
       return false;
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
 }

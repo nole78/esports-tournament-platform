@@ -24,7 +24,8 @@ export class UserReadRepository implements IUserReadRepository {
     } catch (err) {
       this.logger.error("UserRepository", "findById failed", err);
       return new User();
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
 
   async findByIds(ids: number[]): Promise<User[]> {
@@ -38,7 +39,8 @@ export class UserReadRepository implements IUserReadRepository {
     } catch (err) {
       this.logger.error("UserRepository", "findByIds failed", err);
       return [];
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
 
   async findByUsername(username: string): Promise<User> {
@@ -50,7 +52,8 @@ export class UserReadRepository implements IUserReadRepository {
     } catch (err) {
       this.logger.error("UserRepository", "findByUsername failed", err);
       return new User();
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
 
   async findByEmail(email: string): Promise<User> {
@@ -62,7 +65,8 @@ export class UserReadRepository implements IUserReadRepository {
     } catch (err) {
       this.logger.error("UserRepository", "findByEmail failed", err);
       return new User();
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
 
   async findAll(): Promise<User[]> {
@@ -74,7 +78,8 @@ export class UserReadRepository implements IUserReadRepository {
     } catch (err) {
       this.logger.error("UserRepository", "findAll failed", err);
       return [];
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
   
   async exists(id: number): Promise<boolean> {
@@ -88,6 +93,7 @@ export class UserReadRepository implements IUserReadRepository {
     } catch (err) {
       this.logger.error("UserRepository", "exists failed", err);
       return false;
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
 }

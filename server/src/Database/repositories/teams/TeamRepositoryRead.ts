@@ -27,7 +27,8 @@ export class TeamRepositoryRead implements ITeamRepositoryRead {
     } catch (err) {
       this.logger.error("TeamRepository", "findById failed", err);
       return new Team();
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
 
   async findAll(page = 1, limit = 20): Promise<Team[]> {
@@ -44,7 +45,8 @@ export class TeamRepositoryRead implements ITeamRepositoryRead {
     } catch (err) {
       this.logger.error("TeamRepository", "findAll failed", err);
       return [];
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
 
   async findByTeamTag(TeamTag: string): Promise<Team> {
@@ -58,7 +60,8 @@ export class TeamRepositoryRead implements ITeamRepositoryRead {
     } catch (err) {
       this.logger.error("TeamRepository", "findByTeamTag failed", err);
       return new Team;
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
   async getTotal(): Promise<number>{
     const res = await this.db.getReadConnection();
@@ -71,7 +74,8 @@ export class TeamRepositoryRead implements ITeamRepositoryRead {
     catch (err){
       this.logger.error("TeamRepository", "get total failed", err);
       return 0;
-    } finally {res.conn.release();}
+    } finally {if(!res.isTransaction)
+        res.conn.release();;}
   }
   async findByIds(ids: number[]): Promise<Team[]> {
     const res = await this.db.getReadConnection();
@@ -85,7 +89,8 @@ export class TeamRepositoryRead implements ITeamRepositoryRead {
     } catch (err) {
       this.logger.error("TeamRepositoryRead", "findByIds failed", err);
       return [];
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
   
 }

@@ -24,7 +24,8 @@ export class UserWriteRepository implements IUserWriteRepository {
     } catch (err) {
       this.logger.error("UserRepository", "create failed", err);
       return new User();
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
 
   async update(id:number ,fields: Partial<User>): Promise<boolean> {
@@ -55,7 +56,8 @@ export class UserWriteRepository implements IUserWriteRepository {
     } catch (err) {
       this.logger.error("UserRepository", "update failed", err);
       return false;
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
 
   async logOut(id: number): Promise<boolean> {
@@ -69,7 +71,8 @@ export class UserWriteRepository implements IUserWriteRepository {
     } catch (err) {
       this.logger.error("UserRepository", "log out failed", err);
       return false;
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
 
   async logIn(id: number): Promise<boolean> {
@@ -83,6 +86,7 @@ export class UserWriteRepository implements IUserWriteRepository {
     } catch (err) {
       this.logger.error("UserRepository", "log in failed", err);
       return false;
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
 }

@@ -55,9 +55,13 @@ import { UserWatchlistService } from "./Services/user_watchlist/UserWatchlistSer
 import { UserWatchlistController } from "./WebAPI/controllers/UserWatchlistController";
 import { BracketAdvancementService } from "./Services/bracket/BracketAdvancmentService";
 import { BracketGeneratorService } from "./Services/bracket/BracketGeneratorService";
+import { UnitOfWork } from "./Database/UnitOfWork";
 
 export const logger = new ConsoleLoggerService();
 export const db     = new DbManager(logger);
+
+// Unit of Work
+const unitOfWork = new UnitOfWork(db, logger);
 
 // Domain Services
 const dateTimeConverter = new DateTimeConverter();
@@ -98,9 +102,9 @@ const healthService = new HealthService(gameReadRepo, tournamentReadRepo, userRe
 const watchlistService = new UserWatchlistService(userWatchlistReadRepo, userWatchlistWriteRepo, tournamentReadRepo, gameReadRepo);
 const tournamentRegistrationReadService = new TournamentRegistrationReadService(tournamentRegistrationReadRepo, teamRepoRead, tournamentReadRepo, logger);
 const bracketGeneratorService = new BracketGeneratorService();
-const tournamentRegistrationWriteService = new TournamentRegistrationWriteService(tournamentRegistrationWriteRepo, tournamentRegistrationReadRepo, teamRepoRead, teamMemberRepoRead, tournamentReadRepo, tournamentWriteRepo, gameReadRepo, logger, bracketGeneratorService, matchWriteRepo);
+const tournamentRegistrationWriteService = new TournamentRegistrationWriteService(tournamentRegistrationWriteRepo, tournamentRegistrationReadRepo, teamRepoRead, teamMemberRepoRead, tournamentReadRepo, tournamentWriteRepo, gameReadRepo, logger, bracketGeneratorService, matchWriteRepo, unitOfWork);
 const bracketAdvancementService = new BracketAdvancementService(matchReadRepo,matchWriteRepo);
-const matchService = new MatchService(matchReadRepo, matchWriteRepo, teamRepoRead, tournamentReadRepo, gameReadRepo,bracketAdvancementService);
+const matchService = new MatchService(matchReadRepo, matchWriteRepo, teamRepoRead, tournamentReadRepo, gameReadRepo, bracketAdvancementService, unitOfWork);
 const matchPlayerService = new MatchPlayerService(matchReadRepo, matchPlayerReadRepo, matchPlayerWriteRepo, userReadRepo, teamRepoRead, teamMemberRepoRead);
 
 // Express

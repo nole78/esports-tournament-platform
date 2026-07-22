@@ -4,6 +4,7 @@ import { DbNode } from "../../Domain/models/DbNode";
 import { NodeStatus } from "../../Domain/enums/NodeStatus";
 import { HEALTH_CHECK_TIMEOUT, HEALTH_CHECK_INTERVAL_MS } from "../../Domain/constants/Constants";
 import { ILoggerService } from "../../Domain/services/logger/ILoggerService";
+import { transactionStorage } from "../TransactionContext";
 
 dotenv.config();
 
@@ -92,7 +93,14 @@ export class DbManager {
   }
 
   /** All writes (INSERT/UPDATE/DELETE) → Master only */
-  public async getWriteConnection(): Promise<{ conn: PoolConnection; nodeName: string } | null> {
+  public async getWriteConnection(): Promise<{ conn: PoolConnection; nodeName: string; isTransaction: boolean } | null> {
+    // Checks if there is a transaction
+    const txConn = transactionStorage.getStore();
+    if(txConn) {
+      return { conn: txConn, nodeName: this.master.name, isTransaction: true};
+    }
+    
+    // Gets write connection from master pool
     if (this.master.node.status === NodeStatus.UNREACHABLE) {
       this.logger.error("DB", "Master is UNREACHABLE — write not possible");
       return null;
@@ -100,7 +108,7 @@ export class DbManager {
     try {
       const conn = await this.master.pool.getConnection();
       this.master.node.successfulWrites++;
-      return { conn, nodeName: this.master.name };
+      return { conn, nodeName: this.master.name, isTransaction: false};
     } catch (err) {
       this.master.node.status = NodeStatus.UNREACHABLE;
       this.master.node.failedWrites++;
@@ -110,7 +118,14 @@ export class DbManager {
   }
 
   /** All reads (SELECT) → Round-Robin slaves, fallback to Master */
-  public async getReadConnection(): Promise<{ conn: PoolConnection; nodeName: string } | null> {
+  public async getReadConnection(): Promise<{ conn: PoolConnection; nodeName: string; isTransaction: boolean} | null> {
+    // Checks if there is a transaction
+    const txConn = transactionStorage.getStore();
+    if(txConn) {
+      return { conn: txConn, nodeName: this.master.name, isTransaction: true};
+    }
+
+    // Gets connection from pool
     const n = this.slaves.length;
     for (let i = 0; i < n; i++) {
       const idx = (this.slaveRrIndex + i) % n;
@@ -120,7 +135,7 @@ export class DbManager {
         const conn = await info.pool.getConnection();
         this.slaveRrIndex = (idx + 1) % n;
         info.node.successfulReads++;
-        return { conn, nodeName: info.name };
+        return { conn, nodeName: info.name, isTransaction: false};
       } catch (err) {
         info.node.status = NodeStatus.UNREACHABLE;
         info.node.failedReads++;
@@ -136,7 +151,7 @@ export class DbManager {
     try {
       const conn = await this.master.pool.getConnection();
       this.master.node.successfulReads++;
-      return { conn, nodeName: this.master.name };
+      return { conn, nodeName: this.master.name, isTransaction: false};
     } catch (err) {
       this.master.node.status = NodeStatus.UNREACHABLE;
       this.master.node.failedReads++;

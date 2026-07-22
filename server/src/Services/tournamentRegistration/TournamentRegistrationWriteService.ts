@@ -23,6 +23,7 @@ import { IMatchWriteRepository } from "../../Domain/repositories/matches/IMatchW
 import { BracketMatchMapper } from "../bracket/mappers/BracketMatchMapper";
 import { BracketIdMapper } from "../bracket/mappers/BracketIdMapper";
 import { BracketRelationBuilder } from "../bracket/mappers/BracketRelationBuilder";
+import { IUnitOfWork } from "../../Domain/IUnitOfWork";
 
 export class TournamentRegistrationWriteService implements ITournamentRegistrationWriteService{
     public constructor(
@@ -35,7 +36,8 @@ export class TournamentRegistrationWriteService implements ITournamentRegistrati
         private readonly gameReadRepo: IGameReadRepository,
         private readonly logger: ILoggerService,
         private readonly generator: IBracketGeneratorService,
-        private readonly matchWriteRepo: IMatchWriteRepository
+        private readonly matchWriteRepo: IMatchWriteRepository,
+        private readonly unitOfWork: IUnitOfWork
     ){}
 
     async create(tr: CreateTournamentRegistrationDto): Promise<Result<TournamentRegistrationDto>>{
@@ -145,31 +147,24 @@ export class TournamentRegistrationWriteService implements ITournamentRegistrati
         try
         {
             const tournament = await this.tournamentReadRepo.findById(id);
-            if(tournament.tournamentId === 0)
-            {
-                this.logger.error("TournamentService", "generateBracket failed", `Tournament with tournamentId "${id}" not found`);
+            if(tournament.tournamentId === 0) {
                 return Result.Failure("Tournament with id "+id+"does not exist!", ErrorType.NotFound);
             }
 
-            if(tournament.tournamentStatus === TournamentStatus.ACTIVE || tournament.tournamentStatus === TournamentStatus.COMPLETED)
-            {
-                this.logger.error("TournamentService", "generateBracket failed", `Bracket is already created!`);
+            if(tournament.tournamentStatus === TournamentStatus.ACTIVE || tournament.tournamentStatus === TournamentStatus.COMPLETED) {
                 return Result.Failure("Bracket for this tournament is already created!", ErrorType.NotFound);
             }
             
             const tournamentRegs = await this.tournamentRegistrationReadRepo.findAllByTournamentId(id, TournamentRegistrationStatus.CONFIRMED);
-            if(tournamentRegs.length == 0)
-            {
-                this.logger.error("TournamentRegistrationWriteService", "generateBracket failed", `Registered  not found`);
-                return Result.Failure("Tournament with id "+id+"does not exist!", ErrorType.NotFound);
+            if(tournamentRegs.length == 0) {
+                return Result.Failure("Tournament with id " + id + " does not exist!", ErrorType.NotFound);
             }
 
             const numOfRegTeams = await this.tournamentRegistrationReadRepo.findTotalByTournamentId(id, TournamentRegistrationStatus.CONFIRMED);
-            if(numOfRegTeams < MIN_TOURNAMENT_TEAMS)
-            {
-                this.logger.error("TournamentRegistrationWriteService", "generateBracket failed", `Not enough teams for tournament`);
+            if(numOfRegTeams < MIN_TOURNAMENT_TEAMS) {
                 return Result.Failure("There must be atleast 2 teams to generate bracket!", ErrorType.NotFound);
             }
+
             if(tournament.tournamentFormat !== TournamentFormat.ROUND_ROBIN)
             {
                 if((numOfRegTeams & (numOfRegTeams - 1)) !== 0)
@@ -179,73 +174,76 @@ export class TournamentRegistrationWriteService implements ITournamentRegistrati
                 }
             }
 
-            for (let seed = 1; seed <= tournamentRegs.length; seed++) {
-                const registration = tournamentRegs[seed - 1];
-                const success = await this.tournamentRegistrationWriteRepo.update(
-                    id, 
-                    registration.teamId, 
-                    {seed: seed}
-                );
-                if (!success) {
-                    return Result.Failure("Failed to seed teams", ErrorType.Internal);
+            return await this.unitOfWork.runInTransaction(async () =>{
+                for (let seed = 1; seed <= tournamentRegs.length; seed++) {
+                    const registration = tournamentRegs[seed - 1];
+                    const success = await this.tournamentRegistrationWriteRepo.update(
+                        id, 
+                        registration.teamId, 
+                        {seed: seed}
+                    );
+                    if (!success) {
+                        return Result.Failure("Failed to seed teams", ErrorType.Internal);
+                    }
                 }
-            }
+        
+                const registrationIds = tournamentRegs.map(t => t.teamId);
+                let nodes : BracketNode[];
+                switch(tournament.tournamentFormat)
+                {
+                    case TournamentFormat.DOUBLE_ELIMINATION:
+                        {
+                            const res = this.generator.generateDoubleElimination(id, registrationIds);
+                            if(!res.isSuccess)
+                                return Result.Failure("Couldn't generate bracket", ErrorType.Internal);
+                            nodes = res.value as BracketNode[];
+                        }
+                        break;
+                    case TournamentFormat.ROUND_ROBIN:
+                        {
+                            const res = this.generator.generateRoundRobin(id, registrationIds);
+                            if(!res.isSuccess)
+                                return Result.Failure("Couldn't generate bracket", ErrorType.Internal);
+                            nodes = res.value as BracketNode[];
+                        }
+                        break;
+                    default:
+                        {
+                            const res = this.generator.generateSingleElimination(id, registrationIds);
+                            if(!res.isSuccess)
+                                return Result.Failure("Couldn't generate bracket", ErrorType.Internal);
+                            nodes = res.value as BracketNode[];
+                        }
+                        break;
+                }
 
-            const registrationIds = tournamentRegs.map(t => t.teamId);
-            let nodes : BracketNode[];
-            switch(tournament.tournamentFormat)
-            {
-                case TournamentFormat.DOUBLE_ELIMINATION:
-                    {
-                        const res = this.generator.generateDoubleElimination(id, registrationIds);
-                        if(!res.isSuccess)
-                            return Result.Failure("Couldn't generate bracket", ErrorType.Internal);
-                        nodes = res.value as BracketNode[];
-                    }
-                    break;
-                case TournamentFormat.ROUND_ROBIN:
-                    {
-                        const res = this.generator.generateRoundRobin(id, registrationIds);
-                        if(!res.isSuccess)
-                            return Result.Failure("Couldn't generate bracket", ErrorType.Internal);
-                        nodes = res.value as BracketNode[];
-                    }
-                    break;
-                default:
-                    {
-                        const res = this.generator.generateSingleElimination(id, registrationIds);
-                        if(!res.isSuccess)
-                            return Result.Failure("Couldn't generate bracket", ErrorType.Internal);
-                        nodes = res.value as BracketNode[];
-                    }
-                    break;
-            }
+                const matches = nodes.map(BracketMatchMapper.mapNodeToMatch);
 
-            const matches = nodes.map(BracketMatchMapper.mapNodeToMatch);
+                const created = await this.matchWriteRepo.createBulk(matches);
+                if(created.length === 0)
+                    return Result.Failure("Failed to create matches", ErrorType.Internal);
 
-            const created = await this.matchWriteRepo.createBulk(matches);
-            if(created.length === 0)
-                return Result.Failure("Failed to create matches", ErrorType.Internal);
+                const tempMap = BracketIdMapper.mapTempIdsToMatchIds(nodes,created);
 
-            const tempMap = BracketIdMapper.mapTempIdsToMatchIds(nodes,created);
+                const updates = BracketRelationBuilder.generateRelationUpdates(nodes, tempMap);
 
-            const updates = BracketRelationBuilder.generateRelationUpdates(nodes, tempMap);
+                for(const update of updates) {
+                    await this.matchWriteRepo.update(update.matchId, update);
+                }
 
-            for(const update of updates) {
-                await this.matchWriteRepo.update(update.matchId, update);
-            }
-
-            const updateRes = await this.tournamentWriteRepo.update(id, { tournamentStatus: TournamentStatus.ACTIVE });
-            if(!updateRes)
-            {
-                this.logger.error("TournamentRegistrationWriteService", "generateBracket failed", `Could not update tournament!`);
-                return Result.Failure("Could not update tournament with id "+id+"!", ErrorType.NotFound);
-            }
-
-            return Result.Success();
+                const updateRes = await this.tournamentWriteRepo.update(id, { tournamentStatus: TournamentStatus.ACTIVE });
+                if(!updateRes)
+                {
+                    this.logger.error("TournamentRegistrationWriteService", "generateBracket failed", `Could not update tournament!`);
+                    return Result.Failure("Could not update tournament with id "+id+"!", ErrorType.NotFound);
+                }
+                
+                return Result.Success();
+            });
         }
-        catch
+        catch(err)
         {
+            this.logger.error("TournamentRegistrationService", "Failed to generate bracket", err);
             return Result.Failure("Server error",  ErrorType.Internal);
         }
     }

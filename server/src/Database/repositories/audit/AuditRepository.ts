@@ -27,7 +27,11 @@ export class AuditRepository implements IAuditRepository {
     } catch (err) {
       this.logger.error("AuditRepository", "create failed", err);
       return new AuditLog();
-    } finally { res.conn.release(); }
+    } finally {
+      if(!res.isTransaction)
+        if(!res.isTransaction)
+        res.conn.release();
+    }
   }
 
   async findAll(page: number, limit: number): Promise<AuditLog[]> {
@@ -54,7 +58,11 @@ export class AuditRepository implements IAuditRepository {
     } catch (err) {
       this.logger.error("AuditRepository", "findAll failed", err);
       return [];
-    } finally { res.conn.release(); }
+    } finally {
+      if(!res.isTransaction)
+        if(!res.isTransaction)
+        res.conn.release();
+    }
   }
 
   async getTotal(): Promise<number>
@@ -68,7 +76,10 @@ export class AuditRepository implements IAuditRepository {
         catch (err){
             this.logger.error("AuditRepository", "get total failed", err);
             return 0;
-        } finally { res.conn.release(); }
+        } finally {
+          if(!res.isTransaction)
+            res.conn.release();
+        }
   }
 }
  

@@ -26,7 +26,10 @@ export class TournamentReadRepository implements ITournamentReadRepository {
     } catch (err) {
       this.logger.error("TournamentRepository", "findTotal failed", err);
       return 0;
-    } finally { res.conn.release(); }
+    } finally { 
+        if(!res.isTransaction)
+        res.conn.release(); 
+    }
   }
 
   async findTotalFiltered(tournamentGameId?:number, tournamentFormat?:string, tournamentStatus?:string): Promise<number>{
@@ -54,7 +57,10 @@ export class TournamentReadRepository implements ITournamentReadRepository {
     } catch (err) {
       this.logger.error("TournamentRepository", "findTotalFiltered failed", err);
       return 0;
-    } finally { res.conn.release(); }
+    } finally { 
+        if(!res.isTransaction)
+        res.conn.release();
+    }
   }
 
   async findById(id: number): Promise<Tournament> {
@@ -71,7 +77,10 @@ export class TournamentReadRepository implements ITournamentReadRepository {
     } catch (err) {
       this.logger.error("TournamentRepository", "findById failed", err);
       return new Tournament();
-    } finally { res.conn.release(); }
+    } finally {
+        if(!res.isTransaction)
+        res.conn.release();
+    }
   }
 
   async findAll(page:number, limit:number): Promise<Tournament[]> {
@@ -93,7 +102,10 @@ export class TournamentReadRepository implements ITournamentReadRepository {
     } catch (err) {
       this.logger.error("TournamentRepository", "findAll failed", err);
       return [];
-    } finally { res.conn.release(); }
+    } finally {
+        if(!res.isTransaction)
+        res.conn.release();
+    }
   }
 
   async findFiltered(tournamentGameId?:number, tournamentFormat?:string, tournamentStatus?:string, page:number = 1, limit:number = 10): Promise<Tournament[]>{
@@ -133,7 +145,10 @@ export class TournamentReadRepository implements ITournamentReadRepository {
     } catch (err) {
       this.logger.error("TournamentRepository", "findAll failed", err);
       return [];
-    } finally { res.conn.release(); }
+    } finally {
+        if(!res.isTransaction)
+        res.conn.release();
+    }
   }
 
   async findByIds(ids: number[]): Promise<Tournament[]>{
@@ -155,6 +170,9 @@ export class TournamentReadRepository implements ITournamentReadRepository {
     } catch (err) {
       this.logger.error("TournamentRepository", "findByIds failed", err);
       return [];
-    } finally { res.conn.release(); }
+    } finally {
+        if(!res.isTransaction)
+        res.conn.release();
+    }
   }
 }

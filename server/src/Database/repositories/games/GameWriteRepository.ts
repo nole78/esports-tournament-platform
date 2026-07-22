@@ -24,7 +24,8 @@ export class GameWriteRepository implements IGameWriteRepository{
         } catch (err) {
         this.logger.error("GameRepository", "create failed", err);
         return new Game;
-        } finally { res.conn.release(); }
+        } finally { if(!res.isTransaction)
+        res.conn.release();; }
     }
 
     async update(id: number, fields: Partial<Game>): Promise<boolean> {
@@ -53,7 +54,8 @@ export class GameWriteRepository implements IGameWriteRepository{
             } catch (err) {
             this.logger.error("GameRepository", "update failed", err);
             return false;
-        } finally { res.conn.release(); }
+        } finally { if(!res.isTransaction)
+        res.conn.release();; }
     }
 
     async delete(id: number): Promise<boolean> {
@@ -67,6 +69,7 @@ export class GameWriteRepository implements IGameWriteRepository{
         } catch (err) {
         this.logger.error("GameRepository", "delete failed", err);
         return false;
-        } finally { res.conn.release(); }
+        } finally { if(!res.isTransaction)
+        res.conn.release();; }
     }
 }

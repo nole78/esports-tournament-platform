@@ -14,6 +14,7 @@ import { ITournamentReadRepository } from "../../Domain/repositories/tournaments
 import { IBracketAdvancementService } from "../../Domain/services/bracket/IBracketAdvancmentService";
 import { MatchMapper } from './mappers/MatchMapper';
 import { MatchTeamHelper } from './helpers/MatchTeamHelper';
+import { IUnitOfWork } from "../../Domain/IUnitOfWork";
 
 export class MatchService implements IMatchService{
     constructor(
@@ -25,6 +26,7 @@ export class MatchService implements IMatchService{
         private readonly gameReadRepo: IGameReadRepository,
 
         private readonly bracketAdvancementService: IBracketAdvancementService,
+        private readonly unitOfWork: IUnitOfWork
     ){}
 
     public async getAll(page?: number, limit?: number): Promise<Result<PaginatedListDto<MatchDto>>> {
@@ -133,33 +135,22 @@ export class MatchService implements IMatchService{
             const winnerTeamId = blueTeamScore > redTeamScore ? match.blueTeamId : match.redTeamId;
             const loserTeamId = match.blueTeamId === winnerTeamId ? match.redTeamId : match.blueTeamId;
 
-            // PRE VALIDATION
-            if(match.winnerToMatchId) {
-                const validation = await this.bracketAdvancementService.validateAdvance(match.winnerToMatchId, match.winnerToSlot, winnerTeamId);
-                if(!validation.isSuccess)
-                    return validation;
-            }
-            if(match.loserToMatchId) {
-                const validation = await this.bracketAdvancementService.validateAdvance(match.loserToMatchId, match.loserToSlot, loserTeamId);
-                if(!validation.isSuccess)
-                    return validation;
-            }
-            // SAVE RESULT
-            const ok = await this.matchWriteRepo.update(id,{blueTeamScore, redTeamScore, winnerTeamId, status: MatchStatus.COMPLETED});
-            if(!ok) return Result.Failure("Couldn't set match result",ErrorType.Internal);
-            // ADVANCE WINNER
-            if(match.winnerToMatchId) {
-                const result = await this.bracketAdvancementService.advanceTeam(match.winnerToMatchId, match.winnerToSlot, winnerTeamId);
-                if(!result.isSuccess)
-                    return result;
-            }
-            // ADVANCE LOSER
-            if(match.loserToMatchId) {
-                const result = await this.bracketAdvancementService.advanceTeam(match.loserToMatchId, match.loserToSlot, loserTeamId);
-                if(!result.isSuccess)
-                    return result;
-            }
-            return Result.Success();
+            return await this.unitOfWork.runInTransaction(async() => {
+                // SAVE RESULT
+                const ok = await this.matchWriteRepo.update(id,{
+                    blueTeamScore, 
+                    redTeamScore, 
+                    winnerTeamId, 
+                    status: MatchStatus.COMPLETED
+                });
+                if(!ok) return Result.Failure("Couldn't set match result",ErrorType.Internal);
+                
+                // ADVANCE WINNER   
+                const advanceResult = await this.bracketAdvancementService.advanceMatch(match, winnerTeamId, loserTeamId);
+                if(!advanceResult.isSuccess) return advanceResult;
+                
+                return Result.Success();
+            });
         }
         catch(err) {
             return Result.Failure("There was an error setting match result",ErrorType.Internal);

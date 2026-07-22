@@ -26,7 +26,8 @@ export class TeamMemberRepositoryRead implements ITeamMemberRepositoryRead{
     } catch (err) {
       this.logger.error("TeamMemberRepository", "findAll failed", err);
       return [];
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
 
   async findByUserId(userId: number): Promise<TeamMember[]> {
@@ -40,7 +41,8 @@ export class TeamMemberRepositoryRead implements ITeamMemberRepositoryRead{
     } catch (err) {
       this.logger.error("TeamMemberRepository", "findByUserId failed", err);
       return [];
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
 
    async findByTeamId(teamId: number): Promise<TeamMember[]> {
@@ -54,6 +56,7 @@ export class TeamMemberRepositoryRead implements ITeamMemberRepositoryRead{
     } catch (err) {
       this.logger.error("TeamMemberRepository", "findByTeamId failed", err);
       return [];
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
 }

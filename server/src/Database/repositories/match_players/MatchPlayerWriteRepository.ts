@@ -23,7 +23,8 @@ export class MatchPlayerWriteRepository implements IMatchPlayerWriteRepository {
     } catch (err) {
       this.logger.error("MatchPlayerRepository", "create failed", err);
       return new MatchPlayer();
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
 
   async update(userId: number, teamId: number, matchId: number, fields: Partial<MatchPlayer>): Promise<boolean> {
@@ -52,7 +53,8 @@ export class MatchPlayerWriteRepository implements IMatchPlayerWriteRepository {
     } catch (err) {
       this.logger.error("MatchPlayerRepository", "update failed", err);
       return false;
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
 
   async delete(userId: number, teamId: number, matchId: number): Promise<boolean> {
@@ -66,6 +68,7 @@ export class MatchPlayerWriteRepository implements IMatchPlayerWriteRepository {
     } catch (err) {
       this.logger.error("MatchPlayerRepository", "delete failed", err);
       return false;
-    } finally { res.conn.release(); }
+    } finally { if(!res.isTransaction)
+        res.conn.release();; }
   }
 }
