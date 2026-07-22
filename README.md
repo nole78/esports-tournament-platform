@@ -121,9 +121,11 @@ Esports Tournament Platform is built as a multi-layer distributed system:
 ### Admin Dashboard
 
 ![User List](README-assets/users.png)
-![Audit Log](README-assets/audit.png)
-![DB Health](README-assets/health1.png)
-![API Health](README-assets/health2.png)
+<details>
+  <summary>Deployed Health Page</summary>
+  <img src="README-assets/health1.png"/>
+  <img src="README-assets/health2.png"/>
+</details>
 
 User administration, audit logging, and system monitoring.
 ### Team Management
