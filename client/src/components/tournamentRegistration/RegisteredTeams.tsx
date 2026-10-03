@@ -31,7 +31,7 @@ export default function RegisteredTeams() {
       }
       else
       {
-        setError(res.message);
+        setError(res.message ?? "Request failed");
         setConfirmedTeams([]);
       }
     })
@@ -41,7 +41,7 @@ export default function RegisteredTeams() {
         setTournament(res.data);
       }
       else
-        setError(res.message);
+        setError(res.message ?? "Request failed");
     })
     .finally(() => setLoading(false));
   };

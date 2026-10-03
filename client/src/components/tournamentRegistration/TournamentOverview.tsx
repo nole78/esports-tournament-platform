@@ -33,7 +33,7 @@ export default function TournamentOverview() {
           }
           else
           {
-            setError(res.message);
+            setError(res.message ?? "Request failed");
           }
         })
         .finally(() => setLoading(false));

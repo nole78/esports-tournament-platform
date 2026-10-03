@@ -7,7 +7,7 @@ export type TournamentDto = {
     tournamentGame : string,
     tournamentFormat : TournamentFormat,
     tournamentMaxTeams : number,
-    tournamentApplicationDeadline : Date,
+    tournamentApplicationDeadline : string | Date,
     tournamentPrizeFund : number,
     tournamentStatus : TournamentStatus
 }

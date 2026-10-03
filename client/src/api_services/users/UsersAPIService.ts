@@ -3,6 +3,7 @@ import type { IUsersAPIService } from "./IUsersAPIService";
 import type { UserDto } from "../../models/user/UserTypes";
 import { readItem } from "../../helpers/local_storage";
 import type { ApiResponse } from "../tournament_list/ITournamentAPIService";
+import { apiError } from "../apiResponse";
 
 const BASE = import.meta.env.VITE_API_URL + "users";
 
@@ -11,26 +12,21 @@ const authHeader = () => {
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
-const err = <T>(e: unknown, fallback: string): ApiResponse<T> => ({
-  success: false,
-  message: axios.isAxiosError(e) ? (e.response?.data as { message?: string })?.message ?? fallback : fallback,
-});
-
 export const usersApi: IUsersAPIService = {
   async getAll() {
     return axios.get<ApiResponse<UserDto[]>>(BASE, { headers: authHeader() })
-      .then(r => r.data).catch(e => err(e, "Failed to load users"));
+      .then(r => r.data).catch(e => apiError<UserDto[]>(e, "Failed to load users"));
   },
   async getById(id) {
     return axios.get<ApiResponse<UserDto>>(`${BASE}/${id}`, { headers: authHeader() })
-      .then(r => r.data).catch(e => err(e, "Failed to load user"));
+      .then(r => r.data).catch(e => apiError<UserDto>(e, "Failed to load user"));
   },
   async changeRole(id, role) {
-    return axios.put<ApiResponse<void>>(`${BASE}/${id}/role`, {role : role.toLowerCase()}, { headers: authHeader() })
-      .then(r => r.data).catch(e => err(e, "Failed to change user role"));
+    return axios.put<ApiResponse<void>>(`${BASE}/${id}/role`, { role }, { headers: authHeader() })
+      .then(r => r.data).catch(e => apiError<void>(e, "Failed to change user role"));
   },
   async searchUsername(username){
     return axios.get<ApiResponse<UserDto[]>>(`${BASE}/search/${username}`, {headers: authHeader()})
-      .then(r => r.data).catch(e=>err(e, "Failed to search users"))
+      .then(r => r.data).catch(e => apiError<UserDto[]>(e, "Failed to search users"))
   }
 };

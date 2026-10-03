@@ -1,5 +1,7 @@
 import type { UserWatchlistDto } from "../../models/user_watchlist/UserWatchlistDto";
-export type ApiResponse<T> = { success: boolean; message: string; data?: T };
+import type { ApiResponse } from "../../types/api/ApiResponse";
+
+export type { ApiResponse };
 
 export interface IUserWatchListAPIService{
       getById(id: number, page?: number, limit?: number): Promise<ApiResponse<{ items: UserWatchlistDto[]; total: number }>>;

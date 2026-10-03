@@ -11,7 +11,7 @@ export default function UsersPage() {
 
   useEffect(() => {
     usersApi.getAll()
-      .then(res => { if (res.success) setUsers(res.data ?? []); else setError(res.message); })
+      .then(res => { if (res.success) setUsers(res.data ?? []); else setError(res.message ?? "Failed to load users"); })
       .catch(() => setError("Failed to load users"));
   }, []);
 

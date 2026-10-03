@@ -18,7 +18,7 @@ export default function TeamsGuestForm(){
                     setTeams(res.data?.items ?? []);
                     setTotal(res.data?.total ?? 0);
                 } else {
-                    setError(res.message);
+                    setError(res.message ?? "Request failed");
                 }
             })
             .catch(() => setError("Failed to load teams"));

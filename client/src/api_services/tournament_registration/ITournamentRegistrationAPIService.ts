@@ -1,7 +1,8 @@
 import type { TournamentRegistrationDto } from "../../models/tournamentRegistration/TournamentRegistrationDto";
 import type { TournamentRegistrationStatus } from "../../types/tournament_registration/TournamentRegistrationStatus";
+import type { ApiResponse } from "../../types/api/ApiResponse";
 
-export type ApiResponse<T> = { success: boolean; message: string; data?: T };
+export type { ApiResponse };
 
 export interface ITournamentRegistrationAPIService {
     getByTournamentId(id: number, status?:TournamentRegistrationStatus, page?: number, limit?: number): Promise<ApiResponse<{ items: TournamentRegistrationDto[]; total: number }>>;

@@ -27,7 +27,7 @@ export default function PendingTeams(){
       }
       else
       {
-        setError(res.message);
+        setError(res.message ?? "Request failed");
         setPendingTeams([]);
       }
     })

@@ -36,7 +36,7 @@ export default function TournamentList(){
             }
             else
             {
-                setError(res.message);
+                setError(res.message ?? "Request failed");
                 setTournaments([]);
             }
         })
@@ -90,7 +90,7 @@ export default function TournamentList(){
                 setTotal(res.data.total);
             }
                 else
-                setError(res.message);
+                setError(res.message ?? "Request failed");
         })
         .catch(() => setError("Failed to load tournaments!"))
     }, [gameNameFilter, statusFilter, formatFilter, page]);
