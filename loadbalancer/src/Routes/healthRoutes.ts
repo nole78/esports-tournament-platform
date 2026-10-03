@@ -15,6 +15,7 @@ export function createHealthRouter(healthCheck: HealthCheckService) {
                 return res.status(200).json({ success: true, data: servers });
             } catch (error) {
                 return res.status(500).json({
+                    success: false,
                     message: 'Health check failed',
                 });
             }

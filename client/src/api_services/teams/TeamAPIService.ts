@@ -6,6 +6,7 @@ import type { UserForMembersDto } from "../../models/user/UserForMembers";
 import type { IniviteDto } from "../../models/invite/InviteDto";
 import type { TeamDtoGuest } from "../../models/team/TeamDtoGuest";
 import type { UserDto } from "../../models/user/UserTypes";
+import { apiError } from "../apiResponse";
 
 
 
@@ -16,38 +17,33 @@ const authHeader = () => {
     return token ? {Authorization: `Bearer ${token}`} : {};
 };
 
-const err = <T>(e: unknown, fallback: string): ApiResponse<T> => ({
-    success : false,
-    message : axios.isAxiosError(e) ? (e.response?.data as { message?: string})?.message ?? fallback : fallback,
-});
-
 export const teamApi: ITeamAPIService ={
     async getAll(page, limit) {
-        return axios.get(`${BASE}/guest/all?page=${page}&limit=${limit}`).then(r => r.data).catch(e => err(e, "Failed to get all teams"))
+        return axios.get(`${BASE}/guest/all?page=${page}&limit=${limit}`).then(r => r.data).catch(e => apiError<{items: TeamDto[], total: number}>(e, "Failed to get all teams"))
     },
     async getByGamerTag(page, limit){
         return axios.get(`${BASE}?page=${page}&limit=${limit}`, { headers: authHeader()})
-        .then(r => r.data).catch(e => err(e, "Failed to load items"));
+        .then(r => r.data).catch(e => apiError<{items: TeamDto[], total: number}>(e, "Failed to load items"));
     },
     async create(payload){
         return axios.post<ApiResponse<TeamDto>>(BASE, payload, {headers: authHeader()})
-        .then(r => r.data).catch(e => err(e, "Failed to create!"));
+        .then(r => r.data).catch(e => apiError<TeamDto>(e, "Failed to create!"));
     },
     async delete(id){
         return axios.delete<ApiResponse<void>>(`${BASE}/${id}`, {headers: authHeader()})
-        .then(r => r.data).catch(e => err(e, "Failed to delete"))
+        .then(r => r.data).catch(e => apiError<void>(e, "Failed to delete"))
     },
     async getById(id){
         return axios.get<ApiResponse<TeamDto>>(`${BASE}/user/${id}`, {headers: authHeader()})
-        .then(r => r.data).catch(e => err(e, "Failed to find by id"))
+        .then(r => r.data).catch(e => apiError<TeamDto>(e, "Failed to find by id"))
     },
     async update(id, payload){
         return axios.put<ApiResponse<void>>(`${BASE}/${id}`, payload, {headers: authHeader()})
-        .then(r => r.data).catch(e => err(e, "Failed to update"))
+        .then(r => r.data).catch(e => apiError<void>(e, "Failed to update"))
     },
     async getMembers(id){
         return axios.get<ApiResponse<UserForMembersDto[]>>(`${BASE}/members/${id}`, {headers: authHeader()})
-        .then(r => r.data).catch(e => err(e, "Failed to get team members"))
+        .then(r => r.data).catch(e => apiError<UserForMembersDto[]>(e, "Failed to get team members"))
     },
     async transferCaptainship(idTeam, idReciever){
         return axios.patch<ApiResponse<void>>(
@@ -55,39 +51,39 @@ export const teamApi: ITeamAPIService ={
             {},
             {headers: authHeader()}
         )
-        .then(r=>r.data).catch(e => err(e, "Failed to transfer role"))
+        .then(r=>r.data).catch(e => apiError<void>(e, "Failed to transfer role"))
     },
     async inviteMember(teamId, username) {
         return axios.post<ApiResponse<void>>(`${BASE}/${teamId}/invite`, {userTag : username}, {headers: authHeader()})
-        .then(r=> r.data).catch(e => err(e, "Failed to invite user"))
+        .then(r=> r.data).catch(e => apiError<void>(e, "Failed to invite user"))
     }, 
     async userInvites() {
         return axios.get<ApiResponse<IniviteDto[]>>(`${BASE}/invites/all`, {headers: authHeader()})
-        .then(r => r.data).catch(e=> err(e, "Failed to load invites"))
+        .then(r => r.data).catch(e=> apiError<IniviteDto[]>(e, "Failed to load invites"))
     },
     async inviteRespond(teamId, answer) {
         return axios.post<ApiResponse<void>>(`${BASE}/${teamId}/invite/respond`, {answer: answer}, {headers: authHeader()})
-        .then(r => r.data).catch(e => err(e, "Failed to send response"))
+        .then(r => r.data).catch(e => apiError<void>(e, "Failed to send response"))
     },
     async leaveTeam(teamId, userId){
         return axios.delete<ApiResponse<void>>(`${BASE}/${teamId}/members/${userId}`, {headers: authHeader()})
-        .then(r => r.data).catch(e => err(e, "Failed to delete member"))
+        .then(r => r.data).catch(e => apiError<void>(e, "Failed to delete member"))
     },
     async getMyTeams() {
         return axios.get<ApiResponse<TeamDto[]>>(`${BASE}/mine/all`, {headers: authHeader()})
-        .then(r => r.data).catch(e => err(e, "Failed to get your teams"))
+        .then(r => r.data).catch(e => apiError<TeamDto[]>(e, "Failed to get your teams"))
     },
     async getTeamGuest(teamId) {
         return axios.get<ApiResponse<TeamDtoGuest>>(`${BASE}/${teamId}`)
-        .then(r => r.data).catch(e => err(e, "Failed to get team for guest"))
+        .then(r => r.data).catch(e => apiError<TeamDtoGuest>(e, "Failed to get team for guest"))
     },
     
     async getInvitesByTeamId(teamId) {
          return axios.get<ApiResponse<IniviteDto[]>>(`${BASE}/invites/details/${teamId}`, {headers: authHeader()})
-        .then(r => r.data).catch(e => err(e, "Failed to get your invites"))
+        .then(r => r.data).catch(e => apiError<IniviteDto[]>(e, "Failed to get your invites"))
     },
     async getCaptain(teamId) {
         return axios.get<ApiResponse<UserDto>>(`${BASE}/captain/${teamId}`)
-        .then(r => r.data).catch(e => err(e, "Failed to get your invites"))
+        .then(r => r.data).catch(e => apiError<UserDto>(e, "Failed to get team captain"))
     },
 };

@@ -25,7 +25,7 @@ export default function UserWatchlist() {
                     setTotal(res.data?.total ?? 0);
                 }
                 else
-                    setError(res.message);
+                    setError(res.message ?? "Failed to load watchlist");
             })
             .catch(() => setError("Failed to load watchlist"))
     }, [id, page]);
@@ -77,7 +77,7 @@ export default function UserWatchlist() {
                                                             }, 3000);
                                                             return;
                                                         }
-                                                        setError(res.message);
+                                                        setError(res.message ?? "Failed to remove watchlist item");
                                                     })
                                                     .catch(() =>
                                                         setError("Failed to remove tournament from watchlist")

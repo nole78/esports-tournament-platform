@@ -56,7 +56,7 @@ export default function TeamsPage(){
                 setTeams(res.data?.items ?? []);
                 setTotal(res.data?.total ?? 0);
             }else{
-                setError(res.message);
+                setError(res.message ?? "Failed to load teams");
             }
         })
         .catch(() => setError("Failed to load teams"))
@@ -119,7 +119,7 @@ export default function TeamsPage(){
                                                             setTeams(prev => prev.filter(team => team.teamId !== t.teamId));
                                                             setTimeout(() => {setDeleted(false)}, 3000);
                                                             return;}
-                                                        else setError(res.message);
+                                                        else setError(res.message ?? "Failed to leave team");
                                                     })
                                                     .catch(() => setError("Failed to delete the team"))
                                                 }}

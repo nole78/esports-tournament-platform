@@ -1,8 +1,9 @@
 import type { TournamentDto } from "../../models/tournament/TournamentDto";
 import type { TournamentFilterDto } from "../../models/tournament/TournamentFilterDto";
 import type { UserWatchlistDto } from "../../models/user_watchlist/UserWatchlistDto";
+import type { ApiResponse } from "../../types/api/ApiResponse";
 
-export type ApiResponse<T> = { success: boolean; message: string; data?: T };
+export type { ApiResponse };
 
 export interface ITournamentAPIService {
     getAll(page?: number, limit?: number): Promise<ApiResponse<{ items: TournamentDto[]; total: number }>>;

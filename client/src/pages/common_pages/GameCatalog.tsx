@@ -25,7 +25,7 @@ export default function GameCatalog(){
                 setTotal(res.data?.total ?? 0);
             }
             else
-                setError(res.message);
+                setError(res.message ?? "Request failed");
         })
         .catch(() => setError("Failed to load games"))
     }, [page]);
@@ -66,7 +66,7 @@ export default function GameCatalog(){
                                                         setGames(prev => prev.filter(game => game.gameId !== g.gameId));
                                                         setTimeout(() => {setDeleted(false)}, 3000);
                                                         return;}
-                                                    else setError(res.message);
+                                                    else setError(res.message ?? "Request failed");
                                                 })
                                                 .catch(() => setError("Failed to delete the game"))
                                             }}>

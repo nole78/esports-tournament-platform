@@ -24,7 +24,7 @@ export default function ApiHealthDisplay(){
                 }, 3000);
             }
             else
-                setError(res?.message)
+                setError(res.message ?? "Failed to load API health status")
         }
         catch{
             setError("Coudnt't load API health status");

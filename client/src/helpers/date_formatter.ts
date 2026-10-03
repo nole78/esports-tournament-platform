@@ -1,4 +1,4 @@
-export function formatDeadline(date: Date): string {
+export function formatDeadline(date: Date | string): string {
   const d = new Date(date);
   const options: Intl.DateTimeFormatOptions = {
     year: "numeric",
@@ -8,7 +8,7 @@ export function formatDeadline(date: Date): string {
   return d.toLocaleDateString("en-US", options);
 }
 
-export function daysUntilDeadline(deadline: Date): number {
+export function daysUntilDeadline(deadline: Date | string): number {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   
@@ -21,7 +21,7 @@ export function daysUntilDeadline(deadline: Date): number {
   return diffDays;
 }
 
-export function getDeadlineStatus(deadline: Date): "expired" | "today" | "tomorrow" | "soon" | "upcoming" {
+export function getDeadlineStatus(deadline: Date | string): "expired" | "today" | "tomorrow" | "soon" | "upcoming" {
   const days = daysUntilDeadline(deadline);
   
   if (days < 0) return "expired";

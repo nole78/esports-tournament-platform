@@ -81,7 +81,7 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
                         }
                     )
                     return;
-                }else setError(res.message);
+                }else setError(res.message ?? "Request failed");
             }
            
         ).catch(() => setError("Failed to transfer role"));
@@ -120,7 +120,7 @@ export const TeamsDetailForm: React.FC<{id: string}> = ({id}) =>{
 
                     setSearch("");
                     return;
-                }else setError(res.message);
+                }else setError(res.message ?? "Request failed");
             }
             
         ).catch(() => setError("Failed to inivte user"));

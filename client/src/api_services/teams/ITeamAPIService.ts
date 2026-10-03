@@ -4,12 +4,9 @@ import type { TeamDtoGuest } from "../../models/team/TeamDtoGuest";
 import type { UserForMembersDto } from "../../models/user/UserForMembers";
 import type { UserDto } from "../../models/user/UserTypes";
 
-//import { ApiResponse } from '../tournament_list/ITournamentAPIService';
+import type { ApiResponse } from "../../types/api/ApiResponse";
 
-
-
-
-export type ApiResponse<T> = {success: boolean; message: string; data?: T};
+export type { ApiResponse };
 
 export interface ITeamAPIService {
     getAll(page: number, limit: number): Promise<ApiResponse<{items: TeamDto[], total: number}>>;
