@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { ProtectedRoute } from "./components/protected_route/ProtectedRoute";
 import { injectSpeedInsights } from '@vercel/speed-insights';
+import { Analytics } from '@vercel/analytics/react';
 
 injectSpeedInsights();
 
@@ -30,40 +31,43 @@ import TeamsGuestPage from "./pages/common_pages/TeamsGuestPage";
 
 export default function App() {
   return (
-    <Routes>
-      <Route path="/login"    element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
-    <Route element={<Layout/>}>
-      {/* Guest routes */}
-      <Route path="/match/:id" element={<MatchInfo/>}/>
-      <Route path="/home" element={<LandingPage/>}/>
-      <Route path="/game_catalog" element={<GameCatalog/>} />
-      <Route path="/tournament_list" element={<TournamentList />} />
-      <Route path="/teams/details/:id" element = {<TeamsDetailPage/>}/>
-      <Route path="/tournament_registration/:id" element={<TournamentRegistrationPage />}/>
-      <Route path="/guest/teams/" element={<TeamsGuestPage />} />
-      
-      {/* User routes */}
-      <Route path="/account_details" element={<ProtectedRoute><AccountDetailsPage/></ProtectedRoute>}/>
-      <Route path="/teams" element ={<ProtectedRoute> <TeamsPage/></ProtectedRoute>} />
-      <Route path="/teams/add" element ={<ProtectedRoute> <TeamsAddPage/></ProtectedRoute>} />
-      <Route path="/teams/edit/:id" element ={<ProtectedRoute> <TeamsEditPage/></ProtectedRoute>} />
-      <Route path="/teams/inbox" element ={<ProtectedRoute> <TeamsInboxPage/></ProtectedRoute>} />
-      <Route path="/watchlist" element={<ProtectedRoute><UserWatchList/></ProtectedRoute>} />
+    <>
+      <Routes>
+        <Route path="/login"    element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+      <Route element={<Layout/>}>
+        {/* Guest routes */}
+        <Route path="/match/:id" element={<MatchInfo/>}/>
+        <Route path="/home" element={<LandingPage/>}/>
+        <Route path="/game_catalog" element={<GameCatalog/>} />
+        <Route path="/tournament_list" element={<TournamentList />} />
+        <Route path="/teams/details/:id" element = {<TeamsDetailPage/>}/>
+        <Route path="/tournament_registration/:id" element={<TournamentRegistrationPage />}/>
+        <Route path="/guest/teams/" element={<TeamsGuestPage />} />
+        
+        {/* User routes */}
+        <Route path="/account_details" element={<ProtectedRoute><AccountDetailsPage/></ProtectedRoute>}/>
+        <Route path="/teams" element ={<ProtectedRoute> <TeamsPage/></ProtectedRoute>} />
+        <Route path="/teams/add" element ={<ProtectedRoute> <TeamsAddPage/></ProtectedRoute>} />
+        <Route path="/teams/edit/:id" element ={<ProtectedRoute> <TeamsEditPage/></ProtectedRoute>} />
+        <Route path="/teams/inbox" element ={<ProtectedRoute> <TeamsInboxPage/></ProtectedRoute>} />
+        <Route path="/watchlist" element={<ProtectedRoute><UserWatchList/></ProtectedRoute>} />
 
-      {/* Admin routes */}
-      <Route path="/admin"       element={<ProtectedRoute requiredRoles={["admin"]}><AdminDashboard /></ProtectedRoute>} />
-      <Route path="/admin/game_catalog/add" element={<ProtectedRoute requiredRoles={["admin"]}><GameAddPage/></ProtectedRoute>} />
-      <Route path="/admin/game_catalog/edit/:id" element={<ProtectedRoute requiredRoles={["admin"]}><GameEditPage/></ProtectedRoute>}/>
-      <Route path="/admin/tournament_list/add" element={<ProtectedRoute requiredRoles={["admin"]}><TournamentAddPage/></ProtectedRoute>} />
-      <Route path="/admin/dashboard" element={<ProtectedRoute requiredRoles={["admin"]}><AdminDashboard/></ProtectedRoute>}/>
-      <Route path="/admin/teams/add" element ={<ProtectedRoute requiredRoles={["admin"]}> <TeamsAddPage/></ProtectedRoute>} />
-      <Route path="/admin/teams/edit/:id" element ={<ProtectedRoute requiredRoles={["admin"]}> <TeamsEditPage/></ProtectedRoute>} />
+        {/* Admin routes */}
+        <Route path="/admin"       element={<ProtectedRoute requiredRoles={["admin"]}><AdminDashboard /></ProtectedRoute>} />
+        <Route path="/admin/game_catalog/add" element={<ProtectedRoute requiredRoles={["admin"]}><GameAddPage/></ProtectedRoute>} />
+        <Route path="/admin/game_catalog/edit/:id" element={<ProtectedRoute requiredRoles={["admin"]}><GameEditPage/></ProtectedRoute>}/>
+        <Route path="/admin/tournament_list/add" element={<ProtectedRoute requiredRoles={["admin"]}><TournamentAddPage/></ProtectedRoute>} />
+        <Route path="/admin/dashboard" element={<ProtectedRoute requiredRoles={["admin"]}><AdminDashboard/></ProtectedRoute>}/>
+        <Route path="/admin/teams/add" element ={<ProtectedRoute requiredRoles={["admin"]}> <TeamsAddPage/></ProtectedRoute>} />
+        <Route path="/admin/teams/edit/:id" element ={<ProtectedRoute requiredRoles={["admin"]}> <TeamsEditPage/></ProtectedRoute>} />
 
-      <Route path="/"    element={<Navigate to="/home" replace />} />
-      <Route path="/404" element={<NotFoundPage />} />
-      <Route path="*"    element={<Navigate to="/404" replace />} />
-    </Route>
-    </Routes>
+        <Route path="/"    element={<Navigate to="/home" replace />} />
+        <Route path="/404" element={<NotFoundPage />} />
+        <Route path="*"    element={<Navigate to="/404" replace />} />
+      </Route>
+      </Routes>
+      <Analytics />
+    </>
   );
 }
