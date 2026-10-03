@@ -5,6 +5,7 @@ import { gameApi } from "../../api_services/game_catalog/GameAPIService";
 import { useAuth } from "../../hooks/auth/useAuthHook";
 import { useNavigate } from "react-router-dom";
 import placeholder from "../../assets/placeholder.png";
+import { Button } from "../../components/ui/Button";
 
 
 export default function GameCatalog(){
@@ -34,9 +35,9 @@ export default function GameCatalog(){
         <div>
             <PageHeader eyebrow="" title="Game Catalog"/>
             {user?.role === "admin" && (
-                <button onClick={() => navigate("/admin/game_catalog/add")}
-                        className="cursor-pointer mb-2 w-1/6 bg-bgsecondary/40 border-2 border-bgsecondary hover:bg-bgsecondary/30 text-bgsecondary font-semibold rounded-xl py-3 text-sm transition-colors">
-                Add Game</button>
+                <Button variant="secondary" className="mb-6" onClick={() => navigate("/admin/game_catalog/add")}>
+                    Add Game
+                </Button>
             )}
             {error && <ErrorBox message={error}/>}
             {deleted && (
@@ -47,16 +48,19 @@ export default function GameCatalog(){
             {games.length === 0 && !error ? <Empty message="No games found"/> : (
                 <section className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                     {games.map(g => (
-                    <div className="group relative aspect-4/3 border-2 h-2xl border-white/5 bg-bgprimary/30 rounded-xl overflow-hidden transition-all duration-200 hover:shadow-lg hover:shadow-secondary/20" key={g.gameId}>
+                    <article className="group surface relative aspect-[4/3] overflow-hidden transition-shadow duration-200 hover:shadow-lg hover:shadow-secondary/20" key={g.gameId}>
                         <div className="w-full h-full">
-                            <img src={g.gameLogotip ? g.gameLogotip : placeholder} className="object-cover w-full h-full rounded-xl transition-transform duration-300 group-hover:scale-110"/>
+                            <img src={g.gameLogotip ? g.gameLogotip : placeholder} alt={`${g.gameName} logo`} width="640" height="480" loading="lazy" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"/>
                         </div>
-                        <div className="absolute rounded-t-lg bg-primary/90 h-min inset-0 origin-top scale-y-0 group-hover:scale-y-100 transition-transform duration-300">
-                            <h2 className="text-bgsecondary text-center text-2xl font-bold">{g.gameName}</h2>
+                        <div className="absolute inset-x-0 bottom-0 bg-primary/90 p-4">
+                            <h2 className="text-xl font-bold text-bgsecondary">{g.gameName}</h2>
+                            <div className="mt-2 flex items-center justify-between text-sm text-bgsecondary/70">
+                                <span>{g.gamePlayers}v{g.gamePlayers}</span>
+                                <span>{g.gameGenre}</span>
+                            </div>
                         </div>
-                        <div className="absolute rounded-b-lg bottom-0 bg-primary/90 w-full p-2 origin-bottom scale-y-0 group-hover:scale-y-100 transition-transform duration-300">
-                            {user?.role === "admin" && (<div className="top-0">
-                                <button className="cursor-pointer w-1/3 mb-2 bg-red-400/40 border-2 border-red-500 hover:bg-bgsecondary/30 hover:border-bgsecondary text-red-500 font-semibold rounded-xl p-1 text-sm transition-colors"
+                        {user?.role === "admin" && <div className="absolute right-3 top-3 flex gap-2">
+                                <button aria-label={`Delete ${g.gameName}`} className="min-h-10 rounded-lg border border-danger/70 bg-primary/90 px-3 text-xs font-semibold text-danger transition-colors hover:bg-danger/20"
                                         onClick={() => {
                                             setDeleted(false);
                                             gameApi.delete(g.gameId)
@@ -72,15 +76,12 @@ export default function GameCatalog(){
                                             }}>
                                     Delete
                                 </button>
-                                <button className="cursor-pointer w-1/3 mb-2 float-right bg-green-400/40 border-2 border-green-500 hover:bg-bgsecondary/30 hover:border-bgsecondary text-green-500 font-semibold rounded-xl p-1 text-sm transition-colors"
+                                <button aria-label={`Edit ${g.gameName}`} className="min-h-10 rounded-lg border border-bgprimary/70 bg-primary/90 px-3 text-xs font-semibold text-bgprimary transition-colors hover:bg-bgprimary/20"
                                         onClick={() => navigate(`/admin/game_catalog/edit/${g.gameId}`)}>
                                     Edit
                                 </button>
-                            </div>)}
-                            <span className="float-left font-semibold text-sm text-bgsecondary">{g.gamePlayers}v{g.gamePlayers}</span>
-                            <span className="text-sm text-bgsecondary font-semibold float-right">{g.gameGenre}</span>
-                        </div>
-                    </div>
+                        </div>}
+                    </article>
                     ))}
                 </section>
             )}

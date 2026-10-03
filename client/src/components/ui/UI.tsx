@@ -119,14 +119,14 @@ export function TableHead({ columns }: { columns: string[] }) {
   );
 }
 
-export function PageHeader({ eyebrow, title, action }: { eyebrow: string; title: string; action?: ReactNode }) {
+export function PageHeader({ eyebrow, title, action }: { eyebrow?: string; title: string; action?: ReactNode }) {
   return (
-    <div className="flex items-start justify-between mb-8">
+    <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
       <div>
-        <p className="text-xs text-secondary font-mono uppercase tracking-widest mb-1">{eyebrow}</p>
-        <h1 className="text-xl font-semibold text-bgsecondary tracking-tight">{title}</h1>
+        {eyebrow && <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-bgprimary">{eyebrow}</p>}
+        <h1 className="text-pretty text-2xl font-bold tracking-tight text-bgsecondary sm:text-3xl">{title}</h1>
       </div>
-      {action && <div>{action}</div>}
+      {action && <div className="shrink-0">{action}</div>}
     </div>
   );
 }

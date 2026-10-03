@@ -10,6 +10,7 @@ import { gameApi } from "../../api_services/game_catalog/GameAPIService";
 import { TournamentStatus } from "../../types/tournament/TournamentStatus";
 import { TournamentFormat } from "../../types/tournament/TournamentFormat";
 import type { TournamentFilterDto } from '../../models/tournament/TournamentFilterDto';
+import { Button } from "../../components/ui/Button";
 
 export default function TournamentList(){
     const { user } = useAuth();
@@ -108,15 +109,16 @@ export default function TournamentList(){
             <PageHeader eyebrow="" title="Tournament List" />
             <div className="flex justify-between gap-2 items-center mb-5">
                 {user?.role === "admin" && (
-                    <button onClick={() => navigate("/admin/tournament_list/add")}
-                            className="mb-2 w-1/5  bg-bgsecondary/40 border-2 border-bgsecondary hover:bg-bgsecondary/30 text-bgsecondary font-semibold rounded-xl p-3 text-sm transition-colors">
-                    Add Tournament</button>
+                    <Button variant="secondary" className="mb-2" onClick={() => navigate("/admin/tournament_list/add")}>
+                        Add Tournament
+                    </Button>
                 )}
                 <div className="flex flex-row w-full gap-2">
                     <select 
                         value={gameNameFilter} 
                         onChange={(e) => setGameNameFilter(e.target.value)}
-                        className="bg-bgprimary/10 border w-1/3 border-secondary/50 rounded-xl px-4 py-3 text-bgsecondary text-sm focus:outline-none focus:border-white/30 transition-colors disabled:opacity-50">
+                        aria-label="Filter tournaments by game"
+                        className="control w-1/3 px-4 py-3 text-sm">
                         <option value="" className='bg-lime-950'>
                             Game
                         </option>
@@ -129,7 +131,8 @@ export default function TournamentList(){
                     <select 
                         value={statusFilter} 
                         onChange={(e) => setStatusFilter(e.target.value)}
-                        className="bg-bgprimary/10 w-1/3 border border-secondary/50 rounded-xl px-4 py-3 text-bgsecondary text-sm focus:outline-none focus:border-white/30 transition-colors">
+                        aria-label="Filter tournaments by status"
+                        className="control w-1/3 px-4 py-3 text-sm">
                         <option value="" className='bg-lime-950'>
                             Status
                         </option>
@@ -142,7 +145,8 @@ export default function TournamentList(){
                     <select 
                         value={formatFilter} 
                         onChange={(e) => setFormatFilter(e.target.value)}
-                        className="bg-bgprimary/10 border w-1/3 border-secondary/50 rounded-xl px-4 py-3 text-bgsecondary text-sm focus:outline-none focus:border-white/30 transition-colors">
+                        aria-label="Filter tournaments by format"
+                        className="control w-1/3 px-4 py-3 text-sm">
                         <option value="" className='bg-lime-950'>
                             Format
                         </option>
@@ -164,8 +168,8 @@ export default function TournamentList(){
                         const isInWatchList = watchListMap[t.tournamentId] ?? false;
                         
                         return (
-                            <div className="border-2 border-bgsecondary bg-bgprimary/30 p-4 rounded-xl hover:border-secondary/60 transition-all duration-200 hover:shadow-lg hover:shadow-secondary/20 cursor-pointer flex flex-col" key={t.tournamentId}>
-                                <a onClick={() => navigate(`/tournament_registration/${t.tournamentId}`)}>
+                            <article className="surface flex cursor-pointer flex-col p-5 transition-shadow duration-200 hover:shadow-lg hover:shadow-secondary/20" key={t.tournamentId}>
+                                <button type="button" className="text-left" onClick={() => navigate(`/tournament_registration/${t.tournamentId}`)}>
                                     <h2 className="text-bgsecondary text-2xl font-bold">{t.tournamentName}</h2>
                                     <p className="text-bgsecondary mb-3">{t.tournamentGame}</p>
                                     <div className="space-y-2">
@@ -186,7 +190,7 @@ export default function TournamentList(){
                                         <p className="text-bgsecondary">Prize: {t.tournamentPrizeFund}$</p>
                                     </div>
                                     <p className="text-bgsecondary">{t.tournamentStatus}</p>
-                                </a>
+                                </button>
                                 {user?.role === "admin" || user?.role === "player" ? 
                                 <div className="mt-auto">
                                 <br></br>
@@ -225,7 +229,7 @@ export default function TournamentList(){
                                                 setError("Failed to update watchlist!");
                                             }
                                         }}
-                                        className={`cursor-pointer w-full min-w-3 rounded-xl p-1 text-sm transition-colors justify-self-center align-bottom
+                                        className={`min-h-11 w-full rounded-xl p-2 text-sm font-semibold transition-colors
                                         ${
                                             isInWatchList
                                                 ? "bg-red-400/40 border-2 border-red-500 hover:bg-bgsecondary/30 hover:border-bgsecondary text-red-500 font-semibold"
@@ -235,8 +239,8 @@ export default function TournamentList(){
                                         {isInWatchList
                                             ? "Remove from watchlist"
                                             : "Add to watchlist"}
-                                    </button></div> : <button></button>}  
-                            </div>
+                                    </button></div> : null}
+                            </article>
                         );
                     })}
                 </section>

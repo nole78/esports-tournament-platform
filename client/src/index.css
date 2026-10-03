@@ -5,11 +5,93 @@
     --color-secondary: #628141;
     --color-bgprimary: #8BAE66;
     --color-bgsecondary: #EBD5AB;
+    --color-surface: #273323;
+    --color-surface-muted: #34432b;
+    --color-danger: #d97868;
+    --color-success: #9fc77a;
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    background: var(--color-primary);
+    color: var(--color-bgsecondary);
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    min-width: 320px;
+    min-height: 100vh;
+    margin: 0;
+    background:
+      radial-gradient(circle at 80% -10%, color-mix(in srgb, var(--color-bgprimary) 18%, transparent), transparent 34rem),
+      var(--color-primary);
+  }
+
+  button,
+  a,
+  select,
+  input {
+    touch-action: manipulation;
+  }
+
+  button:focus-visible,
+  a:focus-visible,
+  select:focus-visible,
+  input:focus-visible {
+    outline: 2px solid var(--color-bgprimary);
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    background: var(--color-bgprimary);
+    color: var(--color-primary);
+  }
 }
 
 .main-scroll {
   scrollbar-width: auto;
   scrollbar-color: var(--color-secondary) transparent;
+  overscroll-behavior: contain;
 }
 
+.surface {
+  background: color-mix(in srgb, var(--color-surface) 82%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-secondary) 55%, transparent);
+  border-radius: 1rem;
+}
 
+.control {
+  min-height: 2.75rem;
+  border: 1px solid color-mix(in srgb, var(--color-secondary) 65%, transparent);
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--color-surface-muted) 72%, transparent);
+  color: var(--color-bgsecondary);
+  transition: border-color 160ms ease, background-color 160ms ease;
+}
+
+.control:hover {
+  border-color: var(--color-bgprimary);
+  background: color-mix(in srgb, var(--color-surface-muted) 90%, transparent);
+}
+
+.control::placeholder {
+  color: color-mix(in srgb, var(--color-bgsecondary) 55%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

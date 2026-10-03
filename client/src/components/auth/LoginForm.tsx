@@ -20,10 +20,10 @@ export function LoginForm({ authApi }: { authApi: IAuthAPIService }) {
   };
 
   return (
-    <div className="w-full max-w-sm">
+    <div className="surface w-full max-w-sm p-6 sm:p-8">
       <div className="text-center mb-10">
         <div className="w-20 h-20 rounded-2xl bg-bgprimary/10 border border-secondary/50 flex items-center justify-center mx-auto mb-4">
-          <img src={logo} className="w-20 h-20 border border-secondary/50 rounded-2xl flex"/>
+          <img src={logo} alt="PulseGrid logo" width="80" height="80" className="h-20 w-20 rounded-2xl border border-secondary/50"/>
         </div>
         <h1 className="text-xl font-semibold text-bgsecondary">Welcome back</h1>
         <p className="text-sm text-secondary mt-1">Sign in to your account</p>
@@ -37,19 +37,19 @@ export function LoginForm({ authApi }: { authApi: IAuthAPIService }) {
 
       <form onSubmit={submit} className="flex flex-col gap-4">
         <div>
-          <label className="block text-xs text-bgprimary mb-2 font-medium">Username</label>
-          <input type="text" value={username} onChange={e => setUsername(e.target.value)} required
-            className="w-full bg-bgprimary/10 border border-secondary/50 rounded-xl px-4 py-3 text-bgsecondary text-sm placeholder-bgsecondary/30 focus:outline-none focus:border-white/30 transition-colors"
-            placeholder="your_username" />
+          <label htmlFor="username" className="mb-2 block text-sm font-medium text-bgsecondary">Username</label>
+          <input id="username" name="username" autoComplete="username" type="text" value={username} onChange={e => setUsername(e.target.value)} required
+            className="control w-full px-4 py-3 text-sm"
+            placeholder="your_username…" />
         </div>
         <div>
-          <label className="block text-xs text-bgprimary mb-2 font-medium">Password</label>
-          <input type="password" value={password} onChange={e => setPassword(e.target.value)} required
-            className="w-full bg-bgprimary/10 border border-secondary/50 rounded-xl px-4 py-3 text-bgsecondary text-sm placeholder-bgsecondary/30 focus:outline-none focus:border-white/30 transition-colors"
-            placeholder="••••••••" />
+          <label htmlFor="password" className="mb-2 block text-sm font-medium text-bgsecondary">Password</label>
+          <input id="password" name="password" autoComplete="current-password" type="password" value={password} onChange={e => setPassword(e.target.value)} required
+            className="control w-full px-4 py-3 text-sm"
+            placeholder="Enter your password…" />
         </div>
         <button type="submit" disabled={loading}
-          className="mt-2 bg-bgprimary hover:bg-bgprimary/80 disabled:opacity-50 text-primary font-semibold rounded-xl py-3 text-sm transition-colors">
+          className="mt-2 min-h-11 rounded-xl bg-bgprimary py-3 text-sm font-semibold text-primary transition-colors hover:bg-bgprimary/80 disabled:opacity-50">
           {loading ? "Signing in…" : "Sign in"}
         </button>
       </form>

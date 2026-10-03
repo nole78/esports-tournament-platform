@@ -1,45 +1,27 @@
 export default function LandingPage(){
 
     return(
-        <div className="w-1/2 justify-self-center flex flex-col justify-center">
-            <div className="flex flex-col items-center gap-2">
-
-                <span className="text-bgsecondary uppercase text-3xl font-semibold drop-shadow-lg">
-                    Welcome to
-                </span>
-
-                <div className="relative font-extrabold tracking-wider">
-                    <div className="absolute blur-xl opacity-90 text-7xl animate-pulse">
-                        <span className="text-bgsecondary">
-                            Pulse
-                        </span>
-                        <span className="text-bgprimary">
-                            Grid
-                        </span>
-                    </div>
-                    <div className="relative">
-                        <span className="text-bgprimary text-7xl">
-                            Pulse
-                        </span>
-                        <span className="text-bgsecondary text-7xl">
-                            Grid
-                        </span>
-                    </div>
-                </div>
+        <div className="mx-auto flex max-w-5xl flex-col justify-center py-12 sm:py-20">
+            <div className="max-w-3xl">
+                <p className="mb-5 text-sm font-semibold uppercase tracking-[0.2em] text-bgprimary">Competitive play, organized</p>
+                <h1 className="text-pretty text-5xl font-black tracking-[-0.04em] text-bgsecondary sm:text-7xl">
+                    Your next match starts in <span className="text-bgprimary">PulseGrid.</span>
+                </h1>
+                <p className="mt-6 max-w-2xl text-lg leading-8 text-bgsecondary/75">
+                    A focused home for players, teams, and tournament organizers to find the games and competitions worth showing up for.
+                </p>
             </div>
-            <div className="border-3 border-t-bgprimary border-l-bgprimary border-r-bgsecondary border-b-bgsecondary shadow-[0_0_25px] shadow-bgprimary w-full rounded-full mt-8 p-25">
-                <div className="text-bgsecondary text-16">
-                    <div className="text-3xl border-b-2 border-bgsecondary">What is
-                        <span className="text-bgprimary ml-2">
-                            Pulse
-                        </span>
-                        <span className="text-bgsecondary">
-                            Grid
-                        </span>?</div>
-                    <div className="mt-2 text-justify">PulseGrid is an E-sports platform built for players, teams, and tournament organizers. Explore a growing catalog of competitive games, discover active and upcoming tournaments, and follow registered teams from across the platform.
-                         Create your own team, invite teammates, register for tournaments, and keep track of upcoming competitions with your personal watchlist. Whether you are a casual player or a competitive squad, PulseGrid brings the E-sports community together in one place.
-                    </div>
-                </div>
+            <div className="mt-12 grid gap-4 sm:grid-cols-3">
+                {[
+                    ["Discover", "Explore a growing catalog of competitive games."],
+                    ["Compete", "Find active and upcoming tournaments."],
+                    ["Follow", "Keep your next competitions in one watchlist."],
+                ].map(([title, description]) => (
+                    <article key={title} className="surface p-5">
+                        <h2 className="text-lg font-bold text-bgsecondary">{title}</h2>
+                        <p className="mt-2 text-sm leading-6 text-bgsecondary/65">{description}</p>
+                    </article>
+                ))}
             </div>
         </div>
     )

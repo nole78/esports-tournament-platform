@@ -33,6 +33,7 @@ export function Layout() {
   const navigate = useNavigate();
   const nav = user?.role === "admin" ? adminNav : user? userNav : guestNav;
   const [avatar, setAvatar] = useState("");
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     if(user)
@@ -45,35 +46,51 @@ export function Layout() {
   },[user])
 
   return (
-    <div className="flex oveflow-hidden flex-col h-screen bg-primary">
-      <header className="h-16 shrink-0 w-full border-b border-secondary/40 bg-bgprimary/70">
-        <div className="h-16 px-6 flex items-center justify-between">
+    <div className="flex h-screen flex-col overflow-hidden bg-primary">
+      <header className="h-auto min-h-16 shrink-0 border-b border-secondary/40 bg-primary/95">
+        <div className="flex min-h-16 flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6 sm:py-0">
           {/* LEFT - Logo */}
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-white/10 border border-primary/50 flex items-center justify-center">
-              <img src={logo} className="w-10 h-9.5 rounded-lg" />
+              <img src={logo} alt="PulseGrid logo" width="40" height="40" className="h-10 w-10 rounded-lg" />
             </div>
 
             <button
-              className="text-2xl font-bold text-primary tracking-tight hover:text-primary/80 cursor-pointer"
+              className="cursor-pointer text-2xl font-bold tracking-tight text-bgsecondary transition-colors hover:text-bgprimary"
               onClick={() => navigate("/home")}
             >
-              Pulse<span className="text-bgsecondary">Grid</span>
+              Pulse<span className="text-bgprimary">Grid</span>
             </button>
           </div>
 
+          <button
+            type="button"
+            aria-label={isMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={isMenuOpen}
+            aria-controls="primary-navigation"
+            onClick={() => setIsMenuOpen((open) => !open)}
+            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg border border-secondary/60 text-bgsecondary transition-colors hover:bg-white/10 sm:hidden"
+          >
+            <span className="text-xl" aria-hidden="true">{isMenuOpen ? "×" : "☰"}</span>
+          </button>
+
           {/* CENTER - Navigation */}
-          <nav className="flex items-center gap-2">
+          <nav
+            id="primary-navigation"
+            aria-label="Primary navigation"
+            className={`${isMenuOpen ? "flex" : "hidden"} order-3 w-full flex-col gap-1 border-t border-secondary/30 pt-3 sm:order-none sm:flex sm:w-auto sm:flex-row sm:overflow-x-auto sm:border-t-0 sm:pt-0`}
+          >
             {nav.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
                 end
+                onClick={() => setIsMenuOpen(false)}
                 className={({ isActive }) =>
-                  `flex items-center font-semibold gap-2 px-4 py-2 rounded-lg text-sm transition-all ${
+                  `flex min-h-11 shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${
                     isActive
-                      ? "bg-white/8 text-bgsecondary border border-secondary/50"
-                      : "text-primary/40 hover:text-primary/80 hover:bg-white/5"
+                      ? "border border-bgprimary/60 bg-bgprimary/15 text-bgprimary"
+                      : "text-bgsecondary/80 hover:bg-white/5 hover:text-bgsecondary"
                   }`
                 }
               >
@@ -91,7 +108,7 @@ export function Layout() {
                 </div>
                 <button onClick={() => navigate("/account_details")}
                   className="cursor-pointer w-8 h-8 rounded-full bg-white/10 border border-primary/50 flex items-center justify-center">
-                  <img src={avatar? avatar : avatarPlaceholder} className="rounded-full"/>
+                  <img src={avatar ? avatar : avatarPlaceholder} alt="Open account details" width="32" height="32" className="rounded-full"/>
                 </button>
               </div>
             )}
@@ -105,7 +122,8 @@ export function Layout() {
                 }
                 else navigate("/login");
               }}
-              className="text-sm text-secondary bg-bgsecondary p-2 rounded-lg font-semibold cursor-pointer hover:text-white/70 hover:bg-bgsecondary/70 transition-colors"
+              aria-label={user ? "Log out" : "Log in"}
+              className="min-h-11 rounded-lg bg-bgsecondary px-3 py-2 text-sm font-semibold text-primary transition-colors hover:bg-bgsecondary/80"
             >
               {user ? "Log out" : "Log in"}
             </button>
@@ -114,7 +132,7 @@ export function Layout() {
       </header>
 
       <main className="main-scroll flex-1 overflow-y-auto">
-        <div className="mx-auto px-8 py-8"><Outlet/></div>
+        <div className="mx-auto w-full max-w-[1440px] px-4 py-6 sm:px-6 sm:py-8"><Outlet/></div>
       </main>
     </div>
   );
