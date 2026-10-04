@@ -35,7 +35,7 @@ export class UserWatchlistService implements IUserWatchlistService {
 
     async getByUserId(userId: number, page?: number, limit?: number) : Promise<Result<PaginatedListDto<UserWatchlistDto>>>
     {
-        const items = await this.watchlistReadRepo.findByUserId(userId, page ?? 1, limit ?? 20);
+        const items = await this.watchlistReadRepo.findByUserId(userId);
         const total = await this.watchlistReadRepo.getTotal(userId);
         const list = await Promise.all(items.map(i => this.toUserWatchlistDto(i)));
         return Result.Success(new PaginatedListDto(list, total, page ?? 1, limit ?? 20));

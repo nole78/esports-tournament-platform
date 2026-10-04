@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../hooks/auth/useAuthHook";
-import type { TournamentDto } from "../../models/tournament/TournamentDto";
 import { useNavigate } from "react-router-dom";
 import { tournamentApi } from "../../api_services/tournament_list/TournamentAPIService";
 import { Empty, ErrorBox, PageHeader, Pagination } from "../../components/ui/UI";
@@ -10,76 +9,58 @@ import { TournamentStatus } from "../../types/tournament/TournamentStatus";
 import { TournamentFormat } from "../../types/tournament/TournamentFormat";
 import type { TournamentFilterDto } from '../../models/tournament/TournamentFilterDto';
 import { Button } from "../../components/ui/Button";
+import { useQuery, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 
 export default function TournamentList(){
     const { user } = useAuth();
-    const [tournaments, setTournaments] = useState<TournamentDto[]>([]);
-    const [error, setError] = useState<string>("");
-    const [games, setGames] = useState<string[]>([]);
+    const [actionError, setActionError] = useState<string>("");
     const [gameNameFilter, setGameNameFilter] = useState<string>("");
     const [statusFilter, setStatusFilter] = useState<string>("");
     const [formatFilter, setFormatFilter] = useState<string>("");
     const [page, setPage] = useState(1);
-    const [total, setTotal] = useState(0);
-    const [watchListMap, setWatchListMap] = useState<Record<number, boolean>>({});
     const navigate = useNavigate();
     const limit = 12;
     const userId = user?.id ?? 0;
+    const queryClient = useQueryClient();
 
-    const loadPage = (p : number) =>{
-        tournamentApi.getAll(p, limit)
-        .then(res => {
-            if(res.success && res.data)
-            {
-                setTournaments(res.data?.items);
-                setTotal(res.data.total);
-            }
-            else
-            {
-                setError(res.message ?? "Request failed");
-                setTournaments([]);
-            }
-        })
-        .catch(() => setError("Failed to load tournaments!"))
-
-    }
-
-    const checkWatchList = async (userId: number, tournamentId: number) => {
-    try {
-        const res = await tournamentApi.findWatchListItem({
-            userId,
-            tournamentId
-        });
-
-        setWatchListMap(prev => ({
-            ...prev,
-            [tournamentId]: res.success ? (res.data ?? false) : false
-        }));
-    } catch {
-        setError("Failed to check if the item is in watchlist!");
-        }
-    };
-
-    useEffect(() =>{
-        loadPage(page);
-
-    }, [page]);
-
-    useEffect(() => {
-        gameApi.getAllNames()
+    const {data: tournamentData, error} = useQuery({
+        queryKey: ["tournaments", page],
+        queryFn: async () => {
+            return tournamentApi.getAll(page, limit)
             .then(res => {
-                if (res.success && res.data) {
-                    setGames(res.data.gameNames);
-                } else {
-                    setError(res.message ?? "Failed to load games");
-                    setGames([]);
+                if(!res.success)
+                {
+                    throw new Error(res.message ?? "Request failed");
                 }
+                return res.data;
             })
-            .catch(() => {
-                setError("Failed to load games!");
-                setGames([]);
+            .catch((err) => {throw new Error(err.message || "Failed to load tournaments!")})
+        },
+        placeholderData: keepPreviousData
+    })
+
+    const {data: gameNamesData} = useQuery({
+        queryKey: ["gameNames"],
+        queryFn: async () => {
+            return gameApi.getAllNames()
+            .then(res => {
+                if (!res.success) {
+                    throw new Error(res.message ?? "Failed to load games");
+                }
+                return res.data;
+            })
+            .catch((err) => {
+                throw new Error(err.message || "Failed to load games!");
             });
-    }, []);
+        },
+        placeholderData: keepPreviousData
+    })
+
+    const gameNames = gameNamesData?.gameNames || []
+    const tournaments = tournamentData?.items || []
+    const total = tournamentData?.total || 0
+    const errorMessage = error instanceof Error? error.message : (actionError || "")
+    
 
     useEffect(() => {
         const filter: TournamentFilterDto = {
@@ -91,22 +72,14 @@ export default function TournamentList(){
         .then(res => {
             if(res.success && res.data)
             {
-                setTournaments(res.data?.items ?? []);
-                setTotal(res.data.total);
+                //setTournaments(res.data?.items ?? []);
+                //setTotal(res.data.total);
             }
                 else
-                setError(res.message ?? "Request failed");
+                setActionError(res.message ?? "Request failed");
         })
-        .catch(() => setError("Failed to load tournaments!"))
+        .catch(() => setActionError("Failed to load tournaments!"))
     }, [gameNameFilter, statusFilter, formatFilter, page]);
-
-    useEffect(() => {
-    if (!userId || tournaments.length === 0) return;
-
-    tournaments.forEach(t => {
-        checkWatchList(userId, t.tournamentId);
-    });
-    }, [userId,tournaments]);
 
     return(
         <div>
@@ -126,7 +99,7 @@ export default function TournamentList(){
                         <option value="" className='bg-lime-950'>
                             Game
                         </option>
-                        {games.map(gameName => (
+                        { gameNames.map(gameName => (
                             <option className='bg-lime-950' key={gameName} value={gameName}>
                                 {gameName}
                             </option>
@@ -162,14 +135,13 @@ export default function TournamentList(){
                     </select>
                 </div>
             </div>
-            {error && <ErrorBox message={error}/>}
-            {tournaments.length === 0 && !error ? <Empty message="No tournaments found"/> : (
+            {errorMessage && <ErrorBox message={errorMessage}/>}
+            {tournaments.length === 0? <Empty message="No tournaments found"/> : (
                 <section className="grid gap-5 sm:grid-cols-4 lg:grid-cols-4">
                     {tournaments.map(t => {
                         const days = daysUntilDeadline(t.tournamentApplicationDeadline);
                         const status = getDeadlineStatus(t.tournamentApplicationDeadline);
                         const color = getDeadlineColor(status);
-                        const isInWatchList = watchListMap[t.tournamentId] ?? false;
                         
                         return (
                             <article className="surface flex cursor-pointer flex-col p-5 transition-shadow duration-200 hover:shadow-lg hover:shadow-secondary/20" key={t.tournamentId}>
@@ -204,17 +176,15 @@ export default function TournamentList(){
                                             e.stopPropagation();
 
                                             try {
-                                                if (isInWatchList) {
+                                                if (t.isWatchlisted) {
                                                     const res = await tournamentApi.removeFromWatchList(
                                                         t.tournamentId,
                                                         userId
                                                     );
 
                                                     if (res.success) {
-                                                        setWatchListMap(prev => ({
-                                                            ...prev,
-                                                            [t.tournamentId]: false
-                                                        }));
+                                                        // change toutnament watchlsited state
+                                                        queryClient.invalidateQueries({ queryKey: ["tournaments"]})
                                                     }
                                                 } else {
                                                     const res = await tournamentApi.addToWatchList(
@@ -223,24 +193,22 @@ export default function TournamentList(){
                                                     );
 
                                                     if (res.success) {
-                                                        setWatchListMap(prev => ({
-                                                            ...prev,
-                                                            [t.tournamentId]: true
-                                                        }));
+                                                        // change toutnament watchlsited state
+                                                        queryClient.invalidateQueries({ queryKey: ["tournaments"]})
                                                     }
                                                 }
                                             } catch {
-                                                setError("Failed to update watchlist!");
+                                                setActionError("Failed to update watchlist!");
                                             }
                                         }}
                                         className={`min-h-11 w-full rounded-xl p-2 text-sm font-semibold transition-colors
                                         ${
-                                            isInWatchList
+                                            t.isWatchlisted
                                                 ? "bg-red-400/40 border-2 border-red-500 hover:bg-bgsecondary/30 hover:border-bgsecondary text-red-500 font-semibold"
                                                 : "bg-green-400/40 border-2 border-green-500 hover:bg-bgsecondary/30 hover:border-bgsecondary text-green-500 font-semibold"
                                         }`}
                                         >
-                                        {isInWatchList
+                                        {t.isWatchlisted
                                             ? "Remove from watchlist"
                                             : "Add to watchlist"}
                                     </button></div> : null}
