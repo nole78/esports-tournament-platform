@@ -32,6 +32,27 @@ export class GameReadRepository implements IGameReadRepository{
         }
     }
 
+    async findByIds(ids: number[]): Promise<Game[]> {
+        if (ids.length === 0) return [];
+
+        const res = await this.db.getReadConnection();
+        if (!res) return [];
+        try {
+            const placeholders = ids.map(() => "?").join(",");
+            const [rows] = await res.conn.execute<RowDataPacket[]>(
+                `SELECT * FROM games WHERE game_id IN (${placeholders})`,
+                ids
+            );
+            return rows.map((r) => this.map(r));
+        } catch (err) {
+            this.logger.error("GameRepository", "findByIds failed", err);
+            return [];
+        } finally {
+            if (!res.isTransaction)
+                res.conn.release();
+        }
+    }
+
     async findByName(name: string): Promise<Game> {
         const res = await this.db.getReadConnection();
         if(!res) return new Game;
