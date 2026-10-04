@@ -84,7 +84,7 @@ export class GameReadRepository implements IGameReadRepository{
         res.conn.release(); }
     }
 
-    async findAllNames() : Promise<String[]> {
+    async findAllNames() : Promise<string[]> {
         const res = await this.db.getReadConnection();
         if (!res) return [];
         try {
