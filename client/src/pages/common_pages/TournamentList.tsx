@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 import { tournamentApi } from "../../api_services/tournament_list/TournamentAPIService";
 import { Empty, ErrorBox, PageHeader, Pagination } from "../../components/ui/UI";
 import { formatDeadline, daysUntilDeadline, getDeadlineStatus, getDeadlineColor } from '../../helpers/date_formatter';
-import type { GameDto } from "../../models/game/GameDto";
 import { gameApi } from "../../api_services/game_catalog/GameAPIService";
 import { TournamentStatus } from "../../types/tournament/TournamentStatus";
 import { TournamentFormat } from "../../types/tournament/TournamentFormat";
@@ -16,7 +15,7 @@ export default function TournamentList(){
     const { user } = useAuth();
     const [tournaments, setTournaments] = useState<TournamentDto[]>([]);
     const [error, setError] = useState<string>("");
-    const [games, setGames] = useState<GameDto[]>([]);
+    const [games, setGames] = useState<string[]>([]);
     const [gameNameFilter, setGameNameFilter] = useState<string>("");
     const [statusFilter, setStatusFilter] = useState<string>("");
     const [formatFilter, setFormatFilter] = useState<string>("");
@@ -43,17 +42,6 @@ export default function TournamentList(){
         })
         .catch(() => setError("Failed to load tournaments!"))
 
-        gameApi.getAll()
-        .then(res => {
-            if (res.success) {
-                setGames(res.data?.items ?? []);
-                setError("");
-            } else {
-                setError(res.message ?? "Failed to load games");
-                setGames([]);
-            } 
-        })
-        .catch(() => setError("Failed to load games!"));
     }
 
     const checkWatchList = async (userId: number, tournamentId: number) => {
@@ -76,6 +64,22 @@ export default function TournamentList(){
         loadPage(page);
 
     }, [page]);
+
+    useEffect(() => {
+        gameApi.getAllNames()
+            .then(res => {
+                if (res.success && res.data) {
+                    setGames(res.data.gameNames);
+                } else {
+                    setError(res.message ?? "Failed to load games");
+                    setGames([]);
+                }
+            })
+            .catch(() => {
+                setError("Failed to load games!");
+                setGames([]);
+            });
+    }, []);
 
     useEffect(() => {
         const filter: TournamentFilterDto = {
@@ -122,9 +126,9 @@ export default function TournamentList(){
                         <option value="" className='bg-lime-950'>
                             Game
                         </option>
-                        {games.map(game => (
-                            <option className='bg-lime-950' key={game.gameId} value={game.gameName}>
-                                {game.gameName}
+                        {games.map(gameName => (
+                            <option className='bg-lime-950' key={gameName} value={gameName}>
+                                {gameName}
                             </option>
                         ))}
                     </select>

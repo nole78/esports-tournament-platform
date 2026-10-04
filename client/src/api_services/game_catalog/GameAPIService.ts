@@ -1,8 +1,9 @@
 import axios from "axios";
 import type { IGameAPIService } from "./IGameAPIService";
 import type { GameDto } from "../../models/game/GameDto";
+import type { GameNamesDto } from "../../types/game/GameNamesDto";
+import type { ApiResponse } from "../../types/api/ApiResponse";
 import { readItem } from "../../helpers/local_storage";
-import type { ApiResponse } from "../tournament_list/ITournamentAPIService";
 import { apiError } from "../apiResponse";
 
 const BASE = import.meta.env.VITE_API_URL + "games";
@@ -16,6 +17,10 @@ export const gameApi: IGameAPIService = {
   async getAll(page = 1, limit = 20) {
     return axios.get(`${BASE}?page=${page}&limit=${limit}`, { headers: authHeader() })
       .then(r => r.data).catch(e => apiError<{items: GameDto[]; total: number}>(e, "Failed to load items"));
+  },
+  async getAllNames(): Promise<ApiResponse<GameNamesDto>> {
+    return axios.get<ApiResponse<GameNamesDto>>(`${BASE}/names`, { headers: authHeader() })
+      .then(r => r.data).catch(e => apiError<GameNamesDto>(e, "Failed to load game names"));
   },
   async getById(id) {
     return axios.get<ApiResponse<GameDto>>(`${BASE}/${id}`, { headers: authHeader() })
