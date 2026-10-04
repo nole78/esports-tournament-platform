@@ -84,6 +84,19 @@ export class GameReadRepository implements IGameReadRepository{
         res.conn.release(); }
     }
 
+    async findAllNames() : Promise<String[]> {
+        const res = await this.db.getReadConnection();
+        if (!res) return [];
+        try {
+            const [rows] = await res.conn.query<RowDataPacket[]>(`SELECT game_name FROM games`);
+            return rows.map(r => r.game_name);  
+        } catch (err) {
+            this.logger.error("GameRepository", "findAllNames failed", err);
+            return [];
+        } finally { if(!res.isTransaction)
+        res.conn.release(); }
+    }
+
     async getTotal(): Promise<number> {
         const res = await this.db.getReadConnection();
             if (!res) return 0;
