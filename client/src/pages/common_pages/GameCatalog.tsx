@@ -20,11 +20,14 @@ export default function GameCatalog(){
     const {data, isLoading, error} = useQuery({
         queryKey: ["games", page],
         queryFn: async () => {
-            const res = await gameApi.getAll(page, limit);
+            return gameApi.getAll(page, limit)
+            .then(res => {
             if(!res.success) {
                 throw new Error(res.message ?? "Request failed");
             }
             return res.data;
+        })
+        .catch(() => {throw new Error("Failed to load games!")})
         },
         placeholderData: keepPreviousData
     })
@@ -42,19 +45,19 @@ export default function GameCatalog(){
                     Add Game
                 </Button>
             )}
-            {/* Error message*/}
-            {errrorMessage && <ErrorBox message={errrorMessage}/>}
             {deleted && (
                 <div className="mb-5 bg-green-500/10 border border-green-500/20 text-green-300 text-sm px-4 py-3 rounded-xl">
                     Succesfully deleted game
                 </div>
             )}
-            {/* Loading indicator*/}
-            {isLoading && games.length === 0 ? (
+            {errrorMessage? ( 
+                <ErrorBox message={errrorMessage}/>
+            ):
+            isLoading ? (
                 <p>Loading...</p>
-                ) : games.length === 0 && !errrorMessage ? (
+            ) : games.length === 0 ? (
                 <Empty message="No games found"/>
-                ) : (
+            ) : (
                 <section className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                     {games.map(g => (
                     <article className="group surface relative aspect-[4/3] overflow-hidden transition-shadow duration-200 hover:shadow-lg hover:shadow-secondary/20" key={g.gameId}>

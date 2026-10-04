@@ -1,34 +1,40 @@
-import { useState, useEffect } from "react";
-import { Empty, PageHeader, Pagination, Table, TableHead } from "../../components/ui/UI";
-import type { UserWatchlistDto } from "../../models/user_watchlist/UserWatchlistDto";
+import { useState } from "react";
+import { Empty, ErrorBox, PageHeader, Pagination, Table, TableHead } from "../../components/ui/UI";
 import { userWatchlistApi } from '../../api_services/user_watchlist/UserWatchlistAPIService';
 import { useAuth } from "../../hooks/auth/useAuthHook";
 import { useNavigate } from "react-router-dom";
 import placeholder from "../../assets/placeholder.png";
+import { useQuery, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 
 export default function UserWatchlist() {
     const { user } = useAuth();
-    const [watchlist, setWatchlist] = useState<UserWatchlistDto[]>([]);
-    const [error, setError] = useState<string>("");
+    const [actionError, setActionError] = useState<string>("");
     const [deleted, setDeleted] = useState<boolean>(false);
     const [page, setPage] = useState(1);
-    const [total, setTotal] = useState(0);
     const navigate = useNavigate();
     const limit = 20;
     const id = user?.id ?? 0;
+    const queryClient = useQueryClient();
 
-    useEffect(() => {
-        userWatchlistApi.getById(id, page, limit)
+    const {data, isLoading, error} = useQuery({
+        queryKey: ["watchlist", page],
+        queryFn: async () => {
+            return userWatchlistApi.getById(id, page, limit)
             .then(res => {
-                if (res.success) {
-                    setWatchlist(res.data?.items ?? []);
-                    setTotal(res.data?.total ?? 0);
+                if (!res.success) {
+                    throw new Error(res.message ?? "Failed to load watchlist");
                 }
-                else
-                    setError(res.message ?? "Failed to load watchlist");
+                return res.data;
             })
-            .catch(() => setError("Failed to load watchlist"))
-    }, [id, page]);
+            .catch(() => {throw new Error("Failed to load watchlist")})
+        },
+        placeholderData: keepPreviousData
+    })
+
+    const watchlist = data?.items || [];
+    const total = data?.total || 0;
+    const errorMessage = error instanceof Error? error.message : (actionError || "");
+
     return (
         <div>
             <PageHeader eyebrow="" title="My Watchlist" />
@@ -37,7 +43,15 @@ export default function UserWatchlist() {
                     Succesfully removed an item from your watchlist
                 </div>
             )}
-            {watchlist.length === 0 && !error ? <Empty message="Nothing on your watchlist" /> : (
+            {errorMessage ? (
+            <ErrorBox message={errorMessage}/> 
+            ):
+            isLoading ? (
+                <p>Loading...</p> 
+            ) :
+            watchlist.length === 0 ? (
+            <Empty message="Nothing on your watchlist" /> 
+            ) : (
                 <>
                     <Table>
                         <TableHead columns={["Logo", "Tournament Name", "Game Name", "Status", "Added At", "Action"]} />
@@ -66,21 +80,16 @@ export default function UserWatchlist() {
                                                     .then(res => {
                                                         if (res.success) {
                                                             setDeleted(true);
-                                                            setWatchlist(prev =>
-                                                                prev.filter(
-                                                                    watchlist =>
-                                                                        watchlist.tournamentId !== w.tournamentId
-                                                                )
-                                                            );
+                                                            queryClient.invalidateQueries({queryKey: ["watchlist"]});
                                                             setTimeout(() => {
                                                                 setDeleted(false);
                                                             }, 3000);
                                                             return;
                                                         }
-                                                        setError(res.message ?? "Failed to remove watchlist item");
+                                                        setActionError(res.message ?? "Failed to remove watchlist item");
                                                     })
                                                     .catch(() =>
-                                                        setError("Failed to remove tournament from watchlist")
+                                                        setActionError("Failed to remove tournament from watchlist")
                                                     );
                                             }}
                                             className="cursor-pointer px-3 py-1 bg-red-400/40 border border-red-500 hover:bg-red-500/20 text-red-400 font-semibold rounded-lg text-xs transition-colors"

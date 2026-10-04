@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useAuth } from "../../hooks/auth/useAuthHook";
 import { useNavigate } from "react-router-dom";
 import { tournamentApi } from "../../api_services/tournament_list/TournamentAPIService";
@@ -7,7 +7,6 @@ import { formatDeadline, daysUntilDeadline, getDeadlineStatus, getDeadlineColor 
 import { gameApi } from "../../api_services/game_catalog/GameAPIService";
 import { TournamentStatus } from "../../types/tournament/TournamentStatus";
 import { TournamentFormat } from "../../types/tournament/TournamentFormat";
-import type { TournamentFilterDto } from '../../models/tournament/TournamentFilterDto';
 import { Button } from "../../components/ui/Button";
 import { useQuery, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 
@@ -23,7 +22,7 @@ export default function TournamentList(){
     const userId = user?.id ?? 0;
     const queryClient = useQueryClient();
 
-    const {data: tournamentData, error} = useQuery({
+    const {data: tournamentData, isLoading, error} = useQuery({
         queryKey: ["tournaments", page],
         queryFn: async () => {
             return tournamentApi.getAll(page, limit)
@@ -34,7 +33,7 @@ export default function TournamentList(){
                 }
                 return res.data;
             })
-            .catch((err) => {throw new Error(err.message || "Failed to load tournaments!")})
+            .catch(() => {throw new Error("Failed to load tournaments!")})
         },
         placeholderData: keepPreviousData
     })
@@ -49,8 +48,8 @@ export default function TournamentList(){
                 }
                 return res.data;
             })
-            .catch((err) => {
-                throw new Error(err.message || "Failed to load games!");
+            .catch(() => {
+                throw new Error("Failed to load games!");
             });
         },
         placeholderData: keepPreviousData
@@ -62,7 +61,7 @@ export default function TournamentList(){
     const errorMessage = error instanceof Error? error.message : (actionError || "")
     
 
-    useEffect(() => {
+    /*useEffect(() => {
         const filter: TournamentFilterDto = {
             tournamentGame: gameNameFilter === "" ? "" : gameNameFilter,
             tournamentFormat: formatFilter === "" ? "" : formatFilter,
@@ -79,7 +78,7 @@ export default function TournamentList(){
                 setActionError(res.message ?? "Request failed");
         })
         .catch(() => setActionError("Failed to load tournaments!"))
-    }, [gameNameFilter, statusFilter, formatFilter, page]);
+    }, [gameNameFilter, statusFilter, formatFilter, page]);*/
 
     return(
         <div>
@@ -135,8 +134,15 @@ export default function TournamentList(){
                     </select>
                 </div>
             </div>
-            {errorMessage && <ErrorBox message={errorMessage}/>}
-            {tournaments.length === 0? <Empty message="No tournaments found"/> : (
+            {errorMessage ? (
+                <ErrorBox message={errorMessage}/>
+            ):
+            isLoading ? (
+                <p>Loading...</p>
+            ) :
+            tournaments.length === 0? (
+                <Empty message="No tournaments found"/> 
+            ) : (
                 <section className="grid gap-5 sm:grid-cols-4 lg:grid-cols-4">
                     {tournaments.map(t => {
                         const days = daysUntilDeadline(t.tournamentApplicationDeadline);
