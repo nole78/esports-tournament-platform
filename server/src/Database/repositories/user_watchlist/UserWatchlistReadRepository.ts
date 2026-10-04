@@ -14,13 +14,12 @@ export class UserWatchlistReadRepository implements IUserWatchlistReadRepository
     return new UserWatchlist(r.user_id, r.tournament_id, r.added_at);
   }
 
-  async findByUserId(userId: number, page = 1, limit = 20): Promise<UserWatchlist[]> {
+  async findByUserId(userId: number): Promise<UserWatchlist[]> {
     const res = await this.db.getReadConnection();
     if (!res) return [];
-    const offset = (page - 1) * limit;
     try {
       const [rows] = await res.conn.query<RowDataPacket[]>(
-        `SELECT * FROM user_watchlist WHERE user_id = ? ORDER BY tournament_id LIMIT ? OFFSET ?`, [userId, limit, offset]
+        `SELECT * FROM user_watchlist WHERE user_id = ? ORDER BY tournament_id`, [userId]
       );
       const items = rows.map((r) => this.map(r));
       return items;

@@ -92,7 +92,7 @@ const userWatchlistWriteRepo = new UserWatchlistWriteRepository(db, logger);
 // Services
 const userService   = new UserService(userReadRepo, userWriteRepo);
 const gameService   = new GameService(gameReadRepo, gameWriteRepo);
-const tournamentReadService = new TournamentReadService(tournamentReadRepo, gameReadRepo, logger);
+const tournamentReadService = new TournamentReadService(tournamentReadRepo, gameReadRepo, logger, userWatchlistReadRepo);
 const tournamentWriteService = new TournamentWriteService(tournamentReadRepo, tournamentWriteRepo, gameReadRepo, logger, dateTimeConverter);
 const auditService = new AuditService(auditRepo, userReadRepo);
 const authService   = new AuthService(userReadRepo, userWriteRepo);

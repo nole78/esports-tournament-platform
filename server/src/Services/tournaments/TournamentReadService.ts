@@ -7,6 +7,7 @@ import { TournamentFilterDto } from "../../Domain/DTOs/tournaments/TournamentFil
 import { Game } from "../../Domain/models/Game";
 import { IGameReadRepository } from "../../Domain/repositories/games/IGameReadRepository";
 import { ITournamentReadRepository } from "../../Domain/repositories/tournaments/ITournamentReadRepository";
+import { IUserWatchlistReadRepository } from "../../Domain/repositories/user_watchlist/IUserWatchlistReadRepository";
 import { ILoggerService } from "../../Domain/services/logger/ILoggerService";
 import { ITournamentReadService } from "../../Domain/services/tournaments/ITournamentReadService";
 
@@ -15,27 +16,23 @@ export class TournamentReadService implements ITournamentReadService {
     private readonly tournamentReadRepo: ITournamentReadRepository,
     private readonly gameReadRepo: IGameReadRepository,
     private readonly logger: ILoggerService,
+    private readonly userWatchlistReadRepo: IUserWatchlistReadRepository
   ) {}
 
-  async getAll(page?: number, limit?: number): Promise<Result<PaginatedListDto<TournamentDto>>> {
+  async getAll(page?: number, limit?: number, userId?: number): Promise<Result<PaginatedListDto<TournamentDto>>> {
     const tournaments = await this.tournamentReadRepo.findAll(page, limit);
     if (!tournaments) {
       return Result.Failure("There are no tournaments!", ErrorType.NotFound);
     }
 
     const gameIds = [...new Set(tournaments.map(t => t.tournamentGameId))];
-    const games:Game[] = [];
-    
-    for(let i:number = 0; i < gameIds.length; i++)
-    {
-      const game = await this.gameReadRepo.findById(gameIds[i]);
-      if(game)
-        games.push(game);
-    }
+    const games: Game[] = await this.gameReadRepo.findByIds(gameIds);
 
     const gameMap = new Map(games.map(g => [g.gameId, g.gameName]));
     
-    
+    const watchlist = userId? await this.userWatchlistReadRepo.findByUserId(userId) : [];
+    const watchlistedTournamentIds = new Set(watchlist.map(w => w.tournamentId));
+
     const items = tournaments.map(t => 
       new TournamentDto(
         t.tournamentId,
@@ -45,7 +42,8 @@ export class TournamentReadService implements ITournamentReadService {
         t.tournamentMaxTeams,
         t.tournamentApplicationDeadline,
         t.tournamentPrizeFund,
-        t.tournamentStatus
+        t.tournamentStatus,
+        watchlistedTournamentIds.has(t.tournamentId)
       )
     );
 
