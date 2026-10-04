@@ -2,6 +2,7 @@ import { ErrorType } from '../../Domain/common/ErrorType';
 import { Result } from '../../Domain/common/Result';
 import { CreateGameDto } from '../../Domain/DTOs/games/CreateGameDto';
 import { GameDto } from '../../Domain/DTOs/games/GameDto';
+import { GameNamesDTO } from '../../Domain/DTOs/games/GameNamesDto';
 import { PaginatedListDto } from '../../Domain/DTOs/PaginatedListDto';
 import { Game } from '../../Domain/models/Game';
 import { IGameReadRepository } from '../../Domain/repositories/games/IGameReadRepository';
@@ -21,12 +22,19 @@ export class GameService implements IGameService {
         const list = items.map(i => this.toGameDto(i))
         return Result.Success(new PaginatedListDto( list, total, page ?? 1, limit ?? 20));
     }
+
+    async getAllNames() : Promise<Result<GameNamesDTO>>{
+        const items = await this.gameReadRepo.findAllNames();
+        return Result.Success(new GameNamesDTO(items));
+    }
+
     async getById(id: number) : Promise<Result<GameDto>>{
         const item = await this.gameReadRepo.findById(id);
         if(item.gameId === 0)
             return Result.Failure(`Game with id ${id} doesn't exist`, ErrorType.NotFound);
         return Result.Success(this.toGameDto(item));
     }
+
     async create(dto: CreateGameDto) : Promise<Result<GameDto>>{
         const game = await this.gameReadRepo.findByName(dto.gameName);
         if(game.gameId !== 0)
