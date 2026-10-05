@@ -37,12 +37,10 @@ export class TournamentController{
         tournamentFormat: req.query.tournamentFormat as TournamentFormat,
         tournamentStatus: req.query.tournamentStatus as TournamentStatus
         };
+
+        console.log(filters);
     
-        const hasFilters = Object.values(filters).some(v => v);
-        
-        const result = hasFilters 
-            ? await this.tournamentReadService.getFiltered(filters, page, limit)
-            : await this.tournamentReadService.getAll(page, limit, req.user?.id);
+        const result = await this.tournamentReadService.getAll(filters, page, limit, req.user?.id);
         handleResult(result, res);
         }
 

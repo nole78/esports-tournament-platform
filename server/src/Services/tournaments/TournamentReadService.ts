@@ -19,8 +19,14 @@ export class TournamentReadService implements ITournamentReadService {
     private readonly userWatchlistReadRepo: IUserWatchlistReadRepository
   ) {}
 
-  async getAll(page?: number, limit?: number, userId?: number): Promise<Result<PaginatedListDto<TournamentDto>>> {
-    const tournaments = await this.tournamentReadRepo.findAll(page, limit);
+  async getAll(filters: Partial<TournamentFilterDto>, page?: number, limit?: number, userId?: number): Promise<Result<PaginatedListDto<TournamentDto>>> {
+    let game:GameDto = new GameDto();
+    if(filters.tournamentGame)
+    {
+      game = await this.gameReadRepo.findByName(filters.tournamentGame);
+    }
+    const tournaments = await this.tournamentReadRepo.findFiltered(game.gameId, filters.tournamentFormat, filters.tournamentStatus, page, limit);
+
     if (!tournaments) {
       return Result.Failure("There are no tournaments!", ErrorType.NotFound);
     }
@@ -47,46 +53,8 @@ export class TournamentReadService implements ITournamentReadService {
       )
     );
 
-    const total = await this.tournamentReadRepo.findTotal();
+    const total = await this.tournamentReadRepo.findTotalFiltered(game.gameId, filters.tournamentFormat, filters.tournamentStatus);
 
-    return Result.Success(new PaginatedListDto(items, total, page, limit));
-  }
-
-  async getFiltered(fields: Partial<TournamentFilterDto>, page?: number, limit?: number): Promise<Result<PaginatedListDto<TournamentDto>>> {
-    
-    let game:GameDto = new GameDto();
-    if(fields.tournamentGame)
-    {
-      game = await this.gameReadRepo.findByName(fields.tournamentGame);
-    }
-    
-    const tournaments = await this.tournamentReadRepo.findFiltered(game?.gameId == 0 ? 0 : game?.gameId, fields?.tournamentFormat, fields?.tournamentStatus, page, limit);
-
-    const gameIds = [...new Set(tournaments.map(t => t.tournamentGameId))];
-    const games:GameDto[] = [];
-    
-    for(let i:number = 0; i < gameIds.length; i++)
-    {
-      const game = await this.gameReadRepo.findById(gameIds[i]);
-      if(game)
-        games.push(game);
-    }
-
-    const gameMap = new Map(games.map(g => [g.gameId, g.gameName]));
-
-    const items = tournaments.map(t => 
-      new TournamentDto(
-        t.tournamentId,
-        t.tournamentName,
-        gameMap.get(t.tournamentGameId) || "Unknown",
-        t.tournamentFormat,
-        t.tournamentMaxTeams,
-        t.tournamentApplicationDeadline,
-        t.tournamentPrizeFund,
-        t.tournamentStatus
-      )
-    );
-    const total = await this.tournamentReadRepo.findTotalFiltered(game?.gameId == 0 ? 0 : game?.gameId, fields?.tournamentFormat, fields?.tournamentStatus);
     return Result.Success(new PaginatedListDto(items, total, page, limit));
   }
 

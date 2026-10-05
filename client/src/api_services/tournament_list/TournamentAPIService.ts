@@ -13,8 +13,16 @@ const authHeader = () => {
 };
 
 export const tournamentApi : ITournamentAPIService = {
-  async getAll(page = 1, limit = 20) {
-    return axios.get(`${BASE}?page=${page}&limit=${limit}`, { headers: authHeader() })
+  async getAll(payload, page = 1, limit = 20) {
+    const params = new URLSearchParams({
+      page: String(page),
+      limit: String(limit),
+    });
+    if (payload.tournamentGame) params.set("tournamentGame", payload.tournamentGame);
+    if (payload.tournamentFormat) params.set("tournamentFormat", payload.tournamentFormat);
+    if (payload.tournamentStatus) params.set("tournamentStatus", payload.tournamentStatus);
+
+    return axios.get(`${BASE}?${params.toString()}`, {headers: authHeader() })
       .then(r => r.data).catch(e => apiError<{ items: TournamentDto[]; total: number }>(e, "Failed to load items"));
   },
   async getById(id) {
@@ -24,19 +32,6 @@ export const tournamentApi : ITournamentAPIService = {
   async create(payload) {
     return axios.post<ApiResponse<TournamentDto>>(BASE, payload, { headers: authHeader() })
       .then(r => r.data).catch(e => apiError<TournamentDto>(e, "Failed to create"));
-  },
-  async getFiltered(payload, page = 1, limit = 20)
-  {
-    const params = new URLSearchParams({
-      page: String(page),
-      limit: String(limit),
-    });
-    if (payload.tournamentGame) params.set("tournamentGame", payload.tournamentGame);
-    if (payload.tournamentFormat) params.set("tournamentFormat", payload.tournamentFormat);
-    if (payload.tournamentStatus) params.set("tournamentStatus", payload.tournamentStatus);
-
-    return axios.get<ApiResponse<{ items: TournamentDto[]; total: number }>>(`${BASE}?${params.toString()}`, { headers: authHeader() })
-      .then(r => r.data).catch(e => apiError<{ items: TournamentDto[]; total: number }>(e, "Failed to load items"));
   },
   async update(id, payload) {
     return axios.put<ApiResponse<void>>(`${BASE}/${id}`, payload, { headers: authHeader() })

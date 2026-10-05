@@ -6,8 +6,7 @@ import type { ApiResponse } from "../../types/api/ApiResponse";
 export type { ApiResponse };
 
 export interface ITournamentAPIService {
-    getAll(page?: number, limit?: number): Promise<ApiResponse<{ items: TournamentDto[]; total: number }>>;
-    getFiltered(payload: Partial<TournamentFilterDto>, page?:number, limit?: number): Promise<ApiResponse<{ items: TournamentDto[]; total: number }>>;
+    getAll(payload: Partial<TournamentFilterDto>, page?: number, limit?: number): Promise<ApiResponse<{ items: TournamentDto[]; total: number }>>;
     getById(id: number): Promise<ApiResponse<TournamentDto>>;
     create(payload: Record<string, unknown>): Promise<ApiResponse<TournamentDto>>;
     update(id: number, payload: Partial<TournamentDto>): Promise<ApiResponse<void>>;

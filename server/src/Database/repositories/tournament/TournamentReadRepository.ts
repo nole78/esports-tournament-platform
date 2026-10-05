@@ -113,19 +113,25 @@ export class TournamentReadRepository implements ITournamentReadRepository {
     if (!res) return [];
     const offset = Math.max(0, Math.floor((page - 1) * limit));
     const lim    = Math.max(1, Math.floor(limit));
+    const conditions: string[] = [];
+    const values: any[] = [];
 
-    const fieldMap: Record<string, string> = {
-      tournamentGameId: "tournament_game_id",
-      tournamentFormat: "tournament_format",
-      tournamentStatus: "tournament_status"
+    if (tournamentGameId) {
+      conditions.push("tournament_game_id = ?");
+      values.push(tournamentGameId);
     }
-    const filter = {tournamentGameId, tournamentFormat, tournamentStatus};
+    if (tournamentFormat) {
+      conditions.push("tournament_format = ?");
+      values.push(tournamentFormat);
+    }
+    if (tournamentStatus) {
+      conditions.push("tournament_status = ?");
+      values.push(tournamentStatus);
+    }
+
+    const filterClause = conditions.length > 0 ? conditions.join(" AND ") : "1 = 1";
+
     try {
-      const entries = Object.entries(filter).filter(([, v]) => v).map(([k,v]) => [fieldMap[k] ?? k, v]);
-      if (entries.length === 0) return [];
-      const filterClause = entries.map(([k]) => `${k} = ?`).join(" AND ");
-      const values = entries.map(([, v]) => v);
-      
       const [rows] = await res.conn.query<RowDataPacket[]>(
         `SELECT tournament_id, tournament_name, tournament_game_id, tournament_format, tournament_max_teams, tournament_application_deadline, tournament_prize_fund, tournament_status
          FROM tournaments

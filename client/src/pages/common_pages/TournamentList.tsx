@@ -9,6 +9,7 @@ import { TournamentStatus } from "../../types/tournament/TournamentStatus";
 import { TournamentFormat } from "../../types/tournament/TournamentFormat";
 import { Button } from "../../components/ui/Button";
 import { useQuery, useQueryClient, keepPreviousData } from "@tanstack/react-query";
+import type { TournamentFilterDto } from "../../models/tournament/TournamentFilterDto";
 
 export default function TournamentList(){
     const { user } = useAuth();
@@ -21,11 +22,16 @@ export default function TournamentList(){
     const limit = 12;
     const userId = user?.id ?? 0;
     const queryClient = useQueryClient();
-
+    
     const {data: tournamentData, isLoading, error} = useQuery({
-        queryKey: ["tournaments", page],
+        queryKey: ["tournaments", page, gameNameFilter, formatFilter, statusFilter],
         queryFn: async () => {
-            return tournamentApi.getAll(page, limit)
+            const filter: TournamentFilterDto = {
+                tournamentGame: gameNameFilter ||"",
+                tournamentFormat: formatFilter || "",
+                tournamentStatus: statusFilter || ""
+            };
+            return tournamentApi.getAll(filter, page, limit)
             .then(res => {
                 if(!res.success)
                 {
@@ -33,10 +39,11 @@ export default function TournamentList(){
                 }
                 return res.data;
             })
-            .catch(() => {throw new Error("Failed to load tournaments!")})
+            .catch((err) => {console.log(err);throw new Error("Failed to load tournaments!")})
         },
         placeholderData: keepPreviousData
     })
+
 
     const {data: gameNamesData} = useQuery({
         queryKey: ["gameNames"],
@@ -59,26 +66,6 @@ export default function TournamentList(){
     const tournaments = tournamentData?.items || []
     const total = tournamentData?.total || 0
     const errorMessage = error instanceof Error? error.message : (actionError || "")
-    
-
-    /*useEffect(() => {
-        const filter: TournamentFilterDto = {
-            tournamentGame: gameNameFilter === "" ? "" : gameNameFilter,
-            tournamentFormat: formatFilter === "" ? "" : formatFilter,
-            tournamentStatus: statusFilter === "" ? "" : statusFilter
-        };
-        tournamentApi.getFiltered(filter, page, limit)
-        .then(res => {
-            if(res.success && res.data)
-            {
-                //setTournaments(res.data?.items ?? []);
-                //setTotal(res.data.total);
-            }
-                else
-                setActionError(res.message ?? "Request failed");
-        })
-        .catch(() => setActionError("Failed to load tournaments!"))
-    }, [gameNameFilter, statusFilter, formatFilter, page]);*/
 
     return(
         <div>
