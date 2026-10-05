@@ -1,18 +1,14 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "../../hooks/auth/useAuthHook";
-import type { TeamDto } from "../../models/team/TeamDto";
 import { useLocation, useNavigate } from 'react-router-dom';
 import { teamApi } from "../../api_services/teams/TeamAPIService";
 import { Empty, ErrorBox, PageHeader, Pagination} from "../../components/ui/UI";
 import { TeamRole } from "../../types/teamMembers/teamMemberRole";
 import placeholder from "../../assets/placeholder.png"
+import { useQuery, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 
 
 export default function TeamsPage(){
-    const {user} = useAuth();
-    const [total, setTotal] = useState<number>(0);
-    const [teams, setTeams] = useState<TeamDto[]>([]);
-    const [error, setError] = useState<string>("");
+    const [actionError, setActionError] = useState<string>("");
     const [deleted, setDeleted] = useState<boolean>(false);
     const location = useLocation();
     const [added, setAdded] = useState<boolean>(location.state?.added ?? false);
@@ -21,6 +17,26 @@ export default function TeamsPage(){
     const [page, setPage] = useState(1);
     const limit = 6;
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
+
+    const {data, isLoading, error} = useQuery({
+        queryKey: ["teams", page],
+        queryFn: async () => {
+            return teamApi.getByGamerTag(page, limit)
+            .then((res) => {
+                if (!res.success){
+                    throw new Error(res.message ?? "Failed to load teams");
+                }
+                return res.data;
+            })
+            .catch(() => { throw new Error("Failed to load teams")})
+        },
+        placeholderData: keepPreviousData
+    })
+
+    const teams = data?.items || [];
+    const total = data?.total || 0;
+    const errorMessage = error instanceof Error? error.message : (actionError || "");
 
     useEffect(()=>{
         if (!edited) return;
@@ -44,26 +60,6 @@ export default function TeamsPage(){
         }
     }, [location.state, location.pathname, navigate]);
 
-
-
-    useEffect(() =>{
-        const loadPage = (p : number)=>{
-        if (!user?.username) return;
-
-        teamApi.getByGamerTag(p, limit)
-        .then((res) => {
-            if (res.success){
-                setTeams(res.data?.items ?? []);
-                setTotal(res.data?.total ?? 0);
-            }else{
-                setError(res.message ?? "Failed to load teams");
-            }
-        })
-        .catch(() => setError("Failed to load teams"))
-    }
-        loadPage(page);   
-    }, [page,user]);
-
     return (
             <div>
                 <PageHeader eyebrow="" title="Your Teams"/>
@@ -71,8 +67,6 @@ export default function TeamsPage(){
                         className="cursor-pointer mb-2 w-1/6 bg-bgsecondary/40 border-2 border-bgsecondary hover:bg-bgsecondary/30 text-bgsecondary font-semibold rounded-xl py-3 text-sm transition-colors">
                 Add Team</button>
                 
-                {error && <ErrorBox message={error}/>}
-
                 {deleted && (
                 <div className="mb-5 bg-green-500/10 border border-green-500/20 text-green-300 text-sm px-4 py-3 rounded-xl">
                     Succesfully deleted team
@@ -93,7 +87,13 @@ export default function TeamsPage(){
                     Succesfully added team
                 </div>)}
 
-                {teams.length === 0 && !error ? <Empty message="No teams found"/> : (
+                {errorMessage? ( 
+                    <ErrorBox message={errorMessage}/>
+                ) :
+                isLoading? (
+                    <p>Loading...</p>
+                ) :
+                teams.length === 0 && !error ? <Empty message="No teams found"/> : (
                 <section className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">     
                     {teams.map(t => (
                         <div onClick={() => navigate(`/teams/details/${t.teamId}`)} className="cursor-pointer rounded-2xl group relative aspect-4/3 border-2 border-white/5 bg-bgprimary/30 overflow-hidden">
@@ -115,13 +115,13 @@ export default function TeamsPage(){
                                                 teamApi.delete(t.teamId)
                                                     .then(res =>{
                                                         if(res.success) {
-                                                            setDeleted(true); 
-                                                            setTeams(prev => prev.filter(team => team.teamId !== t.teamId));
+                                                            setDeleted(true);
+                                                            queryClient.invalidateQueries({queryKey:["teams"]})
                                                             setTimeout(() => {setDeleted(false)}, 3000);
                                                             return;}
-                                                        else setError(res.message ?? "Failed to leave team");
+                                                        else setActionError(res.message ?? "Failed to leave team");
                                                     })
-                                                    .catch(() => setError("Failed to delete the team"))
+                                                    .catch(() => setActionError("Failed to delete the team"))
                                                 }}
                                                 >
                                         Delete
