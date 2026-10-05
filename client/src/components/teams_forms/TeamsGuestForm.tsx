@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { teamApi } from "../../api_services/teams/TeamAPIService";
-import { Empty, ErrorBox, PageHeader, Pagination} from "../ui/UI";
+import { Empty, ErrorBox, PageHeader, Pagination, Spinner} from "../ui/UI";
 import { useNavigate } from "react-router-dom";
 import placeholder from "../../assets/placeholder.png";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
@@ -35,7 +35,9 @@ export default function TeamsGuestForm(){
                 <ErrorBox message={error.message}/>
             ):
             isLoading ? (
-                <p>Loading...</p>
+                <div className="flex justify-center py-16">
+                    <Spinner />
+                </div>
             ) :
             teams.length === 0 ? (
                 <Empty message="No teams found"/> 

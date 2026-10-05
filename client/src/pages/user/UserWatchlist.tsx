@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Empty, ErrorBox, PageHeader, Pagination, Table, TableHead } from "../../components/ui/UI";
+import { Empty, ErrorBox, PageHeader, Pagination, Spinner, Table, TableHead } from "../../components/ui/UI";
 import { userWatchlistApi } from '../../api_services/user_watchlist/UserWatchlistAPIService';
 import { useAuth } from "../../hooks/auth/useAuthHook";
 import { useNavigate } from "react-router-dom";
@@ -33,7 +33,6 @@ export default function UserWatchlist() {
 
     const watchlist = data?.items || [];
     const total = data?.total || 0;
-    const errorMessage = error instanceof Error? error.message : (actionError || "");
 
     return (
         <div>
@@ -43,14 +42,19 @@ export default function UserWatchlist() {
                     Succesfully removed an item from your watchlist
                 </div>
             )}
-            {errorMessage ? (
-            <ErrorBox message={errorMessage}/> 
+            {actionError &&
+                <ErrorBox message={actionError}/>
+            }
+            {error ? (
+                <ErrorBox message={error.message}/> 
             ):
             isLoading ? (
-                <p>Loading...</p> 
+                <div className="flex justify-center py-16">
+                    <Spinner />
+                </div> 
             ) :
             watchlist.length === 0 ? (
-            <Empty message="Nothing on your watchlist" /> 
+                <Empty message="Nothing on your watchlist" /> 
             ) : (
                 <>
                     <Table>

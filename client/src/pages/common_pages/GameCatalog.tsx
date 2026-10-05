@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Empty, ErrorBox, PageHeader, Pagination } from "../../components/ui/UI";
+import { Empty, ErrorBox, PageHeader, Pagination, Spinner } from "../../components/ui/UI";
 import { gameApi } from "../../api_services/game_catalog/GameAPIService";
 import { useAuth } from "../../hooks/auth/useAuthHook";
 import { useNavigate } from "react-router-dom";
@@ -34,7 +34,6 @@ export default function GameCatalog(){
 
     const games = data?.items ?? [];
     const total = data?.total ?? 0;
-    const errrorMessage = error instanceof Error ? error.message : (actionError || "");
 
     return (
         <div>
@@ -50,17 +49,22 @@ export default function GameCatalog(){
                     Succesfully deleted game
                 </div>
             )}
-            {errrorMessage? ( 
-                <ErrorBox message={errrorMessage}/>
+            {actionError &&
+                <ErrorBox message={actionError}/>
+            }
+            {error? ( 
+                <ErrorBox message={error.message}/>
             ):
             isLoading ? (
-                <p>Loading...</p>
+                <div className="flex justify-center py-16">
+                    <Spinner />
+                </div>
             ) : games.length === 0 ? (
                 <Empty message="No games found"/>
             ) : (
                 <section className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                     {games.map(g => (
-                    <article className="group surface relative aspect-[4/3] overflow-hidden transition-shadow duration-200 hover:shadow-lg hover:shadow-secondary/20" key={g.gameId}>
+                    <article className="group surface relative aspect-4/3 overflow-hidden transition-shadow duration-200 hover:shadow-lg hover:shadow-secondary/20" key={g.gameId}>
                         <div className="w-full h-full">
                             <img src={g.gameLogotip ? g.gameLogotip : placeholder} alt={`${g.gameName} logo`} width="640" height="480" loading="lazy" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"/>
                         </div>

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useAuth } from "../../hooks/auth/useAuthHook";
 import { useNavigate } from "react-router-dom";
 import { tournamentApi } from "../../api_services/tournament_list/TournamentAPIService";
-import { Empty, ErrorBox, PageHeader, Pagination } from "../../components/ui/UI";
+import { Empty, ErrorBox, PageHeader, Pagination, Spinner } from "../../components/ui/UI";
 import { formatDeadline, daysUntilDeadline, getDeadlineStatus, getDeadlineColor } from '../../helpers/date_formatter';
 import { gameApi } from "../../api_services/game_catalog/GameAPIService";
 import { TournamentStatus } from "../../types/tournament/TournamentStatus";
@@ -65,7 +65,6 @@ export default function TournamentList(){
     const gameNames = gameNamesData?.gameNames || []
     const tournaments = tournamentData?.items || []
     const total = tournamentData?.total || 0
-    const errorMessage = error instanceof Error? error.message : (actionError || "")
 
     return(
         <div>
@@ -121,11 +120,16 @@ export default function TournamentList(){
                     </select>
                 </div>
             </div>
-            {errorMessage ? (
-                <ErrorBox message={errorMessage}/>
+            {actionError && 
+                <ErrorBox message={actionError}/>
+            }
+            {error ? (
+                <ErrorBox message={error.message}/>
             ):
             isLoading ? (
-                <p>Loading...</p>
+                <div className="flex justify-center py-16">
+                    <Spinner />
+                </div>
             ) :
             tournaments.length === 0? (
                 <Empty message="No tournaments found"/> 

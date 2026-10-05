@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from 'react-router-dom';
 import { teamApi } from "../../api_services/teams/TeamAPIService";
-import { Empty, ErrorBox, PageHeader, Pagination} from "../../components/ui/UI";
+import { Empty, ErrorBox, PageHeader, Pagination, Spinner} from "../../components/ui/UI";
 import { TeamRole } from "../../types/teamMembers/teamMemberRole";
 import placeholder from "../../assets/placeholder.png"
 import { useQuery, useQueryClient, keepPreviousData } from "@tanstack/react-query";
@@ -36,7 +36,6 @@ export default function TeamsPage(){
 
     const teams = data?.items || [];
     const total = data?.total || 0;
-    const errorMessage = error instanceof Error? error.message : (actionError || "");
 
     useEffect(()=>{
         if (!edited) return;
@@ -87,11 +86,16 @@ export default function TeamsPage(){
                     Succesfully added team
                 </div>)}
 
-                {errorMessage? ( 
-                    <ErrorBox message={errorMessage}/>
+                {actionError && 
+                    <ErrorBox message={actionError}/>
+                }
+                {error? ( 
+                    <ErrorBox message={error.message}/>
                 ) :
                 isLoading? (
-                    <p>Loading...</p>
+                    <div className="flex justify-center py-16">
+                        <Spinner />
+                    </div>
                 ) :
                 teams.length === 0 && !error ? <Empty message="No teams found"/> : (
                 <section className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">     
