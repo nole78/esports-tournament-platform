@@ -1,44 +1,45 @@
-import { useEffect, useState } from "react";
-import { useAuth } from "../../hooks/auth/useAuthHook";
+import { useState } from "react";
 import { auditLogApi } from "../../api_services/audit_log/AuditLogAPIService";
-import type { AuditLogDto } from "../../models/audit/AuditLogDTO";
-import { Spinner, Empty, Pagination, Table, TableHead, PageHeader } from "../../components/ui/UI";
+import { Spinner, Empty, Pagination, Table, TableHead, PageHeader, ErrorBox } from "../../components/ui/UI";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 
 export default function AuditLogPage() {
-  const { token } = useAuth();
-  const [logs, setLogs] = useState<AuditLogDto[]>([]);
-  const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(true);
   const limit = 20;
 
-  const load = (p: number) => {
-    if (!token) return;
-    
-    Promise.resolve().then(() => setLoading(true));
-
-    auditLogApi.getLogs(p, limit)
+  const { data, isLoading, error} = useQuery({
+    queryKey: ["audit", page],
+    queryFn: async () => {
+      return auditLogApi.getLogs(page, limit)
       .then((res) => {
-        if (res.success && res.data) {
-          setLogs(res.data.items);
-          setTotal(res.data.total);
+        if (!res.success) {
+          throw new Error(res.message || "Failed to load logs")
         }
+        return res.data;
       })
-      .finally(() => setLoading(false));
-  };
+      .catch(() => { throw new Error("Failed to load logs")})
+    },
+    placeholderData: keepPreviousData
+  })
 
-  useEffect(() => {
-    load(page);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, token]);
-
+  const logs = data?.items || [];
+  const total = data?.total || 0;
 
   return (
     <div>
       <PageHeader eyebrow="admin" title="Audit Log" />
-      {loading ? <div className="flex justify-center py-16"><Spinner /></div>
-        : logs.length === 0 ? <Empty message="No log entries" />
-        : <>
+      {error? (
+        <ErrorBox message={error.message}/>
+      ) :
+      isLoading ? ( 
+        <div className="flex justify-center py-16">
+          <Spinner />
+        </div>
+      ) : 
+      logs.length === 0 ? (
+      <Empty message="No log entries" />
+      ) : 
+        <>
           <Table>
             <TableHead columns={["#", "Gamer Tag", "Action", "Entity", "IP", "Time"]} />
             <tbody>

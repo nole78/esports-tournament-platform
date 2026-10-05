@@ -1,25 +1,50 @@
-import { useEffect, useState } from "react";
-import { PageHeader, Table, TableHead, RoleBadge, Empty, ErrorBox } from "../../components/ui/UI";
+// Add user pagination
+import { useState } from "react";
+import { PageHeader, Table, TableHead, RoleBadge, Empty, ErrorBox, Spinner } from "../../components/ui/UI";
 import { usersApi } from "../../api_services/users/UsersAPIService";
 import type { UserDto } from "../../models/user/UserTypes";
+import { useQuery, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 
 export default function UsersPage() {
-  const [users, setUsers] = useState<UserDto[]>([]);
-  const [error, setError] = useState<string>("");
+  const [actionError, setActionError] = useState<string>("");
   const [selectedUser, setSelectedUser] = useState<UserDto>();
   const [open, setOpen] = useState<boolean>(false);
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    usersApi.getAll()
-      .then(res => { if (res.success) setUsers(res.data ?? []); else setError(res.message ?? "Failed to load users"); })
-      .catch(() => setError("Failed to load users"));
-  }, []);
+  const { data, isLoading, error} = useQuery({
+    queryKey:["users"],
+    queryFn: async () => {
+      return usersApi.getAll()
+      .then(res => { 
+        if (!res.success) {
+          throw new Error(res.message ?? "Failed to load users"); 
+        }
+        return res.data;
+      })
+      .catch(() => { throw new Error("Failed to load users")});
+    },
+    placeholderData: keepPreviousData
+  })
+
+  const users = data || []
 
   return (
     <div>
       <PageHeader eyebrow="Admin" title="Users" />
-      {error && <ErrorBox message={error} />}
-      {users.length === 0 && !error ? <Empty message="No users found" /> : (
+      {actionError && 
+        <ErrorBox message={actionError}/>
+      }
+      {error ? (
+        <ErrorBox message={error.message} />
+      ) :
+      isLoading? (
+        <div className="flex justify-center py-16">
+          <Spinner />
+        </div>
+      ) : 
+      users.length === 0 ? (
+        <Empty message="No users found" /> 
+      ) : (
         <Table>
           <TableHead columns={["ID", "Username", "Email", "Role", "Status"]} />
           <tbody>
@@ -72,24 +97,24 @@ export default function UsersPage() {
             <div className="space-y-2">
               {["admin", "player"].map(role => (
                 <button key={role} onClick={() => {
-                    setUsers(prev =>
-                      prev.map(user =>
-                        user.id === selectedUser.id
-                          ? { ...user, role }
-                          : user
-                      )
-                    );
                     if(selectedUser.role === "admin")
                     {
                       role = selectedUser.role;
                       setOpen(false);
-                      setError("Cannot change the role of an admin")
-                      setTimeout(() => {setError("")}, 3000);
+                      setActionError("Cannot change the role of an admin")
+                      setTimeout(() => {setActionError("")}, 3000);
                       return;
                     }
                     else
                     {
                       usersApi.changeRole(selectedUser.id, role)
+                      .then(res => {
+                        if(!res.success) {
+                          setActionError(res.message || "Failed to change users role");
+                        }
+                        queryClient.invalidateQueries({queryKey: ["users"]});
+                      })
+                      .catch(() => setActionError("Failed to change users role"));
                     }
                     
                     setOpen(false);
