@@ -4,7 +4,7 @@ import { UserRole } from "../../enums/UserRole";
 
 
 export interface IUserService {
-  getAll(): Promise<Result<UserDto[]>>;
+  getAll(page?:number, limit?: number): Promise<Result<UserDto[]>>;
   getById(id: number): Promise<Result<UserDto>>;
   changeRole(id: number,role: UserRole): Promise<Result<void>>;
   logout(id: number): Promise<Result<void>>;
