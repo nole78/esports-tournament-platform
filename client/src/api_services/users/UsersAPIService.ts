@@ -13,9 +13,9 @@ const authHeader = () => {
 };
 
 export const usersApi: IUsersAPIService = {
-  async getAll() {
-    return axios.get<ApiResponse<UserDto[]>>(BASE, { headers: authHeader() })
-      .then(r => r.data).catch(e => apiError<UserDto[]>(e, "Failed to load users"));
+  async getAll(page = 1, limit = 20): Promise<ApiResponse<{ items: UserDto[]; total: number }>> {
+    return axios.get<ApiResponse<{ items: UserDto[]; total: number }>>(`${BASE}?page=${page}&limit=${limit}`, { headers: authHeader() })
+      .then(r => r.data).catch(e => apiError<{ items: UserDto[]; total: number }>(e, "Failed to load users"));
   },
   async getById(id) {
     return axios.get<ApiResponse<UserDto>>(`${BASE}/${id}`, { headers: authHeader() })
