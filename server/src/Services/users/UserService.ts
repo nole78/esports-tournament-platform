@@ -14,11 +14,11 @@ export class UserService implements IUserService {
     private readonly userWriteRepo: IUserWriteRepository
   ) {}
 
-  async getAll(page?: number, limit?: number): Promise<Result<UserDto[]>> {
+  async getAll(page?: number, limit?: number): Promise<Result<PaginatedListDto<UserDto>>> {
     const users = await this.userReadRepo.findAllPaginated(page, limit);
     const total = await this.userReadRepo.findTotal();
     const paginatedUsers = new PaginatedListDto(users, total, page, limit)
-    return Result.Success(users.map((u) => new UserDto(u.id, u.gamerTag, u.fullName, u.email, u.role, u.profilePicture, u.isActive)));
+    return Result.Success(paginatedUsers);
   }
 
   async getById(id: number): Promise<Result<UserDto>> {
