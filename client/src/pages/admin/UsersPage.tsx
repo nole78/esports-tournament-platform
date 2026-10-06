@@ -4,17 +4,20 @@ import { PageHeader, Table, TableHead, RoleBadge, Empty, ErrorBox, Spinner } fro
 import { usersApi } from "../../api_services/users/UsersAPIService";
 import type { UserDto } from "../../models/user/UserTypes";
 import { useQuery, useQueryClient, keepPreviousData } from "@tanstack/react-query";
+import { Pagination } from "../../components/ui/UI";
 
 export default function UsersPage() {
   const [actionError, setActionError] = useState<string>("");
   const [selectedUser, setSelectedUser] = useState<UserDto>();
   const [open, setOpen] = useState<boolean>(false);
+  const [page, setPage] = useState(1);
+  const limit = 20;
   const queryClient = useQueryClient();
 
   const { data, isLoading, error} = useQuery({
-    queryKey:["users"],
+    queryKey:["users", page],
     queryFn: async () => {
-      return usersApi.getAll()
+      return usersApi.getAll(page, limit)
       .then(res => { 
         if (!res.success) {
           throw new Error(res.message ?? "Failed to load users"); 
@@ -26,7 +29,8 @@ export default function UsersPage() {
     placeholderData: keepPreviousData
   })
 
-  const users = data || []
+  const users = data?.items ?? [];
+  const total = data?.total ?? 0;
 
   return (
     <div>
@@ -77,6 +81,7 @@ export default function UsersPage() {
           </tbody>
         </Table>
       )}
+      <Pagination page={page} total={total} pageSize={limit} onChange={setPage} />
       {selectedUser && open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setOpen(false)}/>
