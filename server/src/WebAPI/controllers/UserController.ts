@@ -19,7 +19,11 @@ export class UserController {
   }
 
   private async getAll(req: Request, res: Response): Promise<void> {
-    const result = await this.userService.getAll();
+    const page = parseInt(req.query.page as string ?? "1", 10);
+    const limit = parseInt(req.query.limit as string ?? "10", 10);
+    console.log(page);
+    console.log(limit);
+    const result = await this.userService.getAll(page, limit);
     handleResult(result, res);
   }
 

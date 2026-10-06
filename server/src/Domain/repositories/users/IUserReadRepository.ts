@@ -6,4 +6,6 @@ export interface IUserReadRepository {
   findByUsername(username: string): Promise<User>;
   findByEmail(email: string): Promise<User>;
   findAll(): Promise<User[]>;
+  findAllPaginated(page?: number, limit?: number): Promise<User[]>;
+  findTotal() : Promise<number>;
 }

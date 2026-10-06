@@ -1,35 +1,47 @@
-import { useEffect, useState } from "react";
-import type { TeamDto } from "../../models/team/TeamDto";
+import { useState } from "react";
 import { teamApi } from "../../api_services/teams/TeamAPIService";
-import { Empty, ErrorBox, PageHeader, Pagination} from "../ui/UI";
+import { Empty, ErrorBox, PageHeader, Pagination, Spinner} from "../ui/UI";
 import { useNavigate } from "react-router-dom";
 import placeholder from "../../assets/placeholder.png";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
+
 export default function TeamsGuestForm(){
-    const [teams, setTeams] = useState<TeamDto[]>([]);
-    const [error, setError] = useState<string>("");
-    const [total, setTotal] = useState<number>(0);
     const [page, setPage] = useState(1);
     const limit = 6;
     const navigate = useNavigate()
-    useEffect(() => {
-        teamApi.getAll(page, limit)
+
+    const { data, isLoading, error} = useQuery({
+        queryKey:["teamsGuest", page],
+        queryFn: async () => {
+            return teamApi.getAll(page, limit)
             .then(res => {
-                if (res.success){
-                    setTeams(res.data?.items ?? []);
-                    setTotal(res.data?.total ?? 0);
-                } else {
-                    setError(res.message ?? "Request failed");
+                if (!res.success){
+                    throw new Error(res.message ?? "Request failed");
                 }
+                return res.data;
             })
-            .catch(() => setError("Failed to load teams"));
-    }, [page]);
+            .catch(() => {throw new Error("Failed to load teams")});
+        },
+        placeholderData: keepPreviousData
+    })
+
+    const teams = data?.items || [];
+    const total = data?.total || 0;
 
     return (
         <div>
             <PageHeader eyebrow="" title="Team Catalog"/>
-            {error && <ErrorBox message={error}/>}
-
-            {teams.length === 0 && !error ? <Empty message="No teams found"/> : (
+            {error ? (
+                <ErrorBox message={error.message}/>
+            ):
+            isLoading ? (
+                <div className="flex justify-center py-16">
+                    <Spinner />
+                </div>
+            ) :
+            teams.length === 0 ? (
+                <Empty message="No teams found"/> 
+            ) : (
             <section className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 {teams.map(t => (
                     <div onClick= {() => navigate(`/teams/details/${t.teamId}`)} key={t.teamId} className="rounded-2xl group relative aspect-4/3 border-2 border-white/5 bg-bgprimary/30 overflow-hidden">

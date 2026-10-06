@@ -21,7 +21,7 @@ export default function NotificationDropdown() {
     return () => {
       document.removeEventListener("mousedown", handleOutsideClick);
     };
-  }, []);
+  }, [dropdownRef]);
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -29,7 +29,7 @@ export default function NotificationDropdown() {
       <button
         onClick={() => setOpen(prev => !prev)}
         className="relative flex h-11 w-11 items-center justify-center rounded-full text-white/70 transition-all duration-200 hover:bg-white/6">
-        <div className="px-2 py-1 w-12 font-bold text-2xl rounded-4xl transition-all text-primary/60 hover:text-primary hover:bg-white/5 cursor-pointer">
+        <div className="px-2 py-1 w-12 font-bold text-2xl rounded-4xl transition-all text-bgsecondary/80 hover:text-bgsecondary hover:bg-white/5 cursor-pointer">
             {open?
                 <EnvelopeClosed/>:
                 <EnvelopeOpen/>

@@ -5,6 +5,7 @@ import { UserDto } from "../../Domain/DTOs/users/UserDto";
 import { Result } from "../../Domain/common/Result";
 import { ErrorType } from "../../Domain/common/ErrorType";
 import { UserRole } from "../../Domain/enums/UserRole";
+import { PaginatedListDto } from "../../Domain/DTOs/PaginatedListDto";
 
 
 export class UserService implements IUserService {
@@ -13,9 +14,11 @@ export class UserService implements IUserService {
     private readonly userWriteRepo: IUserWriteRepository
   ) {}
 
-  async getAll(): Promise<Result<UserDto[]>> {
-    const users = await this.userReadRepo.findAll();
-    return Result.Success(users.map((u) => new UserDto(u.id, u.gamerTag, u.fullName, u.email, u.role, u.profilePicture, u.isActive)));
+  async getAll(page?: number, limit?: number): Promise<Result<PaginatedListDto<UserDto>>> {
+    const users = await this.userReadRepo.findAllPaginated(page, limit);
+    const total = await this.userReadRepo.findTotal();
+    const paginatedUsers = new PaginatedListDto(users, total, page, limit)
+    return Result.Success(paginatedUsers);
   }
 
   async getById(id: number): Promise<Result<UserDto>> {

@@ -1,91 +1,76 @@
 import { useParams } from "react-router-dom";
 import { PageHeader, Spinner, ErrorBox } from "../ui/UI";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { tournamentApi } from "../../api_services/tournament_list/TournamentAPIService";
-import type { TournamentDto } from "../../models/tournament/TournamentDto";
 import { formatDeadline } from "../../helpers/date_formatter";
 import { tournamentRegistrationApi } from "../../api_services/tournament_registration/TournamentRegistrationAPIService";
 import { matchApi } from "../../api_services/matches/MatchAPIService";
 import Bracket from "../matches/Bracket";
-import type { MatchDto } from "../../models/match/MatchDto";
 import { TournamentFormat } from "../../types/tournament/TournamentFormat";
 import RoundRobin from "../matches/RoundRobin";
 import DoubleBracket from "../matches/DoubleBracket";
 import { useAuth } from "../../hooks/auth/useAuthHook";
+import { useQuery, keepPreviousData, useQueryClient} from "@tanstack/react-query";
 
 export default function TournamentOverview() {
     
     const {id} = useParams();
-    const [tournament, setTournament] = useState<TournamentDto>();
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string>("");
     const [bracketError, setBracketError] = useState<string>("");
     const [generatingBracket, setGeneratingBracket] = useState(false);
-    const [matches, setMatches] = useState<MatchDto[]>([]);
-    const [loadingMatches, setLoadingMatches] = useState(false);
     const {user} = useAuth();
-    useEffect(() => {
-        Promise.resolve().then(() => setLoading(true));
-        tournamentApi.getById(Number(id))
-        .then(res => {
-          if (res.success && res.data) {
-            setTournament(res.data);
-          }
-          else
-          {
-            setError(res.message ?? "Request failed");
-          }
-        })
-        .finally(() => setLoading(false));
-    }, [id]);
+    const queryClinet = useQueryClient();
 
-    useEffect(() => {
-        if (tournament && tournament.tournamentStatus !== 'upcoming') {
-            setLoadingMatches(true);
-            matchApi.getAllForTorunament(Number(id))
+    const { data: tournamentData, isLoading: loading, error} = useQuery({
+        queryKey: ["tournament"],
+        queryFn: async () => {
+            return tournamentApi.getById(Number(id))
             .then(res => {
-                if (res.success && res.data) {
-                    setMatches(res.data);
-                } else {
-                    setError("Error while loading matches "+res.message);
+                if (!res.success) {
+                    throw new Error(res.message ?? "Failed to get tournament info");
                 }
+                return res.data;
             })
-            .catch(() => setError('Failed to load matches'))
-            .finally(() => setLoadingMatches(false));
-        }
-    }, [tournament, id]);
+            .catch(() => { throw new Error("Failed to get torunament info")})
+        },
+        placeholderData: keepPreviousData
+    })
+
+    const {data: matchesData, isLoading: loadingMatches, error: matchesError} = useQuery({
+        queryKey: ["matches"],
+        queryFn: async () => {
+                return matchApi.getAllForTorunament(Number(id))
+                .then(res => {
+                    if (!res.success) {
+                        throw new Error(res.message || "Error while loading matches ");
+                    }
+                    return res.data;
+                })
+                .catch(() => { throw new Error('Failed to load matches')})
+        },
+        placeholderData: keepPreviousData
+    })
+
+    const tournament = tournamentData
+    const matches = matchesData || [];
 
     const handleGenerateBracket = async () => {
         setGeneratingBracket(true);
-        setBracketError("");
-        try {
-            
-            const response = await tournamentRegistrationApi.generateBracket(Number(id));
-            if(response.success)
-            {
-                //load page again
-                setTimeout(() => {
-                    tournamentApi.getById(Number(id))
-                    .then(res => {
-                        if (res.success && res.data) {
-                            setTournament(res.data);
-                        }
-                    })
-                    .catch(() => setBracketError("Failed to reload tournament"));
-                }, 1000);
-            }
-            else
-            {
+        setBracketError("");    
+        tournamentRegistrationApi.generateBracket(Number(id))
+        .then(res => {
+            if(!res.success) {
                 setBracketError("Generating bracket failed!");
                 setTimeout(() => setBracketError(""), 5000);
             }
-        } catch (err) {
-            setBracketError('Failed to generate bracket: ' + err);
+            queryClinet.invalidateQueries({queryKey: ["tournament"]});
+        })
+        .catch(() => {
+            setBracketError('Failed to generate bracket: ');
             setTimeout(() => setBracketError(""), 5000);
-        } finally {
-            setGeneratingBracket(false);
-        }
-    };
+        })
+        .finally (() => {setGeneratingBracket(false)})
+    }
+
 
     return (
         <div>
@@ -96,7 +81,7 @@ export default function TournamentOverview() {
                         <Spinner />
                     </div>
                 ) : error ? (
-                    <ErrorBox message={error} />
+                    <ErrorBox message={error.message} />
                 ) : tournament ? (
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                         {/* Main Info */}
@@ -175,16 +160,22 @@ export default function TournamentOverview() {
 
                 {tournament && tournament.tournamentStatus !== 'upcoming' && (
                     <div className="mt-8">
-                        {loadingMatches ? (
+                        {matchesError ? (
+                            <ErrorBox message={matchesError.message}/>
+                        ) :
+                        loadingMatches ? (
                             <div className="flex justify-center py-8">
                                 <Spinner />
                             </div>
-                        ) : matches.length > 0 ? (
-                            tournament.tournamentFormat === TournamentFormat.SINGLE_ELIMINATION ?
-                            <Bracket matches={matches} title={`${tournament.tournamentName} - ${tournament.tournamentFormat}`} />:
-                            tournament.tournamentFormat === TournamentFormat.ROUND_ROBIN?
-                            <RoundRobin matches={matches} />:
-                            <DoubleBracket matches={matches} />
+                        ) : matches && matches.length > 0 ? (
+                            tournament.tournamentFormat === TournamentFormat.SINGLE_ELIMINATION ? (
+                                <Bracket matches={matches} title={`${tournament.tournamentName} - ${tournament.tournamentFormat}`} />
+                            ) :
+                            tournament.tournamentFormat === TournamentFormat.ROUND_ROBIN ? (
+                                <RoundRobin matches={matches} />
+                            ) : (
+                                <DoubleBracket matches={matches} />
+                            )
                         ) : (
                             <div className="bg-primary border border-secondary/40 rounded-xl p-6 text-center">
                                 <p className="text-white/50">No matches available yet</p>

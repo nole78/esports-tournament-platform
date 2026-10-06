@@ -1,54 +1,70 @@
-import { useState, useEffect } from "react";
-import { Empty, ErrorBox, PageHeader, Pagination } from "../../components/ui/UI";
-import type { GameDto } from "../../models/game/GameDto";
+import { useState } from "react";
+import { Empty, ErrorBox, PageHeader, Pagination, Spinner } from "../../components/ui/UI";
 import { gameApi } from "../../api_services/game_catalog/GameAPIService";
 import { useAuth } from "../../hooks/auth/useAuthHook";
 import { useNavigate } from "react-router-dom";
 import placeholder from "../../assets/placeholder.png";
 import { Button } from "../../components/ui/Button";
+import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
 
 
 export default function GameCatalog(){
     const {user} = useAuth();
-    const [games, setGames] = useState<GameDto[]>([]);
-    const [error, setError] = useState<string>("");
+    const [actionError, setActionError] = useState<string>("");
     const [deleted, setDeleted] = useState<boolean>(false);
     const [page, setPage] = useState(1);
-    const [total, setTotal] = useState(0);
     const navigate = useNavigate();
     const limit = 9;
+    const queryClient = useQueryClient();
 
-    useEffect(() => {
-                gameApi.getAll(page,limit)
-        .then(res => {
-            if(res.success){
-                setGames(res.data?.items ?? []);
-                setTotal(res.data?.total ?? 0);
+    const {data, isLoading, error} = useQuery({
+        queryKey: ["games", page],
+        queryFn: async () => {
+            return gameApi.getAll(page, limit)
+            .then(res => {
+            if(!res.success) {
+                throw new Error(res.message ?? "Request failed");
             }
-            else
-                setError(res.message ?? "Request failed");
+            return res.data;
         })
-        .catch(() => setError("Failed to load games"))
-    }, [page]);
+        .catch(() => {throw new Error("Failed to load games!")})
+        },
+        placeholderData: keepPreviousData
+    })
+
+    const games = data?.items ?? [];
+    const total = data?.total ?? 0;
 
     return (
         <div>
             <PageHeader eyebrow="" title="Game Catalog"/>
+            {/* Ade game button render*/}
             {user?.role === "admin" && (
                 <Button variant="secondary" className="mb-6" onClick={() => navigate("/admin/game_catalog/add")}>
                     Add Game
                 </Button>
             )}
-            {error && <ErrorBox message={error}/>}
             {deleted && (
                 <div className="mb-5 bg-green-500/10 border border-green-500/20 text-green-300 text-sm px-4 py-3 rounded-xl">
                     Succesfully deleted game
                 </div>
             )}
-            {games.length === 0 && !error ? <Empty message="No games found"/> : (
+            {actionError &&
+                <ErrorBox message={actionError}/>
+            }
+            {error? ( 
+                <ErrorBox message={error.message}/>
+            ):
+            isLoading ? (
+                <div className="flex justify-center py-16">
+                    <Spinner />
+                </div>
+            ) : games.length === 0 ? (
+                <Empty message="No games found"/>
+            ) : (
                 <section className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                     {games.map(g => (
-                    <article className="group surface relative aspect-[4/3] overflow-hidden transition-shadow duration-200 hover:shadow-lg hover:shadow-secondary/20" key={g.gameId}>
+                    <article className="group surface relative aspect-4/3 overflow-hidden transition-shadow duration-200 hover:shadow-lg hover:shadow-secondary/20" key={g.gameId}>
                         <div className="w-full h-full">
                             <img src={g.gameLogotip ? g.gameLogotip : placeholder} alt={`${g.gameName} logo`} width="640" height="480" loading="lazy" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"/>
                         </div>
@@ -63,16 +79,17 @@ export default function GameCatalog(){
                                 <button aria-label={`Delete ${g.gameName}`} className="min-h-10 rounded-lg border border-danger/70 bg-primary/90 px-3 text-xs font-semibold text-danger transition-colors hover:bg-danger/20"
                                         onClick={() => {
                                             setDeleted(false);
+                                            setActionError("");
                                             gameApi.delete(g.gameId)
                                                 .then(res =>{
                                                     if(res.success) {
                                                         setDeleted(true); 
-                                                        setGames(prev => prev.filter(game => game.gameId !== g.gameId));
+                                                        queryClient.invalidateQueries({queryKey: ["games"]});
                                                         setTimeout(() => {setDeleted(false)}, 3000);
                                                         return;}
-                                                    else setError(res.message ?? "Request failed");
+                                                    else setActionError(res.message ?? "Request failed");
                                                 })
-                                                .catch(() => setError("Failed to delete the game"))
+                                                .catch(() => setActionError("Failed to delete the game"))
                                             }}>
                                     Delete
                                 </button>

@@ -1,9 +1,10 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { ProtectedRoute } from "./components/protected_route/ProtectedRoute";
-import { injectSpeedInsights } from '@vercel/speed-insights';
 import { Analytics } from '@vercel/analytics/react';
+import { QueryClient, QueryClientProvider} from "@tanstack/react-query";
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
-injectSpeedInsights();
+const queryClient = new QueryClient();
 
 import LoginPage    from "./pages/auth/LoginPage";
 import RegisterPage from "./pages/auth/RegisterPage";
@@ -31,7 +32,7 @@ import TeamsGuestPage from "./pages/common_pages/TeamsGuestPage";
 
 export default function App() {
   return (
-    <>
+    <QueryClientProvider client={queryClient}>
       <Routes>
         <Route path="/login"    element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
@@ -67,7 +68,8 @@ export default function App() {
         <Route path="*"    element={<Navigate to="/404" replace />} />
       </Route>
       </Routes>
-      <Analytics />
-    </>
+      <ReactQueryDevtools initialIsOpen={false}/>
+      <Analytics/>
+    </QueryClientProvider>
   );
 }

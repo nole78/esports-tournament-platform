@@ -82,6 +82,25 @@ export class UserReadRepository implements IUserReadRepository {
         res.conn.release();; }
   }
   
+  async findAllPaginated(page = 1, limit = 20): Promise<User[]> {
+    const res = await this.db.getReadConnection();
+    if (!res) return [];
+    const offset = (page - 1) * limit;
+    try {
+      const [rows] = await res.conn.query<RowDataPacket[]>(
+        `SELECT * FROM users ORDER BY id ASC
+        LIMIT ? OFFSET ?`, [limit, offset]
+      );
+      return rows.map((r) => this.map(r));
+    } catch (err) {
+      this.logger.error("UserRepository", "findAll failed", err);
+      return [];
+    } finally { 
+      if(!res.isTransaction)
+        res.conn.release();
+    }
+  }
+
   async exists(id: number): Promise<boolean> {
     const res = await this.db.getReadConnection();
     if (!res) return false;
@@ -93,7 +112,26 @@ export class UserReadRepository implements IUserReadRepository {
     } catch (err) {
       this.logger.error("UserRepository", "exists failed", err);
       return false;
-    } finally { if(!res.isTransaction)
-        res.conn.release();; }
+    } finally { 
+      if(!res.isTransaction)
+        res.conn.release(); 
+    }
+  }
+
+  async findTotal() : Promise<number> {
+    const res = await this.db.getReadConnection();
+    if (!res) return 0;
+    try {
+      const [rows] = await res.conn.execute<RowDataPacket[]>(
+        `SELECT COUNT(*) as cnt FROM users`
+      );
+      return rows[0]?.cnt ?? 0;
+    } catch (err) {
+      this.logger.error("UserRepository", "exists failed", err);
+      return 0;
+    } finally { 
+      if(!res.isTransaction)
+        res.conn.release(); 
+    }
   }
 }

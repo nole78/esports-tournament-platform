@@ -9,5 +9,6 @@ export type TournamentDto = {
     tournamentMaxTeams : number,
     tournamentApplicationDeadline : string | Date,
     tournamentPrizeFund : number,
-    tournamentStatus : TournamentStatus
+    tournamentStatus : TournamentStatus,
+    isWatchlisted: boolean
 }

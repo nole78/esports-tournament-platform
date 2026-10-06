@@ -1,46 +1,39 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Empty, ErrorBox, PageHeader, Pagination, Spinner } from "../ui/UI";
 import { useParams } from "react-router-dom";
 import { tournamentRegistrationApi } from "../../api_services/tournament_registration/TournamentRegistrationAPIService";
-import type { TournamentRegistrationDto } from "../../models/tournamentRegistration/TournamentRegistrationDto";
 import { TournamentRegistrationStatus } from "../../types/tournament_registration/TournamentRegistrationStatus";
+import { useQuery, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 
 export default function PendingTeams(){
-  const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
   const limit = 20;
   const {id} = useParams();
-  const [error, setError] = useState<string>("");
+  const [actionError, setActionError] = useState<string>("");
   const [success, setSuccess] = useState<string>("");
-  const [pendingTeams, setPendingTeams] = useState<TournamentRegistrationDto[]>([]); 
+  const queryClient = useQueryClient();
 
-  const loadPage = (pages: number) => {
-      
-    Promise.resolve().then(() => setLoading(true));
-    tournamentRegistrationApi.getByTournamentId(Number(id), TournamentRegistrationStatus.PENDING, pages, limit)
-    .then(res => {
-      if (res.success && res.data) {
-        setPendingTeams(res.data?.items);
-        setTotal(res.data.total);
-      }
-      else
-      {
-        setError(res.message ?? "Request failed");
-        setPendingTeams([]);
-      }
-    })
-    .finally(() => setLoading(false));
-  };
+  const {data, isLoading: loading, error} = useQuery({
+    queryKey: ["pending_teams", page],
+    queryFn: async () => {
+      return tournamentRegistrationApi.getByTournamentId(Number(id), TournamentRegistrationStatus.PENDING, page, limit)
+      .then(res => {
+        if (!res.success) {
+          throw new Error(res.message ?? "Failed to load teams");
+        }
+        return res.data;
+      })
+      .catch(() => { throw new Error("Failed to load teams")})
+    },
+    placeholderData: keepPreviousData
+  })
 
-  useEffect(() => {
-      loadPage(page);
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [page]);
+  const pendingTeams = data?.items || [];
+  const total = data?.total || 0;
 
     const Add = async (tournamentId: number, teamId: number) => {
-      setError("");
+      setActionError("");
       setSuccess("");
       setIsProcessing(true);
       try {
@@ -48,19 +41,19 @@ export default function PendingTeams(){
         if (res.success) {
           setSuccess("Team successfully confirmed!");
           setTimeout(() => setSuccess(""), 3000);
-          loadPage(page);
+          queryClient.invalidateQueries({queryKey:["pending_teams"]})
         } else {
-          setError(res.message ?? "Failed to confirm team");
+          setActionError(res.message ?? "Failed to confirm team");
         }
       } catch (err) {
-        setError("Failed to confirm team: " + err);
+        setActionError("Failed to confirm team: " + err);
       } finally {
         setIsProcessing(false);
       }
     }
 
     const Disqualify = async (tournamentId: number, teamId: number) => {
-      setError("");
+      setActionError("");
       setSuccess("");
       setIsProcessing(true);
       try {
@@ -68,12 +61,12 @@ export default function PendingTeams(){
         if (res.success) {
           setSuccess("Team successfully disqualified!");
           setTimeout(() => setSuccess(""), 3000);
-          loadPage(page);
+          queryClient.invalidateQueries({queryKey:["pending_teams"]})
         } else {
-          setError(res.message ?? "Failed to disqualify team");
+          setActionError(res.message ?? "Failed to disqualify team");
         }
       } catch (err) {
-        setError("Failed to disqualify team: " + err);
+        setActionError("Failed to disqualify team: " + err);
       } finally {
         setIsProcessing(false);
       }
@@ -83,7 +76,10 @@ export default function PendingTeams(){
     <div>
       <PageHeader eyebrow="" title="Pending Teams" />
       <div className="space-y-4">
-        {loading ? (
+        {error ? (
+          <ErrorBox message={error.message}/>
+        ):
+        loading ? (
           <div className="flex justify-center py-16">
             <Spinner />
           </div>
@@ -91,7 +87,7 @@ export default function PendingTeams(){
           <Empty message="No pending teams" />
         ) : (
           <>
-            {error && <ErrorBox message={error} />}
+            {actionError && <ErrorBox message={actionError} />}
             {success && (
               <div className="bg-green-600/20 border border-green-500/50 rounded-lg p-4">
                 <p className="text-green-400 font-medium">{success}</p>

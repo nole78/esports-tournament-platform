@@ -10,5 +10,6 @@ export class TournamentDto{
         public tournamentApplicationDeadline : Date = new Date(),
         public tournamentPrizeFund : number = 0,
         public tournamentStatus : TournamentStatus = TournamentStatus.UPCOMING,
+        public isWatchlisted : boolean = false
     ){}
 }

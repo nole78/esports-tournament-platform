@@ -13,7 +13,6 @@ import { ITournamentReadService } from "../../Domain/services/tournaments/ITourn
 import { handleResult } from "../mappers/ResultMapper";
 import { CreateUserWatchlistDto } from "../../Domain/DTOs/user_watchlists/CreateUserWatchlistDto";
 import { ITournamentWriteService } from "../../Domain/services/tournaments/ITournamentWriteService";
-import { TournamentRegistrationWriteService } from '../../Services/tournamentRegistration/TournamentRegistrationWriteService';
 import { IAuditService } from "../../Domain/services/audit/IAuditService";
 export class TournamentController{
     private readonly router = Router();
@@ -38,12 +37,10 @@ export class TournamentController{
         tournamentFormat: req.query.tournamentFormat as TournamentFormat,
         tournamentStatus: req.query.tournamentStatus as TournamentStatus
         };
+
+        console.log(filters);
     
-        const hasFilters = Object.values(filters).some(v => v);
-    
-        const result = hasFilters 
-            ? await this.tournamentReadService.getFiltered(filters, page, limit)
-            : await this.tournamentReadService.getAll(page, limit);
+        const result = await this.tournamentReadService.getAll(filters, page, limit, req.user?.id);
         handleResult(result, res);
         }
 
