@@ -47,3 +47,7 @@ This repository is an Esports Management System composed of three main services:
 
 - **Every route handler must return a unified JSON response envelope:**  
     `{ success: boolean, data?: T, error?: string }`
+
+## 5. Code Navigation
+
+- Whenever you need to find a symbol, definition, reference, implementation, or usage in the codebase, always use the LSP server first.

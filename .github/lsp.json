@@ -8,6 +8,9 @@
                 ".tsx": "typescriptreact",
                 ".js": "javascript",
                 ".jsx": "javascriptreact"
+            },
+            "initializationOptions": {
+                "tsserver": { "path": "./client/node_modules/typescript/lib/tsserver.js" }
             }
         }
     }
