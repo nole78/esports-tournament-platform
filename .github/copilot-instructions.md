@@ -50,4 +50,34 @@ This repository is an Esports Management System composed of three main services:
 
 ## 5. Code Navigation
 
-- Whenever you need to find a symbol, definition, reference, implementation, or usage in the codebase, always use the LSP server first.
+Whenever you need to find a symbol, definition, reference, implementation, or usage:
+
+1. Inspect the target file first and identify the exact 1-based line and character
+   position of the symbol.
+2. Use LSP as the first search mechanism:
+   - `goToDefinition` for definitions
+   - `findReferences` for usages
+   - `goToImplementation` for implementations
+   - `workspaceSymbol` for workspace-wide symbol lookup
+3. LSP positions are 1-based:
+   - `line` must be greater than 0
+   - `character` must be at least 1
+4. If an LSP request fails because of invalid coordinates, correct the coordinates
+   and retry once before using another search tool.
+5. Use `rg` or other text search only as a fallback when:
+   - LSP cannot resolve the symbol,
+   - the language server is unavailable, or
+   - exact textual occurrences are required.
+6. When reporting references, distinguish the target symbol from same-named
+   methods belonging to other types or repositories.
+7. Verify the final result against the symbol's declared type, interface, or
+   injected dependency.
+
+## 6. File Path Verification
+
+Before opening a file by a guessed path:
+
+1. Verify the path using repository search or directory listing.
+2. Do not infer nested folder names from filenames alone.
+3. If a path lookup fails, search for the filename before trying a corrected path.
+4. Preserve the repository's actual casing and directory structure.
