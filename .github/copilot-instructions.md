@@ -50,34 +50,47 @@ This repository is an Esports Management System composed of three main services:
 
 ## 5. Code Navigation
 
-Whenever you need to find a symbol, definition, reference, implementation, or usage:
+Use LSP first for symbol lookups (definitions, references, implementations,
+callers). Use text search (`rg`) only as a fallback.
 
-1. Inspect the target file first and identify the exact 1-based line and character
-   position of the symbol.
-2. Use LSP as the first search mechanism:
-   - `goToDefinition` for definitions
-   - `findReferences` for usages
-   - `goToImplementation` for implementations
-   - `workspaceSymbol` for workspace-wide symbol lookup
-3. LSP positions are 1-based:
-   - `line` must be greater than 0
-   - `character` must be at least 1
-4. If an LSP request fails because of invalid coordinates, correct the coordinates
-   and retry once before using another search tool.
-5. Use `rg` or other text search only as a fallback when:
-   - LSP cannot resolve the symbol,
-   - the language server is unavailable, or
-   - exact textual occurrences are required.
-6. When reporting references, distinguish the target symbol from same-named
-   methods belonging to other types or repositories.
-7. Verify the final result against the symbol's declared type, interface, or
-   injected dependency.
+### Operations
+- `workspaceSymbol`: find where a symbol is declared when the file is unknown
+- `documentSymbol`: list a file's symbols instead of reading the whole file
+- `goToDefinition` / `goToImplementation` / `findReferences`
+- `incomingCalls` / `outgoingCalls`: callers / callees of a function
+- `hover`: type info without opening the file
 
-## 6. File Path Verification
+### Positions
+- 1-based: `line` > 0, `character` >= 1. Point at the FIRST character of the
+  symbol name.
+- Find the position with `documentSymbol` or `rg -n "<name>" <file>`. Do not
+  read a whole file just to find a position.
+- On an invalid-coordinates error, correct them and retry once.
 
-Before opening a file by a guessed path:
+### Cold start: the first LSP answer may be incomplete
+The language server loads the TypeScript project lazily. The first query after
+it starts can return only the declaration, or nothing. The same query a few
+seconds later returns the full result.
+- If a result is empty, contains only the declaration itself, or is smaller than
+  expected, run `sleep 3` and repeat THE SAME query once before doing anything else.
+- Trust the second result. Only if it is still empty or implausible, fall back to
+  `rg` (filter by receiver type) and say in the answer that you did.
 
-1. Verify the path using repository search or directory listing.
-2. Do not infer nested folder names from filenames alone.
-3. If a path lookup fails, search for the filename before trying a corrected path.
-4. Preserve the repository's actual casing and directory structure.
+### Interfaces vs implementations
+Services depend on interfaces (e.g. `IGameReadRepository`); the concrete class
+(e.g. `GameReadRepository`) is injected at runtime. LSP is static, so:
+- Callers of a repository method: run `findReferences` on the INTERFACE method.
+  The result also contains the declaration and the implementing class's method;
+  list those separately from call sites.
+- `goToDefinition` on a call inside a service returns the interface method
+  (expected). Use `goToImplementation` to reach the concrete class.
+- If the task names a specific type, query that type's method. If it is
+  ambiguous, check both and label which one each result belongs to.
+
+### Text search (`rg`) is allowed when
+- LSP is unavailable, or still fails after the retry described above,
+- exact text is needed (strings, comments, config, non-code files).
+
+### Reporting
+- Report call sites as `file:line` and exclude same-named methods of other types.
+- Verify each usage against the receiver's declared type or injected dependency.
