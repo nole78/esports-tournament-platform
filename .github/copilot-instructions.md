@@ -29,6 +29,8 @@ This repository is an Esports Management System composed of three main services:
 
 - Always explicitly type function return values for public API endpoints and exported service methods.
 
+- **Database Rules:** Services interacting with MySQL must handle potential connection dropouts gracefully using the Result pattern or throw explicit Domain Errors.
+
 ## 3. Frontend Standards (`client/`)
 
 - **Styling:** Use Tailwind CSS exclusively for layout, typography, and UI elements. Inline styles (`style={{...}}`) are strictly forbidden.
