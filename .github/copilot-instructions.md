@@ -47,3 +47,21 @@ This repository is an Esports Management System composed of three main services:
 
 - **Every route handler must return a unified JSON response envelope:**  
     `{ success: boolean, data?: T, error?: string }`
+
+## 5. Code Navigation
+
+Pick the cheapest tool that is reliable for the question:
+- Unique identifier (e.g. `findByIds`, a distinctive class name): use `rg -n "<name>"`.
+- Ambiguous or common name (`findById`, `get`, `create`...), questions about
+  types, interface -> implementation, call hierarchy, and renames: use LSP.
+
+LSP notes:
+- Positions are 1-based; point at the first character of the symbol name.
+  Find it with `rg -n "<name>" <file>`. Never read whole files for this.
+- The first LSP answer after startup may be incomplete (only the declaration,
+  or empty). If so, repeat the same query once before falling back to `rg`.
+- Callers of a repository method: `findReferences` on the INTERFACE method. It
+  also returns the declaration and the implementing class's method; list those
+  separately from call sites. `goToDefinition` on a call returns the interface
+  method; use `goToImplementation` for the concrete class.
+- Report call sites as `file:line`, excluding same-named methods of other types.
