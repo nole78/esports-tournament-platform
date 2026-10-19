@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest"
 import app from "../../../app"
 import supertest from "supertest"
-import { makeGame } from "../../fatories";
+import { makeGame } from "../../factories";
 
 const api = supertest(app);
 
