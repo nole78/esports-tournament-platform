@@ -25,7 +25,7 @@ export class AuthService implements IAuthService {
     const match = await bcrypt.compare(password, user.passwordHash).catch(() => false);
     if (!match) 
     {
-      return Result.Failure("Wrong ussername or password", ErrorType.Unauthorized);
+      return Result.Failure("Wrong username or password", ErrorType.Unauthorized);
     }
 
     await this.userWriteRepo.logIn(user.id);
