@@ -8,6 +8,7 @@ import { ValidationResult } from '../../Domain/types/validation/ValidationResult
 import { validateGameCreation } from "../validators/games/validateGameCreation";
 import { handleResult } from "../mappers/ResultMapper";
 import { IAuditService } from "../../Domain/services/audit/IAuditService";
+import { validateGameUpdate } from "../validators/games/validateGameUpdate";
 
 export class GameController{
     private readonly router = Router();
@@ -59,10 +60,23 @@ export class GameController{
 
     private async update(req: Request, res: Response): Promise<void> {
         const id = parseInt(req.params.id as string, 10);
-        if (isNaN(id)) { res.status(400).json({ success: false, message: "Invalid id" }); return; }
+        if (isNaN(id)) { 
+            res.status(400).json({ success: false, message: "Invalid id" }); 
+            return; 
+        }
+
+        if (!req.body || Object.keys(req.body).length === 0) {
+            res.status(400).json({ success: false, message: "Payload cannot be empty. Please provide at least one field to update." });
+            return;
+        }
+
         const {gameName, gameGenre, gameLogotip, gamePlayers} = req.body as {gameName?:string, gameGenre?:string, gameLogotip?:string, gamePlayers?:number};
-        const v:ValidationResult = validateGameCreation(gameName ?? "",gameGenre ?? "",gamePlayers ?? 0);
-        if(!v.valid) {res.status(400).json({ success: false, message: v.message }); return;}
+        const v:ValidationResult = validateGameUpdate(gameName, gameGenre, gamePlayers);
+        if(!v.valid) {
+            res.status(400).json({ success: false, message: v.message }); 
+            return;
+        }
+
         const result = await this.gameService.update(id, {gameName, gameGenre, gameLogotip, gamePlayers});
         if(result.isSuccess)
             await this.auditService.log({
