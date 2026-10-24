@@ -5,7 +5,7 @@ import { makeGame } from "../../factories";
 
 const api = supertest(app);
 
-describe("GET /api/v1/games - Integration Test", () => {
+describe("GET /api/v1/games", () => {
     it("returns an empty page when there are no games", async () => {
         const res = await api.get("/api/v1/games");
 
