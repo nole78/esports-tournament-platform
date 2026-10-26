@@ -29,9 +29,9 @@ export class UserService implements IUserService {
 
   async changeRole(id: number,role:UserRole): Promise<Result<void>> {
     var user = await this.userReadRepo.findById(id);
-    if(user.id === 0) return Result.Failure(`User with id ${id} doesn't exist`,ErrorType.NotFound);
+    if(user.id === 0) return Result.Failure(`User with id ${id} doesn't exist`, ErrorType.NotFound);
     
-    if(user.role == UserRole.ADMIN) return Result.Failure("Can't change role of an admin",ErrorType.Unauthorized);
+    if(user.role == UserRole.ADMIN) return Result.Failure("Can't change role of an admin", ErrorType.Forbidden);
 
     var res = await this.userWriteRepo.update(id,{role: role});
     return res? Result.Success():Result.Failure("Couldn't change user role",ErrorType.Internal);
