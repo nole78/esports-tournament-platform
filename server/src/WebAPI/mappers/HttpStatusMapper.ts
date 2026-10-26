@@ -16,6 +16,9 @@ export function mapErrorTypeToStatus(errorType: ErrorType | void): number {
         case ErrorType.Unauthorized:
             return 401;
 
+        case ErrorType.Forbidden:
+            return 403;
+            
         default:
             return 500;
     }

@@ -3,5 +3,6 @@ export enum ErrorType{
     NotFound,
     Internal,
     Unauthorized,
-    Conflict
+    Conflict,
+    Forbidden
 }
