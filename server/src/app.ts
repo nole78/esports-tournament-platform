@@ -115,7 +115,7 @@ app.use(express.json({ limit: "10mb"}));
 app.use("/api/v1", new AuthController(authService, userService, auditService).getRouter());
 app.use("/api/v1", new UserController(userService, auditService).getRouter());
 app.use("/api/v1", new GameController(gameService, auditService).getRouter());
-app.use("/api/v1", new TournamentController(tournamentReadService, tournamentWriteService, watchlistService, auditService).getRouter());
+app.use("/api/v1", new TournamentController(tournamentReadService, tournamentWriteService, auditService).getRouter());
 app.use("/api/v1", new AuditController(auditService).getRouter());
 app.use("/api/v1", new HealthController(healthService).getRouter());
 app.use("/api/v1", new TeamController(teamService, teamMemberService, auditService).getRouter());

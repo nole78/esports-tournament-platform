@@ -17,7 +17,11 @@ import { IAuditService } from "../../Domain/services/audit/IAuditService";
 export class TournamentController{
     private readonly router = Router();
 
-    public constructor(private readonly tournamentReadService: ITournamentReadService, private readonly tournamentWriteService: ITournamentWriteService, private readonly watchlistService: IUserWatchlistService, private readonly auditService: IAuditService){
+    public constructor(
+        private readonly tournamentReadService: ITournamentReadService, 
+        private readonly tournamentWriteService: ITournamentWriteService, 
+        private readonly auditService: IAuditService)
+    {
         this.router.get("/tournaments", this.getAll.bind(this));
         this.router.get("/tournaments/:id", this.getById.bind(this));
         this.router.post("/tournaments", authenticate, authorize(UserRole.ADMIN), this.create.bind(this));
