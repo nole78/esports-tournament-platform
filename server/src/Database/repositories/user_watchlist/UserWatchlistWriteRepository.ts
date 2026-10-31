@@ -19,7 +19,7 @@ export class UserWatchlistWriteRepository implements IUserWatchlistWriteReposito
         `INSERT INTO user_watchlist (user_id, tournament_id, added_at) VALUES (?, ?, CURRENT_TIMESTAMP)`,
         [dto.userId,dto.tournamentId]
       );
-      if (result.insertId === 0) return new UserWatchlist();
+      if (result.affectedRows === 0) return new UserWatchlist();
       return new UserWatchlist(dto.userId,dto.tournamentId, new Date());
     } catch (err) {
       this.logger.error("UserWatchlistRepository", "create failed", err);
